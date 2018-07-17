@@ -579,7 +579,7 @@ function wagon:on_rightclick(clicker)
 					poss[#poss+1]={name=attrans("Show Inventory"), key="inv"}
 				end
 				if self.seat_groups[sgr].driving_ctrl_access and advtrains.check_driving_couple_protection(pname, self.owner, self.whitelist) then
-					poss[#poss+1]={name=attrans("Bord Computer"), key="bordcom"}
+					poss[#poss+1]={name=attrans("Onboard Computer"), key="bordcom"}
 				end
 				if self.owner==pname then
 					poss[#poss+1]={name=attrans("Wagon properties"), key="prop"}
