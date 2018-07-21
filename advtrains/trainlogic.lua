@@ -81,27 +81,30 @@ advtrains.mainloop_trainlogic=function(dtime)
 	endstep()
 end
 
-minetest.register_on_joinplayer(function(player)
+function advtrains.tp_player_to_train(player)
+	local pname = player:get_player_name()
+	local id=advtrains.player_to_train_mapping[pname]
+	if id then
+		local train=advtrains.trains[id]
+		if not train then advtrains.player_to_train_mapping[pname]=nil return end
+		--set the player to the train position.
+		--minetest will emerge the area and load the objects, which then will call reattach_all().
+		--because player is in mapping, it will not be subject to dying.
+		player:setpos(train.last_pos_prev)
+	end
+end
+minetest.register_on_joinplayer(function()
 	return advtrains.pcall(function()
-		local pname=player:get_player_name()
-		local id=advtrains.player_to_train_mapping[pname]
-		if id then
-			local train=advtrains.trains[id]
-			if not train then advtrains.player_to_train_mapping[pname]=nil return end
-			--set the player to the train position.
-			--minetest will emerge the area and load the objects, which then will call reattach_all().
-			--because player is in mapping, it will not be subject to dying.
-			player:setpos(train.last_pos_prev)
-			--independent of this, cause all wagons of the train which are loaded to reattach their players
-			--needed because already loaded wagons won't call reattach_all()
-			for _,wagon in pairs(minetest.luaentities) do
-				if wagon.is_wagon and wagon.initialized and wagon.train_id==id then
-					wagon:reattach_all()
-				end
+		--independent of this, cause all wagons of the train which are loaded to reattach their players
+		--needed because already loaded wagons won't call reattach_all()
+		for _,wagon in pairs(minetest.luaentities) do
+			if wagon.is_wagon and wagon.initialized and wagon.train_id==id then
+				wagon:reattach_all()
 			end
 		end
 	end)
 end)
+
 
 minetest.register_on_dieplayer(function(player)
 	return advtrains.pcall(function()
@@ -427,6 +430,12 @@ function advtrains.train_step_a(id, train, dtime)
 	train.check_trainpartload=(train.check_trainpartload or 0)-dtime
 	local node_range=(math.max((minetest.settings:get("active_block_range") or 0),1)*16)
 	if train.check_trainpartload<=0 then
+		-- teleport players to their train
+		for _, player in pairs(minetest.get_connected_players()) do
+			advtrains.tp_player_to_train(player)
+		end
+	
+		
 		local ori_pos=train_pos --see 3a.
 		--atprint("[train "..id.."] at "..minetest.pos_to_string(vector.round(ori_pos)))
 		
