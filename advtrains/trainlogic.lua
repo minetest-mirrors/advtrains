@@ -46,6 +46,8 @@ local t_accel_eng={
 	[4] = 1.5,
 }
 
+local tptimer = 0
+
 advtrains.mainloop_trainlogic=function(dtime)
 	--build a table of all players indexed by pts. used by damage and door system.
 	advtrains.playersbypts={}
@@ -54,6 +56,14 @@ advtrains.mainloop_trainlogic=function(dtime)
 			--players in train are not subject to damage
 			local ptspos=minetest.pos_to_string(vector.round(player:getpos()))
 			advtrains.playersbypts[ptspos]=player
+		end
+		
+		if tptimer<=0 then
+			-- teleport players to their train
+			advtrains.tp_player_to_train(player)
+			tptimer = 2
+		else
+			tptimer = tptimer - dtime
 		end
 	end
 	--regular train step
@@ -430,12 +440,6 @@ function advtrains.train_step_a(id, train, dtime)
 	train.check_trainpartload=(train.check_trainpartload or 0)-dtime
 	local node_range=(math.max((minetest.settings:get("active_block_range") or 0),1)*16)
 	if train.check_trainpartload<=0 then
-		-- teleport players to their train
-		for _, player in pairs(minetest.get_connected_players()) do
-			advtrains.tp_player_to_train(player)
-		end
-	
-		
 		local ori_pos=train_pos --see 3a.
 		--atprint("[train "..id.."] at "..minetest.pos_to_string(vector.round(ori_pos)))
 		
