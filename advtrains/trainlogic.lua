@@ -540,6 +540,9 @@ function advtrains.train_step_b(id, train, dtime)
 		
 		local collpos
 		local coll_grace=1
+		if train.end_index == nil then
+			return
+		end
 		if train.movedir==1 then
 			collpos=advtrains.get_real_index_position(train.path, train.index-coll_grace)
 		else

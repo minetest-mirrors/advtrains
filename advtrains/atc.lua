@@ -32,6 +32,9 @@ function atc.send_command(pos, par_tid)
 				atc.train_reset_command(train_id)
 				local arrowconn=atc.controllers[pts].arrowconn
 				local train=advtrains.trains[train_id]
+				if train.path == nil then
+					return
+				end
 				for index, ppos in pairs(train.path) do
 					if vector.equals(advtrains.round_vector_floor_y(ppos), pos) then
 						advtrains.trains[train_id].atc_arrow =

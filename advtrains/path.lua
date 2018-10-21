@@ -18,7 +18,7 @@ function advtrains.conway(midreal, prev, drives_on)--in order prev,mid,return
 	local nconnid = advtrains.get_matching_conn(pconnid, #midconns)
 	
 	local next, next_connid, _, nextrailheight = advtrains.get_adjacent_rail(mid, midconns, nconnid, drives_on)
-	if not next then
+	if not next or not midconns or not midconns[nconnid] then
 		return nil
 	end
 	return vector.add(advtrains.round_vector_floor_y(next), {x=0, y=nextrailheight, z=0}), midconns[nconnid].c
