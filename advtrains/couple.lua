@@ -20,6 +20,7 @@ minetest.register_entity("advtrains:discouple", {
 	initial_sprite_basepos = {x=0, y=0},
 	
 	is_discouple=true,
+	static_save = false,
 	on_activate=function(self, staticdata) 
 		if staticdata=="DISCOUPLE" then
 			--couple entities have no right to exist further...
@@ -79,6 +80,7 @@ minetest.register_entity("advtrains:couple", {
 	initial_sprite_basepos = {x=0, y=0},
 	
 	is_couple=true,
+	static_save = false,
 	on_activate=function(self, staticdata)
 		return advtrains.pcall(function()
 			if staticdata=="COUPLE" then
@@ -178,6 +180,7 @@ minetest.register_entity("advtrains:lockmarker", {
 	initial_sprite_basepos = {x=0, y=0},
 	
 	is_lockmarker=true,
+	static_save = false,
 	on_activate=function(self, staticdata)
 		return advtrains.pcall(function()
 			if staticdata=="COUPLE" then
