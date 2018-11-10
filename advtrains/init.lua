@@ -170,6 +170,8 @@ dofile(advtrains.modpath.."/log.lua")
 advtrains.fpath=minetest.get_worldpath().."/advtrains"
 dofile(advtrains.modpath.."/log.lua")
 
+local saving_disabled
+
 function advtrains.avt_load()
 	local file, err = io.open(advtrains.fpath, "r")
 	if not file then
@@ -179,6 +181,15 @@ function advtrains.avt_load()
 		if type(tbl) == "table" then
 			if tbl.version then
 				--congrats, we have the new save format.
+				if tbl.version > 1 then
+					-- we are going to downgrade! that's not good!
+					atwarn("The save file of this world has been saved from a newer version of advtrains.")
+					atwarn("Opening it in this version could cause significant data loss once it's saved again.")
+					atwarn("Advtrains data is therefore not saved in this session.")
+					atwarn("To downgrade permanently, locate the 'version' entry in the save file and set it to 1")
+					saving_disabled = true
+				end
+				
 				advtrains.trains = tbl.trains
 				advtrains.wagon_save = tbl.wagon_save
 				advtrains.player_to_train_mapping = tbl.ptmap or {}
@@ -374,6 +385,9 @@ function advtrains.save(remove_players_from_wagons)
 	if not init_load then
 		--wait... we haven't loaded yet?!
 		atwarn("Instructed to save() but load() was never called!")
+		return
+	end
+	if saving_disabled then
 		return
 	end
 	advtrains.avt_save(remove_players_from_wagons) --saving advtrains. includes ndb at advtrains.ndb.save_data()
