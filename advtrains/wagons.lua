@@ -1,5 +1,6 @@
 --atan2 counts angles clockwise, minetest does counterclockwise
 
+
 minetest.register_privilege("train_place", {
 	description = "Player can place trains on tracks not owned by player",
 	give_to_singleplayer= false,
@@ -13,6 +14,11 @@ minetest.register_privilege("train_operator", {
 	give_to_singleplayer= true,
 	default= true,
 });
+
+local function make_inv_name(uid)
+	return "detached:advtrains_wgn_"..uid
+end
+
 
 local wagon={
 	collisionbox = {-0.5,-0.5,-0.5, 0.5,0.5,0.5},
@@ -632,8 +638,8 @@ function wagon:on_rightclick(clicker)
 			if advtrains.player_to_train_mapping[pname] then return end
 			if self.seat_groups then
 				if #self.seats==0 then
-					if self.has_inventory and self.get_inventory_formspec then
-						minetest.show_formspec(pname, "advtrains_inv_"..self.unique_id, self:get_inventory_formspec(pname))
+					if self.has_inventory and self.get_inventory_formspec and advtrains.check_driving_couple_protection(pname, data.owner, data.whitelist) then
+						minetest.show_formspec(pname, "advtrains_inv_"..self.unique_id, self:get_inventory_formspec(pname, make_inv_name(self.unique_id)))
 					end
 					return
 				end
@@ -757,8 +763,9 @@ end
 function wagon:show_get_on_form(pname)
 	if not self.initialized then return end
 	if #self.seats==0 then
-		if self.has_inventory and self.get_inventory_formspec then
-			minetest.show_formspec(pname, "advtrains_inv_"..self.unique_id, self:get_inventory_formspec(pname))
+
+		if self.has_inventory and self.get_inventory_formspec and advtrains.check_driving_couple_protection(pname, data.owner, data.whitelist) then
+			minetest.show_formspec(pname, "advtrains_inv_"..self.unique_id, self:get_inventory_formspec(pname, make_inv_name(self.unique_id)))
 		end
 		return
 	end
@@ -998,7 +1005,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				if wagon.is_wagon and wagon.initialized and wagon.unique_id==uid then
 					if fields.inv then
 						if wagon.has_inventory and wagon.get_inventory_formspec then
-							minetest.show_formspec(player:get_player_name(), "advtrains_inv_"..uid, wagon:get_inventory_formspec(player:get_player_name()))
+							minetest.show_formspec(player:get_player_name(), "advtrains_inv_"..uid, wagon:get_inventory_formspec(player:get_player_name(), make_inv_name(uid)))
 						end
 					elseif fields.seat then
 						local val=minetest.explode_textlist_event(fields.seat)
@@ -1068,7 +1075,7 @@ function wagon:seating_from_key_helper(pname, fields, no)
 		end
 	end
 	if fields.inv and self.has_inventory and self.get_inventory_formspec then
-		minetest.show_formspec(player:get_player_name(), "advtrains_inv_"..self.unique_id, wagon:get_inventory_formspec(player:get_player_name()))
+		minetest.show_formspec(player:get_player_name(), "advtrains_inv_"..self.unique_id, self:get_inventory_formspec(player:get_player_name(), make_inv_name(self.unique_id)))
 	end
 	if fields.prop and self.owner==pname then
 		self:show_wagon_properties(pname)
