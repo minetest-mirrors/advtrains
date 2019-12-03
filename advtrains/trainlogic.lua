@@ -59,7 +59,7 @@ advtrains.mainloop_trainlogic=function(dtime)
 			advtrains.playersbypts[ptspos]=player
 		end
 	end
-	
+
 	if tp_player_tmr<=0 then
 		-- teleport players to their train every 2 seconds
 		for _, player in pairs(minetest.get_connected_players()) do
@@ -78,28 +78,28 @@ advtrains.mainloop_trainlogic=function(dtime)
 	5. make trains do other stuff (c)
 	]]--
 	local t=os.clock()
-	
+
 	for k,v in pairs(advtrains.trains) do
 		advtrains.atprint_context_tid=k
 		advtrains.train_ensure_init(k, v)
 	end
-	
+
 	advtrains.lock_path_inval = true
-	
+
 	for k,v in pairs(advtrains.trains) do
 		advtrains.atprint_context_tid=k
 		advtrains.train_step_b(k, v, dtime)
 	end
-	
+
 	for k,v in pairs(advtrains.trains) do
 		advtrains.atprint_context_tid=k
 		advtrains.train_step_c(k, v, dtime)
 	end
-	
+
 	advtrains.lock_path_inval = false
-	
+
 	advtrains.atprint_context_tid=nil
-	
+
 	atprintbm("trainsteps", t)
 	endstep()
 end
@@ -238,7 +238,7 @@ function advtrains.train_ensure_init(id, train)
 		atwarn(debug.traceback())
 		return nil
 	end
-	
+
 	train.dirty = true
 	if train.no_step then return nil end
 
@@ -247,12 +247,12 @@ function advtrains.train_ensure_init(id, train)
 	assertdef(train, "acceleration", 0)
 	assertdef(train, "id", id)
 	assertdef(train, "ctrl", {})
-	
-	
+
+
 	if not train.drives_on or not train.max_speed then
 		advtrains.update_trainpart_properties(id)
 	end
-	
+
 	--restore path
 	if not train.path then
 		if not train.last_pos then
@@ -274,9 +274,9 @@ function advtrains.train_ensure_init(id, train)
 			Result: log flood.
 			]]
 		end
-		
+
 		local result = advtrains.path_create(train, train.last_pos, train.last_connid or 1, train.last_frac or 0)
-		
+
 		if result==false then
 			atlog("Train",id,": Restoring path failed, node at",train.last_pos,"is gone! Train will be disabled. You can try to place a rail at this position and restart the server.")
 			train.no_step = true
@@ -290,31 +290,31 @@ function advtrains.train_ensure_init(id, train)
 		end
 		-- by now, we should have a working initial path
 		train.wait_for_path = false
-		
+
 		advtrains.update_trainpart_properties(id)
 		recalc_end_index(train)
-		
+
 		--atdebug("Train",id,": Successfully restored path at",train.last_pos," connid",train.last_connid," frac",train.last_frac)
-		
+
 		-- run on_new_path callbacks
 		run_callbacks_new_path(id, train)
 	end
-	
+
 	train.dirty = false -- TODO einbauen!
 	return true
 end
 
 function advtrains.train_step_b(id, train, dtime)
 	if train.no_step or train.wait_for_path or not train.path then return end
-	
+
 	-- in this code, we check variables such as path_trk_? and path_dist. We need to ensure that the path is known for the whole 'Train' zone
 	advtrains.path_get(train, atfloor(train.index + 2))
 	advtrains.path_get(train, atfloor(train.end_index - 1))
-	
+
 	--- 3. handle velocity influences ---
 	local train_moves=(train.velocity~=0)
 	local tarvel_cap = train.speed_restriction
-	
+
 	if train.recently_collided_with_env then
 		tarvel_cap=0
 		if not train_moves then
@@ -324,26 +324,26 @@ function advtrains.train_step_b(id, train, dtime)
 	if train.locomotives_in_train==0 then
 		tarvel_cap=0
 	end
-	
+
 	--- 3a. this can be useful for debugs/warnings and is used for check_trainpartload ---
 	local t_info, train_pos=sid(id), advtrains.path_get(train, atfloor(train.index))
 	if train_pos then
 		t_info=t_info.." @"..minetest.pos_to_string(train_pos)
 		--atprint("train_pos:",train_pos)
 	end
-	
+
 	--apply off-track handling:
 	local front_off_track = train.index>train.path_trk_f
 	local back_off_track=train.end_index<train.path_trk_b
 	train.off_track = front_off_track or back_off_track
-	
+
 	if front_off_track then
 		tarvel_cap=0
 	end
 	if back_off_track then -- eventually overrides front_off_track restriction
 		tarvel_cap=1
 	end
-	
+
 	-- Driving control rework:
 	--[[
 	Items are only defined when something is controlling them.
@@ -355,10 +355,10 @@ function advtrains.train_step_b(id, train, dtime)
 	}
 	The code here determines the precedence and writes the final control into train.lever
 	]]
-	
+
 	--interpret ATC command and apply auto-lever control when not actively controlled
 	local trainvelocity = train.velocity
-	
+
 	if train.ctrl.user then
 		advtrains.atc.train_reset_command(train)
 	else
@@ -389,7 +389,7 @@ function advtrains.train_step_b(id, train, dtime)
 		elseif train.atc_delay then
 			train.atc_delay = nil
 		end
-		
+
 		train.ctrl.atc = nil
 		if train.tarvelocity and train.tarvelocity>trainvelocity then
 			train.ctrl.atc=4
@@ -406,121 +406,121 @@ function advtrains.train_step_b(id, train, dtime)
 			end
 		end
 	end
-	
+
 	--if tarvel_cap and train.tarvelocity and tarvel_cap<train.tarvelocity then
 	--	train.tarvelocity=tarvel_cap
 	--end
-	
+
 	local tmp_lever
-	
-	for _, lev in pairs(train.ctrl) do
-		-- use the most restrictive of all control overrides
-		tmp_lever = math.min(tmp_lever or 4, lev)
-	end
-	
+
+	tmp_lever = train.ctrl.user or train.ctrl.atc
+
 	if not tmp_lever then
 		-- if there was no control at all, default to 3
 		tmp_lever = 3
 	end
-	
+
 	if tarvel_cap and trainvelocity>tarvel_cap then
 		tmp_lever = 0
 	end
-	
+
 	train.lever = tmp_lever
-	
-	--- 3a. actually calculate new velocity ---
-	if tmp_lever~=3 then
-		local accel = advtrains.get_acceleration(train, tmp_lever)
-		local vdiff = accel*dtime
-		
-		-- This should only be executed when we are accelerating
-		-- I suspect that this causes the braking bugs
-		if tmp_lever == 4 then
-		
-			-- ATC control exception: don't cross tarvelocity if
-			-- atc provided a target_vel
-			if train.tarvelocity then
-				local tvdiff = train.tarvelocity - trainvelocity
-				if tvdiff~=0 and math.abs(vdiff) > math.abs(tvdiff) then
-					--applying this change would cross tarvelocity
-					--atdebug("In Tvdiff condition, clipping",vdiff,"to",tvdiff)
-					--atdebug("vel=",trainvelocity,"tvel=",train.tarvelocity)
-					vdiff=tvdiff
-				end
-			end
-			if tarvel_cap and trainvelocity<=tarvel_cap and trainvelocity+vdiff>tarvel_cap then
-				vdiff = tarvel_cap - train.velocity
-			end
-			local mspeed = (train.max_speed or 10)
-			if trainvelocity+vdiff > mspeed then
-				vdiff = mspeed - trainvelocity
-			end
-		end
-		
-		if trainvelocity+vdiff < 0 then
-			vdiff = - trainvelocity
-		end
 
-
-		train.acceleration=vdiff
-		train.velocity=train.velocity+vdiff
-		--if train.ctrl.user then
-		--	train.tarvelocity = train.velocity
-		--end
+	--- 4a. Get the correct lever based on LZB ---
+	tmp_lever = tmp_lever + 1
+	local lzblever = tmp_lever
+	local s, s1, s2, v0, v1, v2, t1, t2, a1, a2
+	repeat
+		tmp_lever = lzblever
+		lzblever = tmp_lever - 1
+		if lzblever < 0 then lzblever = 0 end
+		s1 = advtrains.lzb_get_distance_until_override(id, train, lzblever)
+	until (s1 >= 0) or (s1 == nil) -- also jump out if there is no LZB restriction
+	--- 4b. Calculations ---
+	a1 = advtrains.get_acceleration(train, tmp_lever)
+	a2 = advtrains.get_acceleration(train, lzblever)
+	v0 = train.velocity
+	if s1 == nil then -- No LZB limit - continue as normal
+		v2 = v0 + a1 * dtime
+		if train.tarvelocity then v2 = math.min(v2, train.tarvelocity) end
+		v2 = math.min(v2, (train.max_speed or 10))
+		s = (v2*v2 - v0*v0)/2/a1
+		a2 = a1
+		lzblever = tmp_lever
 	else
-		train.acceleration = 0
+		if (-v0*v0)/2/a1 < s1 then -- train stops in front of LZB control
+			v2 = 0
+			s = (-v0*v0)/2/a1
+		else -- Train continues and further control seems to be taken
+			v1 = math.sqrt(2*s1*a1 + v0*v0)
+			if train.tarvelocity then v1 = math.min(v1, train.tarvelocity) end
+			v1 = math.min(v1, (train.max_speed or 10))
+			t1 = (v1-v0)/a1
+			t2 = dtime - t1
+			if t2 > 0 then -- if the train can reach s2
+				v2 = a2*t2+v1
+				if v2 < 0 then v2 = 0 end -- Force velocity to be at least 0
+				s2 = (v2*v2-v1*v1)/2/a2
+				s = s1 + s2
+			else -- the train might not reach s2 due to some limits
+				v2 = v1
+				s = (v1*v1 - v0*v0)/2/a1
+			end
+		end
 	end
-	
-	--- 4. move train ---
-	
-	local idx_floor = math.floor(train.index)
-	local pdist = (train.path_dist[idx_floor+1] - train.path_dist[idx_floor])
-	local distance = (train.velocity*dtime) / pdist
-	
+	--- 4c. move train and change train properties ---
+	local pdist = train.path_dist[math.floor(train.index)] or 1
+	local distance = s / pdist
+	if train.lever > lzblever then train.ctrl.lzb = lzblever
+	else train.ctrl.lzb = nil
+	end
+	train.lever = lzblever
+	train.velocity = v2
+	train.acceleration = a2
+
 	--debugging code
 	--train.debug = atdump(train.ctrl).."step_dist: "..math.floor(distance*1000)
-	
+
 	train.index=train.index+distance
-	
+
 	recalc_end_index(train)
 
 end
 
 function advtrains.train_step_c(id, train, dtime)
 	if train.no_step or train.wait_for_path or not train.path then return end
-	
+
 	-- all location/extent-critical actions have been done.
 	-- calculate the new occupation window
 	run_callbacks_update(id, train)
-	
+
 	-- Return if something(TM) damaged the path
 	if train.no_step or train.wait_for_path or not train.path then return end
-	
+
 	advtrains.path_clear_unused(train)
-	
+
 	advtrains.path_setrestore(train)
-	
+
 	-- less important stuff
-	
+
 	train.check_trainpartload=(train.check_trainpartload or 0)-dtime
 	if train.check_trainpartload<=0 then
 		advtrains.spawn_wagons(id)
 		train.check_trainpartload=2
 	end
-	
+
 	--- 8. check for collisions with other trains and damage players ---
-	
+
 	local train_moves=(train.velocity~=0)
-	
+
 	--- Check whether this train can be coupled to another, and set couple entities accordingly
 	if not train.was_standing and not train_moves then
 		advtrains.train_check_couples(train)
 	end
 	train.was_standing = not train_moves
-	
+
 	if train_moves then
-		
+
 		local collided = false
 		local coll_grace=1
 		local collindex = advtrains.path_get_index_by_offset(train, train.index, -coll_grace)
@@ -576,7 +576,7 @@ function advtrains.train_step_c(id, train, dtime)
 			if is_loaded_area then
 				local objs = minetest.get_objects_inside_radius(rcollpos, 2)
 				for _,obj in ipairs(objs) do
-					if not obj:is_player() and obj:get_armor_groups().fleshy and obj:get_armor_groups().fleshy > 0 
+					if not obj:is_player() and obj:get_armor_groups().fleshy and obj:get_armor_groups().fleshy > 0
 							and obj:get_luaentity() and obj:get_luaentity().name~="signs:text" then
 						obj:punch(obj, 1, { full_punch_interval = 1.0, damage_groups = {fleshy = 1000}, }, nil)
 					end
@@ -639,7 +639,7 @@ local function tnc_call_leave_callback(pos, train_id, train, index)
 	if mregnode and mregnode.advtrains and mregnode.advtrains.on_train_leave then
 		mregnode.advtrains.on_train_leave(pos, train_id, train, index)
 	end
-	
+
 	-- call other registered callbacks
 	run_callbacks_leave_node(pos, train_id, train, index)
 end
@@ -651,7 +651,7 @@ function advtrains.tnc_call_approach_callback(pos, train_id, train, index, lzbda
 	if mregnode and mregnode.advtrains and mregnode.advtrains.on_train_approach then
 		mregnode.advtrains.on_train_approach(pos, train_id, train, index, lzbdata)
 	end
-	
+
 	-- call other registered callbacks
 	run_callbacks_approach_node(pos, train_id, train, index, lzbdata)
 end
@@ -710,68 +710,68 @@ end)
 function advtrains.create_new_train_at(pos, connid, ioff, trainparts)
 	local new_id=advtrains.random_id()
 	while advtrains.trains[new_id] do new_id=advtrains.random_id() end--ensure uniqueness
-	
+
 	local t={}
 	t.id = new_id
-	
+
 	t.last_pos=pos
 	t.last_connid=connid
 	t.last_frac=ioff
-	
+
 	--t.tarvelocity=0
 	t.velocity=0
 	t.trainparts=trainparts
-	
+
 	advtrains.trains[new_id] = t
 	--atdebug("Created new train:",t)
-	
+
 	if not advtrains.train_ensure_init(new_id, advtrains.trains[new_id]) then
 		atwarn("create_new_train_at",pos,connid,"failed! This might lead to temporary bugs.")
 		return
 	end
-	
+
 	run_callbacks_create(new_id, advtrains.trains[new_id])
-	
+
 	return new_id
 end
 
 function advtrains.remove_train(id)
 	local train = advtrains.trains[id]
-	
+
 	if not advtrains.train_ensure_init(id, train) then
 		atwarn("remove_train",id,"failed! This might lead to temporary bugs.")
 		return
 	end
-	
+
 	run_callbacks_remove(id, train)
-	
+
 	advtrains.path_invalidate(train)
 	advtrains.couple_invalidate(train)
-	
+
 	local tp = train.trainparts
 	--atdebug("Removing train",id,"leftover trainparts:",tp)
-	
+
 	advtrains.trains[id] = nil
-	
+
 	return tp
-	
+
 end
 
 
 function advtrains.add_wagon_to_train(wagon_id, train_id, index)
 	local train=advtrains.trains[train_id]
-	
+
 	if not advtrains.train_ensure_init(train_id, train) then
 		atwarn("Train",train_id,"is not initialized! Operation aborted!")
 		return
 	end
-	
+
 	if index then
 		table.insert(train.trainparts, index, wagon_id)
 	else
 		table.insert(train.trainparts, wagon_id)
 	end
-	
+
 	advtrains.update_trainpart_properties(train_id)
 	recalc_end_index(train)
 	run_callbacks_update(train_id, train)
@@ -786,14 +786,14 @@ function advtrains.update_trainpart_properties(train_id, invert_flipstate)
 	--FIX: deep-copy the table!!!
 	train.max_speed=20
 	train.extent_h = 0;
-	
+
 	local rel_pos=0
 	local count_l=0
 	local shift_dcpl_lock=false
 	for i, w_id in ipairs(train.trainparts) do
-		
+
 		local data = advtrains.wagons[w_id]
-		
+
 		-- 1st: update wagon data (pos_in_train a.s.o)
 		if data then
 			local wagon = advtrains.wagon_prototypes[data.type or data.entity_name]
@@ -814,7 +814,7 @@ function advtrains.update_trainpart_properties(train_id, invert_flipstate)
 				shift_dcpl_lock, data.dcpl_lock = data.dcpl_lock, shift_dcpl_lock
 			end
 			rel_pos=rel_pos+wagon.wagon_span
-			
+
 			if wagon.drives_on then
 				for k,_ in pairs(train.drives_on) do
 					if not wagon.drives_on[k] then
@@ -836,7 +836,7 @@ local ablkrng = minetest.settings:get("active_block_range")*16
 -- Called from train_step_*(), not required to check init.
 function advtrains.spawn_wagons(train_id)
 	local train = advtrains.trains[train_id]
-	
+
 	for i = 1, #train.trainparts do
 		local w_id = train.trainparts[i]
 		local data = advtrains.wagons[w_id]
@@ -849,14 +849,14 @@ function advtrains.spawn_wagons(train_id)
 				-- eventually need to spawn new object. check if position is loaded.
 				local index = advtrains.path_get_index_by_offset(train, train.index, -data.pos_in_train)
 				local pos   = advtrains.path_get(train, atfloor(index))
-				
+
 				local spawn = false
 				for _,p in pairs(minetest.get_connected_players()) do
 					if vector.distance(p:get_pos(),pos)<=ablkrng then
 						spawn = true
 					end
 				end
-				
+
 				if spawn then
 					local wt = advtrains.get_wagon_prototype(data)
 					local wagon = minetest.add_entity(pos, wt):get_luaentity()
@@ -899,11 +899,11 @@ function advtrains.split_train_at_index(train, index)
 	advtrains.update_trainpart_properties(train_id)
 	recalc_end_index(train)
 	run_callbacks_update(train_id, train)
-	
+
 	--create subtrain
 	local newtrain_id=advtrains.create_new_train_at(pos, connid, frac, tp)
 	local newtrain=advtrains.trains[newtrain_id]
-	
+
 	newtrain.velocity=train.velocity
 	return newtrain_id -- return new train ID, so new train can be manipulated
 
@@ -940,7 +940,7 @@ local function createcouple(pos, train1, t1_is_front, train2, t2_is_front)
 	else
 		train2.cpl_back = obj
 	end
-	
+
 end
 
 function advtrains.train_check_couples(train)
@@ -1031,7 +1031,7 @@ end
 
 function advtrains.do_connect_trains(first_id, second_id, vel)
 	local first, second=advtrains.trains[first_id], advtrains.trains[second_id]
-	
+
 	if not advtrains.train_ensure_init(first_id, first) then
 		atwarn("Train",first_id,"is not initialized! Operation aborted!")
 		return
@@ -1040,18 +1040,18 @@ function advtrains.do_connect_trains(first_id, second_id, vel)
 		atwarn("Train",second_id,"is not initialized! Operation aborted!")
 		return
 	end
-	
+
 	local first_wagoncnt=#first.trainparts
 	local second_wagoncnt=#second.trainparts
-	
+
 	for _,v in ipairs(second.trainparts) do
 		table.insert(first.trainparts, v)
 	end
-	
+
 	advtrains.remove_train(second_id)
-	
+
 	first.velocity= vel or 0
-	
+
 	advtrains.update_trainpart_properties(first_id)
 	advtrains.couple_invalidate(first)
 	return true
@@ -1059,14 +1059,14 @@ end
 
 function advtrains.invert_train(train_id)
 	local train=advtrains.trains[train_id]
-	
+
 	if not advtrains.train_ensure_init(train_id, train) then
 		atwarn("Train",train_id,"is not initialized! Operation aborted!")
 		return
 	end
-	
+
 	advtrains.path_setrestore(train, true)
-	
+
 	-- rotate some other stuff
 	if train.door_open then
 		train.door_open = - train.door_open
@@ -1074,20 +1074,20 @@ function advtrains.invert_train(train_id)
 	if train.atc_command then
 		train.atc_arrow = not train.atc_arrow
 	end
-	
+
 	advtrains.path_invalidate(train, true)
 	advtrains.couple_invalidate(train)
-	
+
 	local old_trainparts=train.trainparts
 	train.trainparts={}
 	for k,v in ipairs(old_trainparts) do
 		table.insert(train.trainparts, 1, v)--notice insertion at first place
 	end
 	advtrains.update_trainpart_properties(train_id, true)
-	
+
 	-- recalculate path
 	advtrains.train_ensure_init(train_id, train)
-	
+
 	-- If interlocking present, check whether this train is in a section and then set as shunt move after reversion
 	if advtrains.interlocking and train.il_sections and #train.il_sections > 0 then
 		train.is_shunt = true
@@ -1116,7 +1116,7 @@ function advtrains.invalidate_all_paths(pos)
 	else
 		tab = advtrains.trains
 	end
-	
+
 	for id, _ in pairs(tab) do
 		advtrains.invalidate_path(id)
 	end
@@ -1148,7 +1148,7 @@ local nonblocknodes={
 	"default:fence_junglewood",
 	"default:torch",
 	"bones:bones",
-	
+
 	"default:sign_wall",
 	"signs:sign_wall",
 	"signs:sign_wall_blue",
@@ -1162,8 +1162,8 @@ local nonblocknodes={
 	"signs:sign_wall_yellow",
 	"signs:sign_post",
 	"signs:sign_hanging",
-	
-	
+
+
 }
 minetest.after(0, function()
 	for _,name in ipairs(nonblocknodes) do
