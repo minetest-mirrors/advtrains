@@ -47,19 +47,19 @@ end
 
 
 local function look_ahead(id, train)
-	
+
 	local acc = advtrains.get_acceleration(train, 1)
 	local vel = train.velocity
 	local brakedst = ( -(vel*vel) / (2*acc) ) * params.DST_FACTOR
-	
+
 	local brake_i = advtrains.path_get_index_by_offset(train, train.index, brakedst + params.BRAKE_SPACE)
 	--local aware_i = advtrains.path_get_index_by_offset(train, brake_i, AWARE_ZONE)
-	
+
 	local lzb = train.lzb
 	local trav = lzb.trav
-	
+
 	--train.debug = lspd
-	
+
 	while trav <= brake_i do
 		trav = trav + 1
 		local pos = advtrains.path_get(train, trav)
@@ -74,12 +74,12 @@ local function look_ahead(id, train)
 			-- run callbacks
 			-- Note: those callbacks are defined in trainlogic.lua for consistency with the other node callbacks
 			advtrains.tnc_call_approach_callback(pos, id, train, trav, lzb.data)
-			
+
 		end
 	end
-	
+
 	lzb.trav = trav
-	
+
 end
 
 --[[
@@ -92,7 +92,7 @@ s = v0 * -------  +  - * | ------- |    =  -----------
 
 local function apply_control(id, train)
 	local lzb = train.lzb
-	
+
 	local i = 1
 	while i<=#lzb.oncoming do
 		if lzb.oncoming[i].idx < train.index then
@@ -100,20 +100,20 @@ local function apply_control(id, train)
 			if ent.fun then
 				ent.fun(ent.pos, id, train, ent.idx, ent.spd, lzb.data)
 			end
-			
+
 			table.remove(lzb.oncoming, i)
 		else
 			i = i + 1
 		end
 	end
-	
+
 	for i, it in ipairs(lzb.oncoming) do
 		local a = advtrains.get_acceleration(train, 1) --should be negative
 		local v0 = train.velocity
 		local v1 = it.spd
 		if v1 and v1 <= v0 then
 			local s = (v1*v1 - v0*v0) / (2*a)
-			
+
 			local st = s + params.ADD_SLOW
 			if v0 > 3 then
 				st = s + params.ADD_FAST
@@ -121,9 +121,9 @@ local function apply_control(id, train)
 			if v0<=0 then
 				st = s + params.ADD_STAND
 			end
-			
+
 			local i = advtrains.path_get_index_by_offset(train, it.idx, -st)
-			
+
 			--train.debug = dump({v0f=v0*f, aff=a*f*f,v0=v0, v1=v1, f=f, a=a, s=s, st=st, i=i, idx=train.index})
 			if i <= train.index then
 				-- Gotcha! Braking...
@@ -131,7 +131,7 @@ local function apply_control(id, train)
 				--train.debug = train.debug .. "BRAKE!!!"
 				return
 			end
-			
+
 			i = advtrains.path_get_index_by_offset(train, i, -params.ZONE_ROLL)
 			if i <= train.index and v0>1 then
 				-- roll control
@@ -147,6 +147,53 @@ local function apply_control(id, train)
 		end
 	end
 	train.ctrl.lzb = nil
+end
+
+-- Get the distance between the train and the LZB control point
+-- If not sure, use 3 as the parameter for lever level.
+function advtrains.lzb_get_distance_until_override(id, train, lever)
+	if lever == 4 then return nil end -- acceleration can not be forced by LZB
+	local lzb = train.lzb
+	local i = 1
+	local ret = nil -- the value to return
+	-- Remove LZB entries that are no longer valid
+	while i <= #lzb.oncoming do
+		if lzb.oncoming[i].idx < train.index then
+			local ent = lzb.oncoming[i]
+			if ent.fun then
+				ent.fun(ent.pos, id, train, ent.idx, ent.spd, lzb.data)
+			end
+			table.remove(lzb.oncoming, i)
+		else
+			i = i + 1
+		end
+	end
+	-- Now run through all the LZB entries and find the one that is nearest to the train
+	for _, it in ipairs(lzb.oncoming) do
+		local a = advtrains.get_acceleration(train, lever)
+		local v0 = train.velocity
+		local v1 = it.spd
+		if v1 and v1 <= v0 then
+			if a !~ 0 then local s = (v1*v1-v0*)/2/a else s = 0 end
+			local st
+			if v0 > 3 then st = s + params.ADD_FAST
+			elseif v0 <= 0 then st = s + params.ADD_STAND
+			else st = s + params.ADD_SLOW
+			end
+			i = advtrains.path_get_index_by_offset(train, it.idx, -st)
+			if lever == 2 then
+				i = advtrains.path_get_index_by_offset(train, it.idx, -params.ZONE_ROLL)
+			end
+			if lever == 3 then
+				i = advtrains.path_get_index_by_offset(train, id.idx, -params.ZONE_HOLD)
+			end
+			if not ret then ret = i - train.index end
+			if (i - train.index) < ret then ret = i - train.index end
+		end
+	end
+	-- In extreme cases, there might be no LZB at all.
+	-- In such a case, return nil because the distance to LZB is infinite.
+	return ret
 end
 
 local function invalidate(train)
