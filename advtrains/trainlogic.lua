@@ -410,12 +410,9 @@ function advtrains.train_step_b(id, train, dtime)
 	--end
 	
 	local tmp_lever
-	
-	for _, lev in pairs(train.ctrl) do
-		-- use the most restrictive of all control overrides
-		tmp_lever = math.min(tmp_lever or 4, lev)
-	end
-	
+
+	tmp_lever = train.ctrl.user or train.ctrl.atc
+
 	if not tmp_lever then
 		-- if there was no control at all, default to 3
 		tmp_lever = 3
@@ -424,57 +421,61 @@ function advtrains.train_step_b(id, train, dtime)
 	if tarvel_cap and trainvelocity>tarvel_cap then
 		tmp_lever = 0
 	end
-	
+
 	train.lever = tmp_lever
-	
-	--- 3a. actually calculate new velocity ---
-	if tmp_lever~=3 then
-		local accel = advtrains.get_acceleration(train, tmp_lever)
-		local vdiff = accel*dtime
-		
-		-- This should only be executed when we are accelerating
-		-- I suspect that this causes the braking bugs
-		if tmp_lever == 4 then
-		
-			-- ATC control exception: don't cross tarvelocity if
-			-- atc provided a target_vel
-			if train.tarvelocity then
-				local tvdiff = train.tarvelocity - trainvelocity
-				if tvdiff~=0 and math.abs(vdiff) > math.abs(tvdiff) then
-					--applying this change would cross tarvelocity
-					--atdebug("In Tvdiff condition, clipping",vdiff,"to",tvdiff)
-					--atdebug("vel=",trainvelocity,"tvel=",train.tarvelocity)
-					vdiff=tvdiff
-				end
-			end
-			if tarvel_cap and trainvelocity<=tarvel_cap and trainvelocity+vdiff>tarvel_cap then
-				vdiff = tarvel_cap - train.velocity
-			end
-			local mspeed = (train.max_speed or 10)
-			if trainvelocity+vdiff > mspeed then
-				vdiff = mspeed - trainvelocity
-			end
-		end
-		
-		if trainvelocity+vdiff < 0 then
-			vdiff = - trainvelocity
-		end
 
-
-		train.acceleration=vdiff
-		train.velocity=train.velocity+vdiff
-		--if train.ctrl.user then
-		--	train.tarvelocity = train.velocity
-		--end
+	--- 4a. Get the correct lever based on LZB ---
+	tmp_lever = tmp_lever + 1
+	local lzblever = tmp_lever
+	local s, s1, s2, v0, v1, v2, t1, t2, a1, a2
+	repeat
+		tmp_lever = lzblever
+		lzblever = tmp_lever - 1
+		if lzblever < 0 then lzblever = 0 end
+		s1 = advtrains.lzb_get_distance_until_override(id, train, lzblever)
+	until (s1 >= 0) or (s1 == nil) -- also jump out if there is no LZB restriction
+	--- 4b. Calculations ---
+	a1 = advtrains.get_acceleration(train, tmp_lever)
+	a2 = advtrains.get_acceleration(train, lzblever)
+	v0 = train.velocity
+	if s1 == nil then -- No LZB limit - continue as normal
+		v2 = v0 + a1 * dtime
+		if train.tarvelocity then v2 = math.min(v2, train.tarvelocity) end
+		v2 = math.min(v2, (train.max_speed or 10))
+		s = (v2*v2 - v0*v0)/2/a1
+		a2 = a1
+		lzblever = tmp_lever
 	else
-		train.acceleration = 0
+		if (-v0*v0)/2/a1 < s1 then -- train stops in front of LZB control
+			v2 = 0
+			s = (-v0*v0)/2/a1
+		else -- Train continues and further control seems to be taken
+			v1 = math.sqrt(2*s1*a1 + v0*v0)
+			if train.tarvelocity then v1 = math.min(v1, train.tarvelocity) end
+			v1 = math.min(v1, (train.max_speed or 10))
+			t1 = (v1-v0)/a1
+			t2 = dtime - t1
+			if t2 > 0 then -- if the train can reach s2
+				v2 = a2*t2+v1
+				if v2 < 0 then v2 = 0 end -- Force velocity to be at least 0
+				s2 = (v2*v2-v1*v1)/2/a2
+				s = s1 + s2
+			else -- the train might not reach s2 due to some limits
+				v2 = v1
+				s = (v1*v1 - v0*v0)/2/a1
+			end
+		end
 	end
-	
-	--- 4. move train ---
-	
+	--- 4c. move train and change train properties ---
 	local pdist = train.path_dist[math.floor(train.index)] or 1
-	local distance = (train.velocity*dtime) / pdist
-	
+	local distance = s / pdist
+	if train.lever > lzblever then train.ctrl.lzb = lzblever
+	else train.ctrl.lzb = nil
+	end
+	train.lever = lzblever
+	train.velocity = v2
+	train.acceleration = a2
+
 	--debugging code
 	--train.debug = atdump(train.ctrl).."step_dist: "..math.floor(distance*1000)
 	
