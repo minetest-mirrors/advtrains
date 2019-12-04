@@ -37,6 +37,7 @@ local t_accel_all={
 	[0] = -10,
 	[1] = -3,
 	[2] = -0.5,
+	[3] = 0,
 	[4] = 0.5,
 }
 --acceleration per engine
@@ -44,6 +45,7 @@ local t_accel_eng={
 	[0] = 0,
 	[1] = 0,
 	[2] = 0,
+	[3] = 0,
 	[4] = 1.5,
 }
 
@@ -410,15 +412,7 @@ function advtrains.train_step_b(id, train, dtime)
 	--if tarvel_cap and train.tarvelocity and tarvel_cap<train.tarvelocity then
 	--	train.tarvelocity=tarvel_cap
 	--end
-
-	local tmp_lever
-
-	tmp_lever = train.ctrl.user or train.ctrl.atc
-
-	if not tmp_lever then
-		-- if there was no control at all, default to 3
-		tmp_lever = 3
-	end
+	local tmp_lever = (train.ctrl.user or train.ctrl.atc) or 3
 
 	if tarvel_cap and trainvelocity>tarvel_cap then
 		tmp_lever = 0
@@ -427,8 +421,8 @@ function advtrains.train_step_b(id, train, dtime)
 	train.lever = tmp_lever
 
 	--- 4a. Get the correct lever based on LZB ---
-	tmp_lever = tmp_lever + 1
 	local lzblever = tmp_lever
+	tmp_lever = tmp_lever + 1
 	local s, s1, s2, v0, v1, v2, t1, t2, a1, a2
 	repeat
 		tmp_lever = lzblever
@@ -444,27 +438,31 @@ function advtrains.train_step_b(id, train, dtime)
 		v2 = v0 + a1 * dtime
 		if train.tarvelocity then v2 = math.min(v2, train.tarvelocity) end
 		v2 = math.min(v2, (train.max_speed or 10))
-		s = (v2*v2 - v0*v0)/2/a1
+		if a1 == 0 then -- if there is no acceleration, simply s = v * t
+			s = v0 * dtime
+		else
+			s = (v2*v2 - v0*v0)/2/a1
+		end
 		a2 = a1
 		lzblever = tmp_lever
 	else
-		if (-v0*v0)/2/a1 < s1 then -- train stops in front of LZB control
+		if (a1 ~= 0) and ((-v0*v0)/2/a1 < s1) then -- train stops in front of LZB control
 			v2 = 0
 			s = (-v0*v0)/2/a1
 		else -- Train continues and further control seems to be taken
 			v1 = math.sqrt(2*s1*a1 + v0*v0)
 			if train.tarvelocity then v1 = math.min(v1, train.tarvelocity) end
 			v1 = math.min(v1, (train.max_speed or 10))
-			t1 = (v1-v0)/a1
+			if a1 == 0 then t1 = s1/v1 else t1 = (v1-v0)/a1 end
 			t2 = dtime - t1
 			if t2 > 0 then -- if the train can reach s2
 				v2 = a2*t2+v1
 				if v2 < 0 then v2 = 0 end -- Force velocity to be at least 0
-				s2 = (v2*v2-v1*v1)/2/a2
+				if a2 == 0 then s2 = v2 * t2 else s2 = (v2*v2-v1*v1)/2/a2 end
 				s = s1 + s2
 			else -- the train might not reach s2 due to some limits
 				v2 = v1
-				s = (v1*v1 - v0*v0)/2/a1
+				if a1 == 0 then s = v2 * dtime else s = (v1*v1 - v0*v0)/2/a1 end
 			end
 		end
 	end
