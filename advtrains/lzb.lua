@@ -152,10 +152,12 @@ end
 -- Get the distance between the train and the LZB control point
 -- If not sure, use 3 as the parameter for lever level.
 function advtrains.lzb_get_distance_until_override(id, train, lever)
-	if lever == 4 then return nil end -- acceleration can not be forced by LZB
+	if lever == 4 then return nil end
 	local lzb = train.lzb
 	local i = 1
 	local ret = nil -- the value to return
+	local a = advtrains.get_acceleration(train, lever) -- Acceleration
+	local v0 = train.velocity
 	-- Remove LZB entries that are no longer valid
 	while i <= #lzb.oncoming do
 		if lzb.oncoming[i].idx < train.index then
@@ -170,12 +172,10 @@ function advtrains.lzb_get_distance_until_override(id, train, lever)
 	end
 	-- Now run through all the LZB entries and find the one that is nearest to the train
 	for _, it in ipairs(lzb.oncoming) do
-		local a = advtrains.get_acceleration(train, lever)
-		local v0 = train.velocity
 		local v1 = it.spd
 		if v1 and v1 <= v0 then
-			if a !~ 0 then local s = (v1*v1-v0*)/2/a else s = 0 end
-			local st
+			local s, st
+			if a ~= 0 then s = (v1*v1-v0*v0)/2/a else s = 0 end
 			if v0 > 3 then st = s + params.ADD_FAST
 			elseif v0 <= 0 then st = s + params.ADD_STAND
 			else st = s + params.ADD_SLOW
