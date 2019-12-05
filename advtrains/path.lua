@@ -156,6 +156,9 @@ function advtrains.path_get(train, index)
 	if index ~= atfloor(index) then
 		error("For train "..train.id..": Called path_get() but index="..index.." is not a round number")
 	end
+	
+	advtrains.profiler:enter("path_get")
+	
 	local pef = train.path_ext_f
 	while index > pef do
 		local pos = train.path[pef]
@@ -224,6 +227,8 @@ function advtrains.path_get(train, index)
 		train.path_req_f = index
 	end
 	
+	advtrains.profiler:leave("path_get")
+	
 	return train.path[index], (index<=train.path_trk_f and index>=train.path_trk_b)
 	
 end
@@ -257,6 +262,8 @@ function advtrains.path_get_adjacent(train, index)
 end
 
 function advtrains.path_get_index_by_offset(train, index, offset)
+	advtrains.profiler:enter("path_get_index_by_offset")
+
 	local off = offset
 	local idx = atfloor(index)
 	-- go down to floor. Calculate required path_dist
@@ -285,6 +292,8 @@ function advtrains.path_get_index_by_offset(train, index, offset)
 	--atdebug("pibo: 3 off=",off,"idx=",idx," returns:",idx + (off / train.path_dist[idx]))
 	-- we should now be on the floor of the index we actually want.
 	-- give them the rest!
+	
+	advtrains.profiler:leave("path_get_index_by_offset")
 	
 	return idx + (off / train.path_dist[idx])
 end

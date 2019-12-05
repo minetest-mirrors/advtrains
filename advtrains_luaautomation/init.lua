@@ -9,10 +9,22 @@ else
     atltrans = function(s,a,...)a={a,...}return s:gsub("@(%d+)",function(n)return a[tonumber(n)]end)end
 end
 
+atlatc = { envs = {}}
+
+-- Profiler boilerplate
+if advprofiler then
+	atlatc.profiler = advprofiler.new_profiler("atlatc")
+else
+	atlatc.profiler = {
+		count=function() end,
+		enter=function() end,
+		leave=function() end,
+	}
+end
+
+
 --Privilege
 --Only trusted players should be enabled to build stuff which can break the server.
-
-atlatc = { envs = {}}
 
 minetest.register_privilege("atlatc", { description = "Player can place and modify LUA ATC components. Grant with care! Allows to execute bad LUA code.", give_to_singleplayer = false, default= false })
 

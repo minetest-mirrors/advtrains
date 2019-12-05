@@ -47,6 +47,7 @@ end
 
 
 local function look_ahead(id, train)
+	advtrains.profiler:enter("lzb_look_ahead")
 	
 	local acc = advtrains.get_acceleration(train, 1)
 	local vel = train.velocity
@@ -80,6 +81,8 @@ local function look_ahead(id, train)
 	
 	lzb.trav = trav
 	
+	advtrains.profiler:leave("lzb_look_ahead")
+	
 end
 
 --[[
@@ -91,6 +94,8 @@ s = v0 * -------  +  - * | ------- |    =  -----------
 ]]
 
 local function apply_control(id, train)
+	advtrains.profiler:enter("lzb_apply_control")
+	
 	local lzb = train.lzb
 	
 	local i = 1
@@ -129,6 +134,7 @@ local function apply_control(id, train)
 				-- Gotcha! Braking...
 				train.ctrl.lzb = 1
 				--train.debug = train.debug .. "BRAKE!!!"
+				advtrains.profiler:leave("lzb_apply_control")
 				return
 			end
 			
@@ -136,17 +142,20 @@ local function apply_control(id, train)
 			if i <= train.index and v0>1 then
 				-- roll control
 				train.ctrl.lzb = 2
+				advtrains.profiler:leave("lzb_apply_control")
 				return
 			end
 			i = advtrains.path_get_index_by_offset(train, i, -params.ZONE_HOLD)
 			if i <= train.index and v0>1 then
 				-- hold speed
 				train.ctrl.lzb = 3
+				advtrains.profiler:leave("lzb_apply_control")
 				return
 			end
 		end
 	end
 	train.ctrl.lzb = nil
+	advtrains.profiler:leave("lzb_apply_control")
 end
 
 local function invalidate(train)

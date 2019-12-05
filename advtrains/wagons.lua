@@ -242,12 +242,14 @@ function wagon:on_step(dtime)
 	return advtrains.pcall(function()
 		if not self:ensure_init() then return end
 		
-		local t=os.clock()
+		advtrains.profiler:enter("wagon_step")
+		
 		local pos = self.object:getpos()
 		local data = advtrains.wagons[self.id]
 		
 		if not pos then
 			--atdebug("["..self.id.."][fatal] missing position (object:getpos() returned nil)")
+			advtrains.profiler:leave("wagon_step")
 			return
 		end
 		
@@ -375,9 +377,11 @@ function wagon:on_step(dtime)
 		if not train.path or train.no_step then
 			self.object:setvelocity({x=0, y=0, z=0})
 			self.object:setacceleration({x=0, y=0, z=0})
+			advtrains.profiler:leave("wagon_step")
 			return
 		end
 		if not data.pos_in_train then
+			advtrains.profiler:leave("wagon_step")
 			return
 		end
 		
@@ -538,7 +542,9 @@ function wagon:on_step(dtime)
 		self.old_velocity = train.velocity
 		self.old_acceleration_vector=accelerationvec
 		self.old_yaw=yaw
-		atprintbm("wagon step", t)
+		
+		advtrains.profiler:leave("wagon_step")
+		
 	end)
 end
 

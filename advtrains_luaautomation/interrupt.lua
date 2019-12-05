@@ -22,6 +22,7 @@ function iq.add(t, pos, evtdata)
 end
 
 function iq.mainloop(dtime)
+	atlatc.profiler:enter("iq_mainloop")
 	timer=timer + math.min(dtime, 0.2)
 	for i=1,#queue do
 		local qe=queue[i]
@@ -33,7 +34,9 @@ function iq.mainloop(dtime)
 			local node=advtrains.ndb.get_node(pos)
 			local ndef=minetest.registered_nodes[node.name]
 			if ndef and ndef.luaautomation and ndef.luaautomation.fire_event then
+				atlatc.profiler:enter("iq_run_single_event")
 				ndef.luaautomation.fire_event(pos, evtdata)
+				atlatc.profiler:leave("iq_run_single_event")
 			else
 				atwarn("[atlatc][interrupt] Couldn't run event",evtdata.type,"on",pos,", something wrong with the node",node)
 			end
@@ -41,6 +44,7 @@ function iq.mainloop(dtime)
 			i=i-1
 		end
 	end
+	atlatc.profiler:leave("iq_mainloop")
 end
 
 

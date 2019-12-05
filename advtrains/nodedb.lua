@@ -123,6 +123,7 @@ function ndb.get_node(pos)
 	return n
 end
 function ndb.get_node_raw(pos)
+	advtrains.profiler:count("ndb_get_node")
 	local cid=ndbget(pos.x, pos.y, pos.z)
 	if cid then
 		local nodeid = ndb_nodeids[u14b(cid)]
@@ -135,6 +136,7 @@ end
 
 
 function ndb.swap_node(pos, node, no_inval)
+	advtrains.profiler:count("ndb_swap_node")
 	if minetest.get_node_or_nil(pos) then
 		minetest.swap_node(pos, node)
 	end

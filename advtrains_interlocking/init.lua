@@ -9,6 +9,16 @@ function advtrains.interlocking.sigd_equal(sigd, cmp)
 	return vector.equals(sigd.p, cmp.p) and sigd.s==cmp.s
 end
 
+-- Profiler boilerplate
+if advprofiler then
+	advtrains.interlocking.profiler = advprofiler.new_profiler("advtrains_interlocking")
+else
+	advtrains.interlocking.profiler = {
+		count=function() end,
+		enter=function() end,
+		leave=function() end,
+	}
+end
 
 local modpath = minetest.get_modpath(minetest.get_current_modname()) .. DIR_DELIM
 

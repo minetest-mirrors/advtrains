@@ -19,6 +19,17 @@ AT_CMAX = 16
 
 advtrains = {trains={}, player_to_train_mapping={}}
 
+-- Profiler boilerplate
+if advprofiler then
+	advtrains.profiler = advprofiler.new_profiler("advtrains")
+else
+	advtrains.profiler = {
+		count=function() end,
+		enter=function() end,
+		leave=function() end,
+	}
+end
+
 --pcall
 local no_action=false
 

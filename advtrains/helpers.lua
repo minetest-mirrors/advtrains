@@ -307,6 +307,8 @@ function advtrains.get_adjacent_rail(this_posnr, this_conns_p, conn_idx, drives_
 		return nil
 	end
 	
+	advtrains.profiler:enter("get_adjacent_rail")
+	
 	local conn = this_conns[conn_idx]
 	local conn_y = conn.y or 0
 	local adj_pos = advtrains.dirCoordSet(this_pos, conn.c);
@@ -322,10 +324,12 @@ function advtrains.get_adjacent_rail(this_posnr, this_conns_p, conn_idx, drives_
 		conn_y = conn_y + 1
 		nextnode_ok, nextconns, nextrail_y=advtrains.get_rail_info_at(adj_pos, drives_on)
 		if not nextnode_ok then
+			advtrains.profiler:leave("get_adjacent_rail")
 			return nil
 		end
 	end
 	local adj_connid = advtrains.conn_matches_to({c=conn.c, y=conn_y}, nextconns)
+	advtrains.profiler:leave("get_adjacent_rail")
 	if adj_connid then
 		return adj_pos, adj_connid, conn_idx, nextrail_y, nextconns
 	end

@@ -48,6 +48,7 @@ function sched.save()
 end
 
 function sched.run()
+	advtrains.lines.profiler:enter("scheduler_run")
 	local ctime = ln.rwt.get_time()
 	local cnt = 0
 	local ucn, elem
@@ -57,7 +58,9 @@ function sched.run()
 			table.remove(queue, 1)
 			if callbacks[elem.e] then
 				-- run it
+				advtrains.lines.profiler:enter("scheduler_run_single_schedule")
 				callbacks[elem.e](elem.d)
+				advtrains.lines.profiler:leave("scheduler_run_single_schedule")
 			else
 				atwarn("[lines][scheduler] No callback to handle schedule",elem)
 			end
@@ -70,6 +73,7 @@ function sched.run()
 			break
 		end
 	end
+	advtrains.lines.profiler:leave("scheduler_run")
 end
 
 -- Enqueue a new scheduled item to be executed at "rwtime"
@@ -79,6 +83,7 @@ end
 --    used to prevent expotentially growing "scheduler bombs"
 -- unitlim: Custom override for UNITS_THRESH (see there)
 function sched.enqueue(rwtime, handler, evtdata, unitid, unitlim)
+	advtrains.lines.profiler:enter("scheduler_enqueue")
 	local qtime = ln.rwt.to_secs(rwtime)
 	assert(type(handler)=="string")
 	assert(type(unitid)=="string")
@@ -91,6 +96,7 @@ function sched.enqueue(rwtime, handler, evtdata, unitid, unitlim)
 	local ulim=(unitlim or UNITS_THRESH)
 	if ucn >= ulim then
 		atlog("[lines][scheduler] discarding enqueue for",handler,"(limit",ulim,") because unit",unitid,"has already",ucn,"schedules enqueued")
+		advtrains.lines.profiler:leave("scheduler_enqueue")
 		return false
 	end
 	
@@ -104,6 +110,7 @@ function sched.enqueue(rwtime, handler, evtdata, unitid, unitlim)
 					u=unitid,
 				})
 			units_cnt[unitid] = ucn + 1
+			advtrains.lines.profiler:leave("scheduler_enqueue")
 			return true
 		end
 		cnt = cnt+1

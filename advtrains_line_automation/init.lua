@@ -15,6 +15,16 @@ advtrains.lines = {
 	stops = {},
 }
 
+if advprofiler then
+	advtrains.lines.profiler = advprofiler.new_profiler("advtrains_lines")
+else
+	advtrains.lines.profiler = {
+		count=function() end,
+		enter=function() end,
+		leave=function() end,
+	}
+end
+
 
 local modpath = minetest.get_modpath(minetest.get_current_modname()) .. DIR_DELIM
 

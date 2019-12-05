@@ -2,3 +2,4 @@ advtrains
 advtrains_interlocking?
 advtrains_line_automation?
 mesecons_switch?
+advprofiler?

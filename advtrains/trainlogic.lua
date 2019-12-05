@@ -77,7 +77,8 @@ advtrains.mainloop_trainlogic=function(dtime)
 	   to occupation tables (b)
 	5. make trains do other stuff (c)
 	]]--
-	local t=os.clock()
+	
+	advtrains.profiler:enter("train_steps")
 	
 	for k,v in pairs(advtrains.trains) do
 		advtrains.atprint_context_tid=k
@@ -96,12 +97,12 @@ advtrains.mainloop_trainlogic=function(dtime)
 		advtrains.train_step_c(k, v, dtime)
 	end
 	
+	advtrains.profiler:leave("train_steps")
+	
 	advtrains.lock_path_inval = false
 	
 	advtrains.atprint_context_tid=nil
 	
-	atprintbm("trainsteps", t)
-	endstep()
 end
 
 function advtrains.tp_player_to_train(player)
@@ -239,6 +240,8 @@ function advtrains.train_ensure_init(id, train)
 		return nil
 	end
 	
+	advtrains.profiler:enter("train_ensure_init")
+	
 	train.dirty = true
 	if train.no_step then return nil end
 
@@ -258,6 +261,7 @@ function advtrains.train_ensure_init(id, train)
 		if not train.last_pos then
 			atlog("Train",id,": Restoring path failed, no last_pos set! Train will be disabled. You can try to fix the issue in the save file.")
 			train.no_step = true
+			advtrains.profiler:leave("train_ensure_init")
 			return nil
 		end
 		if not train.last_connid then
@@ -280,12 +284,14 @@ function advtrains.train_ensure_init(id, train)
 		if result==false then
 			atlog("Train",id,": Restoring path failed, node at",train.last_pos,"is gone! Train will be disabled. You can try to place a rail at this position and restart the server.")
 			train.no_step = true
+			advtrains.profiler:leave("train_ensure_init")
 			return nil
 		elseif result==nil then
 			if not train.wait_for_path then
 				atlog("Train",id,": Can't initialize: Waiting for the (yet unloaded) node at",train.last_pos," to be loaded.")
 			end
 			train.wait_for_path = true
+			advtrains.profiler:leave("train_ensure_init")
 			return false
 		end
 		-- by now, we should have a working initial path
@@ -301,11 +307,15 @@ function advtrains.train_ensure_init(id, train)
 	end
 	
 	train.dirty = false -- TODO einbauen!
+	
+	advtrains.profiler:leave("train_ensure_init")
+	
 	return true
 end
 
 function advtrains.train_step_b(id, train, dtime)
 	if train.no_step or train.wait_for_path or not train.path then return end
+	advtrains.profiler:enter("train_step_b")
 	
 	-- in this code, we check variables such as path_trk_? and path_dist. We need to ensure that the path is known for the whole 'Train' zone
 	advtrains.path_get(train, atfloor(train.index + 2))
@@ -483,11 +493,15 @@ function advtrains.train_step_b(id, train, dtime)
 	train.index=train.index+distance
 	
 	recalc_end_index(train)
+	
+	advtrains.profiler:leave("train_step_b")
 
 end
 
 function advtrains.train_step_c(id, train, dtime)
 	if train.no_step or train.wait_for_path or not train.path then return end
+	
+	advtrains.profiler:enter("train_step_c")
 	
 	-- all location/extent-critical actions have been done.
 	-- calculate the new occupation window
@@ -583,6 +597,7 @@ function advtrains.train_step_c(id, train, dtime)
 			end
 		end
 	end
+	advtrains.profiler:leave("train_step_c")
 end
 
 -- Default occupation callbacks for node callbacks
@@ -1122,11 +1137,13 @@ function advtrains.invalidate_all_paths(pos)
 end
 function advtrains.invalidate_path(id)
 	--atdebug("Path invalidate:",id)
+	advtrains.profiler:enter("invalidate_path")
 	local v=advtrains.trains[id]
 	if not v then return end
 	advtrains.path_invalidate(v)
 	advtrains.couple_invalidate(v)
 	v.dirty = true
+	advtrains.profiler:leave("invalidate_path")
 end
 
 --not blocking trains group

@@ -62,6 +62,7 @@ local function itkremove(tbl, ikey, com)
 end
 
 local function setsection(tid, train, ts_id, ts, sigd)
+	advtrains.interlocking.profiler:enter("train_setsection")
 	-- train
 	if not train.il_sections then train.il_sections = {} end
 	if not itkexist(train.il_sections, "ts_id", ts_id) then
@@ -106,9 +107,11 @@ local function setsection(tid, train, ts_id, ts, sigd)
 	if tcbs.signal then
 		advtrains.interlocking.route.update_route(sigd, tcbs)
 	end
+	advtrains.interlocking.profiler:leave("train_setsection")
 end
 
 local function freesection(tid, train, ts_id, ts)
+	advtrains.interlocking.profiler:enter("train_freesection")
 	-- train
 	if not train.il_sections then train.il_sections = {} end
 	itkremove(train.il_sections, "ts_id", ts_id)
@@ -129,6 +132,7 @@ local function freesection(tid, train, ts_id, ts)
 	-- This must be delayed, because this code is executed in-between a train step
 	-- TODO use luaautomation timers?
 	minetest.after(0, advtrains.interlocking.route.update_waiting, "ts", ts_id)
+	advtrains.interlocking.profiler:leave("train_freesection")
 end
 
 

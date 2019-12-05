@@ -114,6 +114,8 @@ function ac.run_in_env(pos, evtdata, customfct_p)
 		return false
 	end
 	
+	atlatc.profiler:enter("ac_run_in_env")
+	
 	local customfct=customfct_p or {}
 	-- add interrupt function
 	customfct.interrupt=function(t, imesg)
@@ -152,6 +154,7 @@ function ac.run_in_env(pos, evtdata, customfct_p)
 	if meta then
 		meta:set_string("formspec", ac.getform(pos, meta))
 	end
+	atlatc.profiler:leave("ac_run_in_env")
 end
 
 function ac.on_digiline_receive(pos, node, channel, msg)

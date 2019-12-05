@@ -265,6 +265,7 @@ local proxy_env={}
 
 -- returns: true, fenv if successful; nil, error if error 
 function env_proto:execute_code(localenv, code, evtdata, customfct)
+	atlatc.profiler:enter("env_execute_code")
 	local metatbl ={
 		__index = function(t, i)
 			if i=="S" then
@@ -291,6 +292,7 @@ function env_proto:execute_code(localenv, code, evtdata, customfct)
 	setmetatable(proxy_env, metatbl)
 	local fun, err=loadstring(code)
 	if not fun then
+		atlatc.profiler:leave("env_execute_code")
 		return false, err
 	end
 	
@@ -299,10 +301,12 @@ function env_proto:execute_code(localenv, code, evtdata, customfct)
 	if succ then
 		data=localenv
 	end
+	atlatc.profiler:leave("env_execute_code")
 	return succ, data
 end
 
 function env_proto:run_initcode()
+	atlatc.profiler:enter("env_run_initcode")
 	if self.init_code and self.init_code~="" then
 		local old_fdata=self.fdata
 		self.fdata = {}
@@ -317,6 +321,7 @@ function env_proto:run_initcode()
 			end
 		end
 	end
+	atlatc.profiler:leave("env_run_initcode")
 end
 function env_proto:run_stepcode()
 	if self.step_code and self.step_code~="" then

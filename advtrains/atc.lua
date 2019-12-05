@@ -298,22 +298,29 @@ eval_conditional = function(command, arrow, speed)
 end
 
 function atc.execute_atc_command(id, train)
+	advtrains.profiler:enter("atc_execute")
+
 	--strip whitespaces
 	local command=string.match(train.atc_command, "^%s*(.*)$")
 	
 	
 	if string.match(command, "^%s*$") then
 		train.atc_command=nil
+		advtrains.profiler:leave("atc_execute")
 		return
 	end
 
 	train.atc_command = eval_conditional(command, train.atc_arrow, train.velocity)
 	
-	if not train.atc_command then return end
+	if not train.atc_command then
+		advtrains.profiler:leave("atc_execute")
+		return
+	end
 	command=string.match(train.atc_command, "^%s*(.*)$")
 	
 	if string.match(command, "^%s*$") then
 		train.atc_command=nil
+		advtrains.profiler:leave("atc_execute")
 		return
 	end
 	
@@ -322,9 +329,8 @@ function atc.execute_atc_command(id, train)
 		if match then
 			local patlen=func(id, train, match)
 			
-			atprint("Executing: "..string.sub(command, 1, patlen))
-			
 			train.atc_command=string.sub(command, patlen+1)
+			advtrains.profiler:leave("atc_execute")
 			if train.atc_delay<=0 and not train.atc_wait_finish then
 				--continue (recursive, cmds shouldn't get too long, and it's a end-recursion.)
 				atc.execute_atc_command(id, train)
@@ -332,6 +338,7 @@ function atc.execute_atc_command(id, train)
 			return
 		end
 	end
+	advtrains.profiler:leave("atc_execute")
 	atwarn(sid(id), attrans("ATC command parse error: Unknown command: @1", command))
 	atc.train_reset_command(train, true)
 end

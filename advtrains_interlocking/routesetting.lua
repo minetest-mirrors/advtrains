@@ -224,6 +224,7 @@ end
 -- note that this does not clear the routesetting status from the entry signal,
 -- only from the ts's
 function ilrs.cancel_route_from(sigd)
+	advtrains.interlocking.profiler:enter("cancel_route_from")
 	-- we start at the tc designated by signal
 	local c_sigd = sigd
 	local c_tcbs, c_ts_id, c_ts, c_rseg, c_lckp
@@ -232,6 +233,7 @@ function ilrs.cancel_route_from(sigd)
 		c_tcbs = ildb.get_tcbs(c_sigd)
 		if not c_tcbs then
 			atwarn("Failed to cancel route, no TCBS at",c_sigd)
+			advtrains.interlocking.profiler:leave("cancel_route_from")
 			return false
 		end
 		
@@ -248,6 +250,7 @@ function ilrs.cancel_route_from(sigd)
 		c_ts_id = c_tcbs.ts_id
 		if not c_tcbs then
 			atwarn("Failed to cancel route, end of interlocking at",c_sigd)
+			advtrains.interlocking.profiler:leave("cancel_route_from")
 			return false
 		end
 		c_ts = ildb.get_ts(c_ts_id)
@@ -256,6 +259,7 @@ function ilrs.cancel_route_from(sigd)
 			or not c_ts.route
 			or not sigd_equal(c_ts.route.entry, c_sigd) then
 			--atdebug("cancel_route_from: abort (eoi/no route):")
+			advtrains.interlocking.profiler:leave("cancel_route_from")
 			return false
 		end
 		
@@ -271,6 +275,7 @@ function ilrs.cancel_route_from(sigd)
 		minetest.after(0, advtrains.interlocking.route.update_waiting, "ts", c_ts_id)
 	end
 	--atdebug("cancel_route_from: done (no final sigd)")
+	advtrains.interlocking.profiler:leave("cancel_route_from")
 	return true
 end
 
@@ -303,7 +308,9 @@ function ilrs.update_route(sigd, tcbs, newrte, cancel)
 		end
 		if newrte then tcbs.routeset = newrte end
 		--atdebug("Setting:",tcbs.routeset)
+		advtrains.interlocking.profiler:enter("set_route")
 		local succ, rsn, cbts, cblk = ilrs.set_route(sigd, tcbs.routes[tcbs.routeset])
+		advtrains.interlocking.profiler:leave("set_route")
 		if not succ then
 			tcbs.route_rsn = rsn
 			--atdebug("Routesetting failed:",rsn)
