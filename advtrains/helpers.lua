@@ -79,7 +79,7 @@ function advtrains.yawToDirection(yaw, conn1, conn2)
 	local yaw2 = advtrains.dir_to_angle(conn2)
 	local adiff1 = advtrains.minAngleDiffRad(yaw, yaw1)
 	local adiff2 = advtrains.minAngleDiffRad(yaw, yaw2)
-	
+
 	if math.abs(adiff2)<math.abs(adiff1) then
 		return conn2
 	else
@@ -129,7 +129,7 @@ function advtrains.minAngleDiffRad(r1, r2)
 	local try1=r2-r1
 	local try2=r2+pi2-r1
 	local try3=r2-pi2-r1
-	
+
 	local minabs = math.min(math.abs(try1), math.abs(try2), math.abs(try3))
 	if minabs==math.abs(try1) then
 		return try1
@@ -170,12 +170,12 @@ end
 
 function advtrains.get_real_index_position(path, index)
 	if not path or not index then return end
-	
+
 	local first_pos=path[math.floor(index)]
 	local second_pos=path[math.floor(index)+1]
-	
+
 	if not first_pos or not second_pos then return nil end
-	
+
 	local factor=index-math.floor(index)
 	local actual_pos={x=first_pos.x-(first_pos.x-second_pos.x)*factor, y=first_pos.y-(first_pos.y-second_pos.y)*factor, z=first_pos.z-(first_pos.z-second_pos.z)*factor,}
 	return actual_pos
@@ -306,16 +306,16 @@ function advtrains.get_adjacent_rail(this_posnr, this_conns_p, conn_idx, drives_
 		end
 		return nil
 	end
-	
+
 	local conn = this_conns[conn_idx]
 	local conn_y = conn.y or 0
 	local adj_pos = advtrains.dirCoordSet(this_pos, conn.c);
-	
+
 	while conn_y>=1 do
 		conn_y = conn_y - 1
 		adj_pos.y = adj_pos.y + 1
 	end
-	
+
 	local nextnode_ok, nextconns, nextrail_y=advtrains.get_rail_info_at(adj_pos, drives_on)
 	if not nextnode_ok then
 		adj_pos.y = adj_pos.y - 1
@@ -398,6 +398,13 @@ function advtrains.decode_pos(pts)
 	return vector.new(dec(strx), dec(stry), dec(strz))
 end
 
+function advtrains.solve_quadratic_equation(a, b, c)
+	if not (a and b and c) then return nil end
+	local delta = (b*b - 4*a*c)
+	if delta < 0 then return nil end
+	return {((-b+math.sqrt(delta))/2/a),((-b-math.sqrt(delta))/2/a)}
+end
+
 --[[ Benchmarking code
 local tdt = {}
 local tlt = {}
@@ -435,8 +442,6 @@ end
 atdebug("pts",os.clock()-t1,"s")
 
 --Results:
---2018-11-29 16:57:08: ACTION[Main]: [advtrains]endec 1.786451 s 
---2018-11-29 16:57:10: ACTION[Main]: [advtrains]pts 2.566377 s 
+--2018-11-29 16:57:08: ACTION[Main]: [advtrains]endec 1.786451 s
+--2018-11-29 16:57:10: ACTION[Main]: [advtrains]pts 2.566377 s
 ]]
-
-

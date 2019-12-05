@@ -420,61 +420,39 @@ function advtrains.train_step_b(id, train, dtime)
 
 	train.lever = tmp_lever
 
-	--- 4a. Get the correct lever based on LZB ---
-	local lzblever = tmp_lever
-	tmp_lever = tmp_lever + 1
-	local s, s1, s2, v0, v1, v2, t1, t2, a1, a2
-	repeat
-		tmp_lever = lzblever
-		lzblever = tmp_lever - 1
-		if lzblever < 0 then lzblever = 0 end
-		s1 = advtrains.lzb_get_distance_until_override(id, train, lzblever)
-	until (s1 >= 0) or (s1 == nil) -- also jump out if there is no LZB restriction
-	--- 4b. Calculations ---
-	a1 = advtrains.get_acceleration(train, tmp_lever)
-	a2 = advtrains.get_acceleration(train, lzblever)
-	v0 = train.velocity
-	if s1 == nil then -- No LZB limit - continue as normal
-		v2 = v0 + a1 * dtime
-		if train.tarvelocity then v2 = math.min(v2, train.tarvelocity) end
-		v2 = math.min(v2, (train.max_speed or 10))
-		if a1 == 0 then -- if there is no acceleration, simply s = v * t
-			s = v0 * dtime
-		else
-			s = (v2*v2 - v0*v0)/2/a1
+	--- 4a. Calculate movement ---
+	local lzbnxt = advtrains.lzb_get_next(train)
+	local lzblimit = advtrains.lzb_get_limit_by_entry(train, lzbnxt)
+	local lzbmap = advtrains.lzb_map_entry(train, lzbnxt)
+	local a = advtrains.get_acceleration(train, tmp_lever)
+	local v0 = train.velocity
+	local v1 = a*dtime+v0
+	v1 = math.min(v1, (train.max_speed or 10))
+	local s
+	if a == 0 then s = v1*dtime
+	else s = (v1*v1 - v0*v0)/2/a
+	end
+	if lzblimit.velocity and lzblimit.velocity < train.velocity then
+		tmp_lever = lzblimit.lever
+		while (lzbmap[tmp_lever].t > dtime) do
+			tmp_lever = tmp_lever - 1
 		end
-		a2 = a1
-		lzblever = tmp_lever
-	else
-		if (a1 ~= 0) and ((-v0*v0)/2/a1 < s1) then -- train stops in front of LZB control
-			v2 = 0
-			s = (-v0*v0)/2/a1
-		else -- Train continues and further control seems to be taken
-			v1 = math.sqrt(2*s1*a1 + v0*v0)
-			if train.tarvelocity then v1 = math.min(v1, train.tarvelocity) end
-			v1 = math.min(v1, (train.max_speed or 10))
-			if a1 == 0 then t1 = s1/v1 else t1 = (v1-v0)/a1 end
-			t2 = dtime - t1
-			if t2 > 0 then -- if the train can reach s2
-				v2 = a2*t2+v1
-				if v2 < 0 then v2 = 0 end -- Force velocity to be at least 0
-				if a2 == 0 then s2 = v2 * t2 else s2 = (v2*v2-v1*v1)/2/a2 end
-				s = s1 + s2
-			else -- the train might not reach s2 due to some limits
-				v2 = v1
-				if a1 == 0 then s = v2 * dtime else s = (v1*v1 - v0*v0)/2/a1 end
-			end
+		a = advtrains.get_acceleration(train, tmp_lever)
+		v0 = lzbmap[tmp_lever].v
+		t = dtime - lzbmap[tmp_lever].t
+		v1 = a*t+v0
+		v1 = math.min(v1, (train.max_speed or 10))
+		s = lzbmap[tmp_lever].i - train.index
+		if a == 0 then s = s + v1*t
+		else s = s + (v1*v1-v0*v0)/2/a
 		end
 	end
-	--- 4c. move train and change train properties ---
+	--- 4b. Move train and update train properties ---
 	local pdist = train.path_dist[math.floor(train.index)] or 1
 	local distance = s / pdist
-	if train.lever > lzblever then train.ctrl.lzb = lzblever
-	else train.ctrl.lzb = nil
-	end
-	train.lever = lzblever
-	train.velocity = v2
-	train.acceleration = a2
+	train.lever = tmp_lever
+	train.velocity = v1
+	train.acceleration = a
 
 	--debugging code
 	--train.debug = atdump(train.ctrl).."step_dist: "..math.floor(distance*1000)
