@@ -83,80 +83,104 @@ local function look_ahead(id, train)
 end
 
 --[[
-Distance needed to accelerate from v0 to v1 with constant acceleration a:
-
-         v1 - v0     a   / v1 - v0 \ 2     v1^2 - v0^2
-s = v0 * -------  +  - * | ------- |    =  -----------
-            a        2   \    a    /           2*a
+The .i element is the index at which LZB overrides the train control with the
+lever specified by the index value. The .v element is the speed at which the
+train control is taken over by LZB with the lever specified by the index. The .t
+element calculates the time needed for the train to reach the point where the
+control is taken over by LZB with the lever specified by the index. Unintialized
+.v and .t values indicate that the train has passed the point with the
+corresponding index. Note that thhe 0th item contains the data related to the
+LZB point itself, and not related to the emergency brake.
 ]]
-
-local function apply_control(id, train)
-	local lzb = train.lzb
-
-	local i = 1
-	while i<=#lzb.oncoming do
-		if lzb.oncoming[i].idx < train.index then
-			local ent = lzb.oncoming[i]
-			if ent.fun then
-				ent.fun(ent.pos, id, train, ent.idx, ent.spd, lzb.data)
-			end
-
-			table.remove(lzb.oncoming, i)
+function advtrains.lzb_map_entry(train, lzb)
+	local ret = {[0]={},[1]={},[2]={},[3]={}}
+	if (not train) or (not lzb) then return ret end
+	local ti = train.index
+	local v0 = train.velocity
+	local v1 = lzb.spd
+	local a = advtrains.get_acceleration(train, train.lever)
+	local s = (v1*v1-v0*v0)/2/advtrains.get_acceleration(train, 1)
+	if v0 > 3 then s = s + params.ADD_FAST
+	elseif v0 <=0 then s = s + params.ADD_STAND
+	else s = s + params.ADD_SLOW
+	end
+	ret[0].i = lzb.idx
+	ret[1].i = advtrains.path_get_index_by_offset(train, ret[0].i, -s)
+	ret[2].i = advtrains.path_get_index_by_offset(train, ret[1].i, -params.ZONE_ROLL)
+	ret[3].i = advtrains.path_get_index_by_offset(train, ret[2].i, -params.ZONE_HOLD)
+	if a == 0 then ret[3].t = (ret[3].i)/v0
+	else
+		ret[3].t = advtrains.solve_quadratic_equation(a/2, v0, (ti-ret[3].i))
+		if not ret[3].t then ret[3].t = 0
 		else
-			i = i + 1
-		end
-	end
-
-	for i, it in ipairs(lzb.oncoming) do
-		local a = advtrains.get_acceleration(train, 1) --should be negative
-		local v0 = train.velocity
-		local v1 = it.spd
-		if v1 and v1 <= v0 then
-			local s = (v1*v1 - v0*v0) / (2*a)
-
-			local st = s + params.ADD_SLOW
-			if v0 > 3 then
-				st = s + params.ADD_FAST
-			end
-			if v0<=0 then
-				st = s + params.ADD_STAND
-			end
-
-			local i = advtrains.path_get_index_by_offset(train, it.idx, -st)
-
-			--train.debug = dump({v0f=v0*f, aff=a*f*f,v0=v0, v1=v1, f=f, a=a, s=s, st=st, i=i, idx=train.index})
-			if i <= train.index then
-				-- Gotcha! Braking...
-				train.ctrl.lzb = 1
-				--train.debug = train.debug .. "BRAKE!!!"
-				return
-			end
-
-			i = advtrains.path_get_index_by_offset(train, i, -params.ZONE_ROLL)
-			if i <= train.index and v0>1 then
-				-- roll control
-				train.ctrl.lzb = 2
-				return
-			end
-			i = advtrains.path_get_index_by_offset(train, i, -params.ZONE_HOLD)
-			if i <= train.index and v0>1 then
-				-- hold speed
-				train.ctrl.lzb = 3
-				return
+			if ret[3].t[1]<0 then
+				if ret[3].t[2]<0 then ret[3].t = ret[3].t[2]
+				else ret[3].t = math.abs(math.max(ret[3].t[1], ret[3].t[2]))
+				end
+			else
+				if ret[3].t[2]<0 then ret[3].t = ret[3].t[1]
+				else ret[3].t = math.min(ret[3].t[1], ret[3].t[2])
+				end
 			end
 		end
 	end
-	train.ctrl.lzb = nil
+	ret[3].v = (v0 + a*ret[3].t)
+	if ret[3].v <= lzb.spd then ret[3].v = lzb.spd end -- Avoid devision by zero
+	if ret[3].v > (train.max_speed or 10) then ret[3].v = train.max_speed or 0 end
+	ret[2].v = ret[3].v
+	ret[2].t = (ret[3].i-ret[2].i)/ret[3].v
+	ret[1].t = advtrains.solve_quadratic_equation(advtrains.get_acceleration(train,2),ret[2].v,(ret[2].i-ret[1].i))
+	if not ret[1].t then ret[1].t = 0
+	else
+		if ret[1].t[1]<0 then
+			if ret[1].t[2]<0 then ret[1].t = ret[1].t[2]
+			else ret[1].t = math.abs(math.max(ret[1].t[1], ret[1].t[2]))
+			end
+		else
+			if ret[1].t[2]<0 then ret[1].t = ret[1].t[1]
+			else ret[1].t = math.min(math.max(ret[1].t[1], ret[1].t[2]))
+			end
+		end
+	end
+	ret[1].v = (ret[2].v + advtrains.get_acceleration(train,2)*ret[1].t)
+	if ret[1].v <= lzb.spd then ret[1].v = lzb.spd end
+	ret[0].v = lzb.spd
+	ret[0].t = (ret[0].v-ret[1].v)/advtrains.get_acceleration(train,1)
+	return ret
 end
 
--- Get the distance between the train and the LZB control point
--- If not sure, use 3 as the parameter for lever level.
-function advtrains.lzb_get_distance_until_override(id, train, lever)
+--[[
+advtrains.lzb_get_limit_by_entry - get the limit
+Returns a table contraining the speed and the acceleration limits
+]]
+function advtrains.lzb_get_limit_by_entry(train, lzb)
+	local ret = {}
+	local lzbmap = advtrains.lzb_map_entry(train, lzb)
+	if not (lzbmap[3].i and lzbmap[2].i and lzbmap[1].i and lzbmap[0].i) then
+		return {}
+	elseif (lzbmap[3].i > train.index) then return {}
+	elseif (lzbmap[2].i > train.index) then ret.lever = 3
+	elseif (lzbmap[1].i > train.index) then ret.lever = 2
+	else ret.lever = 1
+	end
+	if ret.lever == 3 then ret.velocity = lzbmap[3].v
+	else
+		local s = train.index - lzbmap[ret.lever].i
+		local a = advtrains.get_acceleration(train, ret.lever)
+		local v0 = lzbmap[ret.lever].v
+		ret.velocity = math.sqrt(2*a*s - v0*v0)
+	end
+	if ret.velocity < train.velocity -1 then ret.lever = ret.lever - 1 end
+	return ret
+end
+
+-- Get next LZB restriction with the lowest speed restriction
+function advtrains.lzb_get_next(train)
 	if lever == 4 then return nil end
 	local lzb = train.lzb
 	local i = 1
-	local ret = nil -- the value to return
-	local a = advtrains.get_acceleration(train, lever) -- Acceleration
+	local ret
+	local a = advtrains.get_acceleration(train, 3) -- Acceleration
 	local v0 = train.velocity
 	-- Remove LZB entries that are no longer valid
 	while i <= #lzb.oncoming do
@@ -170,29 +194,20 @@ function advtrains.lzb_get_distance_until_override(id, train, lever)
 			i = i + 1
 		end
 	end
-	-- Now run through all the LZB entries and find the one that is nearest to the train
+	-- Now run through all the LZB entries and find the one with the lowest
+	-- speed requirement
 	for _, it in ipairs(lzb.oncoming) do
 		local v1 = it.spd
 		if v1 and v1 <= v0 then
-			local s, st
-			if a ~= 0 then s = (v1*v1-v0*v0)/2/a else s = 0 end
-			if v0 > 3 then st = s + params.ADD_FAST
-			elseif v0 <= 0 then st = s + params.ADD_STAND
-			else st = s + params.ADD_SLOW
+			local curlimit = advtrains.lzb_get_limit_by_entry(train, it)
+			local retlimit = advtrains.lzb_get_limit_by_entry(train, ret)
+			if not ret then ret = it
+			elseif not curlimit.velocity then
+			elseif retlimit.velocity > curlimit.velocity then
+				ret = it
 			end
-			i = advtrains.path_get_index_by_offset(train, it.idx, -st)
-			if lever == 2 then
-				i = advtrains.path_get_index_by_offset(train, it.idx, -params.ZONE_ROLL)
-			end
-			if lever == 3 then
-				i = advtrains.path_get_index_by_offset(train, id.idx, -params.ZONE_HOLD)
-			end
-			if not ret then ret = i - train.index end
-			if (i - train.index) < ret then ret = i - train.index end
 		end
 	end
-	-- In extreme cases, there might be no LZB at all.
-	-- In such a case, return nil because the distance to LZB is infinite.
 	return ret
 end
 
@@ -234,5 +249,4 @@ advtrains.te_register_on_update(function(id, train)
 		return
 	end
 	look_ahead(id, train)
-	apply_control(id, train)
 end, true)
