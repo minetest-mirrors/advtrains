@@ -239,12 +239,12 @@ function advtrains.train_ensure_init(id, train)
 		atwarn(debug.traceback())
 		return nil
 	end
+
+	train.dirty = true
+	if train.no_step then return nil end
 	
 	advtrains.profiler:enter("train_ensure_init")
 	
-	train.dirty = true
-	if train.no_step then return nil end
-
 	assertdef(train, "velocity", 0)
 	--assertdef(train, "tarvelocity", 0)
 	assertdef(train, "acceleration", 0)
@@ -636,18 +636,20 @@ local callbacks_approach_node, run_callbacks_approach_node = mknodecallback("app
 
 
 local function tnc_call_enter_callback(pos, train_id, train, index)
-	--atdebug("tnc enter",pos,train_id)
+	advtrains.profiler:enter("tnc_node_enter_callback")
 	local node = advtrains.ndb.get_node(pos) --this spares the check if node is nil, it has a name in any case
 	local mregnode=minetest.registered_nodes[node.name]
 	if mregnode and mregnode.advtrains and mregnode.advtrains.on_train_enter then
 		mregnode.advtrains.on_train_enter(pos, train_id, train, index)
 	end
-
+	
 	-- call other registered callbacks
 	run_callbacks_enter_node(pos, train_id, train, index)
+	
+	advtrains.profiler:leave("tnc_node_enter_callback")
 end
 local function tnc_call_leave_callback(pos, train_id, train, index)
-	--atdebug("tnc leave",pos,train_id)
+	advtrains.profiler:enter("tnc_node_leave_callback")
 	local node = advtrains.ndb.get_node(pos) --this spares the check if node is nil, it has a name in any case
 	local mregnode=minetest.registered_nodes[node.name]
 	if mregnode and mregnode.advtrains and mregnode.advtrains.on_train_leave then
@@ -656,10 +658,12 @@ local function tnc_call_leave_callback(pos, train_id, train, index)
 	
 	-- call other registered callbacks
 	run_callbacks_leave_node(pos, train_id, train, index)
+
+	advtrains.profiler:leave("tnc_node_leave_callback")
 end
 
 function advtrains.tnc_call_approach_callback(pos, train_id, train, index, lzbdata)
-	--atdebug("tnc approach",pos,train_id, lzbdata)
+	advtrains.profiler:enter("tnc_node_approach_callback")
 	local node = advtrains.ndb.get_node(pos) --this spares the check if node is nil, it has a name in any case
 	local mregnode=minetest.registered_nodes[node.name]
 	if mregnode and mregnode.advtrains and mregnode.advtrains.on_train_approach then
@@ -668,6 +672,8 @@ function advtrains.tnc_call_approach_callback(pos, train_id, train, index, lzbda
 	
 	-- call other registered callbacks
 	run_callbacks_approach_node(pos, train_id, train, index, lzbdata)
+
+	advtrains.profiler:leave("tnc_node_approach_callback")
 end
 
 
@@ -680,6 +686,7 @@ advtrains.te_register_on_new_path(function(id, train)
 end)
 
 advtrains.te_register_on_update(function(id, train)
+	advtrains.profiler:enter("te_update_callback")
 	local new_index = atround(train.index)
 	local new_end_index = atround(train.end_index)
 	local old_index = train.tnc.old_index
@@ -696,6 +703,7 @@ advtrains.te_register_on_update(function(id, train)
 	end
 	train.tnc.old_index = new_index
 	train.tnc.old_end_index = new_end_index
+	advtrains.profiler:leave("te_update_callback")
 end)
 
 advtrains.te_register_on_create(function(id, train)
