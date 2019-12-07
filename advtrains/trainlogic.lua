@@ -434,7 +434,7 @@ function advtrains.train_step_b(id, train, dtime)
 	else s = (v1*v1 - v0*v0)/2/a
 	end
 	train.ctrl.lzb = nil
-	if lzblimit.velocity and lzblimit.velocity < train.velocity then
+	if lzblimit.velocity and lzblimit.lever < train.lever then
 		tmp_lever = lzblimit.lever
 		while (lzbmap[tmp_lever].t > dtime) do
 			tmp_lever = tmp_lever - 1
@@ -457,7 +457,7 @@ function advtrains.train_step_b(id, train, dtime)
 	a = (v1 - train.velocity)/dtime
 	--- 4b. Move train and update train properties ---
 	local pdist = train.path_dist[math.floor(train.index)] or 1
-	local distance = s / pdist
+	local distance = pdist == 0 and s or s / pdist
 	train.lever = tmp_lever
 	train.velocity = v1
 	train.acceleration = a

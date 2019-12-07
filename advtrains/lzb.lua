@@ -94,7 +94,7 @@ LZB point itself, and not related to the emergency brake.
 ]]
 function advtrains.lzb_map_entry(train, lzb)
 	local ret = {[0]={},[1]={},[2]={},[3]={}}
-	if (not train) or (not lzb) then return ret end
+	if not (train and lzb) then return ret end
 	local ti = train.index
 	local v0 = train.velocity
 	local v1 = lzb.spd
@@ -168,7 +168,7 @@ function advtrains.lzb_get_limit_by_entry(train, lzb)
 		local s = train.index - lzbmap[ret.lever].i
 		local a = advtrains.get_acceleration(train, ret.lever)
 		local v0 = lzbmap[ret.lever].v
-		ret.velocity = math.sqrt(2*a*s - v0*v0)
+		ret.velocity = math.abs(advtrains.safesqrt(2*a*s - v0*v0))
 	end
 	if ret.velocity < train.velocity -1 then ret.lever = ret.lever - 1 end
 	return ret
