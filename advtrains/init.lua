@@ -459,6 +459,7 @@ minetest.register_globalstep(function(dtime_mt)
 			advtrains.load()
 		end
 		
+		--[[
 		local dtime
 		if GENERATE_ATRICIFIAL_LAG then
 			dtime = 0.2
@@ -476,6 +477,8 @@ minetest.register_globalstep(function(dtime_mt)
 			end
 		end
 		
+        ]]
+        local dtime = dtime_mt
 		advtrains.mainloop_trainlogic(dtime)
 		if advtrains_itm_mainloop then
 			advtrains_itm_mainloop(dtime)
