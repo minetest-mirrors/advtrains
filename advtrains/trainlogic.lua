@@ -421,9 +421,9 @@ function advtrains.train_step_b(id, train, dtime)
 	train.lever = tmp_lever
 
 	--- 4a. Calculate movement ---
-	local lzbnxt = advtrains.lzb_get_next(train)
-	local lzblimit = advtrains.lzb_get_limit_by_entry(train, lzbnxt)
-	local lzbmap = advtrains.lzb_map_entry(train, lzbnxt)
+	local lzbnxt,lzblever = advtrains.lzb_get_next(train,dtime)
+	if lzblever and lzblever < tmp_lever then tmp_lever = lzblever train.ctrl.lzb = true
+	else train.ctrl.lzb = false end
 	local a = advtrains.get_acceleration(train, tmp_lever)
 	local v0 = train.velocity
 	local v1 = a*dtime+v0
@@ -433,28 +433,9 @@ function advtrains.train_step_b(id, train, dtime)
 	if a == 0 then s = v1*dtime
 	else s = (v1*v1 - v0*v0)/2/a
 	end
-	train.ctrl.lzb = nil
-	if lzblimit.velocity and lzblimit.lever < train.lever then
-		tmp_lever = lzblimit.lever
-		while (lzbmap[tmp_lever].t > dtime) do
-			tmp_lever = tmp_lever - 1
-		end
-		train.ctrl.lzb = tmp_lever
-		a = advtrains.get_acceleration(train, tmp_lever)
-		v0 = lzbmap[tmp_lever].v
-		t = dtime - lzbmap[tmp_lever].t
-		v1 = a*t+v0
-		v1 = math.min(v1, (train.max_speed or 10))
-		v1 = math.max(v1, 0)
-		s = lzbmap[tmp_lever].i - train.index
-		if a == 0 then s = s + v1*t
-		else s = s + (v1*v1-v0*v0)/2/a
-		end
-	end
 	-- FIX: calculate the average acceleration, as if it is static, to avoid
 	-- weird wagon positions
-	-- Since v0 might have been changed, we should use train.velocity instead.
-	a = (v1 - train.velocity)/dtime
+	a = (v1 - v0)/dtime
 	--- 4b. Move train and update train properties ---
 	local pdist = train.path_dist[math.floor(train.index)] or 1
 	local distance = pdist == 0 and s or s / pdist
