@@ -398,22 +398,6 @@ function advtrains.decode_pos(pts)
 	return vector.new(dec(strx), dec(stry), dec(strz))
 end
 
--- Solve quadratic equations (i.e. a*x^2 + b*x + c = 0)
-function advtrains.solve_quadratic_equation(a, b, c)
-	if not (a and b and c) then return nil end
-	if a == 0 then return {-c/b, -c/b} end -- avoid division by zero
-	local delta = (b*b - 4*a*c)
-	if delta < 0 then return {-b/2/a,-b/2/a} end -- ignore imaginary part
-	return {((-b+math.sqrt(delta))/2/a),((-b-math.sqrt(delta))/2/a)}
-end
-
--- safe square root
--- Negative return values indicate imaginary numbers.
-function advtrains.safesqrt(a)
-	if a >= 0 then return math.sqrt(a) end
-	return 0 - math.sqrt(-a)
-end
-
 --[[ Benchmarking code
 local tdt = {}
 local tlt = {}
