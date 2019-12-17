@@ -414,8 +414,12 @@ function advtrains.train_step_b(id, train, dtime)
 	--end
 	local tmp_lever = (train.ctrl.user or train.ctrl.atc) or 3
 
-	if tarvel_cap and trainvelocity>tarvel_cap then
-		tmp_lever = 0
+	if tarvel_cap then
+		if trainvelocity > tarvel_cap then
+			tmp_lever = 0
+		elseif trainvelocity == tarvel_cap then
+			tmp_lever = 3
+		end
 	end
 
 	train.lever = tmp_lever
@@ -429,9 +433,13 @@ function advtrains.train_step_b(id, train, dtime)
 	local v1 = a*dtime+v0
 	v1 = math.min(v1, (train.max_speed or 10))
 	v1 = math.max(v1, 0)
+	if tarvel_cap then v1 = math.min(v1, tarvel_cap) end
 	local s
 	if a == 0 then s = v1*dtime
-	else s = (v1*v1 - v0*v0)/2/a
+	else
+		s = (v1*v1 - v0*v0)/2/a
+		local acctime = (v1-v0)/a
+		if acctime < dtime then s = s + v1*(dtime - acctime) end
 	end
 	-- FIX: calculate the average acceleration, as if it is static, to avoid
 	-- weird wagon positions
