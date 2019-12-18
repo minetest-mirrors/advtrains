@@ -9,7 +9,7 @@ advtrains.hhud[player:get_player_name()] = nil
 end)
 
 local mletter={[1]="F", [-1]="R", [0]="N"}
-local doorstr={[-1]="|<>| >|<", [0]=">|< >|<", [1]=">|< |<>|"}
+local doorstr={[-1]="<|> >|<", [0]=">|< >|<", [1]=">|< <|>"}
 
 function advtrains.on_control_change(pc, train, flip)
    	local maxspeed = train.max_speed or 10
@@ -168,27 +168,27 @@ function advtrains.hud_train_format(train, flip)
 	local vel = advtrains.abs_ceil(train.velocity)
 	local vel_kmh=advtrains.abs_ceil(advtrains.ms_to_kmh(train.velocity))
 	
-	local levers = "B - o +"
+	local levers = " BB  B  -  o  + "
 	local tlev=train.lever
 	if train.velocity==0 and not train.active_control then tlev=1 end
-	if tlev == 0 then levers = ">BB< - o +" end
-	if tlev == 1 then levers = ">B< - o +" end
-	if tlev == 2 then levers = "B >-< o +" end
-	if tlev == 3 then levers = "B - >o< +" end
-	if tlev == 4 then levers = "B - o >+<" end
 	
+	if tlev == 0 then levers = ">BB< B  -  o  + " end
+	if tlev == 1 then levers = " BB >B< -  o  + " end
+	if tlev == 2 then levers = " BB  B >-< o  + " end
+	if tlev == 3 then levers = " BB  B  - >o< + " end
+	if tlev == 4 then levers = " BB  B  -  o >+<" end
 	local topLine, firstLine
 	
 	local secondLine
 	if train.tarvelocity or train.atc_command then
-		local b="   "
+		local b="  "
 		local tvels=""
 		if train.tarvelocity then
 			local tvel = advtrains.abs_ceil(train.tarvelocity)
 			tvels = "|"..string.rep("+", tvel)..string.rep("_", max-tvel)
 		end
 		if train.atc_brake_target then
-			b="-B-"
+			b="-B"
 		end
 		local ad = ""
 		if train.atc_delay then
