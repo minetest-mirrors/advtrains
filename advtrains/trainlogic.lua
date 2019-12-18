@@ -370,13 +370,16 @@ function advtrains.train_step_b(id, train, dtime)
 			braketar = 0
 			emerg = true
 		end
+		--[[
 		if braketar and braketar>=trainvelocity then
 			train.atc_brake_target=nil
 			braketar = nil
 		end
+		]]
 		--if train.tarvelocity and train.velocity==train.tarvelocity then
 		--	train.tarvelocity = nil
 		--end
+		--[[
 		if train.atc_wait_finish then
 			if not train.atc_brake_target and (not train.tarvelocity or train.velocity==train.tarvelocity) then
 				train.atc_wait_finish=nil
@@ -391,8 +394,10 @@ function advtrains.train_step_b(id, train, dtime)
 		elseif train.atc_delay then
 			train.atc_delay = nil
 		end
+		]]
 
 		train.ctrl.atc = nil
+		if train.tarvelocity then train.ctrl.atc = 3 end
 		if train.tarvelocity and train.tarvelocity>trainvelocity then
 			train.ctrl.atc=4
 		end
@@ -407,22 +412,37 @@ function advtrains.train_step_b(id, train, dtime)
 				train.ctrl.atc=2
 			end
 		end
+		if train.atc_wait_finish then
+			if (not train.ctrl.atc) or (train.ctrl.atc<3 and train.tarvelocity>=train.velocity) or (train.ctrl.atc==3) or (train.ctrl.atc>3 and train.velocity>=train.tarvelocity) then
+				train.atc_wait_finish=nil
+			end
+		end
+		if train.atc_command then
+			if (not train.atc_delay or train.atc_delay<=0) and not train.atc_wait_finish then
+				advtrains.atc.execute_atc_command(id, train)
+			else
+				train.atc_delay=train.atc_delay-dtime
+			end
+		elseif train.atc_delay then
+			train.atc_delay = nil
+		end
 	end
 
 	--if tarvel_cap and train.tarvelocity and tarvel_cap<train.tarvelocity then
 	--	train.tarvelocity=tarvel_cap
 	--end
-	local tmp_lever = (train.ctrl.user or train.ctrl.atc) or 3
+
+	local tmp_lever = (train.ctrl.atc or train.ctrl.user) or 3
 
 	if tarvel_cap then
 		if trainvelocity > tarvel_cap then
 			tmp_lever = 0
 		elseif trainvelocity == tarvel_cap then
-			tmp_lever = 3
+			tmp_lever = math.min(3, tmp_lever)
 		end
 	end
 
-	train.lever = tmp_lever
+	--train.lever = tmp_lever
 
 	--- 4a. Calculate movement ---
 	local lzbnxt,lzblever = advtrains.lzb_get_next(train,dtime)
@@ -434,6 +454,7 @@ function advtrains.train_step_b(id, train, dtime)
 	v1 = math.min(v1, (train.max_speed or 10))
 	v1 = math.max(v1, 0)
 	if tarvel_cap then v1 = math.min(v1, tarvel_cap) end
+	if tmp_lever == 4 and train.tarvelocity then v1=math.min(train.tarvelocity,v1) end
 	local s
 	if a == 0 then s = v1*dtime
 	else

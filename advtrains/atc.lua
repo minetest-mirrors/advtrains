@@ -186,18 +186,18 @@ end
 local matchptn={
 	["SM"]=function(id, train)
 		train.tarvelocity=train.max_speed
+		train.atc_brake_target=nil
 		return 2
 	end,
 	["S([0-9]+)"]=function(id, train, match)
 		train.tarvelocity=tonumber(match)
+		train.atc_brake_target=nil
 		return #match+1
 	end,
 	["B([0-9]+)"]=function(id, train, match)
-		if train.velocity>tonumber(match) then
-			train.atc_brake_target=tonumber(match)
-			if not train.tarvelocity or train.tarvelocity>train.atc_brake_target then
-				train.tarvelocity=train.atc_brake_target
-			end
+		train.atc_brake_target=tonumber(match)
+		if not train.tarvelocity or train.tarvelocity>train.atc_brake_target then
+			train.tarvelocity=train.atc_brake_target
 		end
 		return #match+1
 	end,
