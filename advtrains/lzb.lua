@@ -96,8 +96,10 @@ function advtrains.lzb_get_limit_zone(train, lzb, lever, vel)
 	elseif v0 <= 0 then s = s + params.ADD_STAND
 	else s = s + params.ADD_SLOW
 	end
-	if lvr >= 2 then s = s + params.ZONE_HOLD end
-	if lvr >= 3 then s = s + params.ZONE_ROLL end
+	if v0 >= params.ZONE_VSLOW then
+	  if lvr >= 2 then s = s + params.ZONE_HOLD end
+	  if lvr >= 3 then s = s + params.ZONE_ROLL end
+	end
 	return advtrains.path_get_index_by_offset(train, lzb.idx, -s)
 end
 
