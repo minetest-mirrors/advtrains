@@ -459,6 +459,7 @@ function advtrains.train_step_b(id, train, dtime)
 	if a == 0 then s = v1*dtime
 	else
 		s = (v1*v1 - v0*v0)/2/a
+		s = math.max(s, 0)
 		local acctime = (v1-v0)/a
 		if acctime < dtime then s = s + v1*(dtime - acctime) end
 	end
