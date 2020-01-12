@@ -87,20 +87,29 @@ end
 s = v0 * t + ---
               2
 ]]
+function advtrains.lzb_get_limit_zone(train, lzb, lever, vel)
+	local lvr = lever or train.lever
+	local v0 = vel or train.velocity
+	local v1 = lzb.spd
+	local s = (v1*v1-v0*v0)/2/advtrains.get_acceleration(train, 1)
+	if v0 > 3 then s = s + params.ADD_FAST
+	elseif v0 <= 0 then s = s + params.ADD_STAND
+	else s = s + params.ADD_SLOW
+	end
+	if lvr >= 2 then s = s + params.ZONE_HOLD end
+	if lvr >= 3 then s = s + params.ZONE_ROLL end
+	return advtrains.path_get_index_by_offset(train, lzb.idx, -s)
+end
+
 function advtrains.lzb_get_limit_by_entry(train, lzb, dtime)
 	if not (type(lzb)=="table") then return nil end
 	local getacc = advtrains.get_acceleration
 	local v0 = train.velocity
 	local v1 = lzb.spd
-	local s = (v1*v1-v0*v0)/2/getacc(train,1)
 	local t = dtime or 0.2
-	local i = advtrains.path_get_index_by_offset(train, lzb.idx, -s)
-	if v0 > 3 then i = advtrains.path_get_index_by_offset(train, i, -params.ADD_FAST)
-	elseif v0 <= 0 then i = advtrains.path_get_index_by_offset(train, i, -params.ADD_STAND)
-	else i = advtrains.path_get_index_by_offset(train, i, -params.ADD_SLOW) end
-	i = advtrains.path_get_index_by_offset(train, i, -params.ZONE_ROLL)
-	i = advtrains.path_get_index_by_offset(train, i, -params.ZONE_HOLD)
+	local i = advtrains.lzb_get_limit_zone(train, lzb, 4, v0 + getacc(train,4))
 	if train.index + v0*t + getacc(train,4)*t*t/2  <= i then return 4 end
+	i = advtrains.lzb_get_limit_zone(train, lzb, 3, v0)
 	if train.index + v0*t <= i then return 3 end
 	i = advtrains.path_get_index_by_offset(train, i, params.ZONE_HOLD)
 	if train.index + v0*t + getacc(train,2)*t*t/2 <= i then return 2 end
