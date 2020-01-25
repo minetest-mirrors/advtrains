@@ -42,31 +42,31 @@ function atc.send_command(pos, par_tid)
 					atlog("ATC controller at",pts,": This controller had an arrowconn of", atc.controllers[pts].arrowconn, "set. Since this field is now deprecated, it was removed.")
 					atc.controllers[pts].arrowconn = nil
 				end
-				
+
 				local train = advtrains.trains[train_id]
 				local index = advtrains.path_lookup(train, pos)
-				
+
 				local iconnid = 1
 				if index then
 					iconnid = train.path_cn[index]
 				else
 					atwarn("ATC rail at", pos, ": Rail not on train's path! Can't determine arrow direction. Assuming +!")
 				end
-				
-				local command = atc.controllers[pts].command				
+
+				local command = atc.controllers[pts].command
 				command = eval_conditional(command, iconnid==1, train.velocity)
 				if not command then command="" end
 				command=string.match(command, "^%s*(.*)$")
-				
+
 				if command == "" then
 					atprint("Sending ATC Command to", train_id, ": Not modifying, conditional evaluated empty.")
 					return true
 				end
-				
+
 				atc.train_set_command(train, command, iconnid==1)
 				atprint("Sending ATC Command to", train_id, ":", command, "iconnid=",iconnid)
 				return true
-				
+
 			else
 				atwarn("ATC rail at", pos, ": Sending command failed: The train",train_id,"does not exist. This seems to be a bug.")
 			end
@@ -123,7 +123,7 @@ advtrains.atc_function = function(def, preset, suffix, rotation)
 					end
 					local meta=minetest.get_meta(pos)
 					if meta then
-						if not fields.save then 
+						if not fields.save then
 							--maybe only the dropdown changed
 							if fields.mode then
 								meta:set_string("mode", idxtrans[fields.mode])
@@ -146,7 +146,7 @@ advtrains.atc_function = function(def, preset, suffix, rotation)
 							meta:set_string("infotext", attrans("ATC controller, mode @1\nCommand: @2", fields.mode, meta:get_string("command")) )
 						end
 						meta:set_string("formspec", atc.get_atc_controller_formspec(pos, meta))
-						
+
 						local pts=minetest.pos_to_string(pos)
 						local _, conns=advtrains.get_rail_info_at(pos, advtrains.all_tracktypes)
 						atc.controllers[pts]={command=fields.command}
@@ -158,7 +158,7 @@ advtrains.atc_function = function(def, preset, suffix, rotation)
 			end,
 			advtrains = {
 				on_train_enter = function(pos, train_id)
-					atc.send_command(pos)
+					atc.send_command(pos, train_id)
 				end,
 			},
 		}
@@ -244,7 +244,7 @@ eval_conditional = function(command, arrow, speed)
 		if cond=="-" then
 			cond_applies=not arrow
 		end
-	else 
+	else
 		cond, compare, rest=string.match(command, "^I([<>]=?)([0-9]+)(.+)$")
 		if cond and compare then
 			is_cond=true
@@ -261,7 +261,7 @@ eval_conditional = function(command, arrow, speed)
 				cond_applies=speed>=tonumber(compare)
 			end
 		end
-	end	
+	end
 	if is_cond then
 		atprint("Evaluating if statement: "..command)
 		atprint("Cond: "..(cond or "nil"))
@@ -300,30 +300,30 @@ end
 function atc.execute_atc_command(id, train)
 	--strip whitespaces
 	local command=string.match(train.atc_command, "^%s*(.*)$")
-	
-	
+
+
 	if string.match(command, "^%s*$") then
 		train.atc_command=nil
 		return
 	end
 
 	train.atc_command = eval_conditional(command, train.atc_arrow, train.velocity)
-	
+
 	if not train.atc_command then return end
 	command=string.match(train.atc_command, "^%s*(.*)$")
-	
+
 	if string.match(command, "^%s*$") then
 		train.atc_command=nil
 		return
 	end
-	
+
 	for pattern, func in pairs(matchptn) do
 		local match=string.match(command, "^"..pattern)
 		if match then
 			local patlen=func(id, train, match)
-			
+
 			atprint("Executing: "..string.sub(command, 1, patlen))
-			
+
 			train.atc_command=string.sub(command, patlen+1)
 			if train.atc_delay<=0 and not train.atc_wait_finish then
 				--continue (recursive, cmds shouldn't get too long, and it's a end-recursion.)
