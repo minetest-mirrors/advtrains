@@ -1,5 +1,5 @@
-#LyX 2.2 created this file. For more info see http://www.lyx.org/
-\lyxformat 508
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
 \save_transient_properties true
@@ -21,6 +21,8 @@
 \font_osf false
 \font_sf_scale 100 100
 \font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -50,6 +52,7 @@
 \suppress_date false
 \justification true
 \use_refstyle 1
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -62,7 +65,10 @@
 \tocdepth 3
 \paragraph_separation indent
 \paragraph_indentation default
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 1
 \papersides 1
 \paperpagestyle default
@@ -343,7 +349,7 @@ These are a regular analog signal and an electric signal.
 \begin_layout Standard
 These are some platform nodes.
  I suggest using the left one, it's only half height and looks better.
- These nodes also have a sandstone variant, craft with sandstone bricks
+ These nodes also have a sandstone variant, craft with sandstone bricks.
 \end_layout
 
 \begin_layout Standard
@@ -509,19 +515,23 @@ The upper bar shows your current speed and the lower bar shows what speed
 \end_layout
 
 \begin_layout Itemize
-W - faster
+W: Accelerate
 \end_layout
 
 \begin_layout Itemize
-S - slower / change direction
+S: Roll; change direction if the train is stopped
 \end_layout
 
 \begin_layout Itemize
-A / D – open/close doors
+A: Close doors, if one is open; open the door at the left side, if closed
 \end_layout
 
 \begin_layout Itemize
-Space: brake (shown by =B=, target speed will be decreased automatically)
+D: Close doors, if one is open; open the door at the right side, if closed
+\end_layout
+
+\begin_layout Itemize
+Space: brake (shown by >B<, target speed will be decreased automatically)
 \end_layout
 
 \begin_layout Itemize
@@ -533,16 +543,16 @@ Sneak+W: Set full speed
 \end_layout
 
 \begin_layout Itemize
-Sneak+A: Set speed to 4 (~40km/h)
+Sneak+A: Set speed to 4 (14.4km/h)
 \end_layout
 
 \begin_layout Itemize
-Sneak+D: Set speed to 8 (~100km/h)
+Sneak+D: Set speed to 8 (28.8km/h)
 \end_layout
 
 \begin_layout Itemize
 Sneak+Space: toggle brake (the brake will not release when releasing the
- keys, shown by =^B=)
+ keys, shown by >BB<)
 \end_layout
 
 \begin_layout Subsection*
