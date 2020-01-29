@@ -1,3 +1,6 @@
 ## Eclipse project files & directories
 .project
 .settings
+.directory
+assets/manual.html.LyXconv/**
+assets/interlocking.html.LyXconv/**
