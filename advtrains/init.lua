@@ -41,7 +41,7 @@ end
 
 function advtrains.pcall(fun)
 	if no_action then return end
-	
+
 	local succ, return1, return2, return3, return4=xpcall(fun, function(err)
 			atwarn("Lua Error occured: ", err)
 			atwarn(debug.traceback())
@@ -140,11 +140,11 @@ if minetest.settings:get_bool("advtrains_enable_debugging") then
 		if not context then return end
 		local text=advtrains.print_concat_table({t, ...})
 		advtrains.drb_record(context, text)
-		
+
 		--atlog("@@",advtrains.atprint_context_tid,t,...)
 	end
 	dofile(advtrains.modpath.."/debugringbuffer.lua")
-	
+
 end
 
 function assertt(var, typ)
@@ -156,7 +156,7 @@ end
 dofile(advtrains.modpath.."/helpers.lua");
 --dofile(advtrains.modpath.."/debugitems.lua");
 
-advtrains.meseconrules = 
+advtrains.meseconrules =
 {{x=0,  y=0,  z=-1},
  {x=1,  y=0,  z=0},
  {x=-1, y=0,  z=0},
@@ -222,7 +222,7 @@ end
 
 function advtrains.avt_load()
 	-- check for new, split advtrains save file
-	
+
 	local version = advtrains.read_component("version")
 	local tbl
 	if version and version == 3 then
@@ -242,7 +242,7 @@ function advtrains.avt_load()
 			wagon_save = true,
 			ptmap = true,
 			atc = true,
-			ndb = true,		
+			ndb = true,
 			lines = true,
 			version = 2,
 		}
@@ -253,7 +253,7 @@ function advtrains.avt_load()
 			tbl[i] = advtrains.read_component(i)
 		end
 		tbl["interlocking"] = il_save
-	else	
+	else
 		local file, err = io.open(advtrains.fpath, "r")
 		if not file then
 			minetest.log("warning", " Failed to read advtrains save data from file "..advtrains.fpath..": "..(err or "Unknown Error"))
@@ -352,19 +352,19 @@ advtrains.save_component = function (tbl, name)
 	file:write(datastr)
 	file:close()
 	os.rename(temppath, advtrains.fpath.."_"..name)
-	
+
 end
 
 advtrains.avt_save = function(remove_players_from_wagons)
 	--atprint("saving")
-	
+
 	if remove_players_from_wagons then
 		for w_id, data in pairs(advtrains.wagons) do
 			data.seatp={}
 		end
 		advtrains.player_to_train_mapping={}
 	end
-	
+
 	local tmp_trains={}
 	for id, train in pairs(advtrains.trains) do
 		--first, deep_copy the train
@@ -383,7 +383,7 @@ advtrains.avt_save = function(remove_players_from_wagons)
 			advtrains.remove_train(id)
 		end
 	end
-	
+
 	for id, wdata in pairs(advtrains.wagons) do
 		local _,proto = advtrains.get_wagon_prototype(wdata)
 		if proto.has_inventory then
@@ -397,7 +397,7 @@ advtrains.avt_save = function(remove_players_from_wagons)
 		-- TODO temp
 		wdata.dcpl_lock = nil
 	end
-	
+
 	--versions:
 	-- 1 - Initial new save format.
 	-- 2 - version as of tss branch 11-2018+
@@ -426,11 +426,11 @@ advtrains.avt_save = function(remove_players_from_wagons)
 	for i,k in pairs(save_tbl) do
 		advtrains.save_component(k,i)
 	end
-	
+
 	for i,k in pairs(il_save) do
 		advtrains.save_component(k,"interlocking_"..i)
 	end
-	
+
 	if DUMP_DEBUG_SAVE then
 		local file, err = io.open(advtrains.fpath.."_DUMP", "w")
 		if err then
@@ -458,7 +458,7 @@ minetest.register_globalstep(function(dtime_mt)
 		if not init_load then
 			advtrains.load()
 		end
-		
+
 		--[[
 		local dtime
 		if GENERATE_ATRICIFIAL_LAG then
@@ -466,7 +466,7 @@ minetest.register_globalstep(function(dtime_mt)
 			if os.clock()<t then
 				return
 			end
-			
+
 			t = os.clock()+0.2
 		else
 			--limit dtime: if trains move too far in one step, automation may cause stuck and wrongly braking trains
@@ -476,23 +476,28 @@ minetest.register_globalstep(function(dtime_mt)
 				dtime=0.2
 			end
 		end
-		
-        ]]
-        local dtime = dtime_mt
-		advtrains.mainloop_trainlogic(dtime)
-		if advtrains_itm_mainloop then
-			advtrains_itm_mainloop(dtime)
+		]]
+
+		-- hotfix to prevent bugs related to ATC tracks.
+		while (dtime_mt>0) do
+			local dtime = dtime_mt
+			if dtime > 0.2 then dtime = 0.2 end
+			advtrains.mainloop_trainlogic(dtime)
+			if advtrains_itm_mainloop then
+				advtrains_itm_mainloop(dtime)
+			end
+			if atlatc then
+				atlatc.mainloop_stepcode(dtime)
+				atlatc.interrupt.mainloop(dtime)
+			end
+			if advtrains.lines then
+				advtrains.lines.step(dtime)
+			end
+			dtime_mt = dtime_mt - dtime
 		end
-		if atlatc then
-			atlatc.mainloop_stepcode(dtime)
-			atlatc.interrupt.mainloop(dtime)
-		end
-		if advtrains.lines then
-			advtrains.lines.step(dtime)
-		end
-		
+
 		--trigger a save when necessary
-		save_timer=save_timer-dtime
+		save_timer=save_timer-dtime_mt
 		if save_timer<=0 then
 			local t=os.clock()
 			--save
@@ -534,7 +539,7 @@ function advtrains.save(remove_players_from_wagons)
 		atlatc.save()
 	end
 	atprint("[save_all]Saved advtrains save files")
-	
+
 	--TODO very simple yet hacky workaround for the "green signals" bug
 	advtrains.invalidate_all_paths()
 end
@@ -559,8 +564,8 @@ minetest.register_chatcommand("at_empty_seats",
 -- This chat command solves another problem: Trains getting randomly stuck.
 minetest.register_chatcommand("at_reroute",
 	{
-        params = "", 
-        description = "Delete all train routes, force them to recalculate", 
+        params = "",
+        description = "Delete all train routes, force them to recalculate",
         privs = {train_operator=true}, -- Only train operator is required, since this is relatively safe.
         func = function(name, param)
 			return advtrains.pcall(function()
@@ -573,4 +578,3 @@ minetest.register_chatcommand("at_reroute",
 
 local tot=(os.clock()-lot)*1000
 minetest.log("action", "[advtrains] Loaded in "..tot.."ms")
-
