@@ -366,18 +366,11 @@ advtrains.save_component = function (tbl, name)
 	end
 	local path = advtrains.fpath.."_"..name
 	local success = minetest.safe_file_write(path, datastr)
-	
+
 	if not success then
 		minetest.log("error", " Failed to write advtrains save data to file "..path)
 	end
-<<<<<<< HEAD
 	
-=======
-	file:write(datastr)
-	file:close()
-	os.rename(temppath, advtrains.fpath.."_"..name)
-
->>>>>>> hostfix for trains ignoring ATC tracks
 end
 
 advtrains.avt_save = function(remove_players_from_wagons)
