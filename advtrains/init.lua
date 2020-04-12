@@ -370,7 +370,7 @@ advtrains.save_component = function (tbl, name)
 	if not success then
 		minetest.log("error", " Failed to write advtrains save data to file "..path)
 	end
-	
+
 end
 
 advtrains.avt_save = function(remove_players_from_wagons)
