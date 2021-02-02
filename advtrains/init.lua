@@ -198,6 +198,8 @@ advtrains.meseconrules =
 
 advtrains.fpath=minetest.get_worldpath().."/advtrains"
 
+advtrains.atcjit=dofile(advtrains.modpath.."/atcjit.lua")
+
 dofile(advtrains.modpath.."/path.lua")
 dofile(advtrains.modpath.."/trainlogic.lua")
 dofile(advtrains.modpath.."/trainhud.lua")

@@ -53,15 +53,7 @@ function atc.send_command(pos, par_tid)
 					atwarn("ATC rail at", pos, ": Rail not on train's path! Can't determine arrow direction. Assuming +!")
 				end
 				
-				local command = atc.controllers[pts].command				
-				command = eval_conditional(command, iconnid==1, train.velocity)
-				if not command then command="" end
-				command=string.match(command, "^%s*(.*)$")
-				
-				if command == "" then
-					atprint("Sending ATC Command to", train_id, ": Not modifying, conditional evaluated empty.")
-					return true
-				end
+				local command = atc.controllers[pts].command
 				
 				atc.train_set_command(train, command, iconnid==1)
 				atprint("Sending ATC Command to", train_id, ":", command, "iconnid=",iconnid)
@@ -188,189 +180,17 @@ function atc.get_atc_controller_formspec(pos, meta)
 	return formspec.."button_exit[0.5,4.5;7,1;save;"..attrans("Save").."]"
 end
 
---from trainlogic.lua train step
-local matchptn={
-	["SM"]=function(id, train)
-		train.tarvelocity=train.max_speed
-		return 2
-	end,
-	["S([0-9]+)"]=function(id, train, match)
-		train.tarvelocity=tonumber(match)
-		return #match+1
-	end,
-	["B([0-9]+)"]=function(id, train, match)
-		if train.velocity>tonumber(match) then
-			train.atc_brake_target=tonumber(match)
-			if not train.tarvelocity or train.tarvelocity>train.atc_brake_target then
-				train.tarvelocity=train.atc_brake_target
-			end
-		end
-		return #match+1
-	end,
-	["BB"]=function(id, train)
-		train.atc_brake_target = -1
-		train.tarvelocity = 0
-		return 2
-	end,
-	["W"]=function(id, train)
-		train.atc_wait_finish=true
-		return 1
-	end,
-	["D([0-9]+)"]=function(id, train, match)
-		train.atc_delay=tonumber(match)
-		return #match+1
-	end,
-	["R"]=function(id, train)
-		if train.velocity<=0 then
-			advtrains.invert_train(id)
-			advtrains.train_ensure_init(id, train)
-			-- no one minds if this failed... this shouldn't even be called without train being initialized...
-		else
-			atwarn(sid(id), attrans("ATC Reverse command warning: didn't reverse train, train moving!"))
-		end
-		return 1
-	end,
-	["O([LRC])"]=function(id, train, match)
-		local tt={L=-1, R=1, C=0}
-		local arr=train.atc_arrow and 1 or -1
-		train.door_open = tt[match]*arr
-		return 2
-	end,
-	["K"] = function(id, train)
-		if train.door_open == 0 then
-			atwarn(sid(id), attrans("ATC Kick command warning: Doors closed"))
-			return 1
-		end
-		if train.velocity > 0 then
-			atwarn(sid(id), attrans("ATC Kick command warning: Train moving"))
-			return 1
-		end
-		local tp = train.trainparts
-		for i=1,#tp do
-			local data = advtrains.wagons[tp[i]]
-			local obj = advtrains.wagon_objects[tp[i]]
-			if data and obj then
-				local ent = obj:get_luaentity()
-				if ent then
-					for seatno,seat in pairs(ent.seats) do
-						if data.seatp[seatno] and not ent:is_driver_stand(seat) then
-							ent:get_off(seatno)
-						end
-					end
-				end
-			end
-		end
-		return 1
-	end,
-	["A([01])"]=function(id, train, match)
-		if not advtrains.interlocking then return 2 end
-		advtrains.interlocking.ars_set_disable(train, match=="0")
-		return 2
-	end,
-}
-
-eval_conditional = function(command, arrow, speed)
-	--conditional statement?
-	local is_cond, cond_applies, compare
-	local cond, rest=string.match(command, "^I([%+%-])(.+)$")
-	if cond then
-		is_cond=true
-		if cond=="+" then
-			cond_applies=arrow
-		end
-		if cond=="-" then
-			cond_applies=not arrow
-		end
-	else 
-		cond, compare, rest=string.match(command, "^I([<>]=?)([0-9]+)(.+)$")
-		if cond and compare then
-			is_cond=true
-			if cond=="<" then
-				cond_applies=speed<tonumber(compare)
-			end
-			if cond==">" then
-				cond_applies=speed>tonumber(compare)
-			end
-			if cond=="<=" then
-				cond_applies=speed<=tonumber(compare)
-			end
-			if cond==">=" then
-				cond_applies=speed>=tonumber(compare)
-			end
-		end
-	end	
-	if is_cond then
-		atprint("Evaluating if statement: "..command)
-		atprint("Cond: "..(cond or "nil"))
-		atprint("Applies: "..(cond_applies and "true" or "false"))
-		atprint("Rest: "..rest)
-		--find end of conditional statement
-		local nest, pos, elsepos=0, 1
-		while nest>=0 do
-			if pos>#rest then
-				atwarn(sid(id), attrans("ATC command syntax error: I statement not closed: @1",command))
-				return ""
-			end
-			local char=string.sub(rest, pos, pos)
-			if char=="I" then
-				nest=nest+1
-			end
-			if char==";" then
-				nest=nest-1
-			end
-			if nest==0 and char=="E" then
-				elsepos=pos+0
-			end
-			pos=pos+1
-		end
-		if not elsepos then elsepos=pos-1 end
-		if cond_applies then
-			command=string.sub(rest, 1, elsepos-1)..string.sub(rest, pos)
-		else
-			command=string.sub(rest, elsepos+1, pos-2)..string.sub(rest, pos)
-		end
-		atprint("Result: "..command)
-	end
-	return command
-end
-
 function atc.execute_atc_command(id, train)
-	--strip whitespaces
-	local command=string.match(train.atc_command, "^%s*(.*)$")
-	
-	
-	if string.match(command, "^%s*$") then
-		train.atc_command=nil
-		return
-	end
-
-	train.atc_command = eval_conditional(command, train.atc_arrow, train.velocity)
-	
-	if not train.atc_command then return end
-	command=string.match(train.atc_command, "^%s*(.*)$")
-	
-	if string.match(command, "^%s*$") then
-		train.atc_command=nil
-		return
-	end
-	
-	for pattern, func in pairs(matchptn) do
-		local match=string.match(command, "^"..pattern)
-		if match then
-			local patlen=func(id, train, match)
-			
-			atprint("Executing: "..string.sub(command, 1, patlen))
-			
-			train.atc_command=string.sub(command, patlen+1)
-			if train.atc_delay<=0 and not train.atc_wait_finish then
-				--continue (recursive, cmds shouldn't get too long, and it's a end-recursion.)
-				atc.execute_atc_command(id, train)
-			end
-			return
+	local w, e = advtrains.atcjit.execute(id, train)
+	if w then
+		for i = 1, #w, 1 do
+			atwarn(sid(id),w[i])
 		end
 	end
-	atwarn(sid(id), attrans("ATC command parse error: Unknown command: @1", command))
-	atc.train_reset_command(train, true)
+	if e then
+		atwarn(sid(id),e)
+		atc.train_reset_command(train, true)
+	end
 end
 
 
