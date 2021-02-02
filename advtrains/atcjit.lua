@@ -1,4 +1,5 @@
 local aj_cache = {}
+local aj_strout = {}
 
 local aj_tostring
 
@@ -155,8 +156,9 @@ aj_tostring = function(cmd, pos, noreset)
 		t[#t+1] = str
 		pos = pos+len
 		if endp then
-			if endp then
-				t[#t+1] = string.format("_c[#_c+1]=%q",string.sub(cmd, pos))
+			local cont = string.sub(cmd, pos)
+			if not string.match(cont, "^%s*$") then
+				t[#t+1] = string.format("_c[#_c+1]=%q",cont)
 			end
 			break
 		end
@@ -165,32 +167,37 @@ aj_tostring = function(cmd, pos, noreset)
 end
 
 local function aj_compile(cmd)
-	if aj_cache[cmd] then
-		local x = aj_cache[cmd]
-		if type(x) == "function" then
-			return x
+	local c = aj_cache[cmd]
+	if c then
+		if type(c) == "function" then
+			return c, aj_strout[cmd]
 		else
-			return nil, x
+			return nil, c
 		end
+	else
+		local str, err = aj_tostring(cmd)
+		if not str then
+			aj_cache[cmd] = err
+			return nil, err
+		end
+		str = string.format([[return function(id, train)
+			local _c={}
+			local _w={}
+			%s
+			if _c[1] then train.atc_command=table.concat(_c)
+			else train.atc_command=nil end
+			return _w, nil
+		end]], str)
+		local f, e = loadstring(str)
+		if not f then
+			aj_cache[cmd] = e
+			return nil, e
+		end
+		f = f()
+		aj_cache[cmd] = f
+		aj_strout[cmd] = str
+		return f, str
 	end
-	local str, err = aj_tostring(cmd)
-	if not str then
-		aj_cache[cmd] = err
-		return nil, err
-	end
-	local str = string.format([[return function(id,train)
-		local _c = {}
-		local _w = {}
-		%s
-		if _c[1] then train.atc_command=table.concat(_c)
-		else train.atc_command = nil end
-		return _w, nil
-	end]], str)
-	local f, e = loadstring(str)
-	if not f then return nil, e end
-	f = f()
-	aj_cache[cmd] = f
-	return f
 end
 
 local function aj_execute(id,train)

@@ -193,7 +193,19 @@ function atc.execute_atc_command(id, train)
 	end
 end
 
-
+minetest.register_chatcommand("at_get_lua",{
+	params = "<command>",
+	description = "Compile the given ATC command into Lua code and show the given code",
+	privs = {train_admin = true},
+	func = function(name, params)
+		local f, s = advtrains.atcjit.compile(params)
+		if not f then	
+			return false, s or ("Unknown compilation error")
+		else
+			return true, s
+		end
+	end,
+})
 
 --move table to desired place
 advtrains.atc=atc

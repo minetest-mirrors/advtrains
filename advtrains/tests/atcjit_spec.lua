@@ -154,3 +154,18 @@ describe("ATC track with invalid I condition", function()
 	local t = { atc_command = "I?;" }
 	thisatc("should report an error", t, {}, "Invalid I statement", t)
 end)
+
+describe("ATC track reusing existing code", function()
+	local t = { atc_command = " B12WB8WBBWOLD15ORD15OCD1RS10WSM", tarvelocity = 15 }
+	thisatc("should do the same thing as in the first test", t, {}, nil, {
+		atc_brake_target = 12,
+		atc_command = "B8WBBWOLD15ORD15OCD1RS10WSM",
+		atc_wait_finish = true,
+		tarvelocity = 12
+	})
+end)
+
+describe("ATC track reusing malformed code", function()
+	local t = {atc_command = "I?;"}
+	thisatc("Should report the invalid I statement", t, {}, "Invalid I statement", t)
+end)
