@@ -181,12 +181,7 @@ function atc.get_atc_controller_formspec(pos, meta)
 end
 
 function atc.execute_atc_command(id, train)
-	local w, e = advtrains.atcjit.execute(id, train)
-	if w then
-		for i = 1, #w, 1 do
-			atwarn(sid(id),w[i])
-		end
-	end
+	local _, e = advtrains.atcjit.execute(id, train)
 	if e then
 		atwarn(sid(id),e)
 		atc.train_reset_command(train, true)

@@ -3,6 +3,18 @@ local aj_strout = {}
 
 local aj_tostring
 
+--[[ Notes on the pattern matching functions:
+- Patterns can have multiple captures (e.g. coordinates). These captures
+are passed starting from the second argument.
+- The commands after the match are passed as the first argument. If the
+command involves waiting, it should:
+  - Set train.atc_command to the first argument passed to the function,
+  - End with "do return end", and
+  - Return true as the second argument
+- The function should return a string to be compiled as the first result.
+- In case of an error, the function should return nil as the first
+argument and the error message as the second argument.
+]]
 local matchptn = {
 	["A[01FT]"] = function(match)
 		return string.format(
@@ -13,20 +25,24 @@ local matchptn = {
 		return [[do
 			train.atc_brake_target = -1
 			train.tarvelocity = 0
-		end]], 2
+		end]]
 	end,
-	["B([0-9]+)"] = function(match)
+	["B([0-9]+)"] = function(_, match)
 		return string.format([[do
 			train.atc_brake_target = %s
 			if not train.tarvelocity or train.tarvelocity > train.atc_brake_target then
 				train.tarvelocity = train.atc_brake_target
 			end
-		end]], match),#match+1
+		end]], match)
 	end,
-	["D([0-9]+)"] = function(match)
-		return string.format("train.atc_delay = %s", match), #match+1, true
+	["D([0-9]+)"] = function(cont, match)
+		return string.format([[do
+			train.atc_delay = %s
+			train.atc_command = %q
+			return
+		end]], match, cont), true
 	end,
-	["(%bI;)"] = function(match)
+	["(%bI;)"] = function(cont, match)
 		local i = 2
 		local l = #match
 		local epos
@@ -48,41 +64,41 @@ local matchptn = {
 			local vtrue = string.sub(match, 3, epos and epos-1 or -2)
 			local vfalse = epos and string.sub(match, epos+1, -2)
 			local cstr = (cond == "-") and "not" or ""
-			local tstr, err = aj_tostring(vtrue, 1, true)
+			local tstr, err = aj_tostring(vtrue, 1, cont)
 			if not tstr then return nil, err end
 			if vfalse then
-				local fstr, err = aj_tostring(vfalse, 1, true)
+				local fstr, err = aj_tostring(vfalse, 1, cont)
 				if not fstr then return nil, err end
 				return string.format("if %s train.atc_arrow then %s else %s end",
-					cstr, tstr, fstr), l, endp
+					cstr, tstr, fstr)
 			else
-				return string.format("if %s train.atc_arrow then %s end", cstr, tstr), l, endp
+				return string.format("if %s train.atc_arrow then %s end", cstr, tstr)
 			end
 		else
 			local op, ref = string.match(match,"^I([<>]=?)([0-9]+)")
 			if not op then
-				return _, "Invalid I statement"
+				return nil, "Invalid I statement"
 			end
 			local spos = 2+#op+#ref
 			local vtrue = string.sub(match, spos, epos and epos-1 or -2)
 			local vfalse = epos and string.sub(match, epos+1, -2)
 			local cstr = string.format("train.velocity %s %s", op, ref)
-			local tstr = aj_tostring(vtrue, 1, true)
+			local tstr = aj_tostring(vtrue, 1, cont)
 			if vfalse then
-				local fstr, err = aj_tostring(vfalse, 1, true)
+				local fstr, err = aj_tostring(vfalse, 1, cont)
 				if not fstr then return nil, err end
-				return string.format("if %s then %s else %s end", cstr, tstr, fstr), l, endp
+				return string.format("if %s then %s else %s end", cstr, tstr, fstr)
 			else
-				return string.format("if %s then %s end", cstr, tstr), l, endp
+				return string.format("if %s then %s end", cstr, tstr)
 			end
 		end
 	end,
 	["K"] = function()
 		return [=[do
 			if train.door_open == 0 then
-				_w[#_w+1] = attrans("ATC Kick command warning: Doors are closed")
+				atwarn(sid(id),attrans("ATC Kick command warning: Doors are closed"))
 			elseif train.velocity>0 then
-				_w[#_w+1] = attrans("ATC Kick command warning: Train moving")
+				atwarn(sid(id),attrans("ATC Kick command warning: Train moving"))
 			else
 				local tp = train.trainparts
 				for i = 1, #tp do
@@ -100,14 +116,14 @@ local matchptn = {
 					end
 				end
 			end
-		end]=], 1
+		end]=]
 	end,
-	["O([LR])"] = function(match)
+	["O([LR])"] = function(_, match)
 		local tt = {L = -1, R = 1}
-		return string.format("train.door_open = %d*(train.atc_arrow and 1 or -1)",tt[match]), 2
+		return string.format("train.door_open = %d*(train.atc_arrow and 1 or -1)",tt[match])
 	end,
-	["OC"] = function(match)
-		return "train.door_open = 0", 2
+	["OC"] = function()
+		return "train.door_open = 0"
 	end,
 	["R"] = function()
 		return [[
@@ -115,32 +131,38 @@ local matchptn = {
 				advtrains.invert_train(id)
 				advtrains.train_ensure_init(id, train)
 			else
-				_w[#_w+1] = attrans("ATC Reverse command warning: didn't reverse train, train moving!")
-			end]], 1
+				atwarn(sid(id),attrans("ATC Reverse command warning: didn't reverse train, train moving!"))
+			end]]
 	end,
 	["SM"] = function()
-		return "train.tarvelocity=train.max_speed", 2
+		return "train.tarvelocity=train.max_speed"
 	end,
-	["S([0-9]+)"] = function(match)
-		return string.format("train.tarvelocity=%s",match), #match+1
+	["S([0-9]+)"] = function(_, match)
+		return string.format("train.tarvelocity=%s",match)
 	end,
-	["W"] = function()
-		return "train.atc_wait_finish=true", 1, true
+	["W"] = function(cont)
+		return string.format([[do
+			train.atc_wait_finish=true
+			train.atc_command=%q
+			return
+		end]], cont), true
 	end,
 }
 
-local function aj_tostring_single(cmd, pos)
+local function aj_tostring_single(cmd, pos, cont)
 	if not pos then pos = 1 end
 	for pattern, func in pairs(matchptn) do
-		local match = {string.match(cmd, "^"..pattern, pos)}
+		local match = {string.find(cmd, "^"..pattern, pos)}
 		if match[1] then
-			return func(unpack(match))
+			local e = match[2]
+			match[2] = string.sub(cmd, e+1)..(cont or "")
+			return e+1, func(unpack(match, 2))
 		end
 	end
 	return nil
 end
 
-aj_tostring = function(cmd, pos, noreset)
+aj_tostring = function(cmd, pos, cont)
 	if not pos then pos = 1 end
 	local t = {}
 	local endp = false
@@ -148,18 +170,14 @@ aj_tostring = function(cmd, pos, noreset)
 		if string.match(cmd,"^%s+$", pos) then break end
 		local _, e = string.find(cmd, "^%s+", pos)
 		if e then pos = e+1 end
-		local str, len
-		str, len, endp = aj_tostring_single(cmd, pos)
+		local nxt, str
+		nxt, str, endp = aj_tostring_single(cmd, pos, cont or "")
 		if not str then
-			return nil, (len or "Invalid command or malformed I statement: "..string.sub(cmd,pos))
+			return nil, (endp or "Invalid command or malformed I statement: "..string.sub(cmd,pos))
 		end
 		t[#t+1] = str
-		pos = pos+len
+		pos = nxt
 		if endp then
-			local cont = string.sub(cmd, pos)
-			if not string.match(cont, "^%s*$") then
-				t[#t+1] = string.format("_c[#_c+1]=%q",cont)
-			end
 			break
 		end
 	end
@@ -181,12 +199,8 @@ local function aj_compile(cmd)
 			return nil, err
 		end
 		str = string.format([[return function(id, train)
-			local _c={}
-			local _w={}
 			%s
-			if _c[1] then train.atc_command=table.concat(_c)
-			else train.atc_command=nil end
-			return _w, nil
+			train.atc_command=nil
 		end]], str)
 		local f, e = loadstring(str)
 		if not f then
