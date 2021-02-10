@@ -16,10 +16,10 @@ command involves waiting, it should:
 argument and the error message as the second argument.
 ]]
 local matchptn = {
-	["A[01FT]"] = function(match)
+	["A([01FT])"] = function(_, match)
 		return string.format(
-			"advtrains.interlocking.set_ars_disable(train,%s)",
-			(match=="0" or match=="F") and "true" or "false"), false
+			"train.ars_disable=%s",
+			(match=="0" or match=="F") and "true" or "false")
 	end,
 	["BB"] = function()
 		return [[do

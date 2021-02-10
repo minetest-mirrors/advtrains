@@ -167,5 +167,13 @@ end)
 
 describe("ATC track reusing malformed code", function()
 	local t = {atc_command = "I?;"}
-	thisatc("Should report the invalid I statement", t, {}, "Invalid I statement", t)
+	thisatc("should report the invalid I statement", t, {}, "Invalid I statement", t)
+end)
+
+describe("ATC track that sets ARS modes", function()
+	local t = {atc_command = "A0WA1WAFWAT"}
+	thisatc("should disable ARS on the train with A0", t, {}, nil, {atc_wait_finish=true, ars_disable=true,  atc_command="A1WAFWAT"})
+	thisatc("should enable ARS on the train with A1",  t, {}, nil, {atc_wait_finish=true, ars_disable=false, atc_command="AFWAT"})
+	thisatc("should disable ARS on the train with AF", t, {}, nil, {atc_wait_finish=true, ars_disable=true,  atc_command="AT"})
+	thisatc("should enable ARS on the train with AT",  t, {}, nil, {atc_wait_finish=true, ars_disable=false,})
 end)
