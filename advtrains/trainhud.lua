@@ -86,16 +86,18 @@ function advtrains.on_control_change(pc, train, flip)
 		end
 	end
 end
-function advtrains.update_driver_hud(pname, train, flip)
+function advtrains.update_driver_hud(pname, train, flip, thud, ghud)
 	local inside=train.text_inside or ""
-	local ft, ht = advtrains.hud_train_format(train, flip)
-	advtrains.set_trainhud(pname, inside.."\n"..ft, ht)
+	local ft = (thud or advtrains.hud.dtext)(train, flip)
+	local ht, gs = (ghud or advtrains.hud.dgraphical)(train, flip)
+	advtrains.set_trainhud(pname, inside.."\n"..ft, ht, gs)
 end
 function advtrains.clear_driver_hud(pname)
 	advtrains.set_trainhud(pname, "")
 end
 
-function advtrains.set_trainhud(name, text, driver)
+function advtrains.set_trainhud(name, text, driver, gs)
+	gs = gs or 110
 	local hud = advtrains.hud[name]
 	local player=minetest.get_player_by_name(name)
 	if not player then
@@ -117,7 +119,7 @@ function advtrains.set_trainhud(name, text, driver)
 			name = "ADVTRAINS",
 			number = 0xFFFFFF,
 			position = {x=0.5, y=1},
-			offset = {x=0, y=-300},
+			offset = {x=0, y=-190-gs},
 			text = text,
 			scale = {x=200, y=60},
 			alignment = {x=0, y=-1},
@@ -127,6 +129,7 @@ function advtrains.set_trainhud(name, text, driver)
 	else
 		if hud.oldText ~= text then
 			player:hud_change(hud.id, "text", text)
+			player:hud_change(hud.id, "offset", {x=0, y=-190-gs})
 			hud.oldText=text
 		end
 		if hud.driver then
@@ -175,70 +178,109 @@ Value	Disp	Control	Meaning
 4		+		W		Accelerate
 ]]
 
-function advtrains.hud_train_format(train, flip)
-	if not train then return "","" end
+function advtrains.hud.dtext(train, flip)
+	local st = {}
+	if train.debug then st = {train.debug} end
+	
+	if res and res == 0 then
+		st[#st+1] = attrans("OVERRUN RED SIGNAL! Examine situation and reverse train to move again.")
+	end
+	
+	if train.atc_command then
+			st[#st+1] = string.format("ATC: %s%s", train.atc_delay and advtrains.abs_ceil(train.atc_delay).."s " or "", train.atc_command or "")
+	end
+	
+	return table.concat(st, "\n")
+end
+
+function advtrains.hud.sevenseg(digit, x, y, w, h, m)
+	local st = {}
+	local sformat = string.format
+	local f = "%d,%d=(advtrains_hud_bg.png^[resize\\:%dx%d"..(m and "^%s)" or ")")
+	local segs = {
+		{h, 0, w, h},
+		{0, h, h, w},
+		{w+h, h, h, w},
+		{h, w+h, w, h},
+		{0, w+2*h, h, w},
+		{w+h, w+2*h, h, w},
+		{h, 2*(w+h), w, h}}
+	local trans = {
+		[0] = {true, true, true, false, true, true, true},
+		[1] = {false, false, true, false, false, true, false},
+		[2] = {true, false, true, true, true, false, true},
+		[3] = {true, false, true, true, false, true, true},
+		[4] = {false, true, true, true, false, true, false},
+		[5] = {true, true, false, true, false, true, true},
+		[6] = {true, true, false, true, true, true, true},
+		[7] = {true, false, true, false, false, true, false},
+		[8] = {true, true, true, true, true, true, true},
+		[9] = {true, true, true, true, false, true, true}}
+	local ent = trans[digit or 10]
+	if not ent then return end
+	for i = 1, 7, 1 do
+		if ent[i] then
+			local s = segs[i]
+			st[#st+1] = sformat(f, x+s[1], y+s[2], s[3], s[4], m)
+		end
+	end
+	return table.concat(st,":")
+end
+
+function advtrains.hud.leverof(train)
+	if not train then return nil end
+	local tlev=train.lever or 3
+	if train.velocity==0 and not train.active_control then tlev=1 end
+	if train.hud_lzb_effect_tmr then
+		tlev=1
+	end
+	return tlev
+end
+
+function advtrains.hud.lever(lever, x, y, w1, w2, height)
+	local sformat = string.format
+	local hs = height/5
+	local st = {
+		sformat("%d,%d=(advtrains_hud_bg.png^[colorize\\:cyan^[resize\\:%dx%d)", x, y, w1, hs),
+		sformat("%d,%d=(advtrains_hud_bg.png^[colorize\\:white^[resize\\:%dx%d)", x, y+hs, w1, hs),
+		sformat("%d,%d=(advtrains_hud_bg.png^[colorize\\:orange^[resize\\:%dx%d)", x, y+hs*2, w1, hs*2),
+		sformat("%d,%d=(advtrains_hud_bg.png^[colorize\\:red^[resize\\:%dx%d)", x, y+hs*4, w1, hs),
+		sformat("%d,%d=(advtrains_hud_bg.png^[colorize\\:darkslategray^[resize\\:%dx%d)", x+(w2+w1)/2, y+(hs-w1)/2, w1, hs*4+2*w1),
+		sformat("%d,%d=(advtrains_hud_bg.png^[colorize\\:gray^[resize\\:%dx%d)", x+w1, y+(4-lever)*hs, w2, hs),
+	}
+	return table.concat(st, ":")
+end
+
+function advtrains.hud.door(o, x, y, w, h, m)
+	local sformat = string.format
+	local dw = (w-m*2)/4
+	local ww = w-(dw+m)*2
+	local wh = h/2-m
+	local st = {
+		sformat("%d,%d=(advtrains_hud_bg.png^[resize\\:%dx%d^[colorize\\:white)", x+dw+m, y, ww, h),
+		sformat("%d,%d=(advtrains_hud_bg.png^[resize\\:%dx%d)", x+dw+m*2, y+m, ww-2*m, wh),
+		sformat("%d,%d=(advtrains_hud_bg.png^[resize\\:%dx%d^[colorize\\:%s)", x, y, dw, h, o==-1 and "white" or "darkslategray"),
+		sformat("%d,%d=(advtrains_hud_bg.png^[resize\\:%dx%d)", x+m, y+m, dw-2*m, wh),
+		sformat("%d,%d=(advtrains_hud_bg.png^[resize\\:%dx%d^[colorize\\:%s)", x+w-dw, y, dw, h, o==1 and "white" or "darkslategray"),
+		sformat("%d,%d=(advtrains_hud_bg.png^[resize\\:%dx%d)", x+w-dw+m, y+m, dw-2*m, wh),
+	}
+	return table.concat(st, ":")
+end
+
+function advtrains.hud.dgraphical(train, flip)
+	if not train then return "" end
 	local sformat = string.format -- this appears to be faster than (...):format
+	local sevenseg = advtrains.hud.sevenseg
 	
 	local max = train.max_speed or 10
 	local res = train.speed_restriction
 	local vel = advtrains.abs_ceil(train.velocity)
 	local vel_kmh=advtrains.abs_ceil(advtrains.ms_to_kmh(train.velocity))
 	
-	local tlev=train.lever or 1
-	if train.velocity==0 and not train.active_control then tlev=1 end
-	if train.hud_lzb_effect_tmr then
-		tlev=1
-	end
-	
 	local ht = {"[combine:440x110:0,0=(advtrains_hud_bg.png^[resize\\:440x110)"}
-	local st = {}
 	if train.debug then st = {train.debug} end
 	
-	-- seven-segment display
-	local function sevenseg(digit, x, y, w, h, m)
-		--[[
-		 -1-
-		2   3
-		 -4-
-		5   6
-		 -7-
-		]]
-		local segs = {
-			{h, 0, w, h},
-			{0, h, h, w},
-			{w+h, h, h, w},
-			{h, w+h, w, h},
-			{0, w+2*h, h, w},
-			{w+h, w+2*h, h, w},
-			{h, 2*(w+h), w, h}}
-		local trans = {
-			[0] = {true, true, true, false, true, true, true},
-			[1] = {false, false, true, false, false, true, false},
-			[2] = {true, false, true, true, true, false, true},
-			[3] = {true, false, true, true, false, true, true},
-			[4] = {false, true, true, true, false, true, false},
-			[5] = {true, true, false, true, false, true, true},
-			[6] = {true, true, false, true, true, true, true},
-			[7] = {true, false, true, false, false, true, false},
-			[8] = {true, true, true, true, true, true, true},
-			[9] = {true, true, true, true, false, true, true}}
-		local ent = trans[digit or 10]
-		if not ent then return end
-		for i = 1, 7, 1 do
-			if ent[i] then
-				local s = segs[i]
-				ht[#ht+1] = sformat("%d,%d=(advtrains_hud_bg.png^[resize\\:%dx%d^%s)",x+s[1], y+s[2], s[3], s[4], m)
-			end
-		end
-	end
-	
-	-- lever
-	ht[#ht+1] = "275,10=(advtrains_hud_bg.png^[colorize\\:cyan^[resize\\:5x18)"
-	ht[#ht+1] = "275,28=(advtrains_hud_bg.png^[colorize\\:white^[resize\\:5x18)"
-	ht[#ht+1] = "275,46=(advtrains_hud_bg.png^[colorize\\:orange^[resize\\:5x36)"
-	ht[#ht+1] = "275,82=(advtrains_hud_bg.png^[colorize\\:red^[resize\\:5x18)"
-	ht[#ht+1] = "292,16=(advtrains_hud_bg.png^[colorize\\:darkslategray^[resize\\:6x78)"
-	ht[#ht+1] = sformat("280,%s=(advtrains_hud_bg.png^[colorize\\:gray^[resize\\:30x18)",18*(4-tlev)+10)
+	ht[#ht+1] = advtrains.hud.lever(advtrains.hud.leverof(train), 275, 10, 5, 30, 90)
 	-- reverser
 	ht[#ht+1] = sformat("245,10=(advtrains_hud_arrow.png^[transformFY%s)", flip and "" or "^[multiply\\:cyan")
 	ht[#ht+1] = sformat("245,85=(advtrains_hud_arrow.png%s)", flip and "^[multiply\\:orange" or "")
@@ -254,16 +296,10 @@ function advtrains.hud_train_format(train, flip)
 	if train.is_shunt then
 		ht[#ht+1] = "90,10=(advtrains_hud_shunt.png^[resize\\:30x30^[multiply\\:orange)"
 	end
-	-- door
-	ht[#ht+1] = "187,10=(advtrains_hud_bg.png^[resize\\:26x30^[colorize\\:white)"
-	ht[#ht+1] = "189,12=(advtrains_hud_bg.png^[resize\\:22x11)"
-	ht[#ht+1] = sformat("170,10=(advtrains_hud_bg.png^[resize\\:15x30^[colorize\\:%s)", train.door_open==-1 and "white" or "darkslategray")
-	ht[#ht+1] = "172,12=(advtrains_hud_bg.png^[resize\\:11x11)"
-	ht[#ht+1] = sformat("215,10=(advtrains_hud_bg.png^[resize\\:15x30^[colorize\\:%s)", train.door_open==1 and "white" or "darkslategray")
-	ht[#ht+1] = "217,12=(advtrains_hud_bg.png^[resize\\:11x11)"
+	ht[#ht+1] = advtrains.hud.door(train.door_open, 170, 10, 60, 30, 2)
 	-- speed indication(s)
-	sevenseg(math.floor(vel/10), 320, 10, 30, 10, "[colorize\\:red\\:255")
-	sevenseg(vel%10, 380, 10, 30, 10, "[colorize\\:red\\:255")
+	ht[#ht+1] = sevenseg(math.floor(vel/10), 320, 10, 30, 10, "[colorize\\:red\\:255")
+	ht[#ht+1] = sevenseg(vel%10, 380, 10, 30, 10, "[colorize\\:red\\:255")
 	for i = 1, vel, 1 do
 		ht[#ht+1] = sformat("%d,65=(advtrains_hud_bg.png^[resize\\:8x20^[colorize\\:white)", i*11-1)
 	end
@@ -294,28 +330,21 @@ function advtrains.hud_train_format(train, flip)
 				local dist = floor(((oc[i].index or train.index)-train.index))
 				dist = math.max(0, math.min(999, dist))
 				for j = 1, 3, 1 do
-					sevenseg(floor((dist/10^(3-j))%10), 119+j*11, 18, 4, 2, "[colorize\\:"..c)
+					ht[#ht+1] = sevenseg(floor((dist/10^(3-j))%10), 119+j*11, 18, 4, 2, "[colorize\\:"..c)
 				end
 				break
 			end
 		end
 	end
 	
-	if res and res == 0 then
-		st[#st+1] = attrans("OVERRUN RED SIGNAL! Examine situation and reverse train to move again.")
-	end
-	
-	if train.atc_command then
-			st[#st+1] = sformat("ATC: %s%s", train.atc_delay and advtrains.abs_ceil(train.atc_delay).."s " or "", train.atc_command or "")
-	end
-	
-	return table.concat(st,"\n"), table.concat(ht,":")
+	return table.concat(ht,":"), 110
 end
 
-local _, texture = advtrains.hud_train_format { -- dummy train object to demonstrate the train hud
+local texture = advtrains.hud.dgraphical { -- dummy train object to demonstrate the train hud
 	max_speed = 15, speed_restriction = 15, velocity = 15, tarvelocity = 12,
 	active_control = true, lever = 3, ctrl = {lzb = true}, is_shunt = true,
-	door_open = 1, lzb = {oncoming = {{spd=6, idx=125.7}}}, index = 0,
+	door_open = 1, lzb = {checkpoints = {{speed=6, index=125.7}}}, index = 0,
+	hud_lzb_effect_tmr = true,
 }
 
 minetest.register_node("advtrains:hud_demo",{

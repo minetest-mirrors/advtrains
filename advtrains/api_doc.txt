@@ -120,6 +120,12 @@ advtrains.register_wagon(name, prototype, description, inventory_image)
 	^- both the inventory grid and a 'Wagon properties' button.
 	^- Use "list["..inventory_name..";<list_name>;<X>,<Y>;<W>,<H>;<Start>]" to display a wagon's inventory list.
 
+	text_hud = function(train, flip) end
+	^- optional: Text HUD to show to the driver. The inside display is automatically prepended.
+	graphical_hud = function(train, flip) end
+	^- optional: Graphical HUD to show to the driver.
+	The HUD formats defined by advtrains are used by default.
+
 	custom_on_step = function(self, dtime) end
 	^- optional: Execute custom code on every step
 	custom_on_activate = function(self, dtime_s) end
