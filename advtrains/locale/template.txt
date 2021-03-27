@@ -1,0 +1,146 @@
+# textdomain: advtrains
+
+# Advtrains Core (unorganized)
+This wagon is owned by @1, you can't destroy it.=This wagon is owned by @1, you can't destroy it.
+Warning: If you destroy this wagon, you only get some steel back! If you are sure, hold Sneak and left-click the wagon.=Warning: If you destroy this wagon, you only get some steel back! If you are sure, hold Sneak and left-click the wagon.
+This position is protected!=This position is protected!
+Can't place: not pointing at node=Can't place: not pointing at node
+Can't place: space occupied!=Can't place: space occupied!
+Can't place: protected position!=Can't place: protected position!
+Can't place: Not enough slope items left (@1 required)=Can't place: Not enough slope items left (@1 required)
+Can't place: There's no slope of length @1=Can't place: There's no slope of length @1
+Can't place: no supporting node at upper end.=Can't place: no supporting node at upper end.
+Deprecated Track=Deprecated Track
+Can't get on: wagon full or doors closed!=Can't get on: wagon full or doors closed!
+Use Sneak+rightclick to bypass closed doors!=Use Sneak+rightclick to bypass closed doors!
+Doors are closed! Use Sneak+rightclick to ignore the closed doors and get off!=Doors are closed! Use Sneak+rightclick to ignore the closed doors and get off!
+Access to @1=Access to @1
+You do not have the @1 privilege.=You do not have the @1 privilege.
+The wagon's inventory is not empty!=The wagon's inventory is not empty!
+Position is occupied by a train.=Position is occupied by a train.
+There's a Track Circuit Break here.=There's a Track Circuit Break here.
+There's a Signal Influence Point here.=There's a Signal Influence Point here.
+
+# Trackworker, rotation, adjustment
+This node can't be rotated using the trackworker!=This node can't be rotated using the trackworker!
+This node can't be changed using the trackworker!=This node can't be changed using the trackworker!
+This track can not be changed!=This track can not be changed!
+This track can not be rotated!=This track can not be rotated!
+This track can not be removed!=This track can not be removed!
+
+# ATC
+ATC controller, unconfigured.=ATC controller, unconfigured.
+ATC controller=ATC controller
+ATC controller, mode @1@nChannel: @2=ATC controller, mode @1@nChannel: @2
+ATC controller, mode @1@nCommand: @2=ATC controller, mode @1@nCommand: @2
+Command=Command
+Command (on)=Command (on)
+Digiline channel=Digiline channel
+ATC Kick command warning: Doors closed=ATC Kick command warning: Doors closed
+ATC Kick command warning: Train moving=ATC Kick command warning: Train moving
+ATC Reverse command warning: didn't reverse train, train moving!=ATC Reverse command warning: didn't reverse train, train moving!
+ATC command syntax error: I statement not closed: @1=ATC command syntax error: I statement not closed: @1
+ATC command parse error: Unknown command: @1=ATC command parse error: Unknown command: @1
+
+# Coupling
+Lock couples=Lock couples
+You need to own at least one neighboring wagon to destroy this couple.=You need to own at least one neighboring wagon to destroy this couple.
+Buffer and Chain Coupler=Buffer and Chain Coupler
+Scharfenberg Coupler=Scharfenberg Coupler
+Japanese Train Inter-Wagon Connection=Japanese Train Inter-Wagon Connection
+Can not couple: The couplers of the trains do not match (@1 and @2).=Can not couple: The couplers of the trains do not match (@1 and @2).
+You are not allowed to couple trains without the train_operator privilege.=You are not allowed to couple trains without the train_operator privilege.
+
+# Clipboard
+The track you are trying to place the wagon on is not long enough!=The track you are trying to place the wagon on is not long enough!
+The clipboard couldn't access the metadata. Paste failed.=The clipboard couldn't access the metadata. Paste failed.
+The clipboard couldn't access the metadata. Copy failed.=The clipboard couldn't access the metadata. Copy failed.
+The clipboard is empty.=The clipboard is empty.
+Back of train would end up off track, cancelling.=Back of train would end up off track, cancelling.
+No such lua entity!=No such lua entity!
+No such wagon: @1=No such wagon: @1
+No such train: @1=No such train: @1
+Train copied!=Train copied!
+
+# Protection
+You are not allowed to build tracks without the track_builder privilege.=You are not allowed to build tracks without the track_builder privilege.
+You are not allowed to build near tracks without the track_builder privilege.=You are not allowed to build near tracks without the track_builder privilege.
+You are not allowed to build tracks at this protected position.=You are not allowed to build tracks at this protected position.
+You are not allowed to build near tracks at this protected position.=You are not allowed to build near tracks at this protected position.
+You are not allowed to operate turnouts and signals without the railway_operator privilege.=You are not allowed to operate turnouts and signals without the railway_operator privilege.
+
+# Train HUD/Formspecs
+Speed:=Speed:
+Target:=Target:
+Show Inventory=Show Inventory
+Select seat:=Select seat:
+Wagon properties=Wagon properties
+Save wagon properties=Save wagon properties
+Text displayed outside on train=Text displayed outside on train
+Text displayed inside train=Text displayed inside train
+Line=Line
+Routingcode=Routingcode
+Get off=Get off
+Get off (forced)=Get off (forced)
+(Doors closed)=(Doors closed)
+
+# General
+Save=Save
+
+# Line automation
+Station Code=Station Code
+Station Name=Station Name
+Door Delay=Door Delay
+Door Side=Door Side
+Dep. Speed=Dep. Speed
+Stop Time=Stop Time
+
+# Items
+Track Worker Tool@n@nLeft-click: change rail type (straight/curve/switch)@nRight-click: rotate rail/bumper/signal/etc.=Track Worker Tool@n@nLeft-click: change rail type (straight/curve/switch)@nRight-click: rotate rail/bumper/signal/etc.
+Passive Component Naming Tool@n@nRight-click to name a passive component.=Passive Component Naming Tool@n@nRight-click to name a passive component.
+Train copy/paste tool@n@nLeft-click: copy train@nRight-click: paste train=Train copy/paste tool@n@nLeft-click: copy train@nRight-click: paste train
+Track=Track
+Perpendicular Diamond Crossing Track=Perpendicular Diamond Crossing Track
+Diagonal Diamond Crossing Track=Diagonal Diamond Crossing Track
+90+Angle Diamond Crossing Track=90+Angle Diamond Crossing Track
+Y-turnout=Y-turnout
+3-way turnout=3-way turnout
+Unloading Track=Unloading Track
+Loading Track=Loading Track
+Bumper=Bumper
+Detector Rail=Detector Rail
+@1 Slope=@1 Slope
+@1 Platform (low)=@1 Platform (low)
+@1 Platform (high)=@1 Platform (high)
+@1 Platform (low, 45 degree)=@1 Platform (low, 45 degree)
+@1 Platform (45 degree)=@1 Platform (45 degree)
+Lampless Signal=Lampless Signal
+Signal=Signal
+Wallmounted Signal (l)=Wallmounted Signal (l)
+Wallmounted Signal (r)=Wallmounted Signal (r)
+Wallmounted Signal (t)=Wallmounted Signal (t)
+Andrew's Cross=Andrew's Cross
+Boiler=Boiler
+driver's cab=driver's cab
+Wheel=Wheel
+Chimney=Chimney
+
+# Seats
+Default Seat=Default Seat
+Default Seat (driver stand)=Default Seat (driver stand)
+Driver stand=Driver stand
+Driver Stand (left)=Driver Stand (left)
+Driver Stand (right)=Driver Stand (right)
+
+# Wagon/engine types
+Industrial Train Engine=Industrial Train Engine
+Big Industrial Train Engine=Big Industrial Train Engine
+Industrial tank wagon=Industrial tank wagon
+Industrial wood wagon=Industrial wood wagon
+Japanese Train Engine=Japanese Train Engine
+Japanese Train Wagon=Japanese Train Wagon
+Steam Engine=Steam Engine
+Detailed Steam Engine=Detailed Steam Engine
+Passenger Wagon=Passenger Wagon
+Box Wagon=Box Wagon
+Subway Passenger Wagon=Subway Passenger Wagon

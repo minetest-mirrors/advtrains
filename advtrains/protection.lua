@@ -145,12 +145,12 @@ function advtrains.check_track_protection(pos, pname, near, prot_p)
 	--atdebug("CTP: ",pos,pname,near,prot_p,"priv=",priv,"prot=",prot,"dprot=",dprot)
 	
 	if not priv and (not boo or prot or not dprot) then
-		minetest.chat_send_player(pname, "You are not allowed to build "..nears.."tracks without track_builder privilege")
+		minetest.chat_send_player(pname, near and attrans("You are not allowed to build near tracks without the track_builder privilege.") or attrans("You are not allowed to build tracks without the track_builder privilege."))
 		minetest.log("action", pname.." tried to modify terrain "..nears.."track at "..minetest.pos_to_string(apos).." but is not permitted to (no privilege)")
 		return false
 	end
 	if prot then
-		minetest.chat_send_player(pname, "You are not allowed to build "..nears.."tracks at protected position!")
+		minetest.chat_send_player(pname, near and attrans("You are not allowed to build near tracks at this protected position.") or attrans("You are not allowed to build tracks at this protected position."))
 		minetest.record_protection_violation(pos, pname)
 		minetest.log("action", pname.." tried to modify "..nears.."track at "..minetest.pos_to_string(apos).." but position is protected!")
 		return false
@@ -181,7 +181,7 @@ function advtrains.check_turnout_signal_protection(pos, pname)
 			nocheck=false
 			return true
 		else
-			minetest.chat_send_player(pname, "You are not allowed to operate turnouts and signals (missing railway_operator privilege)")
+			minetest.chat_send_player(pname, attrans("You are not allowed to operate turnouts and signals without the railway_operator privilege."))
 			minetest.log("action", pname.." tried to operate turnout/signal at "..minetest.pos_to_string(pos).." but does not have railway_operator")
 			nocheck=false
 			return false

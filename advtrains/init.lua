@@ -22,8 +22,7 @@ Copyright (C) 2016-2020  Moritz Blei (orwell96) and contributors
 local lot = os.clock()
 minetest.log("action", "[advtrains] Loading...")
 
--- There is no need to support 0.4.x anymore given that the compatitability with it is already broken by 1bb1d825f46af3562554c12fba35a31b9f7973ff
-attrans = minetest.get_translator ("advtrains")
+attrans = minetest.get_translator("advtrains")
 
 --advtrains
 advtrains = {trains={}, player_to_train_mapping={}}
@@ -181,7 +180,7 @@ function assertt(var, typ)
 	end
 end
 
-dofile(advtrains.modpath.."/helpers.lua");
+dofile(advtrains.modpath.."/helpers.lua")
 --dofile(advtrains.modpath.."/debugitems.lua");
 
 advtrains.meseconrules = 

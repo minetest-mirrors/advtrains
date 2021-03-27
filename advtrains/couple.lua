@@ -184,8 +184,8 @@ end
 function advtrains.safe_couple_trains(train1, t1_is_front, train2, t2_is_front, pname)
 
 	if pname and not minetest.check_player_privs(pname, "train_operator") then
-		   minetest.chat_send_player(pname, "Missing train_operator privilege")
-		   return false
+		minetest.chat_send_player(pname, S("You are not allowed to couple trains without the train_operator privilege."))
+		return false
 	end
 
 	local wck_t1, wck_t2

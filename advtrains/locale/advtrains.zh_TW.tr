@@ -1,0 +1,146 @@
+# textdomain: advtrains
+
+# Advtrains Core (unorganized)
+This wagon is owned by @1, you can't destroy it.=這是 @1 的車廂，您不能摧毀它。
+Warning: If you destroy this wagon, you only get some steel back! If you are sure, hold Sneak and left-click the wagon.=警告：如果您摧毀此車廂，您只能拿到一些鋼方塊。如果您確定要摧毀這節車廂，請按潛行鍵並左鍵單擊此車廂。
+This position is protected!=這裡已被保護。
+Can't place: not pointing at node=無法放置：您沒有選擇任何方塊。
+Can't place: space occupied!=無法放置：此區域已被佔用。
+Can't place: protected position!=無法放置：此區域已被保護。
+Can't place: Not enough slope items left (@1 required)=無法放置：您沒有足夠的鐵路斜坡放置工具 (您總共需要@1個)
+Can't place: There's no slope of length @1=無法放置：advtrains 不支援長度為@1米的斜坡。
+Can't place: no supporting node at upper end.=無法放置：較高階沒有支撐方塊。
+Deprecated Track=請不要使用
+Can't get on: wagon full or doors closed!=無法上車：車門已關閉或車廂已滿。
+Use Sneak+rightclick to bypass closed doors!=請使用潛行+右鍵上車。
+Doors are closed! Use Sneak+rightclick to ignore the closed doors and get off!=車門已關閉，請使用潛行+右鍵單擊下車。
+Access to @1=可前往@1
+You do not have the @1 privilege.=您沒有「@1」許可權。
+The wagon's inventory is not empty!=The wagon's inventory is not empty!
+Position is occupied by a train.=Position is occupied by a train.
+There's a Track Circuit Break here.=There's a Track Circuit Break here.
+There's a Signal Influence Point here.=There's a Signal Influence Point here.
+
+# Trackworker, rotation, adjustment
+This node can't be rotated using the trackworker!=您不能使用鐵路調整工具旋轉這個方塊。
+This node can't be changed using the trackworker!=您不能使用鐵路調整工具調整這個方塊。
+This track can not be changed!=您不能調整這段軌道。
+This track can not be rotated!=您不能旋轉這段軌道。
+This track can not be removed!=您不能移除這段軌道。
+
+# ATC
+ATC controller, unconfigured.=ATC 控制器 (未配置)
+ATC controller=ATC 控制器
+ATC controller, mode @1@nChannel: @2=ATC 控制器@n模式：@1@n頻道：@2
+ATC controller, mode @1@nCommand: @2=ATC 控制器@n模式：@1@n命令：@2
+Command=命令
+Command (on)=命令 (啟用時)
+Digiline channel=Digiline 頻道
+ATC Kick command warning: Doors closed=ATC Kick command warning: Doors closed
+ATC Kick command warning: Train moving=ATC Kick command warning: Train moving
+ATC Reverse command warning: didn't reverse train, train moving!=ATC 警告：未執行「R」命令，火車在移動
+ATC command syntax error: I statement not closed: @1=ATC 語法錯誤：「I」命令不完整：@1
+ATC command parse error: Unknown command: @1=ATC 語法錯誤：未知命令：@1
+
+# Coupling
+Lock couples=鎖定連結處
+You need to own at least one neighboring wagon to destroy this couple.=您必須至少擁有其中一節車廂才能分開這兩節車廂。
+Buffer and Chain Coupler=鏈式連結器
+Scharfenberg Coupler=Scharfenberg 式連結器
+Japanese Train Inter-Wagon Connection=日本火車連結器
+Can not couple: The couplers of the trains do not match (@1 and @2).=您無法連結這兩節車廂：這兩節車廂使用不同的連結器 (@1和@2)。
+You are not allowed to couple trains without the train_operator privilege.=您沒有「train_operator」許可權，不能連結這兩節車廂。
+
+# Clipboard
+The track you are trying to place the wagon on is not long enough!=軌道太短。
+The clipboard couldn't access the metadata. Paste failed.=無法貼上：剪貼簿無法訪問元資料。
+The clipboard couldn't access the metadata. Copy failed.=無法複製：剪貼簿無法訪問元資料。
+The clipboard is empty.=剪貼簿是空的。
+Back of train would end up off track, cancelling.=火車後部不在軌道上。
+No such lua entity!=您沒有指向一個可以用火車複製工具複製的物體。
+No such wagon: @1=ID 為「@1」的車廂不存在。
+No such train: @1=ID 為「@1」的列車不存在。
+Train copied!=已複製
+
+# Protection
+You are not allowed to build tracks without the track_builder privilege.=您沒有「train_operator」許可權，不能在這裡建造鐵路。
+You are not allowed to build near tracks without the track_builder privilege.=您沒有「train_operator」許可權，不能在鐵路附近建任何東西。
+You are not allowed to build tracks at this protected position.=這裡已被保護，您不能在這裡建造鐵路。
+You are not allowed to build near tracks at this protected position.=這裡已被保護，您不能在這裡的鐵路附近建任何東西。
+You are not allowed to operate turnouts and signals without the railway_operator privilege.=您沒有「railway_operator」許可權，不能控制鐵路設施。
+
+# Train HUD/Formspecs
+Speed:=速度
+Target:=目標速度
+Show Inventory=顯示物品欄
+Select seat:=請選擇座位
+Wagon properties=車廂屬性
+Save wagon properties=儲存車廂屬性
+Text displayed outside on train=車廂外部顯示
+Text displayed inside train=車廂內部顯示
+Line=火車線路
+Routingcode=路由碼
+Get off=下車
+Get off (forced)=強制下車
+(Doors closed)=(車門已關閉)
+
+# General
+Save=儲存
+
+# Line automation
+Station Code=車站碼
+Station Name=車站名稱
+Door Delay=車門關閉時間
+Door Side=Door Side
+Dep. Speed=出發速度
+Stop Time=停站時間
+
+# Items
+Track Worker Tool@n@nLeft-click: change rail type (straight/curve/switch)@nRight-click: rotate rail/bumper/signal/etc.=鐵路調整工具@n@n左鍵單擊：切換軌道型別@n右鍵單擊：旋轉方塊
+Passive Component Naming Tool@n@nRight-click to name a passive component.=被動元件命名工具@n@n右鍵單擊命名所選元件
+Train copy/paste tool@n@nLeft-click: copy train@nRight-click: paste train=火車複製工具@n@n左鍵單擊：複製@n右鍵單擊：粘帖
+Track=軌道
+Perpendicular Diamond Crossing Track=垂直交叉軌道
+Diagonal Diamond Crossing Track=交叉軌道
+90+Angle Diamond Crossing Track=交叉軌道 (其中一條軌道與座標軸平行)
+Y-turnout=對稱道岔
+3-way turnout=三開道岔
+Unloading Track=卸貨軌道
+Loading Track=裝貨軌道
+Bumper=保險槓
+Detector Rail=探測軌道
+@1 Slope=@1斜坡
+@1 Platform (low)=較低的@1月臺
+@1 Platform (high)=較高的@1月臺
+@1 Platform (low, 45 degree)=較低的@1月臺 (45°)
+@1 Platform (45 degree)=較高的@1月臺 (45°)
+Lampless Signal=臂木式號誌機
+Signal=色燈號誌機
+Wallmounted Signal (l)=壁掛式色燈號誌機 (左側)
+Wallmounted Signal (r)=壁掛式色燈號誌機 (右側)
+Wallmounted Signal (t)=懸掛式色燈號誌機
+Andrew's Cross=平交道號誌燈
+Boiler=鍋爐
+driver's cab=駕駛室
+Wheel=車輪
+Chimney=煙囪
+
+# Seats
+Default Seat=預設座位
+Default Seat (driver stand)=預設座位 (司機座位)
+Driver stand=司機座位
+Driver Stand (left)=左側司機座位
+Driver Stand (right)=右側司機座位
+
+# Wagon/engine types
+Industrial Train Engine=工業用火車頭
+Big Industrial Train Engine=大型工業用火車頭
+Industrial tank wagon=液體運輸車廂
+Industrial wood wagon=木材運輸車廂
+Japanese Train Engine=高速列車車頭
+Japanese Train Wagon=高速列車車廂
+Steam Engine=蒸汽機車
+Detailed Steam Engine=精細的蒸汽機車
+Passenger Wagon=客車
+Box Wagon=貨運車廂
+Subway Passenger Wagon=地鐵車廂
