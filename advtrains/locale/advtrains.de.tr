@@ -1,59 +1,100 @@
 # textdomain: advtrains
-This wagon is owned by @1, you can't destroy it.=Dieser Waggon gehört @1, du kannst ihn nicht abbauen.
-Warning: If you destroy this wagon, you only get some steel back! If you are sure, hold Sneak and left-click the wagon.=Warnung: Du erhältst nur etwas Stahl zurück. Wenn du sicher bist, dass du den Waggon zerstören willst, halte 'Schleichen' und klicke links.
-Show Inventory=Zeige Inventar
-Select seat:=Wähle einen Sitzplatz aus:
-ATC controller, unconfigured.=Zugbeeinflussungsschiene, nicht konfiguiert.
+
+# Advtrains Core (unorganized)
+This wagon is owned by @1, you can't destroy it.=Dieser Waggon gehört @1, Sie dürfen ihn nicht abbauen.
+Warning: If you destroy this wagon, you only get some steel back! If you are sure, hold Sneak and left-click the wagon.=Warnung: Sie erhalten nur etwas Stahl zurück. Halten Sie „Schleichen“ und klicken Sie links, um den Waggon abzubauen.
+ATC controller, unconfigured.=Nicht konfiguierte Zugbeeinflussungsschiene
 ATC controller=Zugbeeinflussungsschiene
-ATC controller, mode @1@nChannel: @2=Zugbeeinflussungsschiene in Betriebsart "@1"@nKanal: @2
-ATC controller, mode @1@nCommand: @2=Zugbeeinflussungsschiene in Betriebsart "@1"@nBefehl: @2
+ATC controller, mode @1@nChannel: @2=Zugbeeinflussungsschiene in Betriebsart „@1“@nKanal: @2
+ATC controller, mode @1@nCommand: @2=Zugbeeinflussungsschiene in Betriebsart „@1“@nBefehl: @2
 Command=Befehl
-Command (on)=Befehl (wenn ein)
+Command (on)=Befehl (wenn angeschaltet)
 Digiline channel=Digiline-Kanal
-Save=Speichern
-ATC Reverse command warning: didn't reverse train, train moving!=Zugbeeinflussung - Warnung: Befehl 'R' nicht ausgeführt, Zug in Bewegung!
+ATC Reverse command warning: didn't reverse train, train moving!=Zugbeeinflussung - Warnung: der Befehl „R“ wurde nicht ausgeführt, Zug in Bewegung!
 ATC command syntax error: I statement not closed: @1=Zugbeeinflussung - Syntaxfehler: I-Anweisung nicht geschlossen: @1
 ATC command parse error: Unknown command: @1=Zugbeeinflussung - Fehler: Unbekannter Befehl: @1
 This position is protected!=Diese Position ist geschützt!
-You need to own at least one neighboring wagon to destroy this couple.=Du musst Besitzer eines angrenzenden Waggons sein, um hier abzukuppeln.
-@1 Platform (low)=Niedriger @1-Bahnsteig
-@1 Platform (high)=Hoher @1-Bahnsteig
-off=aus
-on=ein
-Lampless Signal (@1)=Mechanisches Signal (@1)
-Signal (@1)=Lichtsignal (@1)
-Track Worker Tool@n@nLeft-click: change rail type (straight/curve/switch)@nRight-click: rotate rail/bumper/signal/etc.=Schienenwerkzeug@n@nLinksklick: Schienentyp ändern, Rechtsklick: Objekt drehen.
-This node can't be rotated using the trackworker!=Kann diesen Block nicht mit dem Schienenwerkzeug drehen.
-This node can't be changed using the trackworker!=Kann diesen Block nicht mit dem Schienenwerkzeug bearbeiten.
-Can't place: not pointing at node=Kann nicht platzieren: Du zeigst nicht auf einen Block.
-Can't place: space occupied!=Kann nicht platzieren: Platz besetzt.
-Can't place: protected position!=Kann nicht platzieren: Position geschützt.
-Can't place: Not enough slope items left (@1 required)=Kann nicht platzieren: nicht genug Steigungsblöcke, es werden insgesamt @1 benötigt.
-Can't place: There's no slope of length @1=Kann nicht platzieren: Keine Steigung der Länge @1 definiert.
-Can't place: no supporting node at upper end.=Kann nicht platzieren: kein unterstützender Block am Ende der Steigung.
+You need to own at least one neighboring wagon to destroy this couple.=Sie müssen Besitzer eines angrenzenden Waggons sein, um hier abzukuppeln.
+This node can't be rotated using the trackworker!=Dieser Block kann nicht mit dem Schienenwerkzeug gedreht werden.
+This node can't be changed using the trackworker!=Dieser Block kann nicht mit dem Schienenwerkzeug bearbeitet werden.
+Can't place: not pointing at node=Es kann nicht platziert werden: Sie zeigen nicht auf einem Block.
+Can't place: space occupied!=Es kann nicht platziert werden: diese Position ist besetzt.
+Can't place: protected position!=Es kann nicht platziert werden: diese Position ist geschützt.
+Can't place: Not enough slope items left (@1 required)=Es kann nicht platziert werden: Sie haben nicht genug Steigungsblöcke, es werden insgesamt @1 benötigt.
+Can't place: There's no slope of length @1=Es kann nicht platziert werden: die Steigung der Länge @1 ist nicht definiert.
+Can't place: no supporting node at upper end.=Es kann nicht platziert werden: es gibt keinen unterstützenden Block am Ende der Steigung.
 Deprecated Track=ausrangierte Schiene, nicht verwenden.
-Track=Schiene
-Bumper=Prellbock
-Detector Rail=Detektorschiene
+Can't get on: wagon full or doors closed!=Sie können nicht einsteigen: der Waggon ist voll oder die Türen sind geschlossen.
+Use Sneak+rightclick to bypass closed doors!=Nutzen Sie Sneak+Rechtsklick, um trotz geschlossener Türen einzusteigen.
+Lock couples=Kupplungen sperren
+Doors are closed! Use Sneak+rightclick to ignore the closed doors and get off!=Die Türen sind geschlossen. Nutzen Sie Sneak+Rechtsklick, um trotz geschlossener Türen auszusteigen.
+Access to @1=Zugang zu @1
+The clipboard couldn't access the metadata. Paste failed.=Wegen eines fehlgeschlagenen Zugriffs auf die Metadaten konnte eine Kopie des Zuges nicht eingefügt werden.
+The clipboard couldn't access the metadata. Copy failed.=Wegen eines fehlgeschlagenen Zugriffs auf die Metadaten konnte der Zug nicht kopiert werden.
+
+# Train HUD/Formspecs
 Speed:=Geschw.:
 Target:=Zielges.:
-@1 Slope=@1 Steigung
-Can't get on: wagon full or doors closed!=Kann nicht einsteigen: Waggon voll oder Türen geschlossen.
-Use Sneak+rightclick to bypass closed doors!=Nutze Sneak+Rechtsklick, um die Türnotöffnung zu aktivieren und trotzdem einzusteigen.
-Lock couples=Kupplungen sperren
-Save wagon properties=Waggon-Einstellungen speichern
-Doors are closed! Use Sneak+rightclick to ignore the closed doors and get off!=Türen sind geschlossen! Sneak+Rechtsklick, um die Türnotöffnung zu aktivieren und trotzdem auszusteigen.
+Show Inventory=Inventar Zeigen
+Select seat:=Wählen Sie einen Sitzplatz aus:
 Wagon properties=Waggon-Einstellungen
+Save wagon properties=Waggon-Einstellungen speichern
+Text displayed outside on train=Äußere Anzeige
+Text displayed inside train=Innere Anzeige
+Line=Linie
+Routingcode=Routingcode
 Get off=Aussteigen
-Get off (forced)=Aussteigen (erzwingen)
+Get off (forced)=Ausstieg zwingen
 (Doors closed)=(Türen geschlossen)
-Access to @1=Zugang zu @1
+
+# General
+Save=Speichern
+off=aus
+on=ein
+
+# Line automation
+Station Code=Code der Haltestelle
+Station Name=Name der Haltestelle
+Door Delay=Zeit für die Türschließung
+Departure Speed=Zielgeschwindigkeit bei Abfahrt
+Stop Time=Wartezeit
+
+# Items
+Track Worker Tool@n@nLeft-click: change rail type (straight/curve/switch)@nRight-click: rotate rail/bumper/signal/etc.=Schienenwerkzeug@n@nLinksklick: Schienentyp ändern, Rechtsklick: Objekt drehen.
+Passive Component Naming Tool@n@nRight-click to name a passive component.=PC-Benennungswerkzeug@n@nRechtsklick zur Benennung der passiven Komponente
+Train copy/paste tool@n@nLeft-click: copy train@nRight-click: paste train=Train copy/paste tool@n@nLeft-click: copy train@nRight-click: paste train
+Track=Schiene
+Perpendicular Diamond Crossing Track=Perpendicular Diamond Crossing Track
+45/90 Degree Diamond Crossing Track=45/90 Degree Diamond Crossing Track
+Unloading Track=Abladungsschiene
+Loading Track=Beladungsschiene
+Bumper=Prellbock
+Detector Rail=Detektorschiene
+@1 Slope=@1 Steigung
+@1 Platform (low)=Niedriger @1-Bahnsteig
+@1 Platform (high)=Hoher @1-Bahnsteig
+@1 Platform (45 degree)=@1-Bahnsteig (45°)
+Lampless Signal (@1)=Mechanisches Signal (@1)
+Signal (@1)=Lichtsignal (@1)
+Wallmounted Signal (l)=An der linken Seite montiertes Signal
+Wallmounted Signal (r)=An der rechten Seite montiertes Signal
+Wallmounted Signal (t)=An der Decke montiertes Signal
+Andrew's Cross=Andrew's Cross
+Boiler=Boiler
+driver's cab=driver's cab
+Wheel=Wheel
+Chimney=Chimney
+
+# Seats
 Default Seat=Standardsitzplatz
 Default Seat (driver stand)=Standardsitzplatz (Führerstand)
 Driver Stand=Führerstand
 Driver Stand (left)=Führerstand Links
 Driver Stand (right)=Führerstand Rechts
+
+# Wagon/engine types
 Industrial Train Engine=Industrielle Lokomotive
+Big Industrial Train Engine=Große Industrielle Lokomotive
 Industrial tank wagon=Tankwaggon
 Industrial wood wagon=Holztransportwaggon
 Japanese Train Engine=Japanische Personenzug-Lokomotive
@@ -61,8 +102,10 @@ Japanese Train Wagon=Japanischer Personenzug-Passagierwaggon
 Steam Engine=Dampflokomotive
 Detailed Steam Engine=detaillierte Dampflokomotive
 Passenger Wagon=Passagierwaggon
-Box wagon=Güterwaggon
+Box Wagon=Güterwaggon
 Subway Passenger Wagon=U-Bahn-Waggon
+
+# TODO: rebase fixup
 The wagon's inventory is not empty!=Das Inventar dieses Waggons ist nicht leer!
 This track can not be changed!=Diese Schiene kann nicht geändert werden!
 This track can not be rotated!=Diese Schiene kann nicht gedreht werden!

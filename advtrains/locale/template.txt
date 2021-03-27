@@ -49,7 +49,6 @@ Get off (forced)=Get off (forced)
 
 # General
 Save=Save
-# "off" and "on" can be translated differently depending on the context and are therefore not translated.
 off=off
 on=on
 
