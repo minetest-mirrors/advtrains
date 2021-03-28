@@ -2,17 +2,17 @@
 
 # Advtrains Core (unorganized)
 This wagon is owned by @1, you can't destroy it.=Dieser Waggon gehört @1, Sie dürfen ihn nicht abbauen.
-Warning: If you destroy this wagon, you only get some steel back! If you are sure, hold Sneak and left-click the wagon.=Warnung: Sie erhalten nur etwas Stahl zurück. Halten Sie „Schleichen“ und klicken Sie links, um den Waggon abzubauen.
+Warning: If you destroy this wagon, you only get some steel back! If you are sure, hold Sneak and left-click the wagon.=Warnung: Durch den Abbau des Waggons erhalten Sie nur etwas Stahl zurück. Nutzen Sie Schleichen+Linksklick, um dem Waggon abzubauen.
 ATC controller, unconfigured.=Nicht konfiguierte Zugbeeinflussungsschiene
 ATC controller=Zugbeeinflussungsschiene
 ATC controller, mode @1@nChannel: @2=Zugbeeinflussungsschiene in Betriebsart „@1“@nKanal: @2
 ATC controller, mode @1@nCommand: @2=Zugbeeinflussungsschiene in Betriebsart „@1“@nBefehl: @2
 Command=Befehl
-Command (on)=Befehl (wenn angeschaltet)
+Command (on)=Befehl (wenn aktiviert)
 Digiline channel=Digiline-Kanal
-ATC Reverse command warning: didn't reverse train, train moving!=Zugbeeinflussung - Warnung: der Befehl „R“ wurde nicht ausgeführt, Zug in Bewegung!
-ATC command syntax error: I statement not closed: @1=Zugbeeinflussung - Syntaxfehler: I-Anweisung nicht geschlossen: @1
-ATC command parse error: Unknown command: @1=Zugbeeinflussung - Fehler: Unbekannter Befehl: @1
+ATC Reverse command warning: didn't reverse train, train moving!=Zugbeeinflussung: der Befehl „R“ wurde nicht ausgeführt, Zug in Bewegung!
+ATC command syntax error: I statement not closed: @1=Zugbeeinflussung: Unvollständiger I-Befehl: @1
+ATC command parse error: Unknown command: @1=Zugbeeinflussung: Unbekannter Befehl: @1
 This position is protected!=Diese Position ist geschützt!
 You need to own at least one neighboring wagon to destroy this couple.=Sie müssen Besitzer eines angrenzenden Waggons sein, um hier abzukuppeln.
 This node can't be rotated using the trackworker!=Dieser Block kann nicht mit dem Schienenwerkzeug gedreht werden.
@@ -25,9 +25,9 @@ Can't place: There's no slope of length @1=Es kann nicht platziert werden: die S
 Can't place: no supporting node at upper end.=Es kann nicht platziert werden: es gibt keinen unterstützenden Block am Ende der Steigung.
 Deprecated Track=ausrangierte Schiene, nicht verwenden.
 Can't get on: wagon full or doors closed!=Sie können nicht einsteigen: der Waggon ist voll oder die Türen sind geschlossen.
-Use Sneak+rightclick to bypass closed doors!=Nutzen Sie Sneak+Rechtsklick, um trotz geschlossener Türen einzusteigen.
+Use Sneak+rightclick to bypass closed doors!=Nutzen Sie Schleichen+Rechtsklick, um trotz geschlossener Türen einzusteigen.
 Lock couples=Kupplungen sperren
-Doors are closed! Use Sneak+rightclick to ignore the closed doors and get off!=Die Türen sind geschlossen. Nutzen Sie Sneak+Rechtsklick, um trotz geschlossener Türen auszusteigen.
+Doors are closed! Use Sneak+rightclick to ignore the closed doors and get off!=Die Türen sind geschlossen. Nutzen Sie Schleichen+Rechtsklick, um trotz geschlossener Türen auszusteigen.
 Access to @1=Zugang zu @1
 The clipboard couldn't access the metadata. Paste failed.=Wegen eines fehlgeschlagenen Zugriffs auf die Metadaten konnte eine Kopie des Zuges nicht eingefügt werden.
 The clipboard couldn't access the metadata. Copy failed.=Wegen eines fehlgeschlagenen Zugriffs auf die Metadaten konnte der Zug nicht kopiert werden.
@@ -62,7 +62,7 @@ Stop Time=Wartezeit
 # Items
 Track Worker Tool@n@nLeft-click: change rail type (straight/curve/switch)@nRight-click: rotate rail/bumper/signal/etc.=Schienenwerkzeug@n@nLinksklick: Schienentyp ändern, Rechtsklick: Objekt drehen.
 Passive Component Naming Tool@n@nRight-click to name a passive component.=PC-Benennungswerkzeug@n@nRechtsklick zur Benennung der passiven Komponente
-Train copy/paste tool@n@nLeft-click: copy train@nRight-click: paste train=Train copy/paste tool@n@nLeft-click: copy train@nRight-click: paste train
+Train copy/paste tool@n@nLeft-click: copy train@nRight-click: paste train=Werkzeug zur Erstellung von Zugkopien@n@nLinksklick: Zug ins Clipboard kopieren@nRight-click: Kopierten Zug einfügen
 Track=Schiene
 Perpendicular Diamond Crossing Track=Perpendicular Diamond Crossing Track
 45/90 Degree Diamond Crossing Track=45/90 Degree Diamond Crossing Track
