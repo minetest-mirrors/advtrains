@@ -41,6 +41,6 @@ for l in f:lines() do
 end
 f:close()
 
-local f = io.open(tfn, "wb") or error("Cannot write to translation file")
+local f = io.open(tfn..".new", "wb") or error("Cannot write to translation file")
 f:write(table.concat(ot,"\n"))
 f:close()
