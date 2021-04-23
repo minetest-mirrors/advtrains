@@ -29,8 +29,25 @@ Use Sneak+rightclick to bypass closed doors!=请使用潜行+右键上车。
 Lock couples=锁定连接处
 Doors are closed! Use Sneak+rightclick to ignore the closed doors and get off!=车门已关闭，请使用潜行+右键单击下车。
 Access to @1=可前往@1
-The clipboard couldn't access the metadata. Paste failed.=无法粘贴：剪贴板无法访问元数据
-The clipboard couldn't access the metadata. Copy failed.=无法复制：剪贴板无法访问元数据
+You don't have the train_operator privilege.=You don't have the train_operator privilege.
+
+# Clipboard
+The track you are trying to place the wagon on is not long enough!=轨道太短。
+The clipboard couldn't access the metadata. Paste failed.=无法粘贴：剪贴板无法访问元数据。
+The clipboard couldn't access the metadata. Copy failed.=无法复制：剪贴板无法访问元数据。
+The clipboard is empty.=剪贴板是空的。
+Back of train would end up off track, cancelling.=火车后部不在轨道上。
+No such lua entity!=您没有指向一个可以用火车复制工具复制的物体。
+No such wagon: @1=ID 为“@1”的车厢不存在。
+No such train: @1=ID 为“@1”的列车不存在。
+Train copied!=已复制
+
+# Protection
+You are not allowed to build tracks without the track_builder privilege=您没有“train_operator”权限，不能在这里建造铁路。
+You are not allowed to build near tracks without the track_builder privilege=您没有“train_operator”权限，不能在铁路附近建任何东西。
+You are not allowed to build tracks at this protected position=这里已被保护，您不能在这里建造铁路。
+You are not allowed to build near tracks at this protected position=这里已被保护，您不能在这里的铁路附近建任何东西。
+You are not allowed to operate turnouts and signals (missing railway_operator privilege)=您没有“railway_operator”权限，不能使用铁路设施。
 
 # Train HUD/Formspecs
 Speed:=速度

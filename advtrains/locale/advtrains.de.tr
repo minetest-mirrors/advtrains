@@ -29,8 +29,25 @@ Use Sneak+rightclick to bypass closed doors!=Nutzen Sie Schleichen+Rechtsklick, 
 Lock couples=Kupplungen sperren
 Doors are closed! Use Sneak+rightclick to ignore the closed doors and get off!=Die Türen sind geschlossen. Nutzen Sie Schleichen+Rechtsklick, um trotz geschlossener Türen auszusteigen.
 Access to @1=Zugang zu @1
+You don't have the train_operator privilege.=Ihnen fehlt das „train_operator“-Privileg.
+
+# Clipboard
+The track you are trying to place the wagon on is not long enough!=Das Gleis, auf dem der Waggon platziert werden woll, ist zu kurz.
 The clipboard couldn't access the metadata. Paste failed.=Wegen eines fehlgeschlagenen Zugriffs auf die Metadaten konnte eine Kopie des Zuges nicht eingefügt werden.
 The clipboard couldn't access the metadata. Copy failed.=Wegen eines fehlgeschlagenen Zugriffs auf die Metadaten konnte der Zug nicht kopiert werden.
+The clipboard is empty.=Das Clipboard ist leer.
+Back of train would end up off track, cancelling.=Der hinterer Teil dez Zuges wäre nicht auf dem Gleis.
+No such lua entity!=Sie zeigen nicht auf einem Objekt, das mit diesem Werkzeug kopiert werden kann.
+No such wagon: @1=Es gibt keinen Waggon, der durch „@1“ identifiziert werden kann.
+No such train: @1=Es gibt keinen Zug, der durch „@1“ identifiziert werden kann.
+Train copied!=Sie können jetzt mit diesem Werkzeug Kopien dieses Zuges erstellen.
+
+# Protection
+You are not allowed to build tracks without the track_builder privilege=Sie dürfen ohne das „track_builder“-Privileg keine Schiene bauen.
+You are not allowed to build near tracks without the track_builder privilege=Sie dürfen ohne das „track_builder“-Privileg nicht an Schienen bauen.
+You are not allowed to build tracks at this protected position=Sie dürfen an geschützten Stellen keine Schiene bauen.
+You are not allowed to build near tracks at this protected position=Sie dürfen an geschützten Stellen nicht an Schienen bauen.
+You are not allowed to operate turnouts and signals (missing railway_operator privilege)=Sie dürfen ohne das „railway_operator“-Privileg keine Bahnanlage operieren.
 
 # Train HUD/Formspecs
 Speed:=Geschw.:
