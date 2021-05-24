@@ -181,6 +181,8 @@ Value	Disp	Control	Meaning
 function advtrains.hud.dtext(train, flip)
 	local st = {}
 	if train.debug then st = {train.debug} end
+
+	st[#st+1] = attrans("Train ID: @1", train.id)
 	
 	if res and res == 0 then
 		st[#st+1] = attrans("OVERRUN RED SIGNAL! Examine situation and reverse train to move again.")
