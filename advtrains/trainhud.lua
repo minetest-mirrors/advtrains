@@ -229,6 +229,24 @@ function advtrains.hud.sevenseg(digit, x, y, w, h, m)
 	return table.concat(st,":")
 end
 
+function advtrains.hud.number(number, padding, x, y, w, h, margin, modifier)
+	local st = {}
+	local number = math.abs(math.floor(number))
+	if not padding then
+		if number == 0 then
+			padding = 0
+		else
+			padding = math.floor(math.log10(number))
+		end
+	else
+		padding = padding - 1
+	end
+	for i = padding, 0, -1 do
+		st[#st+1] = advtrains.hud.sevenseg(math.floor(number/10^i)%10, x+(padding-i)*(w+2*h+margin), y, w, h, modifier)
+	end
+	return table.concat(st,":")
+end
+
 function advtrains.hud.leverof(train)
 	if not train then return nil end
 	local tlev=train.lever or 3
@@ -299,9 +317,8 @@ function advtrains.hud.dgraphical(train, flip)
 		ht[#ht+1] = "90,10=(advtrains_hud_shunt.png^[resize\\:30x30^[multiply\\:orange)"
 	end
 	ht[#ht+1] = advtrains.hud.door(train.door_open, 170, 10, 60, 30, 2)
-	-- speed indication(s)
-	ht[#ht+1] = sevenseg(math.floor(vel/10), 320, 10, 30, 10, "[colorize\\:red\\:255")
-	ht[#ht+1] = sevenseg(vel%10, 380, 10, 30, 10, "[colorize\\:red\\:255")
+	-- speed indications
+	ht[#ht+1] = advtrains.hud.number(vel, nil, 320, 10, 30, 10, 10, "[colorize\\:red\\:255")
 	for i = 1, vel, 1 do
 		ht[#ht+1] = sformat("%d,65=(advtrains_hud_bg.png^[resize\\:8x20^[colorize\\:white)", i*11-1)
 	end
@@ -331,9 +348,7 @@ function advtrains.hud.dgraphical(train, flip)
 				local floor = math.floor
 				local dist = floor(((oc[i].index or train.index)-train.index))
 				dist = math.max(0, math.min(999, dist))
-				for j = 1, 3, 1 do
-					ht[#ht+1] = sevenseg(floor((dist/10^(3-j))%10), 119+j*11, 18, 4, 2, "[colorize\\:"..c)
-				end
+				ht[#ht+1] = advtrains.hud.number(dist, 3, 130, 18, 4, 2, 3, "[colorize\\:"..c)
 				break
 			end
 		end
