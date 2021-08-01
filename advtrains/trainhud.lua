@@ -312,15 +312,15 @@ function advtrains.hud.dgraphical(train, flip)
 	ht[#ht+1] = sformat("240,%s=(advtrains_hud_bg.png^[resize\\:25x15^[colorize\\:gray)", flip and 65 or 30)
 	-- train control/safety indication
 	if train.tarvelocity or train.atc_command then
-		ht[#ht+1] = "10,10=(advtrains_hud_atc.png^[resize\\:30x30^[multiply\\:cyan)"
+		ht[#ht+1] = "10,10=(advtrains_hud_atc.png^[multiply\\:cyan)"
 	end
 	if train.hud_lzb_effect_tmr then
-		ht[#ht+1] = "50,10=(advtrains_hud_lzb.png^[resize\\:30x30^[multiply\\:red)"
+		ht[#ht+1] = "45,10=(advtrains_hud_lzb.png^[multiply\\:red)"
 	end
 	if train.is_shunt then
-		ht[#ht+1] = "90,10=(advtrains_hud_shunt.png^[resize\\:30x30^[multiply\\:orange)"
+		ht[#ht+1] = "80,10=(advtrains_hud_shunt.png^[multiply\\:orange)"
 	end
-	ht[#ht+1] = advtrains.hud.door(train.door_open, 170, 10, 60, 30, 2)
+	ht[#ht+1] = advtrains.hud.door(train.door_open, 165, 10, 60, 30, 2)
 	-- speed indications
 	ht[#ht+1] = advtrains.hud.number(vel, 2, 320, 10, 30, 10, 10, "[colorize\\:red\\:255")
 	for i = 1, vel, 1 do
