@@ -178,6 +178,10 @@ Value	Disp	Control	Meaning
 4		+		W		Accelerate
 ]]
 
+function advtrains.hud.texture_escape(str)
+	return string.gsub(str, "[%[%()^:]", "\\%1")
+end
+
 function advtrains.hud.dtext(train, flip)
 	local st = {}
 	if train.debug then st = {train.debug} end
@@ -318,7 +322,7 @@ function advtrains.hud.dgraphical(train, flip)
 	end
 	ht[#ht+1] = advtrains.hud.door(train.door_open, 170, 10, 60, 30, 2)
 	-- speed indications
-	ht[#ht+1] = advtrains.hud.number(vel, nil, 320, 10, 30, 10, 10, "[colorize\\:red\\:255")
+	ht[#ht+1] = advtrains.hud.number(vel, 2, 320, 10, 30, 10, 10, "[colorize\\:red\\:255")
 	for i = 1, vel, 1 do
 		ht[#ht+1] = sformat("%d,65=(advtrains_hud_bg.png^[resize\\:8x20^[colorize\\:white)", i*11-1)
 	end
