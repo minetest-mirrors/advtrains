@@ -125,6 +125,8 @@ advtrains.register_wagon(name, prototype, description, inventory_image)
 	graphical_hud = function(train, flip) end
 	^- optional: Graphical HUD to show to the driver.
 	The HUD formats defined by advtrains are used by default.
+	hud_without_text_inside = false
+	^- optional: whether the inside display should be excluded from the text HUD
 
 	custom_on_step = function(self, dtime) end
 	^- optional: Execute custom code on every step
@@ -160,7 +162,7 @@ If you can't enter or leave a train because the doors are closed, holding the Sn
 
 # Train HUD
 The text_hud and graphical_hud fields of the wagons allow you to specify the look of your driver HUDs.
-* The text_hud function should return a string that will be shown to the driver. This should usually include the inside display as well
+* The text_hud function should return a string that will be shown to the driver. Usually this should not include the inside display.
 * The graphical_hud function should return a texture string and the height of the texture. This is used to allow proper positioning of the text HUD.
 
 There are currently a few pre-defined elements that can help create the graphical HUD. These functions are in the advtrains.hud table:

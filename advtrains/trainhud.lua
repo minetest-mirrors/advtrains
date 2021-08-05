@@ -86,11 +86,11 @@ function advtrains.on_control_change(pc, train, flip)
 		end
 	end
 end
-function advtrains.update_driver_hud(pname, train, flip, thud, ghud)
-	local inside=train.text_inside or ""
+function advtrains.update_driver_hud(pname, train, flip, thud, ghud, nointext)
+	local inside=nointext and "" or (train.text_inside or "").."\n"
 	local ft = (thud or advtrains.hud.dtext)(train, flip)
 	local ht, gs = (ghud or advtrains.hud.dgraphical)(train, flip)
-	advtrains.set_trainhud(pname, inside.."\n"..ft, ht, gs)
+	advtrains.set_trainhud(pname, inside..ft, ht, gs)
 end
 function advtrains.clear_driver_hud(pname)
 	advtrains.set_trainhud(pname, "")
@@ -185,6 +185,7 @@ end
 function advtrains.hud.dtext(train, flip)
 	local st = {}
 	if train.debug then st = {train.debug} end
+	local res = advtrains.speed_restriction
 
 	st[#st+1] = attrans("Train ID: @1", train.id)
 	
