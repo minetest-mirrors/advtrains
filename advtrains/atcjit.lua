@@ -1,7 +1,26 @@
 local aj_cache = {}
 local aj_strout = {}
 
-local aj_tostring
+local aj_tostring, aj_execute
+
+local rwt, sched
+
+minetest.register_on_mods_loaded(function()
+	if not advtrains.lines then return end
+	rwt = advtrains.lines.rwt
+	if not rwt then return end
+	sched = advtrains.lines.sched
+	if not sched then return end
+	sched.register_callback("atcjit", function(d)
+		local id, cmd = d.trainid, d.cmd
+		if not (id and cmd) then return end
+		local train = advtrains.trains[id]
+		if not train then return end
+		train.atc_arrow = d.arrow or false
+		train.atc_command = cmd
+		aj_execute(id, train)
+	end)
+end)
 
 --[[ Notes on the pattern matching functions:
 - Patterns can have multiple captures (e.g. coordinates). These captures
@@ -41,6 +60,36 @@ local matchptn = {
 			train.atc_command = %q
 			return
 		end]], match, cont), true
+	end,
+	["Ds([0-9]+)%+([0-9]+)"] = function(cont, int, off)
+		if sched then
+			return string.format([[do
+				local rwt = advtrains.lines.rwt
+				local tnext = rwt.next_rpt(rwt.now(),%s,%s)
+				local edata = {trainid = train.id, cmd = %q, arrow = train.atc_arrow}
+				advtrains.lines.sched.enqueue(tnext,"atcjit",edata,"atcjit-"..(train.id),1)
+			end]], int, off, cont), true
+		else
+			return string.format([[do
+				train.atc_delay = %s-(os.time()-%s)%%%s
+				train.atc_command = %q
+				return
+			end]], int, off, int, cont), true
+		end
+	end,
+	["Ds%+([0-9]+)"] = function(cont, delta)
+		if sched then
+			return string.format([[do
+				local edata = {trainid = train.id, cmd = %q, arrow = train.atc_arrow}
+				advtrains.lines.sched.enqueue_in(%s,"atcjit",edata,"atcjit-"..(train.id),1)
+			end]], cont, delta), true
+		else
+			return string.format([[do
+				train.atc_delay = %s
+				train.atc_command = %q
+				return
+			end]], delta, cont), true
+		end
 	end,
 	["(%bI;)"] = function(cont, match)
 		local i = 2
@@ -214,7 +263,7 @@ local function aj_compile(cmd)
 	end
 end
 
-local function aj_execute(id,train)
+aj_execute = function(id,train)
 	if not train.atc_command then return end
 	local func, err = aj_compile(train.atc_command)
 	if func then return func(id,train) end
