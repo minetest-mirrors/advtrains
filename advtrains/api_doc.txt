@@ -158,6 +158,48 @@ In case there are multiple possibilities, will show a form.
 
 If you can't enter or leave a train because the doors are closed, holding the Sneak key while right-clicking bypasses the "doors have to be open" enforcement.
 
+# Train HUD
+The text_hud and graphical_hud fields of the wagons allow you to specify the look of your driver HUDs.
+* The text_hud function should return a string that will be shown to the driver. This should usually include the inside display as well
+* The graphical_hud function should return a texture string and the height of the texture. This is used to allow proper positioning of the text HUD.
+
+There are currently a few pre-defined elements that can help create the graphical HUD. These functions are in the advtrains.hud table:
+* texture_escape(str): a trivial function that escapes the textures
+* digit(digit, x, y, w, h, pc, nc): displays a single digit
+	* digit: the digit to display
+	* x, y: the upper-left corner of the digit display
+	* w, h: the width and height of a horizontal segment
+	* pc: the color to show when a given segment is lit
+	* nc: the color to show when a given segment is not lit
+* number(num, length, x, y, w, h, margin, pc, nc): displays a non-negative integer, possibly using multiple 7-segment displays:
+	* num: the number to display
+	* length: the numbers of digits to display (if nil: the number of digits in the number).
+	* x, y: the upper-left corner of the digit display
+	* w, h, pc, nc: (see above)
+	* margin: the margin between each digit
+	* The behavior of num>=10^length is undefined.
+* leverof(train): returns the lever of the train. This should be preferred over train.lever
+* lever(lever, x, y, w1, w2, h): draws a lever
+	* lever: the lever of the train
+	* x, y: the upper-left corner of the lever
+	* w1: the width of the merkers beside the lever
+	* w2: the width of the handle
+	* h: the height of the lever
+	* In the context of drawing (i.e. the description of the x, y, w1, w2, and h arguments), "the lever" refers to the area that the actual lever is drawn in, not the lever itself.
+* door(o, x, y, w, h, m): draws a simple door indicator
+	* o: the state of the door
+	* x, y, w, h: the upper-left corner and the size of the indicator
+	* m: the margin between the elements of the indicator
+	* The indicator includes an indicator for each door and a simple shape showing a vehicle
+	* Due to the internals of this function, it is recommended that (w-2*m) is a multiple of 4
+* speed_horizontal(train, x, y, w, h, m): draws a horizontal bar showing the speed
+	* train: the train table
+	* x, y, w, h: the upper-left cornder and the size of the indicator
+	* m: the margin between the elements of the indicator
+	* h must be greater than 10
+	* Due to the internals of this function, it is recommended that (w-19*m) is a multiple of 20
+* In the above functions, the behavior of negative coordinates and magnitudes (e.g. width, height, margin) and invalid data is undefined.
+
 ### Tracks
 Most modders will be satisfied with the built-in tracks. If cog railways, maglev trains and mine trains are added, it is necessary to understand the definition of tracks. Although the tracks API is there, explaining it would require more effort than me creating the wanted definitions myself. Contact me if you need to register your own rails using my registration functions.
 

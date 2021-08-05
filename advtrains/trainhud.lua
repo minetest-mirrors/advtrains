@@ -199,7 +199,7 @@ function advtrains.hud.dtext(train, flip)
 	return table.concat(st, "\n")
 end
 
-function advtrains.hud.sevenseg(digit, x, y, w, h, m, d)
+function advtrains.hud.sevenseg(digit, x, y, w, h, pc, nc)
 	local st = {}
 	local sformat = string.format
 	local f = "%d,%d=(advtrains_hud_bg.png^[resize\\:%dx%d%s)"
@@ -221,24 +221,25 @@ function advtrains.hud.sevenseg(digit, x, y, w, h, m, d)
 		[6] = {true, true, false, true, true, true, true},
 		[7] = {true, false, true, false, false, true, false},
 		[8] = {true, true, true, true, true, true, true},
-		[9] = {true, true, true, true, false, true, true}}
+		[9] = {true, true, true, true, false, true, true}
+	}
 	local ent = trans[digit or 10]
 	if not ent then return end
 	for i = 1, 7, 1 do
 		if ent[i] then
 			local s = segs[i]
-			st[#st+1] = sformat(f, x+s[1], y+s[2], s[3], s[4], m and "^"..m or "")
-		elseif d then
+			st[#st+1] = sformat(f, x+s[1], y+s[2], s[3], s[4], pc and "^[colorize\\:"..pc or "")
+		elseif nc then
 			local s = segs[i]
-			st[#st+1] = sformat(f, x+s[1], y+s[2], s[3], s[4], "^"..d)
+			st[#st+1] = sformat(f, x+s[1], y+s[2], s[3], s[4], "^[colorize\\:"..nc)
 		end
 	end
 	return table.concat(st,":")
 end
 
-function advtrains.hud.number(number, padding, x, y, w, h, margin, modifier, dark)
+function advtrains.hud.number(number, padding, x, y, w, h, margin, pcolor, ncolor)
 	local st = {}
-	local number = math.abs(math.floor(number))
+	local number = math.abs(math.floor(number or 0))
 	if not padding then
 		if number == 0 then
 			padding = 0
@@ -249,7 +250,7 @@ function advtrains.hud.number(number, padding, x, y, w, h, margin, modifier, dar
 		padding = padding - 1
 	end
 	for i = padding, 0, -1 do
-		st[#st+1] = advtrains.hud.sevenseg(math.floor(number/10^i)%10, x+(padding-i)*(w+2*h+margin), y, w, h, modifier, dark)
+		st[#st+1] = advtrains.hud.sevenseg(math.floor(number/10^i)%10, x+(padding-i)*(w+2*h+margin), y, w, h, pcolor, ncolor)
 	end
 	return table.concat(st,":")
 end
@@ -321,7 +322,6 @@ end
 function advtrains.hud.dgraphical(train, flip)
 	if not train then return "" end
 	local sformat = string.format -- this appears to be faster than (...):format
-	local sevenseg = advtrains.hud.sevenseg
 	
 	local max = train.max_speed or 10
 	local vel = advtrains.abs_ceil(train.velocity)
@@ -354,38 +354,38 @@ function advtrains.hud.dgraphical(train, flip)
 			local c = not spd and "lime" or (type(spd) == "number" and (spd == 0) and "red" or "orange") or nil
 			if c then
 				if spd then
-					ht[#ht+1] = advtrains.hud.number(spd, 2, 10, 45, 5, 2, 2, "[colorize\\:"..c, "[colorize\\:darkslategray")
+					ht[#ht+1] = advtrains.hud.number(spd, 2, 10, 45, 5, 2, 2, c, "darkslategray")
 					ht[#ht+1] = sformat("10,67=(advtrains_hud_ms.png^[multiply\\:%s)", c)
 				else
-					ht[#ht+1] = advtrains.hud.number(88, 2, 10, 45, 5, 2, 2, "[colorize\\:darkslategray")
+					ht[#ht+1] = advtrains.hud.number(88, 2, 10, 45, 5, 2, 2, "darkslategray")
 					ht[#ht+1] = "10,67=(advtrains_hud_ms.png^[multiply\\:darkslategray)"
 				end
 				local floor = math.floor
 				local dist = floor(((oc[i].index or train.index)-train.index))
 				dist = math.max(0, math.min(999, dist))
-				ht[#ht+1] = advtrains.hud.number(dist, 3, 35, 45, 9, 4, 2, "[colorize\\:"..c, "[colorize\\:darkslategray")
+				ht[#ht+1] = advtrains.hud.number(dist, 3, 35, 45, 9, 4, 2, c, "darkslategray")
 				noupcoming = false
 				break
 			end
 		end
 	end
 	if noupcoming then
-		ht[#ht+1] = advtrains.hud.number(88, 2, 10, 45, 5, 2, 2, "[colorize\\:darkslategray")
+		ht[#ht+1] = advtrains.hud.number(88, 2, 10, 45, 5, 2, 2, "darkslategray")
 		ht[#ht+1] = "10,67=(advtrains_hud_ms.png^[multiply\\:darkslategray)"
-		ht[#ht+1] = advtrains.hud.number(888, 3, 35, 45, 9, 4, 2, "[colorize\\:darkslategray")
+		ht[#ht+1] = advtrains.hud.number(888, 3, 35, 45, 9, 4, 2, "darkslategray")
 	end
 	ht[#ht+1] = sformat("100,45=(advtrains_hud_atc.png^[multiply\\:%s)", (train.tarvelocity or train.atc_command) and "cyan" or "darkslategray")
 	if tar and tar >= 0 then
 		local tc = math.min(max, tar)
-		ht[#ht+1] = advtrains.hud.number(tar, 2, 135, 45, 5, 2, 2, "[colorize\\:cyan", "[colorize\\:darkslategray")
+		ht[#ht+1] = advtrains.hud.number(tar, 2, 135, 45, 5, 2, 2, "cyan", "darkslategray")
 		ht[#ht+1] = "135,67=(advtrains_hud_ms.png^[multiply\\:cyan)"
 	else
-		ht[#ht+1] = advtrains.hud.number(88, 2, 135, 45, 5, 2, 2, "[colorize\\:darkslategray")
+		ht[#ht+1] = advtrains.hud.number(88, 2, 135, 45, 5, 2, 2, "darkslategray")
 		ht[#ht+1] = "135,67=(advtrains_hud_ms.png^[multiply\\:darkslategray)"
 	end
 	ht[#ht+1] = advtrains.hud.door(train.door_open, 167, 45, 60, 30, 2)
 	-- speed indications
-	ht[#ht+1] = advtrains.hud.number(vel, 2, 320, 10, 35, 10, 10, "[colorize\\:red\\:255")
+	ht[#ht+1] = advtrains.hud.number(vel, 2, 320, 10, 35, 10, 10, "red")
 	ht[#ht+1] = advtrains.hud.speed_horizontal(train, 10, 80, 217, 30, 3)
 	
 	return table.concat(ht,":"), 120
