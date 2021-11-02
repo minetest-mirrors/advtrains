@@ -370,3 +370,12 @@ end
 
 
 
+
+static_env.os = os
+static_env.io = io
+static_env.advtrains = advtrains
+static_env.minetest = minetest
+static_env.dofile = dofile
+static_env.DF = function (f)
+	dofile(minetest.get_worldpath().."/luaatc/"..f)
+end
