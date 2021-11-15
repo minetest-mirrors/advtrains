@@ -50,7 +50,7 @@ Various features and bugfixes have been contributed by:
 
 - gpcf
 - Blockhead
-- ywang
+- Y. Wang
 
 Small code contributions:
 
