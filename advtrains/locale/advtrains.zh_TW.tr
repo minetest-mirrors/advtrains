@@ -1,7 +1,7 @@
 # textdomain: advtrains
 
 # Advtrains Core (unorganized)
-This wagon is owned by @1, you can't destroy it.=這是@1的車廂，您不能摧毀它。
+This wagon is owned by @1, you can't destroy it.=這是 @1 的車廂，您不能摧毀它。
 Warning: If you destroy this wagon, you only get some steel back! If you are sure, hold Sneak and left-click the wagon.=警告：如果您摧毀此車廂，您只能拿到一些鋼方塊。如果您確定要摧毀這個車廂，請按潛行鍵並左鍵單擊此車廂。
 ATC controller, unconfigured.=ATC 控制器 (未配置)
 ATC controller=ATC 控制器
@@ -10,8 +10,8 @@ ATC controller, mode @1@nCommand: @2=ATC 控制器@n模式：@1@n命令：@2
 Command=命令
 Command (on)=命令 (啟用時)
 Digiline channel=Digiline 頻道
-ATC Reverse command warning: didn't reverse train, train moving!=ATC 警告：未執行“R”命令，火車在移動
-ATC command syntax error: I statement not closed: @1=ATC 語法錯誤：“I”命令不完整：@1
+ATC Reverse command warning: didn't reverse train, train moving!=ATC 警告：未執行「R」命令，火車在移動
+ATC command syntax error: I statement not closed: @1=ATC 語法錯誤：「I」命令不完整：@1
 ATC command parse error: Unknown command: @1=ATC 語法錯誤：未知命令：@1
 This position is protected!=這裡已被保護。
 You need to own at least one neighboring wagon to destroy this couple.=您必須至少擁有其中一個車廂才能解耦這兩個車廂。
@@ -29,7 +29,7 @@ Use Sneak+rightclick to bypass closed doors!=請使用潛行+右鍵上車。
 Lock couples=鎖定連線處
 Doors are closed! Use Sneak+rightclick to ignore the closed doors and get off!=車門已關閉，請使用潛行+右鍵單擊下車。
 Access to @1=可前往@1
-You don't have the train_operator privilege.=You don't have the train_operator privilege.
+You don't have the train_operator privilege.=您沒有「train_operator」許可權。
 
 # Clipboard
 The track you are trying to place the wagon on is not long enough!=軌道太短。
@@ -38,16 +38,16 @@ The clipboard couldn't access the metadata. Copy failed.=無法複製：剪貼�
 The clipboard is empty.=剪貼簿是空的。
 Back of train would end up off track, cancelling.=火車後部不在軌道上。
 No such lua entity!=您沒有指向一個可以用火車複製工具複製的物體。
-No such wagon: @1=ID 為“@1”的車廂不存在。
-No such train: @1=ID 為“@1”的列車不存在。
+No such wagon: @1=ID 為「@1」的車廂不存在。
+No such train: @1=ID 為「@1」的列車不存在。
 Train copied!=已複製
 
 # Protection
-You are not allowed to build tracks without the track_builder privilege=您沒有“train_operator”許可權，不能在這裡建造鐵路。
-You are not allowed to build near tracks without the track_builder privilege=您沒有“train_operator”許可權，不能在鐵路附近建任何東西。
+You are not allowed to build tracks without the track_builder privilege=您沒有「train_operator」許可權，不能在這裡建造鐵路。
+You are not allowed to build near tracks without the track_builder privilege=您沒有「train_operator」許可權，不能在鐵路附近建任何東西。
 You are not allowed to build tracks at this protected position=這裡已被保護，您不能在這裡建造鐵路。
 You are not allowed to build near tracks at this protected position=這裡已被保護，您不能在這裡的鐵路附近建任何東西。
-You are not allowed to operate turnouts and signals (missing railway_operator privilege)=您沒有“railway_operator”許可權，不能使用鐵路設施。
+You are not allowed to operate turnouts and signals (missing railway_operator privilege)=您沒有「railway_operator」許可權，不能使用鐵路設施。
 
 # Train HUD/Formspecs
 Speed:=速度
@@ -83,7 +83,7 @@ Passive Component Naming Tool@n@nRight-click to name a passive component.=被動
 Train copy/paste tool@n@nLeft-click: copy train@nRight-click: paste train=火車複製工具@n@n左鍵單擊：複製@n右鍵單擊：粘帖
 Track=鐵軌
 Perpendicular Diamond Crossing Track=垂直交叉鐵軌
-45/90 Degree Diamond Crossing Track=45度交叉鐵軌
+45/90 Degree Diamond Crossing Track=45/90度交叉鐵軌
 Unloading Track=卸貨鐵軌
 Loading Track=裝貨鐵軌
 Bumper=保險槓
