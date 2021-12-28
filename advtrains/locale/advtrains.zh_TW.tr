@@ -3,6 +3,32 @@
 # Advtrains Core (unorganized)
 This wagon is owned by @1, you can't destroy it.=這是 @1 的車廂，您不能摧毀它。
 Warning: If you destroy this wagon, you only get some steel back! If you are sure, hold Sneak and left-click the wagon.=警告：如果您摧毀此車廂，您只能拿到一些鋼方塊。如果您確定要摧毀這個車廂，請按潛行鍵並左鍵單擊此車廂。
+This position is protected!=這裡已被保護。
+Can't place: not pointing at node=無法放置：您沒有選擇任何方塊。
+Can't place: space occupied!=無法放置：此區域已被佔用。
+Can't place: protected position!=無法放置：此區域已被保護。
+Can't place: Not enough slope items left (@1 required)=無法放置：您沒有足夠的鐵路斜坡放置工具 (您總共需要@1個)
+Can't place: There's no slope of length @1=無法放置：advtrains 不支援長度為@1米的斜坡。
+Can't place: no supporting node at upper end.=無法放置：較高階沒有支撐方塊。
+Deprecated Track=請不要使用
+Can't get on: wagon full or doors closed!=無法上車：車門已關閉或車廂已滿。
+Use Sneak+rightclick to bypass closed doors!=請使用潛行+右鍵上車。
+Doors are closed! Use Sneak+rightclick to ignore the closed doors and get off!=車門已關閉，請使用潛行+右鍵單擊下車。
+Access to @1=可前往@1
+You don't have the train_operator privilege.=您沒有「train_operator」許可權。
+The wagon's inventory is not empty!=The wagon's inventory is not empty!
+Position is occupied by a train.=Position is occupied by a train.
+There's a Track Circuit Break here.=There's a Track Circuit Break here.
+There's a Signal Influence Point here.=There's a Signal Influence Point here.
+
+# Trackworker, rotation, adjustment
+This node can't be rotated using the trackworker!=您不能使用鐵路調整工具旋轉這個方塊。
+This node can't be changed using the trackworker!=您不能使用鐵路調整工具調整這個方塊。
+This track can not be changed!=This track can not be changed!
+This track can not be rotated!=This track can not be rotated!
+This track can not be removed!=This track can not be removed!
+
+# ATC
 ATC controller, unconfigured.=ATC 控制器 (未配置)
 ATC controller=ATC 控制器
 ATC controller, mode @1@nChannel: @2=ATC 控制器@n模式：@1@n頻道：@2
@@ -13,23 +39,14 @@ Digiline channel=Digiline 頻道
 ATC Reverse command warning: didn't reverse train, train moving!=ATC 警告：未執行「R」命令，火車在移動
 ATC command syntax error: I statement not closed: @1=ATC 語法錯誤：「I」命令不完整：@1
 ATC command parse error: Unknown command: @1=ATC 語法錯誤：未知命令：@1
-This position is protected!=這裡已被保護。
-You need to own at least one neighboring wagon to destroy this couple.=您必須至少擁有其中一個車廂才能解耦這兩個車廂。
-This node can't be rotated using the trackworker!=您不能使用鐵路調整工具旋轉這個方塊。
-This node can't be changed using the trackworker!=您不能使用鐵路調整工具調整這個方塊。
-Can't place: not pointing at node=無法放置：您沒有選擇任何方塊。
-Can't place: space occupied!=無法放置：此區域已被佔用。
-Can't place: protected position!=無法放置：此區域已被保護。
-Can't place: Not enough slope items left (@1 required)=無法放置：您沒有足夠的鐵路斜坡放置工具 (您總共需要@1個)
-Can't place: There's no slope of length @1=無法放置：advtrains 不支援長度為@1米的斜坡。
-Can't place: no supporting node at upper end.=無法放置：較高階沒有支撐方塊。
-Deprecated Track=請不要使用
-Can't get on: wagon full or doors closed!=無法上車：車門已關閉或車廂已滿。
-Use Sneak+rightclick to bypass closed doors!=請使用潛行+右鍵上車。
+
+# Coupling
 Lock couples=鎖定連線處
-Doors are closed! Use Sneak+rightclick to ignore the closed doors and get off!=車門已關閉，請使用潛行+右鍵單擊下車。
-Access to @1=可前往@1
-You don't have the train_operator privilege.=您沒有「train_operator」許可權。
+You need to own at least one neighboring wagon to destroy this couple.=您必須至少擁有其中一個車廂才能解耦這兩個車廂。
+Buffer and Chain Coupler=Buffer and Chain Coupler
+Scharfenberg Coupler=Scharfenberg Coupler
+Japanese Train Inter-Wagon Connection=Japanese Train Inter-Wagon Connection
+Can not couple: The couplers of the trains do not match (@1 and @2).=Can not couple: The couplers of the trains do not match (@1 and @2).
 
 # Clipboard
 The track you are trying to place the wagon on is not long enough!=軌道太短。

@@ -1,5 +1,5 @@
-local lang = arg[1] or error("No language supplied")
-local tfn = string.format("advtrains.%s.tr", lang)
+local lang = tostring(arg[1]) or error("Invalid filename supplied")
+local tfn = lang
 local f = io.open(tfn, "rb") or error("Cannot read from translation file")
 local tf = {}
 for l in f:lines() do

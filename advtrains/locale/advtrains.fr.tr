@@ -3,6 +3,32 @@
 # Advtrains Core (unorganized)
 This wagon is owned by @1, you can't destroy it.=Ce wagon est la propriété de @1, vous ne pouvez pas le détruire.
 Warning: If you destroy this wagon, you only get some steel back! If you are sure, hold Sneak and left-click the wagon.=Attention: Si vous détruisez ce wagon, vous ne récupérerez que de la ferraille ! Si vous êtes sûr de vous, appuyez la touche "Marcher lentement (Sneak)" et Clic-Gauche.
+This position is protected!=Cet emplacement est protégé !
+Can't place: not pointing at node=Placement impossible : ne pointe pas un nœud
+Can't place: space occupied!=Placement impossible : espace occupé
+Can't place: protected position!=Placement impossible : emplacement protégé
+Can't place: Not enough slope items left (@1 required)=Placement impossible : voie pentue en quantité insuffisante (@1 manquant)
+Can't place: There's no slope of length @1=Placement impossible : il n'y a pas de voie pentue de longueur @1
+Can't place: no supporting node at upper end.=Placement impossible : pas de nœud d'appui à l'extrémité supérieure
+Deprecated Track=Voie déconseillée
+Can't get on: wagon full or doors closed!= Embarquement impossible : le wagon est plein ou ses portes sont closes !
+Use Sneak+rightclick to bypass closed doors!=Utilisez "Marcher lentement (Sneak)" et Clic-Droit pour franchir les portes closes !
+Doors are closed! Use Sneak+rightclick to ignore the closed doors and get off!=Portes closes ! Utilisez "Marcher lentement (Sneak)" et Clic-Droit pour franchir les portes et débarquer !
+Access to @1=Accès à @1
+You don't have the train_operator privilege.=Vous ne possédez pas le privilège "train_operator".
+The wagon's inventory is not empty!=The wagon's inventory is not empty!
+Position is occupied by a train.=Position is occupied by a train.
+There's a Track Circuit Break here.=There's a Track Circuit Break here.
+There's a Signal Influence Point here.=There's a Signal Influence Point here.
+
+# Trackworker, rotation, adjustment
+This node can't be rotated using the trackworker!=Ce nœud ne peut être tourné avec l'outil "Trackworker" !
+This node can't be changed using the trackworker!=Ce nœud ne peut être modifié avec l'outil "Trackworker" !
+This track can not be changed!=This track can not be changed!
+This track can not be rotated!=This track can not be rotated!
+This track can not be removed!=This track can not be removed!
+
+# ATC
 ATC controller, unconfigured.= Controlleur ATC, non-configuré 
 ATC controller=Controlleur ATC
 ATC controller, mode @1@nChannel: @2=Controlleur ATC, mode @1@nCanal : @2
@@ -13,23 +39,14 @@ Digiline channel=Canal Digiline
 ATC Reverse command warning: didn't reverse train, train moving!=Attention : Commande ATC de renversement impossible car le train se déplace !
 ATC command syntax error: I statement not closed: @1= Erreur de syntaxe de commande ATC : instruction "I" incomplète : @1
 ATC command parse error: Unknown command: @1=Erreur d'analyse de commande ATC : Commande inconnue : @1
-This position is protected!=Cet emplacement est protégé !
-You need to own at least one neighboring wagon to destroy this couple.=Vous devez être propriétaire d'au moins un wagon voisin pour supprimer ce couplage.
-This node can't be rotated using the trackworker!=Ce nœud ne peut être tourné avec l'outil "Trackworker" !
-This node can't be changed using the trackworker!=Ce nœud ne peut être modifié avec l'outil "Trackworker" !
-Can't place: not pointing at node=Placement impossible : ne pointe pas un nœud
-Can't place: space occupied!=Placement impossible : espace occupé
-Can't place: protected position!=Placement impossible : emplacement protégé
-Can't place: Not enough slope items left (@1 required)=Placement impossible : voie pentue en quantité insuffisante (@1 manquant)
-Can't place: There's no slope of length @1=Placement impossible : il n'y a pas de voie pentue de longueur @1
-Can't place: no supporting node at upper end.=Placement impossible : pas de nœud d'appui à l'extrémité supérieure
-Deprecated Track=Voie déconseillée
-Can't get on: wagon full or doors closed!= Embarquement impossible : le wagon est plein ou ses portes sont closes !
-Use Sneak+rightclick to bypass closed doors!=Utilisez "Marcher lentement (Sneak)" et Clic-Droit pour franchir les portes closes !
+
+# Coupling
 Lock couples=Couplage verrouillé (?)
-Doors are closed! Use Sneak+rightclick to ignore the closed doors and get off!=Portes closes ! Utilisez "Marcher lentement (Sneak)" et Clic-Droit pour franchir les portes et débarquer !
-Access to @1=Accès à @1
-You don't have the train_operator privilege.=Vous ne possédez pas le privilège "train_operator".
+You need to own at least one neighboring wagon to destroy this couple.=Vous devez être propriétaire d'au moins un wagon voisin pour supprimer ce couplage.
+Buffer and Chain Coupler=Buffer and Chain Coupler
+Scharfenberg Coupler=Scharfenberg Coupler
+Japanese Train Inter-Wagon Connection=Japanese Train Inter-Wagon Connection
+Can not couple: The couplers of the trains do not match (@1 and @2).=Can not couple: The couplers of the trains do not match (@1 and @2).
 
 # Clipboard
 The track you are trying to place the wagon on is not long enough!=La voie sur laquelle vous tentez de placer le wagon est trop courte !

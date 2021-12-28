@@ -3,6 +3,32 @@
 # Advtrains Core (unorganized)
 This wagon is owned by @1, you can't destroy it.=This wagon is owned by @1, you can't destroy it.
 Warning: If you destroy this wagon, you only get some steel back! If you are sure, hold Sneak and left-click the wagon.=Warning: If you destroy this wagon, you only get some steel back! If you are sure, hold Sneak and left-click the wagon.
+This position is protected!=This position is protected!
+Can't place: not pointing at node=Can't place: not pointing at node
+Can't place: space occupied!=Can't place: space occupied!
+Can't place: protected position!=Can't place: protected position!
+Can't place: Not enough slope items left (@1 required)=Can't place: Not enough slope items left (@1 required)
+Can't place: There's no slope of length @1=Can't place: There's no slope of length @1
+Can't place: no supporting node at upper end.=Can't place: no supporting node at upper end.
+Deprecated Track=Deprecated Track
+Can't get on: wagon full or doors closed!=Can't get on: wagon full or doors closed!
+Use Sneak+rightclick to bypass closed doors!=Use Sneak+rightclick to bypass closed doors!
+Doors are closed! Use Sneak+rightclick to ignore the closed doors and get off!=Doors are closed! Use Sneak+rightclick to ignore the closed doors and get off!
+Access to @1=Access to @1
+You don't have the train_operator privilege.=You don't have the train_operator privilege.
+The wagon's inventory is not empty!=The wagon's inventory is not empty!
+Position is occupied by a train.=Position is occupied by a train.
+There's a Track Circuit Break here.=There's a Track Circuit Break here.
+There's a Signal Influence Point here.=There's a Signal Influence Point here.
+
+# Trackworker, rotation, adjustment
+This node can't be rotated using the trackworker!=This node can't be rotated using the trackworker!
+This node can't be changed using the trackworker!=This node can't be changed using the trackworker!
+This track can not be changed!=This track can not be changed!
+This track can not be rotated!=This track can not be rotated!
+This track can not be removed!=This track can not be removed!
+
+# ATC
 ATC controller, unconfigured.=ATC controller, unconfigured.
 ATC controller=ATC controller
 ATC controller, mode @1@nChannel: @2=ATC controller, mode @1@nChannel: @2
@@ -13,23 +39,14 @@ Digiline channel=Digiline channel
 ATC Reverse command warning: didn't reverse train, train moving!=ATC Reverse command warning: didn't reverse train, train moving!
 ATC command syntax error: I statement not closed: @1=ATC command syntax error: I statement not closed: @1
 ATC command parse error: Unknown command: @1=ATC command parse error: Unknown command: @1
-This position is protected!=This position is protected!
-You need to own at least one neighboring wagon to destroy this couple.=You need to own at least one neighboring wagon to destroy this couple.
-This node can't be rotated using the trackworker!=This node can't be rotated using the trackworker!
-This node can't be changed using the trackworker!=This node can't be changed using the trackworker!
-Can't place: not pointing at node=Can't place: not pointing at node
-Can't place: space occupied!=Can't place: space occupied!
-Can't place: protected position!=Can't place: protected position!
-Can't place: Not enough slope items left (@1 required)=Can't place: Not enough slope items left (@1 required)
-Can't place: There's no slope of length @1=Can't place: There's no slope of length @1
-Can't place: no supporting node at upper end.=Can't place: no supporting node at upper end.
-Deprecated Track=Deprecated Track
-Can't get on: wagon full or doors closed!=Can't get on: wagon full or doors closed!
-Use Sneak+rightclick to bypass closed doors!=Use Sneak+rightclick to bypass closed doors!
+
+# Coupling
 Lock couples=Lock couples
-Doors are closed! Use Sneak+rightclick to ignore the closed doors and get off!=Doors are closed! Use Sneak+rightclick to ignore the closed doors and get off!
-Access to @1=Access to @1
-You don't have the train_operator privilege.=You don't have the train_operator privilege.
+You need to own at least one neighboring wagon to destroy this couple.=You need to own at least one neighboring wagon to destroy this couple.
+Buffer and Chain Coupler=Buffer and Chain Coupler
+Scharfenberg Coupler=Scharfenberg Coupler
+Japanese Train Inter-Wagon Connection=Japanese Train Inter-Wagon Connection
+Can not couple: The couplers of the trains do not match (@1 and @2).=Can not couple: The couplers of the trains do not match (@1 and @2).
 
 # Clipboard
 The track you are trying to place the wagon on is not long enough!=The track you are trying to place the wagon on is not long enough!

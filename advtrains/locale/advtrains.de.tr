@@ -3,6 +3,33 @@
 # Advtrains Core (unorganized)
 This wagon is owned by @1, you can't destroy it.=Dieser Waggon gehört @1, Sie dürfen ihn nicht abbauen.
 Warning: If you destroy this wagon, you only get some steel back! If you are sure, hold Sneak and left-click the wagon.=Warnung: Durch den Abbau des Waggons erhalten Sie nur etwas Stahl zurück. Nutzen Sie Schleichen+Linksklick, um dem Waggon abzubauen.
+This position is protected!=Diese Position ist geschützt!
+Can't place: not pointing at node=Es kann nicht platziert werden: Sie zeigen nicht auf einem Block.
+Can't place: space occupied!=Es kann nicht platziert werden: diese Position ist besetzt.
+Can't place: protected position!=Es kann nicht platziert werden: diese Position ist geschützt.
+Can't place: Not enough slope items left (@1 required)=Es kann nicht platziert werden: Sie haben nicht genug Steigungsblöcke, es werden insgesamt @1 benötigt.
+Can't place: There's no slope of length @1=Es kann nicht platziert werden: die Steigung der Länge @1 ist nicht definiert.
+Can't place: no supporting node at upper end.=Es kann nicht platziert werden: es gibt keinen unterstützenden Block am Ende der Steigung.
+Deprecated Track=ausrangierte Schiene, nicht verwenden.
+Can't get on: wagon full or doors closed!=Sie können nicht einsteigen: der Waggon ist voll oder die Türen sind geschlossen.
+Use Sneak+rightclick to bypass closed doors!=Nutzen Sie Schleichen+Rechtsklick, um trotz geschlossener Türen einzusteigen.
+Doors are closed! Use Sneak+rightclick to ignore the closed doors and get off!=Die Türen sind geschlossen. Nutzen Sie Schleichen+Rechtsklick, um trotz geschlossener Türen auszusteigen.
+Access to @1=Zugang zu @1
+You don't have the train_operator privilege.=Ihnen fehlt das „train_operator“-Privileg.
+# TODO: rebase fixup
+The wagon's inventory is not empty!=Das Inventar dieses Waggons ist nicht leer!
+Position is occupied by a train.=Ein Zug steht an dieser Position.
+There's a Track Circuit Break here.=Hier ist eine Gleisabschnittsgrenze (TCB).
+There's a Signal Influence Point here.=Hier ist ein Signal-Beeinflussungspunkt.
+
+# Trackworker, rotation, adjustment
+This node can't be rotated using the trackworker!=Dieser Block kann nicht mit dem Schienenwerkzeug gedreht werden.
+This node can't be changed using the trackworker!=Dieser Block kann nicht mit dem Schienenwerkzeug bearbeitet werden.
+This track can not be changed!=Diese Schiene kann nicht geändert werden!
+This track can not be rotated!=Diese Schiene kann nicht gedreht werden!
+This track can not be removed!=Diese Schiene kann nicht entfernt werden!
+
+# ATC
 ATC controller, unconfigured.=Nicht konfiguierte Zugbeeinflussungsschiene
 ATC controller=Zugbeeinflussungsschiene
 ATC controller, mode @1@nChannel: @2=Zugbeeinflussungsschiene in Betriebsart „@1“@nKanal: @2
@@ -13,23 +40,14 @@ Digiline channel=Digiline-Kanal
 ATC Reverse command warning: didn't reverse train, train moving!=Zugbeeinflussung: der Befehl „R“ wurde nicht ausgeführt, Zug in Bewegung!
 ATC command syntax error: I statement not closed: @1=Zugbeeinflussung: Unvollständiger I-Befehl: @1
 ATC command parse error: Unknown command: @1=Zugbeeinflussung: Unbekannter Befehl: @1
-This position is protected!=Diese Position ist geschützt!
-You need to own at least one neighboring wagon to destroy this couple.=Sie müssen Besitzer eines angrenzenden Waggons sein, um hier abzukuppeln.
-This node can't be rotated using the trackworker!=Dieser Block kann nicht mit dem Schienenwerkzeug gedreht werden.
-This node can't be changed using the trackworker!=Dieser Block kann nicht mit dem Schienenwerkzeug bearbeitet werden.
-Can't place: not pointing at node=Es kann nicht platziert werden: Sie zeigen nicht auf einem Block.
-Can't place: space occupied!=Es kann nicht platziert werden: diese Position ist besetzt.
-Can't place: protected position!=Es kann nicht platziert werden: diese Position ist geschützt.
-Can't place: Not enough slope items left (@1 required)=Es kann nicht platziert werden: Sie haben nicht genug Steigungsblöcke, es werden insgesamt @1 benötigt.
-Can't place: There's no slope of length @1=Es kann nicht platziert werden: die Steigung der Länge @1 ist nicht definiert.
-Can't place: no supporting node at upper end.=Es kann nicht platziert werden: es gibt keinen unterstützenden Block am Ende der Steigung.
-Deprecated Track=ausrangierte Schiene, nicht verwenden.
-Can't get on: wagon full or doors closed!=Sie können nicht einsteigen: der Waggon ist voll oder die Türen sind geschlossen.
-Use Sneak+rightclick to bypass closed doors!=Nutzen Sie Schleichen+Rechtsklick, um trotz geschlossener Türen einzusteigen.
+
+# Coupling
 Lock couples=Kupplungen sperren
-Doors are closed! Use Sneak+rightclick to ignore the closed doors and get off!=Die Türen sind geschlossen. Nutzen Sie Schleichen+Rechtsklick, um trotz geschlossener Türen auszusteigen.
-Access to @1=Zugang zu @1
-You don't have the train_operator privilege.=Ihnen fehlt das „train_operator“-Privileg.
+You need to own at least one neighboring wagon to destroy this couple.=Sie müssen Besitzer eines angrenzenden Waggons sein, um hier abzukuppeln.
+Buffer and Chain Coupler=Schraubenkupplung
+Scharfenberg Coupler=Scharfenbergkupplung
+Japanese Train Inter-Wagon Connection=Waggonzwischenverbindung Japanischer Personenzug
+Can not couple: The couplers of the trains do not match (@1 and @2).=Kann nicht ankuppeln: Die Kupplungen der Züge passen nicht zueinander (@1 und @2)
 
 # Clipboard
 The track you are trying to place the wagon on is not long enough!=Das Gleis, auf dem der Waggon platziert werden woll, ist zu kurz.
@@ -121,17 +139,3 @@ Detailed Steam Engine=detaillierte Dampflokomotive
 Passenger Wagon=Passagierwaggon
 Box Wagon=Güterwaggon
 Subway Passenger Wagon=U-Bahn-Waggon
-
-# TODO: rebase fixup
-The wagon's inventory is not empty!=Das Inventar dieses Waggons ist nicht leer!
-This track can not be changed!=Diese Schiene kann nicht geändert werden!
-This track can not be rotated!=Diese Schiene kann nicht gedreht werden!
-This track can not be removed!=Diese Schiene kann nicht entfernt werden!
-Position is occupied by a train.=Ein Zug steht an dieser Position.
-There's a Track Circuit Break here.=Hier ist eine Gleisabschnittsgrenze (TCB).
-There's a Signal Influence Point here.=Hier ist ein Signal-Beeinflussungspunkt.
-Buffer and Chain Coupler=Schraubenkupplung
-Scharfenberg Coupler=Scharfenbergkupplung
-Japanese Train Inter-Wagon Connection=Waggonzwischenverbindung Japanischer Personenzug
-Can not couple: The couplers of the trains do not match (@1 and @2).=Kann nicht ankuppeln: Die Kupplungen der Züge passen nicht zueinander (@1 und @2)
-<none>=<keine>
