@@ -24,9 +24,9 @@ There's a Signal Influence Point here.=There's a Signal Influence Point here.
 # Trackworker, rotation, adjustment
 This node can't be rotated using the trackworker!=您不能使用铁路调整工具旋转这个方块。
 This node can't be changed using the trackworker!=您不能使用铁路调整工具调整这个方块。
-This track can not be changed!=This track can not be changed!
-This track can not be rotated!=This track can not be rotated!
-This track can not be removed!=This track can not be removed!
+This track can not be changed!=您不能调整这段铁轨。
+This track can not be rotated!=您不能旋转这段铁轨。
+This track can not be removed!=您不能移除这段铁轨。
 
 # ATC
 ATC controller, unconfigured.=ATC 控制器 (未配置)
@@ -43,10 +43,10 @@ ATC command parse error: Unknown command: @1=ATC 语法错误：未知命令：@
 # Coupling
 Lock couples=锁定连接处
 You need to own at least one neighboring wagon to destroy this couple.=您必须至少拥有其中一个车厢才能解耦这两个车厢。
-Buffer and Chain Coupler=Buffer and Chain Coupler
-Scharfenberg Coupler=Scharfenberg Coupler
-Japanese Train Inter-Wagon Connection=Japanese Train Inter-Wagon Connection
-Can not couple: The couplers of the trains do not match (@1 and @2).=Can not couple: The couplers of the trains do not match (@1 and @2).
+Buffer and Chain Coupler=链式车钩
+Scharfenberg Coupler=Scharfenberg 式车钩
+Japanese Train Inter-Wagon Connection=日本火车车钩
+Can not couple: The couplers of the trains do not match (@1 and @2).=您无法连接这两个车厢：这两个车厢使用不同的车钩 (@1和@2)。
 
 # Clipboard
 The track you are trying to place the wagon on is not long enough!=轨道太短。
