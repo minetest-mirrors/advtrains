@@ -3,12 +3,13 @@
   \def\pgfsysdriver{pgfsys-dvisvgm4ht.def} % for HTML output
 \fi
 \usepackage[a4paper,margin=2cm]{geometry}
+\usepackage[T1]{fontenc}
 \ifx\HCode\undefined
 \usepackage{beton}
 \usepackage{eulervm}
 \fi
-\usepackage[T1]{fontenc}
 \setlength{\parindent}{0pt}
+\setlength{\parskip}{1ex}
 \usepackage{listings}
 \usepackage{hyperref}
 \usepackage{amsmath,amssymb,siunitx}
@@ -667,6 +668,19 @@ To create a route:
 You can also click ``Finish route at the end of NEXT section'' at the starting TCB. This can be useful for the $\overline{P_1P_2}$ route in the previous graph.
 
 If the TCB is not considered suitable for route continuation, please check that the side of the TCB from which the train passes the TCB is part of a track section and that the train can reach there without passing a point assigned to another TCB. If you see ``Advancing over next section is impossible at this place. End of interlocking.'', please check that the side of the TCB corresponding to the driving direction is part of a track section.
+
+\begin{centeredtikzpicture}
+  \draw [->] (-0.5,1) node [left] {Finish route HERE} -- (4.5,1);
+  \draw [->,blue,very thick] (0,1) -- (2,1);
+  \draw [->] (-0.5,0) node [left] {Finish route at the end of NEXT section}-- (4.5,0);
+  \draw [->,blue,very thick] (0,0) -- (4,0);
+  \foreach \y in {1,0} {
+    \draw (0,\y) pic [xscale=-1] {signal=red} node [below] {$P$};
+    \foreach \x/\l in {2/Q,4/R} {
+      \draw (\x,\y) pic {tcb} node [below] {$\l$};
+    }
+  }
+\end{centeredtikzpicture}
 
 After finishing the route, you are prompted for the name of the route. It is recommended to use a sensible name. You should then see the route formspec. If you don't, click on the name of the route you just created and click ``Edit route'', and proceed to the next section regarding ARS.
 
