@@ -83,9 +83,6 @@ Get off (forced)=强制下车
 
 # General
 Save=保存
-# "off" and "on" can be translated differently depending on the context and are therefore not translated.
-off=off
-on=on
 
 # Line automation
 Station Code=车站代码
@@ -108,9 +105,10 @@ Detector Rail=探测铁轨
 @1 Slope=@1斜坡
 @1 Platform (low)=50cm 高的@1站台
 @1 Platform (high)=1m 高的@1站台
-@1 Platform (45 degree)=1m 高的@1站台 (45度)
-Lampless Signal (@1)=臂板信号机 (@1)
-Signal (@1)=信号灯 (@1)
+@1 Platform (low, 45 degree)=50cm 高的@1站台 (45°)
+@1 Platform (45 degree)=1m 高的@1站台 (45°)
+Lampless Signal=臂板信号机
+Signal=信号灯
 Wallmounted Signal (l)=壁挂式信号灯 (左侧)
 Wallmounted Signal (r)=壁挂式信号灯 (右侧)
 Wallmounted Signal (t)=悬挂式信号灯

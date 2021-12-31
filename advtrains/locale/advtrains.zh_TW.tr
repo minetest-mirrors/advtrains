@@ -83,9 +83,6 @@ Get off (forced)=強制下車
 
 # General
 Save=儲存
-# "off" and "on" can be translated differently depending on the context and are therefore not translated.
-off=off
-on=on
 
 # Line automation
 Station Code=車站碼
@@ -108,9 +105,10 @@ Detector Rail=探測鐵軌
 @1 Slope=@1斜坡
 @1 Platform (low)=50cm 高的@1月臺
 @1 Platform (high)=1m 高的@1月臺
-@1 Platform (45 degree)=1m 高的@1月臺 (45度)
-Lampless Signal (@1)=臂木式號誌機 (@1)
-Signal (@1)=色燈號誌機 (@1)
+@1 Platform (low, 45 degree)=50cm 高的@1月臺 (45°)
+@1 Platform (45 degree)=1m 高的@1月臺 (45°)
+Lampless Signal=臂木式號誌機
+Signal=色燈號誌機
 Wallmounted Signal (l)=壁掛式色燈號誌機 (左側)
 Wallmounted Signal (r)=壁掛式色燈號誌機 (右側)
 Wallmounted Signal (t)=懸掛式色燈號誌機

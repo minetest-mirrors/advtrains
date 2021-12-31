@@ -84,8 +84,6 @@ Get off (forced)=Ausstieg zwingen
 
 # General
 Save=Speichern
-off=aus
-on=ein
 
 # Line automation
 Station Code=Code der Haltestelle
@@ -108,9 +106,10 @@ Detector Rail=Detektorschiene
 @1 Slope=@1 Steigung
 @1 Platform (low)=Niedriger @1-Bahnsteig
 @1 Platform (high)=Hoher @1-Bahnsteig
-@1 Platform (45 degree)=@1-Bahnsteig (45°)
-Lampless Signal (@1)=Mechanisches Signal (@1)
-Signal (@1)=Lichtsignal (@1)
+@1 Platform (low, 45 degree)=Niedriger @1-Bahnsteig (45°)
+@1 Platform (45 degree)=Hoher @1-Bahnsteig (45°)
+Lampless Signal=Mechanisches Signal
+Signal=Lichtsignal
 Wallmounted Signal (l)=An der linken Seite montiertes Signal
 Wallmounted Signal (r)=An der rechten Seite montiertes Signal
 Wallmounted Signal (t)=An der Decke montiertes Signal

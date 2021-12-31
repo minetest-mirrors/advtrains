@@ -83,8 +83,6 @@ Get off (forced)=Get off (forced)
 
 # General
 Save=Save
-off=off
-on=on
 
 # Line automation
 Station Code=Station Code
@@ -107,9 +105,10 @@ Detector Rail=Detector Rail
 @1 Slope=@1 Slope
 @1 Platform (low)=@1 Platform (low)
 @1 Platform (high)=@1 Platform (high)
+@1 Platform (low, 45 degree)=@1 Platform (low, 45 degree)
 @1 Platform (45 degree)=@1 Platform (45 degree)
-Lampless Signal (@1)=Lampless Signal (@1)
-Signal (@1)=Signal (@1)
+Lampless Signal=Lampless Signal
+Signal=Signal
 Wallmounted Signal (l)=Wallmounted Signal (l)
 Wallmounted Signal (r)=Wallmounted Signal (r)
 Wallmounted Signal (t)=Wallmounted Signal (t)

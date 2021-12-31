@@ -83,8 +83,6 @@ Get off (forced)=Débarquer (de force)
 
 # General
 Save=Sauvegarder
-off=marche
-on=arrêt
 
 # Line automation
 Station Code=Code de Station
@@ -107,9 +105,10 @@ Detector Rail=Rail détecteur
 @1 Slope=Pente @1
 @1 Platform (low)=Quai @1 (bas)
 @1 Platform (high)=Quai @1 (haut)
-@1 Platform (45 degree)=Quai @1 (45°)
-Lampless Signal (@1)=Sémaphore
-Signal (@1)=Signal (@1)
+@1 Platform (low, 45 degree)=Quai @1 (bas, 45°)
+@1 Platform (45 degree)=Quai @1 (haut, 45°)
+Lampless Signal=Sémaphore
+Signal=Signal
 Wallmounted Signal (l)=Signal mural (gauche)
 Wallmounted Signal (r)=Signal mural (droit)
 Wallmounted Signal (t)=Signal mural (plafond)
