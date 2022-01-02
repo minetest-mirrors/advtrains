@@ -89,7 +89,7 @@ end
 function advtrains.update_driver_hud(pname, train, flip, thud, ghud, nointext)
 	local inside=nointext and "" or (train.text_inside or "").."\n"
 	local ft = (thud or advtrains.hud.dtext)(train, flip)
-	local ht, gs = (ghud or advtrains.hud.dgraphical)(train, flip)
+	local ht, gs = (ghud or advtrains.hud.presets.default)(train, flip)
 	advtrains.set_trainhud(pname, inside..ft, ht, gs)
 end
 function advtrains.clear_driver_hud(pname)
@@ -320,79 +320,25 @@ function advtrains.hud.speed_horizontal(train, x, y, w, h, m)
 	return table.concat(st, ":")
 end
 
-function advtrains.hud.dgraphical(train, flip)
-	if not train then return "" end
-	local sformat = string.format -- this appears to be faster than (...):format
-	
-	local max = train.max_speed or 10
-	local vel = advtrains.abs_ceil(train.velocity)
-	local res = train.speed_restriction
-	local tar = train.tarvelocity
-	
-	local ht = {"[combine:450x120:0,0=(advtrains_hud_bg.png^[resize\\:450x120)"}
-	if train.debug then st = {train.debug} end
-	
-	ht[#ht+1] = advtrains.hud.lever(advtrains.hud.leverof(train), 275, 10, 5, 30, 100)
-	-- reverser
-	ht[#ht+1] = sformat("245,10=(advtrains_hud_arrow.png^[transformFY%s)", flip and "" or "^[multiply\\:cyan")
-	ht[#ht+1] = sformat("245,95=(advtrains_hud_arrow.png%s)", flip and "^[multiply\\:orange" or "")
-	ht[#ht+1] = "250,35=(advtrains_hud_bg.png^[colorize\\:darkslategray^[resize\\:5x50)"
-	ht[#ht+1] = sformat("240,%s=(advtrains_hud_bg.png^[resize\\:25x15^[colorize\\:gray)", flip and 75 or 30)
-	-- first row
-	ht[#ht+1] = sformat("10,10=(advtrains_hud_ars.png^[multiply\\:%s)", (not (advtrains.interlocking and train.ars_disable)) and "cyan" or "darkslategray")
-	ht[#ht+1] = sformat("50,10=(advtrains_hud_lzb.png^[multiply\\:%s)", train.hud_lzb_effect_tmr and "red" or "darkslategray")
-	ht[#ht+1] = sformat("90,10=(advtrains_hud_shunt.png^[multiply\\:%s)", train.is_shunt and "orange" or "darkslategray")
-	ht[#ht+1] = sformat("145,10=(advtrains_hud_autocouple.png^[multiply\\:%s)", train.autocouple and "orange" or "darkslategray")
-	-- second row
-	local lzb = train.lzb
-	local noupcoming = true
-	if lzb and lzb.checkpoints then
-		local oc = lzb.checkpoints
+function advtrains.hud.getlzb(train)
+	if train.lzb and train.lzb.checkpoints then
+		local oc = train.lzb.checkpoints
 		for i = 1, #oc do
 			local spd = oc[i].speed
-			spd = advtrains.speed.min(spd, train.speed_restriction)
-			if spd == -1 then spd = nil end
-			local c = not spd and "lime" or (type(spd) == "number" and (spd == 0) and "red" or "orange") or nil
-			if c then
-				if spd then
-					ht[#ht+1] = advtrains.hud.number(spd, 2, 10, 45, 5, 2, 2, c, "darkslategray")
-					ht[#ht+1] = sformat("10,67=(advtrains_hud_ms.png^[multiply\\:%s)", c)
-				else
-					ht[#ht+1] = advtrains.hud.number(88, 2, 10, 45, 5, 2, 2, "darkslategray")
-					ht[#ht+1] = "10,67=(advtrains_hud_ms.png^[multiply\\:darkslategray)"
-				end
-				local floor = math.floor
-				local dist = floor(((oc[i].index or train.index)-train.index))
-				dist = math.max(0, math.min(999, dist))
-				ht[#ht+1] = advtrains.hud.number(dist, 3, 35, 45, 9, 4, 2, c, "darkslategray")
-				noupcoming = false
-				break
+			spd = advtrains.speed.min(spd,train.speed_restriction)
+			local dist = math.floor((oc[i].index or train.index)-train.index)
+			if spd == -1 or spd == nil then
+				return -1, dist
+			elseif type(spd) == "number" and spd >= 0 then
+				return spd, dist
 			end
 		end
 	end
-	if noupcoming then
-		ht[#ht+1] = advtrains.hud.number(88, 2, 10, 45, 5, 2, 2, "darkslategray")
-		ht[#ht+1] = "10,67=(advtrains_hud_ms.png^[multiply\\:darkslategray)"
-		ht[#ht+1] = advtrains.hud.number(888, 3, 35, 45, 9, 4, 2, "darkslategray")
-	end
-	ht[#ht+1] = sformat("100,45=(advtrains_hud_atc.png^[multiply\\:%s)", (train.tarvelocity or train.atc_command) and "cyan" or "darkslategray")
-	if tar and tar >= 0 then
-		local tc = math.min(max, tar)
-		ht[#ht+1] = advtrains.hud.number(tar, 2, 135, 45, 5, 2, 2, "cyan", "darkslategray")
-		ht[#ht+1] = "135,67=(advtrains_hud_ms.png^[multiply\\:cyan)"
-	else
-		ht[#ht+1] = advtrains.hud.number(88, 2, 135, 45, 5, 2, 2, "darkslategray")
-		ht[#ht+1] = "135,67=(advtrains_hud_ms.png^[multiply\\:darkslategray)"
-	end
-	ht[#ht+1] = advtrains.hud.door(train.door_open, 167, 45, 60, 30, 2)
-	-- speed indications
-	ht[#ht+1] = advtrains.hud.number(vel, 2, 320, 10, 35, 10, 10, "red")
-	ht[#ht+1] = advtrains.hud.speed_horizontal(train, 10, 80, 217, 30, 3)
-	
-	return table.concat(ht,":"), 120
 end
 
-local texture = advtrains.hud.dgraphical { -- dummy train object to demonstrate the train hud
+dofile(advtrains.modpath.."/trainhud_presets.lua")
+
+local texture = advtrains.hud.presets.default { -- dummy train object to demonstrate the train hud
 	max_speed = 17, speed_restriction = 15, velocity = 14, tarvelocity = 12,
 	active_control = true, lever = 3, ctrl = {lzb = true}, is_shunt = true,
 	door_open = 1, lzb = {checkpoints = {{speed=6, index=125.7}}}, index = 0,
