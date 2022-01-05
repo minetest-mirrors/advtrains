@@ -287,13 +287,19 @@ for _, rtab in ipairs({
 	end
 
 	for typ, prts in pairs {
-		["hfs"] = {asp = {main = false, shunt = false}, n = "pam", mesh = "_hfs"},
-		["pam"] = {asp = {main = -1, shunt = false, proceed_as_main = true}, n = "hfs"}
+		["hfs"] = {asp = {main = false, shunt = false}, n = "pam", mesh = "_hfs", owntile = true},
+		["pam"] = {asp = {main = -1, shunt = false, proceed_as_main = true}, n = "ne4"},
+		["ne4"] = {asp = {}, n = "ne3x1", mesh="_ne4", owntile = true},
+		["ne3x1"] = {asp = {}, n = "ne3x2", mesh="_ne3", owntile = true},
+		["ne3x2"] = {asp = {}, n = "ne3x3", mesh="_ne3", owntile = true},
+		["ne3x3"] = {asp = {}, n = "ne3x4", mesh="_ne3", owntile = true},
+		["ne3x4"] = {asp = {}, n = "ne3x5", mesh="_ne3", owntile = true},
+		["ne3x5"] = {asp = {}, n = "hfs", mesh="_ne3", owntile = true},
 	} do
 		local mesh = prts.mesh or ""
 		local tile2 = "advtrains_signals_ks_sign_lf7.png^(advtrains_signals_ks_sign_"..typ..".png^[makealpha:255,255,255)"
-		if typ == "hfs" then
-			tile2 = "advtrains_signals_ks_sign_hfs.png"
+		if prts.owntile then
+			tile2 = "advtrains_signals_ks_sign_"..typ..".png"
 		end
 		register_sign("sign", typ, prts.n, "Signal Sign", "sign"..mesh, tile2, "hfs", "advtrains_signals_ks_sign_lf7.png", prts.asp)
 	end
