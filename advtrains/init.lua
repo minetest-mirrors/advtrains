@@ -229,6 +229,9 @@ end
 
 dofile(advtrains.modpath.."/lzb.lua")
 
+if minetest.settings:get_bool("advtrains_register_debugitems") then
+	dofile(advtrains.modpath.."/debugitems.lua")
+end
 
 --load/save
 

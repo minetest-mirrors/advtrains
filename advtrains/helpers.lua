@@ -470,3 +470,119 @@ else
 		end
 	end
 end
+
+
+-- TrackIterator interface --
+
+-- Metatable:
+local trackiter_mt = {
+	-- get whether there are still unprocessed branches
+	has_next_branch = function(self)
+		return #self.branches > 0
+	end,
+	-- go to the next unprocessed branch
+	-- returns track_pos, track_connid of the switch/crossing node where the track branches off
+	next_branch = function(self)
+		local br = table.remove(self.branches, 1)
+		-- Advance internal state
+		local adj_pos, adj_connid, _, _, adj_conns = advtrains.get_adjacent_rail(br.pos, nil, br.connid)
+		self.pos = adj_pos
+		self.bconnid = adj_connid
+		self.tconns = adj_conns
+		self.limit = br.limit - 1
+		self.visited[advtrains.encode_pos(br.pos)] = true
+		return br.pos, br.connid
+	end,
+	-- get the next track along the current branch,
+	-- potentially adding branching tracks to the unprocessed branches list
+	-- returns status, track_pos, track_connid
+	-- status is true(ok), false(track has ended), nil(traversing limit has been reached) (when status~=true, track_pos and track_connid are nil)
+	next_track = function(self)
+		local pos = self.pos
+		if not pos then
+			-- last run found track end. Return false
+			return false, "track_end"
+		end
+		-- if limit hit, return nil to signal this
+		if self.limit <= 0 then
+			return nil, "limit_hit"
+		end
+		if self.visited[advtrains.encode_pos(pos)] then
+			-- node was already seen. do not continue
+			return nil, "already_visited"
+		end
+		-- select next conn (main conn to follow is the associated connection)
+		local mconnid = advtrains.get_matching_conn(self.bconnid, #self.tconns)
+		-- If there are more connections, add these to branches
+		for nconnid,_ in ipairs(self.tconns) do
+			if nconnid~=mconnid and nconnid~=self.bconnid then
+				table.insert(self.branches, {pos = self.pos, connid = nconnid, limit=self.limit})
+			end
+		end
+		-- Advance internal state
+		local adj_pos, adj_connid, _, _, adj_conns = advtrains.get_adjacent_rail(pos, self.tconns, mconnid)
+		self.pos = adj_pos
+		self.bconnid = adj_connid
+		self.tconns = adj_conns
+		self.limit = self.limit - 1
+		self.visited[advtrains.encode_pos(pos)] = true
+		return pos, mconnid
+	end,
+}
+
+-- Returns a new TrackIterator object
+
+-- Parameters:
+-- initial_pos: the initial track position of the track iterator
+-- initial_connid: the connection index in which to traverse. If nil, adds a "branch" for every connection of the track (traverse in all directions)
+-- limit: maximum distance from the start point after which the traverser stops
+-- follow_all: if true, follows all branches at multi-connection tracks, even the ones pointing backwards or the crossing track on crossings. If false, follows only switches in driving direction.
+
+-- Functions of the returned TrackIterator can be called via the Lua : notation, such as ti:next_track()
+-- If only the main track needs to be followed, use only the ti:next_track() function and do not call ti:next_branch().
+function advtrains.get_track_iterator(initial_pos, initial_connid, limit, follow_all)
+	local ti = {
+		visited = {}
+	}
+	if initial_connid then
+		ti.branches = { {pos = initial_pos, connid = initial_connid, limit=limit} }
+	else
+		-- get track info here
+		local node_ok, conns, rail_y=advtrains.get_rail_info_at(initial_pos)
+		assert(node_ok, "get_track_iterator called with non-track node!")
+		ti.branches = {}
+		for coni, _ in pairs(conns) do
+			table.insert(ti.branches, {pos = initial_pos, connid = coni, limit=limit})
+		end
+	end
+	setmetatable(ti, {__index=trackiter_mt})
+	return ti
+end
+
+--[[
+Example TrackIterator usage structure:
+
+local ti, pos, connid, ok
+ti = advtrains.get_track_iterator(initial_pos, initial_connid, 500, true)
+while ti:has_next_branch() do
+	pos, connid = ti:next_branch() -- in first iteration, this will be the node at initial_pos. In subsequent iterations this will be the switch node from which we are branching off
+	repeat
+		<do something with the track>
+		if <track satisfies an abort condition> then break end --for example, when traversing should stop at TCBs this can check if there is a tcb here
+		ok, pos, connid = ti:next_track()
+	until not ok -- this stops the loop when either the track end is reached or the limit is hit
+	-- while loop continues with the next branch ( diverging branch of one of the switches/crossings) until no more are left
+end
+
+Example for walking only a single track (without branching):
+
+local ti, pos, connid, ok
+ti = advtrains.get_track_iterator(initial_pos, initial_connid, 500, true)
+
+pos, connid = ti:next_branch() -- this always needs to be done at least one time, and gets the track at initial_pos
+repeat
+	<do something with the track>
+	if <track satisfies an abort condition> then break end --for example, when traversing should stop at TCBs this can check if there is a tcb here
+	ok, pos, connid = ti:next_track()
+until not ok -- this stops the loop when either the track end is reached or the limit is hit
+]]
