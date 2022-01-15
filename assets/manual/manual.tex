@@ -633,6 +633,8 @@ After assigning the TCB, you can right click it to open the TCB formspec. This w
 
 The two sides of the TCB are assigned based on the orientation of the tracks. In particular, straight tracks with different orientations can still appear visually the same. For this reason, most graphs in the rest of this chapter will use cardinal directions instead of actual TCB sides, or omit TCB sides if these are irrelevant.
 
+For new players, it is recommended to set up all TCBs before continuing to the next sections.
+
 \subsection{Track sections}\label{s:ilts}
 
 In terms of interlocking, track sections are segments of tracks that can be occupied by a train or reserved for a train to pass. The following graph shows TCBs and sections along a line segment. For simplicity, letters are used instead of actual coordinates and IDs.
@@ -669,7 +671,7 @@ To create a track section, click on ``Create new track section'' in the TCB form
 
 After the track section is created, you can click on ``Show track section'' to open the track section formspec, or ``Remove from section'' to move the TCB side from the track section.
 
-In some cases, you may need to manually add TCB sides to a track section. This can only be done by creating a track section for the TCB side and then merging the two track sections.
+In some cases, such as crossings, you may need to manually add TCB sides to a track section. This can only be done by creating a track section for the TCB side and then merging the two track sections.
 
 To merge two track sections:
 \begin{itemize}
@@ -679,6 +681,8 @@ To merge two track sections:
 To abort the procedure above, click on the ``X'' button on the right.
 
 The track section formspec also has a button labeled ``Dissolve section''. Clicking on that button will remove the track section entirely.
+
+In most cases, the two sides of the TCB should belong to different sections, or at least one side belongs to EOI. If this is not the case (i.e., both sides of the TCB belong to the same track section), it likely means that the presence of the TCB is irrelevant for the track section. If you run into such a situation, dissolve the track section and make sure that every TCB is assigned to a track and delimits the track sections that the two sides of the TCB are assigned to, and then create the sections again.
 
 \subsection{Signals}\label{s:ilsignals}
 
