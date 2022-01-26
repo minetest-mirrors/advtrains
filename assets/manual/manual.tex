@@ -682,7 +682,7 @@ To abort the procedure above, click on the ``X'' button on the right.
 
 The track section formspec also has a button labeled ``Dissolve section''. Clicking on that button will remove the track section entirely.
 
-In most cases, the two sides of the TCB should belong to different sections, or at least one side belongs to EOI. If this is not the case (i.e., both sides of the TCB belong to the same track section), it likely means that the presence of the TCB is irrelevant for the track section. If you run into such a situation, dissolve the track section and make sure that every TCB is assigned to a track and delimits the track sections that the two sides of the TCB are assigned to, and then create the sections again.
+In most cases, the two sides of the TCB should belong to different sections, or at least one side belongs to EOI. If this is not the case (i.e., both sides of the TCB belong to the same track section), it likely means that the presence of the TCB is irrelevant for the track section. With the current implementation of the section occupation system, this is problematic as the section behind the train is always freed, even when the train passes a TCB with both sides belonging to the same section. If you run into such a situation, dissolve the track section and make sure that every TCB is assigned to a track and delimits the track sections that the two sides of the TCB are assigned to, and then create the sections again.
 
 \subsection{Signals}\label{s:ilsignals}
 
