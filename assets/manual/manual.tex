@@ -427,8 +427,16 @@ If you have access to the driver stand of the wagon, right-clicking the train wi
 The onboard computer allow setting certain properties of the train. Feel free to explore it yourself. A few fields are explained here in detail:
 \begin{apidoc}{Onboard computer}
 \item \apiui{Line number} The line name of the train. Despite the label, you can set this to anything. This field is mainly used for interlocking.
-\item \apiui{Routing code} The routing code of the train, separated by space characters. This field is mainly used for interlocking.
+\item \apiui{Routing code} The routing code of the train. This field is mainly used for interlocking. Unlike line numbers, you can specify multiple entries in this field, separated by spaces.
 \item \apiui{Train overview} This section is only shown when the train is not moving. It allows you to couple and decouple wagons from the train.
+\end{apidoc}
+
+\subsection{Wagon properties formspec}
+The ``wagon properties'' formspec allows setting properties that apply to each wagon. The following fields are present in the formspec:
+\begin{apidoc}{Wagon properties}
+\item \apiui{Whitelist} (``Allow these players to access your wagon'') A list of other player that may access the inventory and the driver stand of the wagon.
+\item \apiui{Wagon road number} An identifier that is applied to the wagon. It is mainly intended to be a human-readable alternative to wagon IDs.
+\item \apiui{Freight code} The freight code of the wagon. Please refer to section \ref{s:freightcode} for more information.
 \end{apidoc}
 
 \subsection{HUD}\label{s:trainhud}
@@ -599,14 +607,16 @@ In \advtrains, LZB is a system that makes sure that trains realistically brake t
 
 LZB speed targets are temporary and associated to a specific point - it only makes sure that the front part of the train passes that point at the desired speed. For example, a point speed restriction rail with a speed target of 3 will only make sure that the front of the train passes the PSR rail at the speed of 3, but the train is allowed to accelerate up to the speed limit (or the maximum speed, if there is no speed limit) after the head of the train passes the PSR rail.
 
-\subsection{Minor modes}\label{s:trainminormodes}
-The modes described here do not override any of the modes described above, but rather coexist with these.
+\subsection{ARS}
+Signals using ARS will select the appropriate route for the train only if ARS is also enabled on the train. This mode is enabled by default. This feature is mainly used by station tracks, which disables ARS for the train when it arrives at the station and re-enables ARS before departure.
 
-\begin{apidoc}{Train modes}{}
-\item \apitrainmode{ARS} If enabled, signals using ARS will select the appropriate route for the train. If ARS is disabled for the train, signals using ARS will not select any route for the train. This mode is enabled by default.
-\item \apitrainmode{Autocouple mode} If enabled, the train will automatically couple with any train it collides with. This mode is disabled by default.
-\end{apidoc}
-% TODO: Add documentation on shunt mode
+\subsection{Autocouple mode}
+If enabled, the train automatically couples with any train it collides with. This mode is disabled by default.
+
+Historically, a train would also automatically couple with any train is collides with. This behavior was changed with the introduction of the autocouple mode.
+
+\subsection{Shunt mode}
+This mode restricts the velocity of the train to 6m/s and, allows a train to proceed past a signal at danger if the signal allows the train to proceed in shunt mode. It is disabled by default and automatically enabled when the train reverses in an interlocked section.
 
 \section{Interlocking and line automation}\label{s:interlocking}
 
@@ -1209,7 +1219,7 @@ These functions and variables described in this section are only available to Lu
 \item \apifunc{train\_length}{} Returns the number of wagons in the train.
 \end{apidoc}
 
-\subsubsection{Shunting and freight code}
+\subsubsection{Shunting and freight code}\label{s:freightcode}
 Freight codes are delimited with exclamation marks (\texttt{!}).
 \begin{apidoc}{LuaATC}
 \item \apifunc{set\_autocouple}{} Enables autocouple mode for the train.
