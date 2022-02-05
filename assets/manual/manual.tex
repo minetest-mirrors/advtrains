@@ -833,8 +833,6 @@ The lazy method would be to set up the entire junction as a single track section
   \draw [green] (0.5,0) arc [start angle=0,end angle=15,radius=2];
 \end{centeredtikzpicture}
 
-An example setup can be found in section \ref{s:stjunction}.
-
 It is also possible to build the junction on multiple levels. This is known as grade separation. In real life, grade-separated railway junctions are not common, mostly because of the larger curve radii and slopes that are notably less steep (for example, the steepest slope of the Schwarzwaldbahn in Baden, which has an altitude between 384m and 832m, is only 2\%). As an exercise, you can try to make the T junction grade-separated.
 
 \subsubsection{Track capacity and deadlock}\label{s:ilcapacity}
@@ -1250,28 +1248,6 @@ The following operations are safe in the approach callback:
 \item Setting the display text of the train.
 \item Using the functions specific to the \texttt{approach} event.
 \end{itemize}
-
-\section{Example setups}\label{s:sexamples}
-This chapter shows some example setups that you can use on your rail lines. These are intended as examples and not standards - it is up to you to develop your own standards.
-
-\subsection{Station code using LuaATC}
-\lstinputlisting[style=luastyle]{station.lua}
-
-\subsection{T junction}\label{s:stjunction}
-\begin{centeredtikzpicture}[very thick,draw=black,scale=0.6]
-  \fill [red] (-0.5,6.5) rectangle ++(16,3);
-  \fill [orange] (-0.5,7.5) |- ++(3,-3) -- ++(2,-2) |- ++(3,-3) -- ++(0,8) -- cycle;
-  \fill [green] (15.5,7.5) |- ++(-3,-3) -- ++(-2,-2) |- ++(-3,-3) -- ++(0,8) -- cycle;
-  \fill [cyan] (2.5,7.5) -- ++(5,-5) -- ++(5,5) -- cycle;
-  \draw [shift={(-0.5,-0.5)},gray,thin] (0,0) grid (16,10);
-  \foreach \x/\s in {0/1,-15/-1} {
-    \draw [<->,xscale=\s] (\x,6) -- ++(2,0) -- ++(2,-1) -- ++(1,-1) -- ++(1,-2) -- ++(0,-2);
-    \draw [<-,xscale=\s] (\x,9) -- ++(2,0) -- ++(2,-1) -- ++(4,-4) -- ++(1,-2);
-  }
-  \foreach \y in {6,9} {
-    \draw (2,\y) -- ++(12,0);
-  }
-\end{centeredtikzpicture}
 
 \newpage
 \part{Developer's Manual}
