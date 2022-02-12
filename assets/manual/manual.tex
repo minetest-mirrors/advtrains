@@ -622,11 +622,13 @@ This mode restricts the velocity of the train to 6m/s and, allows a train to pro
 
 Interlocking is a set of equipments employed to prevent train collisions while allowing trains to go to their destinations. This chapter will explain some basic concepts and includes a task at the end that you can try to do yourself.
 
-Please note that this chapter is also intended to be used as a reference, so some things may be explained in a way that is not easy to understand at first. If that is the case, the following links may be helpful, albeit possibly slightly outdated:
+Please note that this chapter is also intended to be used as a reference, so some things may be explained in a way that is not easy to understand at first. If that is the case, the following links may be helpful, albeit possibly outdated:
 \begin{itemize}
 \item The online interlocking guide: \url{https://advtrains.de/interlocking}
 \item Blockhead's Youtube video showing a simple three-station setup (see section \ref{s:ilbasicsetup}): \url{https://www.youtube.com/watch?v=ylG1vHj4zjg}
 \end{itemize}
+
+It is also recommended for new players to read through the entire section (or at least the first few subsections) to understand various concepts of the interlocking system before following the instructions in the subsections.
 
 \subsection{TCBs}\label{s:iltcbs}
 Track circuit breaks (TCBs) are nodes that can be assigned to two-way tracks and indicate the limits of track sections. TCBs have two sides - each corresponding to a direction of the track that the TCB is assigned to - that can be assigned to two track sections.
@@ -635,15 +637,15 @@ To assign a TCB to a track:
 \begin{itemize}
 \item Place a TCB, ideally adjacent to the track it will be assigned to.
 \item Right-click the TCB.
-\item You will be told in the chat to punch a track to assign the TCB to. Punch the track to assign the TCB to.
+\item You will be told in the chat to punch a track to assign the TCB to. Punch the track to assign the TCB to - this track will, in later subsections, be the boundary of track sections.
 \item A TCB marker showing the two sides (A and B) will appear on the track you have assigned the TCB to. This will be explained in further detail below.
 \end{itemize}
 
-After assigning the TCB, you can right click it to open the TCB formspec. This will be used in the following sections. Please note that the TCB formspec has a section for side A and one for side B - when following the instructions in the next sections, make sure you click the button for the right TCB side.
+After assigning the TCB, you can right click it to open the TCB formspec. This will be used in the following sections. Please note that the TCB formspec has a section for side A and one for side B - when following the instructions in the following subsections, make sure you click the button for the right TCB side.
 
 The two sides of the TCB are assigned based on the orientation of the tracks. In particular, straight tracks with different orientations can still appear visually the same. For this reason, most graphs in the rest of this chapter will use cardinal directions instead of actual TCB sides, or omit TCB sides if these are irrelevant.
 
-For new players, it is recommended to set up all TCBs before continuing to the next sections.
+For new players, it is recommended to set up all TCBs before creating new track sections.
 
 \subsection{Track sections}\label{s:ilts}
 
