@@ -1,3 +1,5 @@
+This is advtrains 1.x
+With introduction of the Interlocking system, the 1.x branch was discontinued. This tag preserves it for nostalgic purposes.
 
 ## ADVTRAINS ## realistic trains in Minetest!
 by orwell96 and contributors(see below)
