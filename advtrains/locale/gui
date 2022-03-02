@@ -1,0 +1,184 @@
+#!/usr/bin/tclsh
+package require Tk
+
+global translationTemplate
+global translationData
+global translationLangs
+
+proc readTranslationTemplate {} {
+    global translationTemplate
+    set translationTemplate [list]
+    set handle [open "template.txt" "r"]
+    fconfigure $handle -translation lf
+    set lst [list]
+    while {[gets $handle line] >= 0} {
+	if {$line eq ""} {
+	    lappend lst ""
+        } elseif {[string match "#*" $line]} {
+	    lappend lst $line
+	} elseif {[regexp {^(.+[^@])=.+$} $line x str]} {
+	    lappend lst $str
+	}
+    }
+    set translationTemplate $lst;
+    close $handle
+}
+
+proc readTranslationFiles {} {
+    global translationData
+    global translationLangs
+    array set translationData [list]
+    set translationLangs [list]
+    set tbl [list]
+    set filelist [glob "advtrains.*.tr"]
+    foreach fn $filelist {
+	if {[regexp {\.([^.]+)\.} $fn x lang]} {
+	    set handle [open $fn "r"];
+	    fconfigure $handle -translation lf
+	    while {[gets $handle line] >= 0} {
+		if {[regexp {^([^#].+[^@])=(.+)$} $line x ori tr]} {
+		    set translationData($lang,$ori) $tr
+		}
+	    }
+	    lappend translationLangs $lang
+	    close $handle
+	}
+    }
+    set translationLangs [lsort $translationLangs]
+}
+
+proc loadTranslationToTreeView {} {
+    global translationTemplate;
+    global translationData;
+    set lang [.f.langSelect get];
+    set tree .f.translationView;
+    $tree delete [$tree children {}];
+    set parent {};
+    foreach i [lrange $translationTemplate 1 end] {
+	if {$i eq ""} {
+	    # nop
+	} elseif {[regexp {\#+\s*(.+)} $i x comment]} {
+	    set parent [$tree insert {} end -text $comment -tags {notranslate}];
+	} elseif {[info exists translationData($lang,$i)]} {
+	    $tree insert $parent end -text $i -values [list $translationData($lang,$i)]
+	} else {
+	    $tree insert $parent end -text $i -values [list $i]
+	}
+    }
+    updateEntrySelection
+}
+
+proc updateTranslations {} {
+    readTranslationTemplate
+    readTranslationFiles
+}
+
+updateTranslations
+
+proc updateTranslationsToGUI {} {
+    updateTranslations
+    loadTranslationToTreeView
+}
+
+proc updateEntrySelection {args} {
+    global translationData
+    global origEntry
+    global trEntry
+    global refEntry
+    set reflang [.f.refLang get]
+    set focuseditem [.f.translationView focus]
+    set origEntry [.f.translationView item $focuseditem -text]
+    if {[.f.translationView tag has notranslate $focuseditem]} {
+	.f.trEntry state disabled
+	set trEntry ""
+    } else {
+	.f.trEntry state !disabled
+	set trEntry [lindex [.f.translationView item $focuseditem -value] 0]
+    }
+    if {[info exists translationData($reflang,$origEntry)]} {
+	set refEntry $translationData($reflang,$origEntry)
+    } else {
+	set refEntry ""
+    }
+}
+
+proc applyTranslationString {args} {
+    global translationData
+    global origEntry
+    global trEntry
+    set focuseditem [.f.translationView focus]
+    if {![.f.translationView tag has notranslate $focuseditem]} {
+	set lang [.f.langSelect get]
+	set translationData($lang,$origEntry) $trEntry
+	.f.translationView item $focuseditem -values [list $trEntry]
+    }
+}
+
+proc applyTranslationChanges {} {
+    global translationTemplate
+    global translationData
+    global translationLangs
+    foreach lang $translationLangs {
+	set handle [open [string cat "advtrains." $lang ".tr"] "w"]
+	fconfigure $handle -translation lf
+	foreach i $translationTemplate {
+	    if {$i eq ""} {
+		puts $handle ""
+	    } elseif {[string match "#*" $i]} {
+		puts $handle $i
+	    } elseif {[info exists translationData($lang,$i)]} {
+		puts $handle [string cat $i "=" $translationData($lang,$i)]
+	    } else {
+		puts $handle [string cat $i "=" $i]
+	    }
+	}
+	close $handle
+    }
+}
+
+# GUI
+
+wm title . "Advtrains l10n GUI"
+grid [ttk::frame .f -padding 5] -column 0 -row 0 -sticky nsew
+grid rowconfigure . 0 -weight 1
+grid columnconfigure . 0 -weight 1
+
+grid rowconfigure .f 3 -weight 1
+grid columnconfigure .f 1 -weight 1
+
+foreach i [list 4 5 6] {grid rowconfigure .f $i -uniform bottom}
+
+ttk::combobox .f.langSelect -values $translationLangs -state readonly
+grid .f.langSelect -column 0 -row 0 -sticky we
+bind .f.langSelect <<ComboboxSelected>> {loadTranslationToTreeView}
+.f.langSelect current 0
+
+ttk::button .f.updateBtn -text "Read translation files" -command updateTranslationsToGUI
+grid .f.updateBtn -column 0 -row 1 -sticky we
+ttk::button .f.writeBtn -text "Write changes" -command applyTranslationChanges
+grid .f.writeBtn -column 0 -row 2 -sticky we
+
+ttk::treeview .f.translationView -columns "translation" -yscrollcommand ".f.translationScroll set"
+grid .f.translationView -column 1 -row 0 -rowspan 4 -columnspan 2 -sticky nsew
+bind .f.translationView <<TreeviewSelect>> updateEntrySelection
+ttk::scrollbar .f.translationScroll -orient vertical -command ".f.translationView yview"
+grid .f.translationScroll -column 3 -row 0 -sticky ns -rowspan 4
+
+ttk::label .f.origLabel -text "Original" -anchor w
+grid .f.origLabel -column 0 -row 4 -sticky nswe
+ttk::entry .f.origEntry -state readonly -textvariable origEntry
+grid .f.origEntry -column 1 -row 4 -sticky nswe -columnspan 3
+
+ttk::label .f.trLabel -text "Translated" -anchor w
+grid .f.trLabel -column 0 -row 5 -sticky nswe
+ttk::entry .f.trEntry -textvariable trEntry
+grid .f.trEntry -column 1 -row 5 -sticky nswe -columnspan 3
+trace add variable trEntry write applyTranslationString
+
+ttk::combobox .f.refLang -values [linsert $translationLangs 0 ""] -state readonly
+grid .f.refLang -column 0 -row 6 -sticky nswe
+bind .f.refLang <<ComboboxSelected>> updateEntrySelection
+ttk::entry .f.refEntry -state readonly -textvariable refEntry
+grid .f.refEntry -column 1 -row 6 -sticky nswe -columnspan 3
+
+loadTranslationToTreeView

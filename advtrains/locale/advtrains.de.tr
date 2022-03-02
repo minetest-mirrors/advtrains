@@ -16,7 +16,6 @@ Use Sneak+rightclick to bypass closed doors!=Nutzen Sie Schleichen+Rechtsklick, 
 Doors are closed! Use Sneak+rightclick to ignore the closed doors and get off!=Die Türen sind geschlossen. Nutzen Sie Schleichen+Rechtsklick, um trotz geschlossener Türen auszusteigen.
 Access to @1=Zugang zu @1
 You don't have the train_operator privilege.=Ihnen fehlt das „train_operator“-Privileg.
-# TODO: rebase fixup
 The wagon's inventory is not empty!=Das Inventar dieses Waggons ist nicht leer!
 Position is occupied by a train.=Ein Zug steht an dieser Position.
 There's a Track Circuit Break here.=Hier ist eine Gleisabschnittsgrenze (TCB).
