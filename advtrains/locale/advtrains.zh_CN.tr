@@ -24,9 +24,9 @@ There's a Signal Influence Point here.=There's a Signal Influence Point here.
 # Trackworker, rotation, adjustment
 This node can't be rotated using the trackworker!=您不能使用铁路调整工具旋转这个方块。
 This node can't be changed using the trackworker!=您不能使用铁路调整工具调整这个方块。
-This track can not be changed!=您不能调整这段铁轨。
-This track can not be rotated!=您不能旋转这段铁轨。
-This track can not be removed!=您不能移除这段铁轨。
+This track can not be changed!=您不能调整这段轨道。
+This track can not be rotated!=您不能旋转这段轨道。
+This track can not be removed!=您不能移除这段轨道。
 
 # ATC
 ATC controller, unconfigured.=ATC 控制器 (未配置)
@@ -64,7 +64,7 @@ You are not allowed to build tracks without the track_builder privilege=您没�
 You are not allowed to build near tracks without the track_builder privilege=您没有“train_operator”权限，不能在铁路附近建任何东西。
 You are not allowed to build tracks at this protected position=这里已被保护，您不能在这里建造铁路。
 You are not allowed to build near tracks at this protected position=这里已被保护，您不能在这里的铁路附近建任何东西。
-You are not allowed to operate turnouts and signals (missing railway_operator privilege)=您没有“railway_operator”权限，不能使用铁路设施。
+You are not allowed to operate turnouts and signals (missing railway_operator privilege)=您没有“railway_operator”权限，不能控制铁路设施。
 
 # Train HUD/Formspecs
 Speed:=速度
@@ -95,13 +95,13 @@ Stop Time=停站时间
 Track Worker Tool@n@nLeft-click: change rail type (straight/curve/switch)@nRight-click: rotate rail/bumper/signal/etc.=铁路调整工具@n@n左键单击：切换轨道类型@n右键单击：旋转方块
 Passive Component Naming Tool@n@nRight-click to name a passive component.=被动元件命名工具@n@n右键单击命名所选元件
 Train copy/paste tool@n@nLeft-click: copy train@nRight-click: paste train=火车复制工具@n@n左键单击：复制@n右键单击：粘帖
-Track=铁轨
-Perpendicular Diamond Crossing Track=垂直交叉铁轨
-45/90 Degree Diamond Crossing Track=45度交叉铁轨
-Unloading Track=卸货铁轨
-Loading Track=装货铁轨
+Track=轨道
+Perpendicular Diamond Crossing Track=垂直交叉轨道
+45/90 Degree Diamond Crossing Track=45度交叉轨道
+Unloading Track=卸货轨道
+Loading Track=装货轨道
 Bumper=保险杠
-Detector Rail=探测铁轨
+Detector Rail=探测轨道
 @1 Slope=@1斜坡
 @1 Platform (low)=50cm 高的@1站台
 @1 Platform (high)=1m 高的@1站台

@@ -24,9 +24,9 @@ There's a Signal Influence Point here.=There's a Signal Influence Point here.
 # Trackworker, rotation, adjustment
 This node can't be rotated using the trackworker!=您不能使用鐵路調整工具旋轉這個方塊。
 This node can't be changed using the trackworker!=您不能使用鐵路調整工具調整這個方塊。
-This track can not be changed!=您不能調整這段鐵軌。
-This track can not be rotated!=您不能旋轉這段鐵軌。
-This track can not be removed!=您不能移除這段鐵軌。
+This track can not be changed!=您不能調整這段軌道。
+This track can not be rotated!=您不能旋轉這段軌道。
+This track can not be removed!=您不能移除這段軌道。
 
 # ATC
 ATC controller, unconfigured.=ATC 控制器 (未配置)
@@ -64,7 +64,7 @@ You are not allowed to build tracks without the track_builder privilege=您沒�
 You are not allowed to build near tracks without the track_builder privilege=您沒有「train_operator」許可權，不能在鐵路附近建任何東西。
 You are not allowed to build tracks at this protected position=這裡已被保護，您不能在這裡建造鐵路。
 You are not allowed to build near tracks at this protected position=這裡已被保護，您不能在這裡的鐵路附近建任何東西。
-You are not allowed to operate turnouts and signals (missing railway_operator privilege)=您沒有「railway_operator」許可權，不能使用鐵路設施。
+You are not allowed to operate turnouts and signals (missing railway_operator privilege)=您沒有「railway_operator」許可權，不能控制鐵路設施。
 
 # Train HUD/Formspecs
 Speed:=速度
@@ -95,13 +95,13 @@ Stop Time=停站時間
 Track Worker Tool@n@nLeft-click: change rail type (straight/curve/switch)@nRight-click: rotate rail/bumper/signal/etc.=鐵路調整工具@n@n左鍵單擊：切換軌道型別@n右鍵單擊：旋轉方塊
 Passive Component Naming Tool@n@nRight-click to name a passive component.=被動元件命名工具@n@n右鍵單擊命名所選元件
 Train copy/paste tool@n@nLeft-click: copy train@nRight-click: paste train=火車複製工具@n@n左鍵單擊：複製@n右鍵單擊：粘帖
-Track=鐵軌
-Perpendicular Diamond Crossing Track=垂直交叉鐵軌
-45/90 Degree Diamond Crossing Track=45/90度交叉鐵軌
-Unloading Track=卸貨鐵軌
-Loading Track=裝貨鐵軌
+Track=軌道
+Perpendicular Diamond Crossing Track=垂直交叉軌道
+45/90 Degree Diamond Crossing Track=45/90度交叉軌道
+Unloading Track=卸貨軌道
+Loading Track=裝貨軌道
 Bumper=保險槓
-Detector Rail=探測鐵軌
+Detector Rail=探測軌道
 @1 Slope=@1斜坡
 @1 Platform (low)=50cm 高的@1月臺
 @1 Platform (high)=1m 高的@1月臺
