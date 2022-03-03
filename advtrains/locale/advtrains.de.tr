@@ -10,7 +10,7 @@ Can't place: protected position!=Es kann nicht platziert werden: diese Position 
 Can't place: Not enough slope items left (@1 required)=Es kann nicht platziert werden: Sie haben nicht genug Steigungsblöcke, es werden insgesamt @1 benötigt.
 Can't place: There's no slope of length @1=Es kann nicht platziert werden: die Steigung der Länge @1 ist nicht definiert.
 Can't place: no supporting node at upper end.=Es kann nicht platziert werden: es gibt keinen unterstützenden Block am Ende der Steigung.
-Deprecated Track=ausrangierte Schiene, nicht verwenden.
+Deprecated Track=ausrangiertes Gleis, nicht verwenden.
 Can't get on: wagon full or doors closed!=Sie können nicht einsteigen: der Waggon ist voll oder die Türen sind geschlossen.
 Use Sneak+rightclick to bypass closed doors!=Nutzen Sie Schleichen+Rechtsklick, um trotz geschlossener Türen einzusteigen.
 Doors are closed! Use Sneak+rightclick to ignore the closed doors and get off!=Die Türen sind geschlossen. Nutzen Sie Schleichen+Rechtsklick, um trotz geschlossener Türen auszusteigen.
@@ -22,17 +22,17 @@ There's a Track Circuit Break here.=Hier ist eine Gleisabschnittsgrenze (TCB).
 There's a Signal Influence Point here.=Hier ist ein Signal-Beeinflussungspunkt.
 
 # Trackworker, rotation, adjustment
-This node can't be rotated using the trackworker!=Dieser Block kann nicht mit dem Schienenwerkzeug gedreht werden.
-This node can't be changed using the trackworker!=Dieser Block kann nicht mit dem Schienenwerkzeug bearbeitet werden.
-This track can not be changed!=Diese Schiene kann nicht geändert werden!
-This track can not be rotated!=Diese Schiene kann nicht gedreht werden!
-This track can not be removed!=Diese Schiene kann nicht entfernt werden!
+This node can't be rotated using the trackworker!=Dieser Block kann nicht mit dem Gleiswerkzeug gedreht werden.
+This node can't be changed using the trackworker!=Dieser Block kann nicht mit dem Gleiswerkzeug bearbeitet werden.
+This track can not be changed!=Dieses Gleis kann nicht geändert werden!
+This track can not be rotated!=Dieses Gleis kann nicht gedreht werden!
+This track can not be removed!=Dieses Gleis kann nicht entfernt werden!
 
 # ATC
-ATC controller, unconfigured.=Nicht konfiguierte Zugbeeinflussungsschiene
-ATC controller=Zugbeeinflussungsschiene
-ATC controller, mode @1@nChannel: @2=Zugbeeinflussungsschiene in Betriebsart „@1“@nKanal: @2
-ATC controller, mode @1@nCommand: @2=Zugbeeinflussungsschiene in Betriebsart „@1“@nBefehl: @2
+ATC controller, unconfigured.=Nicht konfiguierte Zugbeeinflussungsgleis
+ATC controller=Zugbeeinflussungsgleis
+ATC controller, mode @1@nChannel: @2=Zugbeeinflussungsgleis in Betriebsart „@1“@nKanal: @2
+ATC controller, mode @1@nCommand: @2=Zugbeeinflussungsgleis in Betriebsart „@1“@nBefehl: @2
 Command=Befehl
 Command (on)=Befehl (wenn aktiviert)
 Digiline channel=Digiline-Kanal
@@ -45,7 +45,7 @@ Lock couples=Kupplungen sperren
 You need to own at least one neighboring wagon to destroy this couple.=Sie müssen Besitzer eines angrenzenden Waggons sein, um hier abzukuppeln.
 Buffer and Chain Coupler=Schraubenkupplung
 Scharfenberg Coupler=Scharfenbergkupplung
-Japanese Train Inter-Wagon Connection=Waggonzwischenverbindung Japanischer Personenzug
+Japanese Train Inter-Wagon Connection=Waggonzwischenverbindung Japanischer Personenzüge
 Can not couple: The couplers of the trains do not match (@1 and @2).=Kann nicht ankuppeln: Die Kupplungen der Züge passen nicht zueinander (@1 und @2)
 
 # Clipboard
@@ -60,10 +60,10 @@ No such train: @1=Es gibt keinen mit „@1“ identifizierbaren Zug.
 Train copied!=Der Zug wurde Kopiert.
 
 # Protection
-You are not allowed to build tracks without the track_builder privilege=Sie dürfen ohne das „track_builder“-Privileg keine Schiene bauen.
-You are not allowed to build near tracks without the track_builder privilege=Sie dürfen ohne das „track_builder“-Privileg nicht an Schienen bauen.
-You are not allowed to build tracks at this protected position=Sie dürfen an geschützten Stellen keine Schiene bauen.
-You are not allowed to build near tracks at this protected position=Sie dürfen an geschützten Stellen nicht an Schienen bauen.
+You are not allowed to build tracks without the track_builder privilege=Sie dürfen ohne das „track_builder“-Privileg kein Gleis bauen.
+You are not allowed to build near tracks without the track_builder privilege=Sie dürfen ohne das „track_builder“-Privileg nicht in der Nähe von Gleisen bauen.
+You are not allowed to build tracks at this protected position=Sie dürfen an geschützten Stellen kein Gleis bauen.
+You are not allowed to build near tracks at this protected position=Sie dürfen an geschützten Stellen nicht in der Nähe von Gleisen bauen.
 You are not allowed to operate turnouts and signals (missing railway_operator privilege)=Sie dürfen ohne das „railway_operator“-Privileg keine Bahnanlage operieren.
 
 # Train HUD/Formspecs
@@ -92,16 +92,16 @@ Departure Speed=Zielgeschwindigkeit bei Abfahrt
 Stop Time=Wartezeit
 
 # Items
-Track Worker Tool@n@nLeft-click: change rail type (straight/curve/switch)@nRight-click: rotate rail/bumper/signal/etc.=Schienenwerkzeug@n@nLinksklick: Schienentyp ändern, Rechtsklick: Objekt drehen.
+Track Worker Tool@n@nLeft-click: change rail type (straight/curve/switch)@nRight-click: rotate rail/bumper/signal/etc.=Gleiswerkzeug@n@nLinksklick: Gleistyp ändern, Rechtsklick: Objekt drehen.
 Passive Component Naming Tool@n@nRight-click to name a passive component.=PC-Benennungswerkzeug@n@nRechtsklick zur Benennung der passiven Komponente
 Train copy/paste tool@n@nLeft-click: copy train@nRight-click: paste train=Werkzeug zur Erstellung von Zugkopien@n@nLinksklick: Zug ins Clipboard kopieren@nRight-click: Kopierten Zug einfügen
-Track=Schiene
+Track=Gleis
 Perpendicular Diamond Crossing Track=Perpendicular Diamond Crossing Track
 45/90 Degree Diamond Crossing Track=45/90 Degree Diamond Crossing Track
-Unloading Track=Abladungsschiene
-Loading Track=Beladungsschiene
+Unloading Track=Abladungsgleis
+Loading Track=Beladungsgleis
 Bumper=Prellbock
-Detector Rail=Detektorschiene
+Detector Rail=Detektorgleis
 @1 Slope=@1 Steigung
 @1 Platform (low)=Niedriger @1-Bahnsteig
 @1 Platform (high)=Hoher @1-Bahnsteig
