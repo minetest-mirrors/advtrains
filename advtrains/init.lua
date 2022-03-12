@@ -199,6 +199,7 @@ advtrains.meseconrules =
 advtrains.fpath=minetest.get_worldpath().."/advtrains"
 
 advtrains.speed = dofile(advtrains.modpath.."/speed.lua")
+advtrains.font = dofile(advtrains.modpath.."/unifont.lua")
 
 dofile(advtrains.modpath.."/path.lua")
 dofile(advtrains.modpath.."/trainlogic.lua")

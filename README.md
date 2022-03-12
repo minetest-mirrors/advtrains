@@ -8,6 +8,8 @@ For up-to-date information, visit <https://advtrains.de/>
 
 License of code: GNU AGPL version 3
 License of media: CC-BY-SA 3.0
+License exceptions:
+* `advtrains/unifont.hex`: GNU GPL version 3 with the font embedding exception
 
 (up to commit 1bb1d8 (2020-02-14), the license has been LGPL 2.1)
 

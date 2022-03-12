@@ -1,5 +1,26 @@
 advtrains.hud.presets = {}
 
+local default_renderers = {}
+for _, width in pairs {30,45,82} do
+	for _, color in pairs {"cyan", "darkslategray", "orange", "red"} do
+		default_renderers[color .. width] = advtrains.font.renderer{width = width, height = 30, bgcolor = color}
+	end
+end
+local default_indicators = {
+	ars = {"ARS", [true] = "darkslategray30", [false] = "cyan30"},
+	atc = {"ATC", [true] = "cyan30", [false] = "darkslategray30"},
+	lzb = {"LZB", [true] = "red30", [false] = "darkslategray30"},
+	shunt = {"Shunt", [true] = "orange45", [false] = "darkslategray45"},
+	autocouple = {"Autocouple", [true] = "orange82", [false] = "darkslategray82"}
+}
+for _, t in pairs(default_indicators) do
+	local text = t[1]
+	t[1] = nil
+	for k, v in pairs(t) do
+		t[k] = advtrains.hud.texture_escape(default_renderers[v](text))
+	end
+end
+advtrains.hud.default_indicators = default_indicators
 function advtrains.hud.presets.default(train, flip)
 	if not train then return "" end
 	local sformat = string.format -- this appears to be faster than (...):format
@@ -19,10 +40,10 @@ function advtrains.hud.presets.default(train, flip)
 	ht[#ht+1] = "250,35=(advtrains_hud_bg.png^[colorize\\:darkslategray^[resize\\:5x50)"
 	ht[#ht+1] = sformat("240,%s=(advtrains_hud_bg.png^[resize\\:25x15^[colorize\\:gray)", flip and 75 or 30)
 	-- first row
-	ht[#ht+1] = sformat("10,10=(advtrains_hud_ars.png^[multiply\\:%s)", (not (advtrains.interlocking and train.ars_disable)) and "cyan" or "darkslategray")
-	ht[#ht+1] = sformat("50,10=(advtrains_hud_lzb.png^[multiply\\:%s)", train.hud_lzb_effect_tmr and "red" or "darkslategray")
-	ht[#ht+1] = sformat("90,10=(advtrains_hud_shunt.png^[multiply\\:%s)", train.is_shunt and "orange" or "darkslategray")
-	ht[#ht+1] = sformat("145,10=(advtrains_hud_autocouple.png^[multiply\\:%s)", train.autocouple and "orange" or "darkslategray")
+	ht[#ht+1] = sformat("10,10=%s", default_indicators.ars[advtrains.interlocking and ars_disable or false])
+	ht[#ht+1] = sformat("50,10=%s", default_indicators.lzb[train.hud_lzb_effect_tmr or false])
+	ht[#ht+1] = sformat("90,10=%s", default_indicators.shunt[train.is_shunt or false])
+	ht[#ht+1] = sformat("145,10=%s", default_indicators.autocouple[train.autocouple or false])
 	-- second row
 	local asp, dist = advtrains.hud.getlzb(train)
 	if dist then
@@ -42,7 +63,7 @@ function advtrains.hud.presets.default(train, flip)
 		ht[#ht+1] = "10,67=(advtrains_hud_ms.png^[multiply\\:darkslategray)"
 		ht[#ht+1] = advtrains.hud.number(888, 3, 35, 45, 9, 4, 2, "darkslategray")
 	end
-	ht[#ht+1] = sformat("100,45=(advtrains_hud_atc.png^[multiply\\:%s)", (train.tarvelocity or train.atc_command) and "cyan" or "darkslategray")
+	ht[#ht+1] = sformat("100,45=%s", default_indicators.atc[(train.tarvelocity or train.atc_command) and true or false])
 	if tar and tar >= 0 then
 		local tc = math.min(max, tar)
 		ht[#ht+1] = advtrains.hud.number(tar, 2, 135, 45, 5, 2, 2, "cyan", "darkslategray")

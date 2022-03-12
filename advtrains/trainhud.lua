@@ -303,6 +303,7 @@ function advtrains.hud.speed_horizontal(train, x, y, w, h, m)
 	local res = train.speed_restriction
 	local vel = advtrains.abs_ceil(train.velocity)
 	local tar = train.tarvelocity
+	local res = train.speed_restriction
 	local st = {}
 	for i = 1, vel do
 		st[i] = sformat("%d,%d=(advtrains_hud_bg.png^[resize\\:%dx%d^[colorize\\:white)", x+(i-1)*(barw+m), y+5, barw, barh)
