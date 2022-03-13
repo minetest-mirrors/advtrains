@@ -45,10 +45,13 @@ local function mbstocps(str)
 			c = 0
 		elseif c < 224 then
 			bt = {sbyte(str, i, i)}
+			c = c%32
 		elseif c < 240 then
 			bt = {sbyte(str, i, i+1)}
+			c = c%16
 		elseif c < 248 then
 			bt = {sbyte(str, i, i+2)}
+			c = c%8
 		else
 			c = 0
 		end
@@ -65,12 +68,14 @@ local function renderer(opts)
 	local opts = opts or {}
 	local x0, y0 = (opts.x or 0), (opts.y or 0)
 	local width, height = opts.width, opts.height
+	local minwidth, minheight = opts.minwidth, opts.minheight
 	local halign, valign = (opts.halign or 0.5), (opts.valign or 0.5)
 	local textcolor = opts.textcolor or "black"
 	local bgcolor = opts.bgcolor
 	local function break_lines(cps)
 		local lastline = {width = 0}
 		local lines = {lastline}
+		local maxwidth = 0
 		local i = 1
 		while i <= #cps do
 			local char = cps[i]
@@ -78,16 +83,19 @@ local function renderer(opts)
 				lastline = {width = 0}
 				lines[#lines+1] = lastline
 			elseif cpwidth[char] then
-				lastline.width = lastline.width + cpwidth[char]
+				local newwidth = lastline.width + cpwidth[char]
+				lastline.width = newwidth
+				maxwidth = math.max(newwidth, maxwidth)
 				lastline[#lastline+1] = char
 			end
 			i = i+1
 		end
-		return lines
+		return lines, maxwidth, 16*#lines
 	end
 	return function(str)
-		local lines = break_lines(mbstocps(str))
-		local textheight = 16*#lines
+		local lines, textwidth, textheight = break_lines(mbstocps(str))
+		local width = math.max(minwidth or 0, width or 0, textwidth)
+		local height = math.max(minheight or 0, height or 0, textheight)
 		local y = y0 + (height-textheight)*valign
 		local st = {
 			"[combine",
@@ -96,18 +104,24 @@ local function renderer(opts)
 		for i = 1, #lines do
 			local line = lines[i]
 			local x = x0 + (width - line.width)*halign
+			local spacing = 0
+			if minwidth and line.width < minwidth then
+				x = x0 + (width - minwidth)*halign
+				spacing = (minwidth - line.width) / (#line - 1)
+			end
 			for j = 1, #line do
 				local cp = line[j]
 				st[#st+1] = sformat("%d,%d=%s", x, y, texture_file(cp))
-				x = x + cpwidth[cp]
+				x = x + cpwidth[cp] + spacing
 			end
+			y = y + 16
 		end
 		local prefix = ""
 		if bgcolor then
 			prefix = sformat("[combine:%dx%d:%d,%d=\\(advtrains_hud_bg.png\\^[resize\\:%dx%d\\^[colorize\\:%s\\:alpha\\)^",
 				x0+width, y0+height, x0, y0, width, height, bgcolor)
 		end
-		return sformat("(%s(%s^[makealpha:000000^[multiply:%s))", prefix, tconcat(st, ":"), textcolor)
+		return sformat("(%s(%s^[makealpha:000000^[multiply:%s))", prefix, tconcat(st, ":"), textcolor), width, height
 	end
 end
 
@@ -168,6 +182,7 @@ minetest.log("action",sformat("[advtrains/unifont] Generated textures in %f seco
 
 return {
 	texture_dir = texture_dir,
+	mbstocps = mbstocps,
 	renderer = renderer,
 	render = render
 }
