@@ -21,8 +21,11 @@ local sbyte, schar, sformat, smatch, ssub = string.byte, string.char, string.for
 local tconcat = table.concat
 
 local texture_dir = tconcat({advtrains.modpath, "textures", "unifont"}, DIR_DELIM)
-minetest.rmdir(texture_dir, true)
 minetest.mkdir(texture_dir)
+for _, i in pairs(minetest.get_dir_list(texture_dir)) do
+	-- FIXME: remove this workaround eventually when MT 5.5.0 becomes common
+	os.remove(texture_dir .. DIR_DELIM .. i)
+end
 
 local function texture_file(cp)
 	return sformat(cp < 65536 and "%s_%04x.bmp" or "%s_%06x.bmp", "advtrains_unifont", cp)
@@ -94,7 +97,7 @@ local function cpwidth(cp)
 		local path = texture_path(cp)
 		minetest.safe_file_write(path, tconcat(bytes))
 		if mods_loaded then
-			minetest.dynamic_add_media({filepath = path})
+			minetest.dynamic_add_media(path)
 		end
 		return width
 	end
