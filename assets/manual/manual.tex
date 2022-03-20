@@ -47,6 +47,7 @@
 \newcommand{\ovar}[1]{$\mathit{[\langle}$\textrm{\textmd{\textit{#1}}}$\mathit{\rangle]}$}
 \fi
 
+\newcommand{\varzero}[1]{\varnth{#1}{0}}
 \newcommand{\vari}[1]{\varnth{#1}{1}}
 \newcommand{\varii}[1]{\varnth{#1}{2}}
 
@@ -1288,16 +1289,16 @@ Railway time can be represented in three formats:
 The following entries are present in \texttt{advtrains.interlocking.rwt}. \var{Time}, \var{t}, \var{interval}, and \var{offset} refer to a railway time object represented in one of the methods described above. \var{Interval} and \var{offset} represent the interval and offset of a repetition, respectively. \var{Cycles}, \var{minutes}, and \var{seconds} should be the value of the \texttt{c}, \texttt{m} and \texttt{s} fields of a railway time table.
 
 \begin{apidoc}{\texttt{advtrains}!\texttt{interlocking.rwt}}
-\item \apifunc{add}{\vari{t},\varii{t}} Returns the sum of \vari{t} and \varii{t}.
+\item \apifunc{add}{\vari{t},\varii{t}} Returns \( t_1 + t_2 \).
 \item \apifunc{copy}{\var{time}} Returns a copy of \var{time}.
-\item \apifunc{diff}{\vari{t},\varii{t}} Subtracts \vari{t} from \varii{t} and returns the result in seconds.
-\item \apifunc{last\_rpt}{\var{time},\var{interval},\var{offset}} Returns the last occurrence of the repetition before or at \var{time}.
+\item \apifunc{diff}{\vari{t},\varii{t}} Returns \( t_2 - t_1 \) in seconds.
+\item \apifunc{last\_rpt}{\varzero{t},\var{interval},\var{offset}} Returns $t$ in the range \( (t_0-\text{\var{interval}},t_0] \) such that \( t = n \cdot \text{\var{interval}} + \text{\var{offset}} \) for \( n \in \mathbb{Z} \).
 \item \apifunc{new}{\var{cycles},\var{minutes},\var{seconds}} Returns a railway time table.
-\item \apifunc{next\_rpt}{\var{time},\var{interval},\var{offset}} Returns the next occurrence of the repetition at or after \var{time}.
+\item \apifunc{next\_rpt}{\varzero{t},\var{interval},\var{offset}} Returns $t$ in the range \( [t_0,t_0+\text{\var{interval}}) \) such that \( t = n \cdot \text{\var{interval}} + \text{\var{offset}} \) for \( n \in \mathbb{Z} \).
 \item \apifunc{now}{} Returns a table corresponding to the current railway time.
-\item \apifunc{sub}{\vari{t},\varii{t}} Subtracts \varii{t} from \vari{t} and returns the result in seconds.
-\item \apifunc{time\_from\_last\_rpt}{\var{time},\var{interval},\var{offset}} Returns the number of seconds from the last occurrence of the repetition before or at \var{time} to \var{time}.
-\item \apifunc{time\_to\_next\_rpt}{\var{time},\var{interval},\var{offset}} Returns the number of seconds from \var{time} to the next occurrence of the repetition at or after \var{time}.
+\item \apifunc{sub}{\vari{t},\varii{t}} Returns \( t_1 - t_2 \) in seconds.
+\item \apifunc{time\_from\_last\_rpt}{\varzero{t},\var{interval},\var{offset}} Returns $t$ in the range \( [0,\text{\var{interval}}) \) such that \( t_0 - t = n \cdot \text{\var{interval}} + \text{\var{offset}} \) for \( n \in \mathbb{Z} \).
+\item \apifunc{time\_to\_next\_rpt}{\varzero{t},\var{interval},\var{offset}} Returns $t$ in the range \( [0,\text{\var{interval}}) \) such that \( t_0 + t = n \cdot \text{\var{interval}} + \text{\var{offset}} \) for \(n \in \mathbb{Z} \).
 \item \apifunc{to\_table}{\var{time}} Returns a railway time table corresponding to \var{time}.
 \item \apifunc{to\_secs}{\var{time},\ovar{cycles}} Returns the railway time in number representation corresponding to \var{time}. \var{Cycles} is used as the number of cycles, if present.
 \item \apifunc{to\_string}{\var{time},\ovar{no cycle}} Returns a railway time string corresponding to \var{time}. If \var{no cycle} is true, the number of cycles is omitted from the return value.
