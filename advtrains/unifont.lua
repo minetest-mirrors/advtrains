@@ -21,7 +21,9 @@ local sbyte, schar, sformat, smatch, ssub = string.byte, string.char, string.for
 local tconcat = table.concat
 
 local texture_dir = tconcat({advtrains.modpath, "textures", "unifont"}, DIR_DELIM)
+minetest.rmdir(texture_dir, true)
 minetest.mkdir(texture_dir)
+
 local function texture_file(cp)
 	return sformat(cp < 65536 and "%s_%04x.bmp" or "%s_%06x.bmp", "advtrains_unifont", cp)
 end
@@ -29,8 +31,75 @@ local function texture_path(cp)
 	return texture_dir .. DIR_DELIM .. texture_file(cp)
 end
 
+local _cpwidth = {}
+local cpdata = {}
 
-local cpwidth = {}
+-- Generate texture files
+local bmp_headers = {}
+for _, v in pairs {8, 16} do
+	bmp_headers[v] = tconcat{
+		"BM", -- starting bytes
+		"\125\0\0\0", -- file size
+		"\0\0\0\0", -- reserved fields
+		"\62\0\0\0", -- offset of the pixel array
+		"\40\0\0\0", -- BITMAPINFOHEADER
+		schar(v, 0, 0, 0), -- image width
+		"\16\0\0\0", -- image height
+		"\1\0", -- number of color planes (must be 1, apparently)
+		"\1\0", -- bits per pixel
+		"\0\0\0\0", -- no compression
+		"\64\0\0\0", -- size of the raw bitmap data
+		"\0\0\0\0\0\0\0\0", -- image resolution (irrelevant here)
+		"\2\0\0\0", -- number of colors in the palette
+		"\0\0\0\0", -- "important" colors
+		-- palette
+		"\0\0\0\0",
+		"\255\255\255\0",
+	}
+end
+
+local f = io.open(advtrains.modpath .. DIR_DELIM .. "unifont.hex", "rb") or error("Cannot open unifont.hex")
+for l in f:lines() do
+	local cp, raw = smatch(l, "^(%x+):(%x+)$")
+	cpdata[tonumber(cp, 16)] = raw
+end
+f:close()
+f = nil
+
+local mods_loaded = false
+local function cpwidth(cp)
+	if _cpwidth[cp] then
+		return _cpwidth[cp]
+	end
+	if cpdata[cp] then
+		local raw = cpdata[cp]
+		local rowsize = #raw/16
+		local width = rowsize*4
+		_cpwidth[cp] = width
+		local rowbytes = rowsize/2
+		local bytes = {bmp_headers[width]}
+		for i = 0, 15 do
+			local row = {}
+			local offset = i*rowsize
+			for j = 1, rowbytes do
+				local offset = offset+2*j-1
+				local data = ssub(raw, offset, offset+1)
+				row[j] = tonumber(data, 16)
+			end
+			for j = rowbytes+1, 4 do
+				row[j] = 0
+			end
+			bytes[17-i] = schar(unpack(row))
+		end
+		local path = texture_path(cp)
+		minetest.safe_file_write(path, tconcat(bytes))
+		if mods_loaded then
+			minetest.dynamic_add_media({filepath = path})
+		end
+		return width
+	end
+end
+minetest.register_on_mods_loaded(function() mods_loaded = true end)
 
 local function mbstocps(str)
 	local t = {}
@@ -82,8 +151,8 @@ local function renderer(opts)
 			if char == 10 then
 				lastline = {width = 0}
 				lines[#lines+1] = lastline
-			elseif cpwidth[char] then
-				local newwidth = lastline.width + cpwidth[char]
+			elseif cpwidth(char) then
+				local newwidth = lastline.width + cpwidth(char)
 				lastline.width = newwidth
 				maxwidth = math.max(newwidth, maxwidth)
 				lastline[#lastline+1] = char
@@ -112,7 +181,7 @@ local function renderer(opts)
 			for j = 1, #line do
 				local cp = line[j]
 				st[#st+1] = sformat("%d,%d=%s", x, y, texture_file(cp))
-				x = x + cpwidth[cp] + spacing
+				x = x + cpwidth(cp) + spacing
 			end
 			y = y + 16
 		end
@@ -128,57 +197,6 @@ end
 local function render(str, opts)
 	return renderer(opts)(str)
 end
-
--- Generate texture files
-local bmp_headers = {}
-for _, v in pairs {8, 16} do
-	bmp_headers[v] = tconcat{
-		"BM", -- starting bytes
-		"\125\0\0\0", -- file size
-		"\0\0\0\0", -- reserved fields
-		"\62\0\0\0", -- offset of the pixel array
-		"\40\0\0\0", -- BITMAPINFOHEADER
-		schar(v, 0, 0, 0), -- image width
-		"\16\0\0\0", -- image height
-		"\1\0", -- number of color planes (must be 1, apparently)
-		"\1\0", -- bits per pixel
-		"\0\0\0\0", -- no compression
-		"\64\0\0\0", -- size of the raw bitmap data
-		"\0\0\0\0\0\0\0\0", -- image resolution (irrelevant here)
-		"\2\0\0\0", -- number of colors in the palette
-		"\0\0\0\0", -- "important" colors
-		-- palette
-		"\0\0\0\0",
-		"\255\255\255\0",
-	}
-end
-
-local t0 = os.clock()
-local f = io.open(advtrains.modpath .. DIR_DELIM .. "unifont.hex", "rb") or error("Cannot open unifont.hex")
-for l in f:lines() do
-	local cp, raw = smatch(l, "^(%x+):(%x+)$")
-	local cp = tonumber(cp, 16) or error("Cannot parse codepoint from " .. cp)
-	local rowsize = #raw/16
-	local width = rowsize*4
-	cpwidth[cp] = width
-	local rowbytes = rowsize/2
-	local bytes = {bmp_headers[width]}
-	for i = 0, 15 do
-		local row = {}
-		local offset = i*rowsize
-		for j = 1, rowbytes do
-			local offset = offset+2*j-1
-			local data = ssub(raw, offset, offset+1)
-			row[j] = tonumber(data, 16)
-		end
-		for j = rowbytes+1, 4 do
-			row[j] = 0
-		end
-		bytes[17-i] = schar(unpack(row))
-	end
-	minetest.safe_file_write(texture_path(cp), tconcat(bytes))
-end
-minetest.log("action",sformat("[advtrains/unifont] Generated textures in %f seconds", os.clock()-t0))
 
 return {
 	texture_dir = texture_dir,
