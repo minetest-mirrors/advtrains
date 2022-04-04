@@ -1360,6 +1360,34 @@ The \texttt{main} and \texttt{dst} fields may contain one of the following:
 \subsection{Train speed restriction table}
 The speed restriction table for trains includes the speed limits for a train, where the key is the type of speed limit and the value is the speed limit itself.
 
+\part{Contributor Guide}
+
+\section{Recommendations}
+At the time of writing, \advtrains{} uses a mostly email-based workflow. It is therefore recommended to format patches with \texttt{git-format-patch} and send them with \texttt{git-send-email}. Alternatively, if you are unable to send patches via email, you can also post patches onto the forum thread.
+
+When sending patches, please include binary files as well instead of linking those to external sources.
+
+\section{Code changes}
+Please include methods of automated testing if possible.
+
+If you want to make significant changes to \advtrains{}, it is recommended to first discuss your proposal with the developers or, at least, with people who have sufficient knowledge of the part of \advtrains{} that you want to work on.
+
+\section{Localization}
+Localization files can be found in the \texttt{advtrains/locale} directory.
+
+If there is a translation file for the target language (e.g. German), you can edit the file directly or by using the GUI included in the directory. If the translation file for the target language is absent, you can create the file by copying \texttt{template.txt} to \texttt{advtrains.\textit{XX}.tr}, with \texttt{XX} replaced by the language code of the target language.
+
+An exception to the language code is Chinese, which has \texttt{zh\_TW} for the traditional variant and \texttt{zh\_CN} for the simplified variant.
+
+When translating, please keep in mind that
+\begin{itemize}
+\item Translations should be consistent. You can look at other entries or the translation in Minetest as a reference. If you know a third language (other than English and the target language), you can also use the translation file for that language as a reference.
+\item Translations do not have to fully correspond to the original text - they only need to provide the same information. In particular, translations do not have to have the same linguistical structure as the original text.
+\item Abbreviations or names may or may not need to be translated. This depends on certain aspects of the target language, such as (in particular) the script used for the written form.
+\end{itemize}
+
+At the moment, the \texttt{l10n} branch is used for managing localization. Please refer to \texttt{advtrains/locale/README.md} file in that branch for more information.
+
 \appendix
 \newpage
 \part*{Appendices}
