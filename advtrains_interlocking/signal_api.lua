@@ -220,8 +220,17 @@ function advtrains.interlocking.signal_set_aspect(pos, asp)
 	local node=advtrains.ndb.get_node(pos)
 	local ndef=minetest.registered_nodes[node.name]
 	if ndef and ndef.advtrains and ndef.advtrains.set_aspect then
+		local oldasp = advtrains.interlocking.signal_get_aspect(pos) or DANGER
+		local suppasp = advtrains.interlocking.signal_get_supported_aspects(pos) or {}
+		if suppasp.type == 2 then
+			asp = advtrains.interlocking.aspects.type1_to_type2main(asp, suppasp.group)
+		end
 		ndef.advtrains.set_aspect(pos, node, asp)
-		advtrains.interlocking.signal_on_aspect_changed(pos)
+		local actualasp = advtrains.interlocking.signal_get_aspect(pos) or DANGER
+		local aspect_changed = advtrains.interlocking.aspects.not_equalp(oldasp, actualasp)
+		if aspect_changed then
+			advtrains.interlocking.signal_on_aspect_changed(pos)
+		end
 	end
 end
 
@@ -252,7 +261,7 @@ function advtrains.interlocking.signal_rc_handler(pos, node, player, itemstack, 
 			local function callback(pname, aspect)
 				advtrains.interlocking.signal_set_aspect(pos, aspect)
 			end
-			local isasp = ndef.advtrains.get_aspect(pos, node)
+			local isasp = advtrains.interlocking.signal_get_aspect(pos, node)
 			
 			advtrains.interlocking.show_signal_aspect_selector(
 				pname,
@@ -285,8 +294,13 @@ function advtrains.interlocking.signal_get_aspect(pos)
 	local ndef=minetest.registered_nodes[node.name]
 	if ndef and ndef.advtrains and ndef.advtrains.get_aspect then
 		local asp = ndef.advtrains.get_aspect(pos, node)
+		local suppasp = advtrains.interlocking.signal_get_supported_aspects(pos) or {}
+		if suppasp.type == 2 then
+			asp = advtrains.interlocking.aspects.type2main_to_type1(suppasp.group, asp)
+		end
 		if not asp then asp = DANGER end
-		return convert_aspect_if_necessary(asp)
+		asp = convert_aspect_if_necessary(asp)
+		return asp
 	end
 	return nil
 end
@@ -410,130 +424,4 @@ minetest.register_on_punchnode(function(pos, node, player, pointed_thing)
 		end
 		players_assign_ip[pname] = nil
 	end
-end)
-
-
---== aspect selector ==--
-
-local players_aspsel = {}
-
---[[
-suppasp: "supported_aspects" table
-purpose: form title string
-callback: func(pname, aspect) called on form submit
-isasp: aspect currently set
-]]
-function advtrains.interlocking.show_signal_aspect_selector(pname, p_suppasp, p_purpose, callback, isasp)
-	local suppasp = p_suppasp or {
-		main = {0, -1}, dst = {false}, shunt = false, info = {},
-	}
-	local purpose = p_purpose or ""
-	
-	local form = "size[7,7]label[0.5,0.5;Select Signal Aspect:]"
-	form = form.."label[0.5,1;"..purpose.."]"
-	
-	form = form.."label[0.5,1.5;== Main Signal ==]"
-	local selid = 1
-	local entries = {}
-	for idx, spv in ipairs(suppasp.main) do
-		local entry
-		if spv == 0 then
-			entry = "Halt"
-		elseif spv == -1 then
-			entry = "Continue at maximum speed"
-		elseif not spv then
-			entry = "Continue\\, speed limit unchanged (no info)"
-		else
-			entry = "Continue at speed of "..spv				
-		end
-		-- hack: the crappy formspec system returns the label, not the index. save the index in it.
-		entries[idx] = idx.."| "..entry
-		if isasp and spv == (isasp.main or false) then
-			selid = idx
-		end
-	end
-	form = form.."dropdown[0.5,2;6;main;"..table.concat(entries, ",")..";"..selid.."]"
-
-	
-	form = form.."label[0.5,3;== Shunting ==]"
-	if suppasp.shunt == nil then
-		local st = 1
-		if isasp and isasp.shunt then st=2 end
-		form = form.."dropdown[0.5,3.5;6;shunt_free;---,allowed;"..st.."]"
-	end
-
-	form = form.."label[0.5,4.5;== Distant Signal ==]"
-	local selid = 1
-	local entries = {}
-	for idx, spv in ipairs(suppasp.dst) do
-		local entry
-		if spv == 0 then
-			entry = "Expect to stop at the next signal"
-		elseif spv == -1 then
-			entry = "Expect to pass the next signal at maximum speed"
-		elseif not spv then
-			entry = "No info"
-		else
-			entry = string.format("Expect to pass the next signal at speed of %d", spv)
-		end
-		entries[idx] = idx.."| "..entry
-		if isasp and spv == (isasp.dst or false) then
-			selid = idx
-		end
-	end
-	form = form.."dropdown[0.5,5;6;dst;"..table.concat(entries, ",")..";"..selid.."]"
-
-	form = form.."button_exit[0.5,6;5,1;save;Save signal aspect]"
-	
-	local token = advtrains.random_id()
-	
-	minetest.show_formspec(pname, "at_il_sigaspdia_"..token, form)
-	
-	minetest.after(1, function()
-	players_aspsel[pname] = {
-		suppasp = suppasp,
-		callback = callback,
-		token = token,
-	}
-	end)
-end
-
-local function usebool(sup, val, free)
-	if sup == nil then
-		return val==free
-	else
-		return sup
-	end
-end
-
--- other side of hack: extract the index
-local function ddindex(val)
-	return tonumber(string.match(val, "^(%d+)|"))
-end
-
--- TODO use non-hacky way to parse outputs
-
-minetest.register_on_player_receive_fields(function(player, formname, fields)
-	local pname = player:get_player_name()
-	local psl = players_aspsel[pname]
-	if psl then
-		if formname == "at_il_sigaspdia_"..psl.token then
-			if fields.save then
-				local maini = ddindex(fields.main)
-				if not maini then return end
-				local dsti = ddindex(fields.dst)
-				if not dsti then return end
-				local asp = {
-					main = psl.suppasp.main[maini],
-					dst = psl.suppasp.dst[dsti],
-					shunt = usebool(psl.suppasp.shunt, fields.shunt_free, "allowed"),
-					info = {}
-				}
-				psl.callback(pname, asp)
-			end
-		else
-			players_aspsel[pname] = nil
-		end
-	end
-	
 end)
