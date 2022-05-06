@@ -39,7 +39,9 @@ tasks:
     ~/.luarocks/bin/busted
     for i in {advtrains,advtrains_interlocking}; do
         cd ../$i
-        ~/.luarocks/bin/mineunit
+        ~/.luarocks/bin/mineunit -c
+        ~/.luarocks/bin/mineunit -r
+        sed -n '/^File/,$p' luacov.report.out
     done
 - activate_test_env: |
     cd advtrains

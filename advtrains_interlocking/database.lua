@@ -131,6 +131,9 @@ function ildb.load(data)
 	if data.npr_rails then
 		advtrains.interlocking.npr_rails = data.npr_rails
 	end
+	if data.supposed_aspects then
+		advtrains.interlocking.load_supposed_aspects(data.supposed_aspects)
+	end
 	
 	--COMPATIBILITY to Signal aspect format
 	-- TODO remove in time...
@@ -173,6 +176,7 @@ function ildb.save()
 		rs_callbacks = advtrains.interlocking.route.rte_callbacks,
 		influence_points = influence_points,
 		npr_rails = advtrains.interlocking.npr_rails,
+		supposed_aspects = advtrains.interlocking.save_supposed_aspects(),
 	}
 end
 

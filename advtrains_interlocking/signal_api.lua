@@ -178,6 +178,8 @@ advtrains.interlocking.GENERIC_FREE = {
 	dst = false,
 }
 
+local supposed_aspects = {}
+
 local function convert_aspect_if_necessary(asp)
 	if type(asp.main) == "table" then
 		local newasp = {} 
@@ -199,6 +201,24 @@ local function convert_aspect_if_necessary(asp)
 	return asp
 end
 
+function advtrains.interlocking.load_supposed_aspects(tbl)
+	if tbl then
+		supposed_aspects = tbl
+	end
+end
+
+function advtrains.interlocking.save_supposed_aspects()
+	return supposed_aspects
+end
+
+local function set_supposed_aspect(pos, asp)
+	supposed_aspects[advtrains.roundfloorpts(pos)] = asp
+end
+
+local function get_supposed_aspect(pos)
+	return supposed_aspects[advtrains.roundfloorpts(pos)]
+end
+
 function advtrains.interlocking.update_signal_aspect(tcbs)
 	if tcbs.signal then
 		local asp = tcbs.aspect or DANGER
@@ -213,6 +233,7 @@ end
 function advtrains.interlocking.signal_after_dig(pos)
 	-- clear influence point
 	advtrains.interlocking.db.clear_ip_by_signalpos(pos)
+	set_supposed_aspect(pos, nil)
 end
 
 function advtrains.interlocking.signal_set_aspect(pos, asp)
@@ -222,12 +243,13 @@ function advtrains.interlocking.signal_set_aspect(pos, asp)
 	if ndef and ndef.advtrains and ndef.advtrains.set_aspect then
 		local oldasp = advtrains.interlocking.signal_get_aspect(pos) or DANGER
 		local suppasp = advtrains.interlocking.signal_get_supported_aspects(pos) or {}
+		local newasp = asp
 		if suppasp.type == 2 then
 			asp = advtrains.interlocking.aspects.type1_to_type2main(asp, suppasp.group)
 		end
+		set_supposed_aspect(pos, newasp)
 		ndef.advtrains.set_aspect(pos, node, asp)
-		local actualasp = advtrains.interlocking.signal_get_aspect(pos) or DANGER
-		local aspect_changed = advtrains.interlocking.aspects.not_equalp(oldasp, actualasp)
+		local aspect_changed = advtrains.interlocking.aspects.not_equalp(oldasp, newasp)
 		if aspect_changed then
 			advtrains.interlocking.signal_on_aspect_changed(pos)
 		end
@@ -289,7 +311,7 @@ end
 
 -- Returns the actual aspect of the signal at position, as returned by the nodedef.
 -- returns nil when there's no signal at the position
-function advtrains.interlocking.signal_get_aspect(pos)
+function advtrains.interlocking.signal_get_real_aspect(pos)
 	local node=advtrains.ndb.get_node(pos)
 	local ndef=minetest.registered_nodes[node.name]
 	if ndef and ndef.advtrains and ndef.advtrains.get_aspect then
@@ -303,6 +325,16 @@ function advtrains.interlocking.signal_get_aspect(pos)
 		return asp
 	end
 	return nil
+end
+
+-- Returns the signal aspect as reported in the suppasp table.
+function advtrains.interlocking.signal_get_aspect(pos)
+	local asp = get_supposed_aspect(pos)
+	if not asp then
+		asp = advtrains.interlocking.signal_get_real_aspect(pos)
+		set_supposed_aspect(pos)
+	end
+	return asp
 end
 
 -- Returns the "supported_aspects" of the signal at position, as returned by the nodedef.
