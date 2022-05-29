@@ -970,8 +970,17 @@ The following is an example of a train running with speed restrictions. You may 
 \end{itemize}
 
 \subsection{Basic signals}
-
 The core mod of \advtrains{} comes with wallmounted signals and a signal with two lights. These signals can only stop the train and lift the main speed restriction of the train.
+
+\subsection{Demo signals}
+The demo signals are provided by the \texttt{advtrains\_interlocking} mod. It is similar to the basic signals described above but have three states instead of two.
+\begin{apidoc}{Signal aspects!Demo signals}
+\item \apiasp{Danger} Red light: Stop.
+\item \apiasp{Free} Green light: Proceed at maximum speed.
+\item \apiasp{Slow} Yellow light: Proceed with the speed limit of 6m/s.
+\end{apidoc}
+
+Demo signals do not allow trains in shunt mode to pass through.
 
 \subsection{German signals}
 The \texttt{advtrains\_signals\_ks} mod provides a set of signals used in Germany, including (but not limited to) Ks signals that the mod gets its name from.
