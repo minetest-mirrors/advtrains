@@ -1,4 +1,4 @@
-type2defs = {}
+local type2defs = {}
 
 local function register_type2(def)
 	local t = {type = 2}

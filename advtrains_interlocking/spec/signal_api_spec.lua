@@ -4,8 +4,7 @@ mineunit("core")
 
 _G.advtrains = {
 	interlocking = {
-		aspects = sourcefile("signal_aspects"),
-		--aspects = fixture("../../signal_aspects"),
+		aspects = fixture("../../signal_aspects"),
 	},
 	ndb = {
 		get_node = minetest.get_node,

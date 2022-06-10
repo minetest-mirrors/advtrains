@@ -272,7 +272,10 @@ function advtrains.interlocking.signal_rc_handler(pos, node, player, itemstack, 
 		advtrains.interlocking.show_ip_form(pos, pname)
 		return
 	end
+	advtrains.interlocking.show_signal_form(pos, node, pname)
+end
 	
+function advtrains.interlocking.show_signal_form(pos, node, pname)
 	local sigd = advtrains.interlocking.db.get_sigd_for_signal(pos)
 	if sigd then
 		advtrains.interlocking.show_signalling_form(sigd, pname)
@@ -288,7 +291,7 @@ function advtrains.interlocking.signal_rc_handler(pos, node, player, itemstack, 
 			advtrains.interlocking.show_signal_aspect_selector(
 				pname,
 				ndef.advtrains.supported_aspects,
-				"Set aspect manually", callback,
+				pos, callback,
 				isasp)
 		else
 			--static signal - only IP
@@ -332,7 +335,7 @@ function advtrains.interlocking.signal_get_aspect(pos)
 	local asp = get_supposed_aspect(pos)
 	if not asp then
 		asp = advtrains.interlocking.signal_get_real_aspect(pos)
-		set_supposed_aspect(pos)
+		set_supposed_aspect(pos, asp)
 	end
 	return asp
 end
@@ -372,6 +375,7 @@ function advtrains.interlocking.show_ip_form(pos, pname, only_notset)
 		return
 	end
 	local form = "size[7,5]label[0.5,0.5;Signal at "..minetest.pos_to_string(pos).."]"
+	form = form .. advtrains.interlocking.make_signal_formspec_tabheader(pname, pos, 7, 2)
 	advtrains.interlocking.db.check_for_duplicate_ip(pos)
 	local pts, connid = advtrains.interlocking.db.get_ip_by_signalpos(pos)
 	if pts then
@@ -394,6 +398,9 @@ end
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
 	local pname = player:get_player_name()
+	if advtrains.interlocking.handle_signal_formspec_tabheader_fields(pname, fields) then
+		return true
+	end
 	if not minetest.check_player_privs(pname, {train_operator=true, interlocking=true}) then
 		return
 	end
