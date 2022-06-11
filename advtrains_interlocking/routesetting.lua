@@ -45,6 +45,7 @@ function ilrs.set_route(signal, route, try)
 	local rtename = route.name
 	local signalname = ildb.get_tcbs(signal).signal_name
 	local c_tcbs, c_ts_id, c_ts, c_rseg, c_lckp
+	local signals = {}
 	while c_sigd and i<=#route do
 		c_tcbs = ildb.get_tcbs(c_sigd)
 		if not c_tcbs then
@@ -115,12 +116,32 @@ function ilrs.set_route(signal, route, try)
 				c_tcbs.aspect = route.aspect or advtrains.interlocking.GENERIC_FREE
 				c_tcbs.route_origin = signal
 				advtrains.interlocking.update_signal_aspect(c_tcbs)
+				signals[#signals+1] = c_tcbs.signal
 			end
 		end
 		-- advance
 		first = nil
 		c_sigd = c_rseg.next
 		i = i + 1
+	end
+
+	-- Distant signaling
+	local lastsig = nil
+	if c_sigd then
+		local e_tcbs = ildb.get_tcbs(c_sigd)
+		local pos = e_tcbs and e_tcbs.signal
+		if pos then
+			lastsig = pos
+		end
+	end
+	for i = #signals, 1, -1 do
+		if lastsig then
+			local pos = signals[i]
+			local _, assigned_by = advtrains.distant.get_main(pos)
+			if assigned_by ~= "manual" then
+				advtrains.distant.assign(lastsig, signals[i], "routesetting")
+			end
+		end
 	end
 	
 	return true

@@ -50,7 +50,7 @@ minetest.register_node("advtrains_interlocking:ds_danger", {
 	},
 	on_rightclick = advtrains.interlocking.signal_rc_handler,
 	can_dig = advtrains.interlocking.signal_can_dig,
-	after_dig_node = advtrains.interlocking.signal_after_dig,
+	after_destruct = advtrains.interlocking.signal_after_dig,
 })
 minetest.register_node("advtrains_interlocking:ds_free", {
 	description = "Demo signal at Free",
@@ -71,7 +71,7 @@ minetest.register_node("advtrains_interlocking:ds_free", {
 	},
 	on_rightclick = advtrains.interlocking.signal_rc_handler,
 	can_dig = advtrains.interlocking.signal_can_dig,
-	after_dig_node = advtrains.interlocking.signal_after_dig,
+	after_destruct = advtrains.interlocking.signal_after_dig,
 })
 minetest.register_node("advtrains_interlocking:ds_slow", {
 	description = "Demo signal at Slow",
@@ -92,6 +92,6 @@ minetest.register_node("advtrains_interlocking:ds_slow", {
 	},
 	on_rightclick = advtrains.interlocking.signal_rc_handler,
 	can_dig = advtrains.interlocking.signal_can_dig,
-	after_dig_node = advtrains.interlocking.signal_after_dig,
+	after_destruct = advtrains.interlocking.signal_after_dig,
 })
 

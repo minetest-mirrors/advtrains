@@ -134,6 +134,9 @@ function ildb.load(data)
 	if data.supposed_aspects then
 		advtrains.interlocking.load_supposed_aspects(data.supposed_aspects)
 	end
+	if data.distant then
+		advtrains.distant.load(data.distant)
+	end
 	
 	--COMPATIBILITY to Signal aspect format
 	-- TODO remove in time...
@@ -177,6 +180,7 @@ function ildb.save()
 		influence_points = influence_points,
 		npr_rails = advtrains.interlocking.npr_rails,
 		supposed_aspects = advtrains.interlocking.save_supposed_aspects(),
+		distant = advtrains.distant.save(),
 	}
 end
 

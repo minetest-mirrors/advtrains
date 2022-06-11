@@ -14,6 +14,7 @@ local lntrans = { "A", "B" }
 local function sigd_to_string(sigd)
 	return minetest.pos_to_string(sigd.p).." / "..lntrans[sigd.s]
 end
+advtrains.interlocking.sigd_to_string = sigd_to_string
 
 minetest.register_node("advtrains_interlocking:tcb_node", {
 	drawtype = "mesh",
@@ -608,7 +609,7 @@ function advtrains.interlocking.show_signalling_form(sigd, pname, sel_rte, calle
 	if not tcbs.signal_name then tcbs.signal_name = "Signal at "..minetest.pos_to_string(sigd.p) end
 	if not tcbs.routes then tcbs.routes = {} end
 	
-	local form = "size[7,9.75]label[0.5,0.5;Signal at "..minetest.pos_to_string(sigd.p).."]"
+	local form = "size[7,10.25]label[0.5,0.5;Signal at "..minetest.pos_to_string(sigd.p).."]"
 	form = form .. advtrains.interlocking.make_signal_formspec_tabheader(pname, tcbs.signal, 7, 1)
 	form = form.."field[0.8,1.5;5.2,1;name;Signal name;"..minetest.formspec_escape(tcbs.signal_name).."]"
 	form = form.."button[5.5,1.2;1,1;setname;Set]"
@@ -670,6 +671,7 @@ function advtrains.interlocking.show_signalling_form(sigd, pname, sel_rte, calle
 				form = form.."button[0.5,8;2.5,1;newroute;New Route]"
 				form = form.."button[  3,8;2.5,1;unassign;Unassign Signal]"
 				form = form..string.format("checkbox[0.5,8.75;ars;Automatic routesetting;%s]", not tcbs.ars_disabled)
+				form = form..string.format("checkbox[0.5,9.25;dst;Distant signalling;%s]", not tcbs.nodst)
 			end
 		elseif sigd_equal(tcbs.route_origin, sigd) then
 			-- something has gone wrong: tcbs.routeset should have been set...
@@ -795,6 +797,10 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		
 		if fields.ars then
 			tcbs.ars_disabled = not minetest.is_yes(fields.ars)
+		end
+
+		if fields.dst then
+			tcbs.nodst = not minetest.is_yes(fields.dst)
 		end
 		
 		if fields.auto then

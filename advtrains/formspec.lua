@@ -9,6 +9,14 @@ local function make_list(entries)
 	return table.concat(t, ",")
 end
 
+local function f_button(x, y, w, h, id, text)
+	return sformat("button[%f,%f;%f,%f;%s;%s]", x, y, w, h, id, text)
+end
+
+local function S_button(x, y, w, h, id, ...)
+	return f_button(x, y, w, h, id, attrans(...))
+end
+
 local function f_button_exit(x, y, w, h, id, text)
 	return sformat("button_exit[%f,%f;%f,%f;%s;%s]", x, y, w, h, id, text)
 end
@@ -54,6 +62,8 @@ local function f_tabheader(x, y, w, h, id, entries, sel, transparent, border)
 end
 
 return {
+	button = f_button,
+	S_button = S_button,
 	button_exit = f_button_exit,
 	S_button_exit = S_button_exit,
 	dropdown = f_dropdown,

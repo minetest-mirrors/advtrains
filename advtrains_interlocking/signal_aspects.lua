@@ -44,6 +44,27 @@ local function get_type2_definition(name)
 	return type2defs[name]
 end
 
+local function get_type2_danger(group)
+	local def = type2defs[group]
+	if not def then
+		return nil
+	end
+	local main = def.main
+	return main[#main]
+end
+
+local function get_type2_dst(group, name)
+	local def = type2defs[group]
+	if not def then
+		return nil
+	end
+	local aspidx = name
+	if type(name) ~= "number" then
+		aspidx = def.main[name] or 1
+	end
+	return def.main[math.max(1, aspidx-1)].name
+end
+
 local function type2main_to_type1(name, asp)
 	local def = type2defs[name]
 	if not def then
@@ -53,7 +74,7 @@ local function type2main_to_type1(name, asp)
 	if type(asp) == "number" then
 		aspidx = asp
 	else
-		aspidx = def.main[asp]
+		aspidx = def.main[asp] or 2
 	end
 	local asptbl = def.main[aspidx]
 	if not asptbl then
@@ -62,11 +83,13 @@ local function type2main_to_type1(name, asp)
 	if type(asp) == "number" then
 		asp = asptbl.name
 	end
+	local dst = def.main[math.min(#def.main, aspidx+1)].main
 
 	local t = {
 		main = asptbl.main,
 		type2name = asp,
 		type2group = name,
+		dst = dst,
 	}
 	if aspidx > 1 and aspidx < #asptbl then
 		t.dst = asptbl[aspidx+1].main
@@ -116,6 +139,7 @@ end
 return {
 	register_type2 = register_type2,
 	get_type2_definition = get_type2_definition,
+	get_type2_dst = get_type2_dst,
 	type2main_to_type1 = type2main_to_type1,
 	type1_to_type2main = type1_to_type2main,
 	equalp = equalp,

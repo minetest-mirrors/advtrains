@@ -43,7 +43,7 @@ local function describe_supported_aspects_t1(suppasp, isasp)
 	local entries = {}
 	local selid = 1
 	for idx, spv in ipairs(suppasp.main) do
-		if isasp and spv == isasp.main then
+		if isasp and spv == (isasp.main or false) then
 			selid = idx
 		end
 		entries[idx] = describe_t1_main_aspect(spv)
@@ -67,7 +67,7 @@ local function describe_supported_aspects_t1(suppasp, isasp)
 	entries = {}
 	selid = 1
 	for idx, spv in ipairs(suppasp.dst) do
-		if isasp and spv == isasp.dst then
+		if isasp and spv == (isasp.dst or false) then
 			selid = idx
 		end
 		entries[idx] = describe_t1_distant_aspect(spv)
@@ -102,6 +102,8 @@ local function handle_signal_formspec_tabheader_fields(pname, fields)
 		advtrains.interlocking.show_signal_form(pos, node, pname)
 	elseif n == 2 then
 		advtrains.interlocking.show_ip_form(pos, pname)
+	elseif n == 3 then
+		advtrains.interlocking.show_distant_signal_form(pos, pname)
 	end
 	return true
 end
