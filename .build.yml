@@ -36,7 +36,7 @@ tasks:
     mkdir -p .minetest/games/
     cd .minetest/games
     unzip ../../minetest_game.zip
-    mv minetest_game-master minetest_game
+    mv minetest_game-5.5.0 minetest_game
 - install_test_world: |
     mkdir -p .minetest/worlds/
     curl https://lifomaps.de/advtrains-test/testworld.tar.gz -o ~/testworld.tar.gz
