@@ -32,10 +32,10 @@ tasks:
     curl https://lifomaps.de/advtrains-test/minetestserver -o ~/bin/minetestserver
     chmod +x ~/bin/minetestserver
 - install_mt_game : |
-    curl -L https://github.com/minetest/minetest_game/archive/master.zip -o master.zip
+    curl -L https://github.com/minetest/minetest_game/archive/refs/tags/5.5.0.zip -o minetest_game.zip
     mkdir -p .minetest/games/
     cd .minetest/games
-    unzip ../../master.zip
+    unzip ../../minetest_game.zip
     mv minetest_game-master minetest_game
 - install_test_world: |
     mkdir -p .minetest/worlds/
