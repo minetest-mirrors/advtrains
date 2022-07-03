@@ -96,8 +96,11 @@ Track Worker Tool@n@nLeft-click: change rail type (straight/curve/switch)@nRight
 Passive Component Naming Tool@n@nRight-click to name a passive component.=PC-Benennungswerkzeug@n@nRechtsklick zur Benennung der passiven Komponente
 Train copy/paste tool@n@nLeft-click: copy train@nRight-click: paste train=Werkzeug zur Erstellung von Zugkopien@n@nLinksklick: Zug ins Clipboard kopieren@nRight-click: Kopierten Zug einfügen
 Track=Gleis
-Perpendicular Diamond Crossing Track=Perpendicular Diamond Crossing Track
-45/90 Degree Diamond Crossing Track=45/90 Degree Diamond Crossing Track
+Perpendicular Diamond Crossing Track=Kreuzung mit zueinander orthogonalen Gleisen
+Diagonal Diamond Crossing Track=Diagonale Gleiskreuzung
+90+Angle Diamond Crossing Track=Kreuzung mit einem achsenparallelen Gleis
+Y-turnout=Y-Weiche
+3-way turnout=Dreiwegweiche
 Unloading Track=Abladungsgleis
 Loading Track=Beladungsgleis
 Bumper=Prellbock

@@ -2,7 +2,7 @@
 
 # Advtrains Core (unorganized)
 This wagon is owned by @1, you can't destroy it.=這是 @1 的車廂，您不能摧毀它。
-Warning: If you destroy this wagon, you only get some steel back! If you are sure, hold Sneak and left-click the wagon.=警告：如果您摧毀此車廂，您只能拿到一些鋼方塊。如果您確定要摧毀這個車廂，請按潛行鍵並左鍵單擊此車廂。
+Warning: If you destroy this wagon, you only get some steel back! If you are sure, hold Sneak and left-click the wagon.=警告：如果您摧毀此車廂，您只能拿到一些鋼方塊。如果您確定要摧毀這節車廂，請按潛行鍵並左鍵單擊此車廂。
 This position is protected!=這裡已被保護。
 Can't place: not pointing at node=無法放置：您沒有選擇任何方塊。
 Can't place: space occupied!=無法放置：此區域已被佔用。
@@ -42,11 +42,11 @@ ATC command parse error: Unknown command: @1=ATC 語法錯誤：未知命令：@
 
 # Coupling
 Lock couples=鎖定連結處
-You need to own at least one neighboring wagon to destroy this couple.=您必須至少擁有其中一個車廂才能解耦這兩個車廂。
+You need to own at least one neighboring wagon to destroy this couple.=您必須至少擁有其中一節車廂才能分開這兩節車廂。
 Buffer and Chain Coupler=鏈式連結器
 Scharfenberg Coupler=Scharfenberg 式連結器
 Japanese Train Inter-Wagon Connection=日本火車連結器
-Can not couple: The couplers of the trains do not match (@1 and @2).=您無法連結這兩個車廂：這兩個車廂使用不同的連結器 (@1和@2)。
+Can not couple: The couplers of the trains do not match (@1 and @2).=您無法連結這兩節車廂：這兩節車廂使用不同的連結器 (@1和@2)。
 
 # Clipboard
 The track you are trying to place the wagon on is not long enough!=軌道太短。
@@ -97,16 +97,19 @@ Passive Component Naming Tool@n@nRight-click to name a passive component.=被動
 Train copy/paste tool@n@nLeft-click: copy train@nRight-click: paste train=火車複製工具@n@n左鍵單擊：複製@n右鍵單擊：粘帖
 Track=軌道
 Perpendicular Diamond Crossing Track=垂直交叉軌道
-45/90 Degree Diamond Crossing Track=45/90度交叉軌道
+Diagonal Diamond Crossing Track=交叉軌道
+90+Angle Diamond Crossing Track=交叉軌道 (其中一條軌道與座標軸平行)
+Y-turnout=對稱道岔
+3-way turnout=三開道岔
 Unloading Track=卸貨軌道
 Loading Track=裝貨軌道
 Bumper=保險槓
 Detector Rail=探測軌道
 @1 Slope=@1斜坡
-@1 Platform (low)=50cm 高的@1月臺
-@1 Platform (high)=1m 高的@1月臺
-@1 Platform (low, 45 degree)=50cm 高的@1月臺 (45°)
-@1 Platform (45 degree)=1m 高的@1月臺 (45°)
+@1 Platform (low)=較低的@1月臺
+@1 Platform (high)=較高的@1月臺
+@1 Platform (low, 45 degree)=較低的@1月臺 (45°)
+@1 Platform (45 degree)=較高的@1月臺 (45°)
 Lampless Signal=臂木式號誌機
 Signal=色燈號誌機
 Wallmounted Signal (l)=壁掛式色燈號誌機 (左側)
