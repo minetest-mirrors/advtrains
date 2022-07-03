@@ -321,7 +321,7 @@ local function process_signal(name, sigdata, isrpt)
 			tt[#tt+1] = string.format("0,%d=(advtrains_hud_bg.png\\^[colorize\\:%s)", lightcount-1, color)
 		end
 		tx[aspname] = table.concat(tt, ":")
-		type2def.main[idx] = {name = asp.name, label = S(aspnames[asp.name]), main = asp.main or false}
+		type2def.main[idx] = {name = asp.name, label = S(aspnames[asp.name]), main = asp.main, proceed_as_main = true}
 	end
 	local invimg = {
 		string.format("[combine:%dx%d", lightcount*4+1, lightcount*4+1),

@@ -176,6 +176,11 @@ advtrains.interlocking.GENERIC_FREE = {
 	shunt = false,
 	dst = false,
 }
+advtrains.interlocking.FULL_FREE = {
+	main = -1,
+	shunt = false,
+	proceed_as_main = true,
+}
 
 local function convert_aspect_if_necessary(asp)
 	if type(asp.main) == "table" then
@@ -212,7 +217,7 @@ end
 
 function advtrains.interlocking.signal_after_dig(pos)
 	-- clear influence point
-	advtrains.interlocking.db.clear_ip_by_signalpos(pos)
+
 	advtrains.interlocking.signal_clear_aspect(pos)
 	advtrains.distant.unassign_all(pos, true)
 end

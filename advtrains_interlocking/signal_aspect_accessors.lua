@@ -103,9 +103,9 @@ local function set_aspect(pos, asp)
 		local newasp, aspval = adjust_aspect(pos, asp)
 		set_supposed_aspect(pos, newasp)
 		ndef.advtrains.set_aspect(pos, node, aspval)
+		I.signal_on_aspect_changed(pos)
 		local aspect_changed = A.not_equalp(oldasp, newasp)
 		if aspect_changed then
-			I.signal_on_aspect_changed(pos)
 			D.update_main(pos)
 		end
 	end

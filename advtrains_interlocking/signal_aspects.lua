@@ -32,6 +32,8 @@ local function register_type2(def)
 		t.label = label
 
 		t.main = asp.main
+		t.shunt = asp.shunt
+		t.proceed_as_main = asp.proceed_as_main
 		mainasps[idx] = t
 		mainasps[name] = idx
 	end
@@ -87,6 +89,8 @@ local function type2main_to_type1(name, asp)
 
 	local t = {
 		main = asptbl.main,
+		shunt = asptbl.shunt,
+		proceed_as_main = asptbl.proceed_as_main,
 		type2name = asp,
 		type2group = name,
 		dst = dst,
