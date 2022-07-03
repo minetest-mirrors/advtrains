@@ -46,11 +46,15 @@ function ilrs.set_route(signal, route, try)
 	local signalname = ildb.get_tcbs(signal).signal_name
 	local c_tcbs, c_ts_id, c_ts, c_rseg, c_lckp
 	local signals = {}
+	local nodst
 	while c_sigd and i<=#route do
 		c_tcbs = ildb.get_tcbs(c_sigd)
 		if not c_tcbs then
 			if not try then atwarn("Did not find TCBS",c_sigd,"while setting route",rtename,"of",signal) end
 			return false, "No TCB found at "..sigd_to_string(c_sigd)..". Please reconfigure route!"
+		end
+		if i == 1 then
+			nodst = c_tcbs.nodst
 		end
 		c_ts_id = c_tcbs.ts_id
 		if not c_ts_id then
@@ -138,7 +142,7 @@ function ilrs.set_route(signal, route, try)
 			local tcbs = signals[i]
 			local pos = tcbs.signal
 			local _, assigned_by = advtrains.distant.get_main(pos)
-			if not assigned_by or assigned_by == "routesetting" then
+			if (not nodst) and (not assigned_by or assigned_by == "routesetting") then
 				advtrains.distant.assign(lastsig, pos, "routesetting", true)
 			end
 			advtrains.interlocking.update_signal_aspect(tcbs, i ~= 1)

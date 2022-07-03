@@ -91,6 +91,13 @@ local function setsection(tid, train, ts_id, ts, sigd)
 			tcbs.route_comitted = nil -- TODO compatibility cleanup
 			tcbs.aspect = nil
 			tcbs.route_origin = nil
+			if tcbs.signal then
+				local spos = tcbs.signal
+				local _, setter = advtrains.distant.get_main(spos)
+				if setter == "routesetting" then
+					advtrains.distant.unassign_dst(spos, true)
+				end
+			end
 			advtrains.interlocking.update_signal_aspect(tcbs)
 			if tcbs.signal and sigd_equal(ts.route.entry, ts.route.origin) then
 				if tcbs.route_auto and tcbs.routeset then
