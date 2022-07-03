@@ -95,7 +95,7 @@ get_aspect = function(pos)
 	return asp
 end
 
-local function set_aspect(pos, asp)
+local function set_aspect(pos, asp, skipdst)
 	local node = N.get_node(pos)
 	local ndef = minetest.registered_nodes[node.name]
 	if ndef and ndef.advtrains and ndef.advtrains.set_aspect then
@@ -105,7 +105,7 @@ local function set_aspect(pos, asp)
 		ndef.advtrains.set_aspect(pos, node, aspval)
 		I.signal_on_aspect_changed(pos)
 		local aspect_changed = A.not_equalp(oldasp, newasp)
-		if aspect_changed then
+		if (not skipdst) and aspect_changed then
 			D.update_main(pos)
 		end
 	end

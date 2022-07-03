@@ -62,7 +62,7 @@ local function unassign_all(pos, force)
 	unassign_dst(pos, force)
 end
 
-local function assign(main, dst, by)
+local function assign(main, dst, by, skip_update)
 	local pts_main = pts(main)
 	local pts_dst = pts(dst)
 	local t = db_distant[pts_main]
@@ -76,7 +76,9 @@ local function assign(main, dst, by)
 	unassign_dst(dst, true)
 	t[pts_dst] = by
 	db_distant_of[pts_dst] = {pts_main, by}
-	update_dst(dst)
+	if not skip_update then
+		update_dst(dst)
+	end
 end
 
 local function pre_occupy(dst, by)

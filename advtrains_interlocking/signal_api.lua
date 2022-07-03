@@ -204,10 +204,10 @@ local function convert_aspect_if_necessary(asp)
 end
 advtrains.interlocking.signal_convert_aspect_if_necessary = convert_aspect_if_necessary
 
-function advtrains.interlocking.update_signal_aspect(tcbs)
+function advtrains.interlocking.update_signal_aspect(tcbs, skipdst)
 	if tcbs.signal then
 		local asp = tcbs.aspect or DANGER
-		advtrains.interlocking.signal_set_aspect(tcbs.signal, asp)
+		advtrains.interlocking.signal_set_aspect(tcbs.signal, asp, skipdst)
 	end
 end
 

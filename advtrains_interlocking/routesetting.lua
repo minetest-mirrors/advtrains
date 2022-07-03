@@ -115,8 +115,7 @@ function ilrs.set_route(signal, route, try)
 				c_tcbs.route_committed = true
 				c_tcbs.aspect = route.aspect or advtrains.interlocking.FULL_FREE
 				c_tcbs.route_origin = signal
-				advtrains.interlocking.update_signal_aspect(c_tcbs)
-				signals[#signals+1] = c_tcbs.signal
+				signals[#signals+1] = c_tcbs
 			end
 		end
 		-- advance
@@ -136,11 +135,13 @@ function ilrs.set_route(signal, route, try)
 	end
 	for i = #signals, 1, -1 do
 		if lastsig then
-			local pos = signals[i]
+			local tcbs = signals[i]
+			local pos = tcbs.signal
 			local _, assigned_by = advtrains.distant.get_main(pos)
 			if not assigned_by or assigned_by == "routesetting" then
-				advtrains.distant.assign(lastsig, signals[i], "routesetting")
+				advtrains.distant.assign(lastsig, pos, "routesetting", true)
 			end
+			advtrains.interlocking.update_signal_aspect(tcbs, i ~= 1)
 		end
 	end
 	
@@ -250,14 +251,14 @@ function ilrs.cancel_route_from(sigd)
 		c_tcbs.route_auto = nil
 		c_tcbs.route_origin = nil
 		
-		advtrains.interlocking.update_signal_aspect(c_tcbs)
 		if c_tcbs.signal then
 			local pos = c_tcbs.signal
 			local _, assigned_by = advtrains.distant.get_main(pos)
 			if assigned_by == "routesetting" then
-				advtrains.distant.unassign_dst(pos)
+				advtrains.distant.unassign_dst(pos, true)
 			end
 		end
+		advtrains.interlocking.update_signal_aspect(c_tcbs)
 		
 		c_ts_id = c_tcbs.ts_id
 		if not c_tcbs then
