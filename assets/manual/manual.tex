@@ -1292,10 +1292,18 @@ Railway time is counted in cycles, minutes, and seconds, roughly corresponding t
 
 Railway time can be represented in three formats:
 \begin{itemize}
-\item As a table with the fields \texttt{c}, \texttt{m}, and \texttt{s}, holding the cycles, minutes, and seconds, respectively. It is an error if the \texttt{m} or \texttt{s} field is not an integer between 0 inclusive and 60 exclusive.
-\item As a string: The number of cycles, minutes, and seconds, delimited with a semicolon, such as \texttt{245;50;32}. The cycles may be absent, in which case the string is formatted as the number of minutes and seconds delimited with a semicolon, such as \texttt{37;25}. Fields do not have to be padded with zeroes, but the field should not be empty unless it is at the beginning or the end of the string; this criteria allows RWT values such as \texttt{43;3} (equivalent to \texttt{43;03}), \texttt{22;} (equivalent to \texttt{22;00}), \texttt{;10} (equivalent to \texttt{0;10}) and even \texttt{;} (equivalent to \texttt{0;00}). It is an error if the number of minutes and seconds is not an integer between 0 inclusive and 60 exclusive.
+\item As a table with the fields \texttt{c}, \texttt{m}, and \texttt{s}, holding the cycles, minutes, and seconds, respectively.
+\item As a string: The number of cycles, minutes, and seconds, delimited with a semicolon, such as \texttt{245;50;32}. The cycles may be absent, in which case the string is formatted as the number of minutes and seconds delimited with a semicolon, such as \texttt{37;25}. Fields do not have to be padded with zeroes, but the field should not be empty unless it is at the beginning or the end of the string; this criteria allows RWT values such as \texttt{43;3} (equivalent to \texttt{43;03}), \texttt{22;} (equivalent to \texttt{22;00}), \texttt{;10} (equivalent to \texttt{0;10}) and even \texttt{;} (equivalent to \texttt{0;00}).
 \item As a number: the number of seconds since \texttt{0;0;0}.
 \end{itemize}
+
+For a railway time object \texttt{$c$;$m$;$s$}, the following properties are expected to apply:
+\begin{itemize}
+\item $c \in \mathbb{Z}$,
+\item $m \in \mathbb{Z} \cap \left[0,60\right)$, and
+\item $s \in \mathbb{Z} \cap \left[0,60\right)$
+\end{itemize}
+It is an error if at least one of the above properties do not apply.
 
 The following entries are present in \texttt{advtrains.interlocking.rwt}. \var{Time}, \var{t}, \var{interval}, and \var{offset} refer to a railway time object represented in one of the methods described above. \var{Interval} and \var{offset} represent the interval and offset of a repetition, respectively. \var{Cycles}, \var{minutes}, and \var{seconds} should be the value of the \texttt{c}, \texttt{m} and \texttt{s} fields of a railway time table.
 
