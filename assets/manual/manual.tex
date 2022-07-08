@@ -1437,19 +1437,15 @@ This section is mainly intended as a reference that is provided for convenience.
 
 \subsection{Movement}
 
-This section will use $x$ as the position and \( s = \Delta x \) as the distance.
-
 \begin{align*}
-  v(T) &= v_0 + \int_0^T a(t) dt \\
-  x(T) &= x_0 + \int_0^T v(t) dt \\
-  s(T) &= \Delta x = \int_0^T v(t) dt
+  v &= \int a\, dt \\
+  x &= \int v\, dt \\
 \end{align*}
 
 \subsubsection{Constant acceleration}
 \begin{align*}
-  v(T) &= v_0 + \int_0^T a(t)dt = v_0 + aT \\
-  x(T) &= x_0 + \int_0^T v(t)dt = x_0 + v_0T + \frac{1}{2}aT^2 \\
-  s(T) &= v_0T + \frac{1}{2}aT^2
+  v &= v_0 + at \\
+  x &= x_0 + v_0t + \frac{1}{2}at^2
 \end{align*}
 
 In certain cases, the starting velocity $v_0$ and the target velocity $v_1$ are known:
@@ -1461,7 +1457,7 @@ In certain cases, the starting velocity $v_0$ and the target velocity $v_1$ are 
 \subsubsection{Acceleration of a train}
 The acceleration of a train is calculate as follows:
 \[a = a_{\text{all}} + a_{\text{locomotive}}\cdot\frac{n_{\text{locomotives}}}{n_{\text{wagons}}}\]
-Please not that slopes are not taken into consideration.
+Please note that slopes are not taken into consideration.
 
 \subsubsection{Acceleration constants}
 \begin{tabular}{|c|r|r|}
