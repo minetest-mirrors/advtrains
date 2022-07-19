@@ -1,0 +1,224 @@
+\section{Train controls}\label{s:controls}
+To get on a train, click on the train while its doors are open, or click on the train while holding the Sneak key. You need to be in the driver stand in order to control the train.
+
+Train movement currently depends on two factors: the lever of the train and the percentage of locomotives in the train. Details on train physics can be found in section \ref{s:physics}.
+
+Unlike in real life, levers are not moved continuously. Instead, there are a few lever ``positions'' that are recognized by \advtrains{}:
+
+\begin{itemize}
+\item The lever 0 triggers the emergency brake. It can be triggered by the ATC \texttt{BB} command (see section \ref{s:atc}).
+\item The lever 1 triggers the default brake.
+\item The lever 2 (``roll'') slows down a train as if it was on a horizontal surface without any traction
+\item The lever 3 does not affect the speed of the train.
+\item The lever 4 accelerates the train.
+\end{itemize}
+
+\subsection{Train formspec}\label{s:trainformspec}
+If you have access to the driver stand of the wagon, right-clicking the train will open up a formspec will a few buttons, depending on the status of the train:
+\begin{apidoc}{Train formspec}
+\item \apiui{Passenger area} Move to the passenger area.
+\item \apiui{Driver stand} Move to the driver stand.
+\item \apiui{Onboard computer} Open the onboard computer.
+\item \apiui{Wagon properties} Allow setting wagon properties.
+\item \apiui{Get off} Get off the train.
+\item \apiui{(Doors closed)} Get off the train by right-clicking the train while holding the Sneak key.
+\end{apidoc}
+
+\subsection{Onboard computer}\label{s:bordcom}
+The onboard computer allow setting certain properties of the train. Feel free to explore it yourself. A few fields are explained here in detail:
+\begin{apidoc}{Onboard computer}
+\item \apiui{Line number} The line name of the train. Despite the label, you can set this to anything. This field is mainly used for interlocking.
+\item \apiui{Routing code} The routing code of the train. This field is mainly used for interlocking. Unlike line numbers, you can specify multiple entries in this field, separated by spaces.
+\item \apiui{Train overview} This section is only shown when the train is not moving. It allows you to couple and decouple wagons from the train.
+\end{apidoc}
+
+\subsection{Wagon properties formspec}
+The ``wagon properties'' formspec allows setting properties that apply to each wagon. The following fields are present in the formspec:
+\begin{apidoc}{Wagon properties}
+\item \apiui{Whitelist} (``Allow these players to access your wagon'') A list of other player that may access the inventory and the driver stand of the wagon.
+\item \apiui{Wagon road number} An identifier that is applied to the wagon. It is mainly intended to be a human-readable alternative to wagon IDs.
+\item \apiui{Freight code} The freight code of the wagon. Please refer to section \ref{s:freightcode} for more information.
+\end{apidoc}
+
+\subsection{HUD}\label{s:trainhud}
+
+The HUD is a visual representation of certain information about the train. An overview of the HUD is as follows:
+
+\begin{centeredtikzpicture}[xscale=0.025,yscale=-0.025]
+  \footnotesize
+  \newcommand{\rect}[3]{
+    \draw[#1] #2 rectangle #3;
+  }
+  \newcommand{\frect}[3]{
+    \rect{#1,fill=#1}{#2}{#3}
+  }
+  \newcommand{\sevenseg}[5]{
+    \def\x{#2}
+    \def\y{#3}
+    \def\w{#4}
+    \def\h{#5}
+    \def\segs{
+      {(\h,0)}/\w/\h,
+      {(0,\h)}/\h/\w,
+      {($(\w,0)+(\h,\h)$)}/\h/\w,
+      {($(0,\w)+(\h,\h)$)}/\w/\h,
+      {($(0,\w)+2*(0,\h)$)}/\h/\w,
+      {($(\w,\w)+\h*(1,2)$)}/\h/\w,
+      {($2*(0,\w)+\h*(1,2)$)}/\w/\h
+    }
+    \foreach \off/\sx/\sy in \segs {
+      \frect{#1}{(\x,\y) ++\off}{++(\sx,\sy)};
+    }
+  }
+  \newcommand{\filledcirclelabel}[2]{
+    \node[circle,text=black,fill=white,draw=black] at #1 {#2};
+  }
+  \newcommand{\plainlabel}[2]{
+    \node[text=black] at #1 {#2};
+  }
+  \frect{black}{(0,0)}{+(440,110)}
+  \frect{cyan}{(10,10)}{++(30,30)}
+  \plainlabel{(25,25)}{1}
+  \frect{red}{(50,10)}{++(30,30)}
+  \plainlabel{(65,25)}{2}
+  \frect{orange}{(90,10)}{++(30,30)}
+  \plainlabel{(105,25)}{3}
+  \frect{orange}{(130,10)}{++(30,5)}
+  \frect{orange}{(130,35)}{++(30,5)}
+  \foreach \i in {130,141,152}{\sevenseg{orange}{\i}{18}{4}{2}}
+  \filledcirclelabel{(145,25)}{4}
+  \frect{white}{(187,10)}{++(26,30)}
+  \frect{black}{(189,12)}{++(22,11)}
+  \frect{white}{(170,10)}{++(15,30)}
+  \frect{black}{(172,12)}{++(11,11)}
+  \frect{white}{(215,10)}{++(15,30)}
+  \frect{black}{(217,12)}{++(11,11)}
+  \filledcirclelabel{(200,25)}{5}
+  \draw[cyan,fill=cyan] (245,10)++(0,15) -- +(15,0) -- +(7.5,-15);
+  \draw[orange,fill=orange] (245,85) -- +(15,0) -- +(7.5,15);
+  \frect{DarkSlateGray}{(250,35)}{++(5,40)}
+  \filledcirclelabel{(252.5,55)}{6}
+  \frect{cyan}{(275,10)}{++(5,18)}
+  \frect{white}{(275,28)}{++(5,18)}
+  \frect{orange}{(275,46)}{++(5,36)}
+  \frect{red}{(275,82)}{++(5,18)}
+  \frect{DarkSlateGray}{(292,16)}{++(6,78)}
+  \filledcirclelabel{(295,55)}{7}
+  \foreach \x in {10,21,...,120}{\frect{white}{(\x,65)}{++(8,20)}}
+  \filledcirclelabel{(69,75)}{8}
+  \foreach \x in {197,208,219}{\frect{DarkSlateGray}{(\x,65)}{++(8,20)}}
+  \filledcirclelabel{(212,75)}{9}
+  \frect{red}{(183,60)}{++(3,30)}
+  \filledcirclelabel{(184.5,75)}{10}
+  \draw[red,fill=red] (133,50) -- +(15,0) -- +(7.5,15);
+  \plainlabel{(140.5,54)}{4}
+  \draw[cyan,fill=cyan] (89,100) -- +(15,0) -- +(7.5,-15);
+  \plainlabel{(96.5,96)}{11}
+  \sevenseg{red}{320}{10}{30}{10}
+  \sevenseg{red}{380}{10}{30}{10}
+  \filledcirclelabel{(375,55)}{8}
+\end{centeredtikzpicture}
+
+\begin{enumerate}
+\item ATC indicator
+\item LZB indicator
+\item Shunt indicator
+\item Aspect of and distance to the upcoming LZB entry (usually a signal)
+\item Door indicator
+\item Reverser
+\item Lever
+\item Speed indicator
+\item Max speed indicator
+\item Speed restriction indicator
+\item ATC target speed indicator
+\end{enumerate}
+
+\subsection{Keybindings}\label{s:keybindings}
+Hitting any movement key as a passenger will drop you off the train when a door is open or when the wagon has no doors. Alternatively, the Sneak+Aux1 keystroke will drop you off a train, regardless of whether doors are open.
+
+The following keybindings are available to the driver, regardless of the mode of the train.
+\begin{itemize}
+\item Sneak+Forward: Set the ATC target speed to the maximum speed
+\item Sneak+Backward: Set the ATC target speed to 0
+\item Sneak+Left: Set the ATC target speed to 4
+\item Sneak+Right: Set the ATC target speed to 8
+\item Sneak+Jump: Open the onboard computer
+\item Jump+Backward: Emergency brake
+\end{itemize}
+
+\subsection{Manual control}\label{s:manual-control}
+Manual control makes the user in charge controlling the train. The following keybindings are available when manually controlling the train:
+\begin{itemize}
+\item Forward: Accelerate.
+\item Backward: Roll when the train is moving, reverse otherwise.
+\item Left: Open/Close the door on the left side and, if the door on the right side is open, close the door on the right side.
+\item Right: Open/Close the door on the right side and, if the door on the left side is open, close the door on the left side.
+\item Jump: Brake or, in ATC mode, switch to manual control
+\end{itemize}
+
+These keybindings (except for the jump key) do not work in ATC mode. The lever is moved to a specific level only as long as the corresponding key is pressed.
+
+\subsection{ATC}\label{s:atc}
+
+ATC is a method of automatically controlling trains. Certain modes can be directly activated using specific keybindings, but more common ways of using ATC include:
+\begin{itemize}
+\item Directly using ATC tracks,
+\item Using station/stop tracks, and
+\item Using LuaATC
+\end{itemize}
+
+ATC tracks can be used to send custom ATC commands to the train passing the track. The ATC commands available are listed below:
+
+\begin{apidoc}{ATC}
+\item \apilex{A0} Disables ARS.
+\item \apilex{A1} Enables ARS.
+\item \apilex{BB} Actives the emergency brake until the train stops.
+\item \apilex{B\var{speed}} Brakes until \var{speed} is reached.
+\item \apilex{Cpl} Enables autocouple mode.
+\item \apilex{D\var{time}} Waits for \var{time} seconds before continuing execution.
+\item \apilex{I\var{condition}\var{consequent};} Executes \var{consequent} if \var{condition} is met.
+\item \apilex{I\var{condition}\var{consequent}E\var{alternate};} Executes \var{consequent} if \var{condition} is met, \var{alternate} otherwise.
+\item \apilex{K} Kicks all passengers (players not driving the train) off the train only when the train is stopped and its doors are open.
+\item \apilex{OC} Closes doors on both sides.
+\item \apilex{OL} Opens doors on the left side and closes doors on the right side (if open).
+\item \apilex{OR} Opens doors on the right side and closes doors on the left side (if open).
+\item \apilex{R} Reverses the train only when the train is not moving.
+\item \apilex{S\var{speed}} Accelerates to \var{speed} or roll if the train is faster then \var{speed}.
+\item \apilex{W} Waits until the target set by \texttt{S} or \texttt{B} command is reached.
+\end{apidoc}
+
+For the \texttt{B}, \texttt{D}, and \texttt{S} commands, the argument should be written immediately after the command, without any whitespace.
+
+The following \var{condition}s are available for the ATC \texttt{I} command:
+
+\begin{apidoc}{ATC conditions}
+\item \apilex{+} True when the train is driving in the same direction as the arrows on the ATC rail.
+\item \apilex{-} True when the train is driving in the opposite direction of the arrow on the ATC rail.
+\item \apilex{<\var{speed}} True when the train is slower than \var{speed}.
+\item \apilex{>\var{speed}} True when the train is faster than \var{speed}.
+\item \apilex{<=\var{speed}} True when the train is not faster than \var{speed}.
+\item \apilex{>=\var{speed}} True when the train is not slower than \var{speed}.
+\end{apidoc}
+
+\subsection{LZB}\label{s:lzb}
+
+\fbox{\parbox{\textwidth}{The explanation of LZB is specific to \advtrains. Please refer to other sources, such as Wikipedia, for information on the use of LZB in real-life rail lines.}}
+
+In \advtrains, LZB is a system that makes sure that trains realistically brake to the desired speed, overriding ATC and manual control if necessary.
+
+LZB speed targets are temporary and associated to a specific point - it only makes sure that the front part of the train passes that point at the desired speed. For example, a point speed restriction rail with a speed target of 3 will only make sure that the front of the train passes the PSR rail at the speed of 3, but the train is allowed to accelerate up to the speed limit (or the maximum speed, if there is no speed limit) after the head of the train passes the PSR rail.
+
+\subsection{ARS}
+Signals using ARS will select the appropriate route for the train only if ARS is also enabled on the train. This mode is enabled by default. This feature is mainly used by station tracks, which disables ARS for the train when it arrives at the station and re-enables ARS before departure.
+
+\subsection{Autocouple mode}
+If enabled, the train automatically couples with any train it collides with. This mode is disabled by default.
+
+Historically, a train would also automatically couple with any train is collides with. This behavior was changed with the introduction of the autocouple mode.
+
+\subsection{Shunt mode}
+This mode restricts the velocity of the train to 6m/s and, allows a train to proceed past a signal at danger if the signal allows the train to proceed in shunt mode. It is disabled by default and automatically enabled when the train reverses in an interlocked section.
+
+%%% Local Variables:
+%%% TeX-master: "a4manual"
+%%% End:

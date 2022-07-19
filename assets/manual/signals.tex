@@ -1,0 +1,135 @@
+\section{Signals}\label{s:signals}
+Signals are devices that give trains certain instructions and/or impose certain limitations on trains. \advtrains{} comes with a few signals, which are explained in the corresponding sections.
+
+\subsection{Types of speed restrictions}\label{s:srtypes}
+There are a few types of speed restrictions that a signal can give. These speed restrictions are independent of each other, and the strictest restriction is chosen as the speed restriction of the train. The speed restrictions need to be set by the specific signs that do so - every signal can only set (and lift) one type of speed restriction and do not affect other speed restrictions. The naming of the speed restriction types are mainly aesthetic and does not give any particular information for \advtrains{} - in real life, these are mainly informative for the driver.
+
+The following types of speed restrictions are used by signals in \advtrains{}:
+
+\begin{apidoc}{speed restriction type}
+\item \apiterm{Permanent (``main'') speed restriction (\texttt{main})} The default type of speed restriction. This one is most commonly given by signal lights.
+\item \apiterm{Temporary speed restriction (\texttt{temp})} Speed restrictions that are temporarily set up, such as near construction sites.
+\item \apiterm{Line speed restriction (\texttt{line})} Speed restriction that applies to the entire rail line.
+\end{apidoc}
+
+The following is an example of a train running with speed restrictions. You may want to read the section on German signal signs first.
+\begin{itemize}
+\item The train starts without any speed restriction.
+\item The train drives past a Lf 1/2 sign with a speed restriction of 8. The train now has a speed restriction of 8.
+\item The train drives past a Ks 1 with the Zs 3 indicator showing 12. The train now has a main speed restriction of 12 and a temporary speed restriction of 8, so the train still has a speed restriction of 8.
+\item The train drives past a Lf 3 sign. The temporary speed restriction is lifted, and the train now has a speed restriction of 12, set by the main speed restriction (described above).
+\item The train drives past a Zs 10 sign. The main speed restriction is lifted, and the train now has no speed restriction.
+\end{itemize}
+
+\subsection{Basic signals}
+The core mod of \advtrains{} comes with wallmounted signals and a signal with two lights. These signals can only stop the train and lift the main speed restriction of the train.
+
+\subsection{Demo signals}
+The demo signals are provided by the \texttt{advtrains\_interlocking} mod. It is similar to the basic signals described above but have three states instead of two.
+\begin{apidoc}{Signal aspects!Demo signals}
+\item \apiasp{Danger} Red light: Stop.
+\item \apiasp{Free} Green light: Proceed at maximum speed.
+\item \apiasp{Slow} Yellow light: Proceed with the speed limit of 6m/s.
+\end{apidoc}
+
+Demo signals do not allow trains in shunt mode to pass through.
+
+\subsection{German signals}
+The \texttt{advtrains\_signals\_ks} mod provides a set of signals used in Germany, including (but not limited to) Ks signals that the mod gets its name from.
+
+Due to historical reasons, the phrases \textit{ex-DB} and \textit{ex-DR} refer to the former Deutsche Bundesbahn (West Germany) and Deutsche Reichsbahn (East Germany) respectively.
+
+The signal placement conventions assume right-hand traffic.
+
+\subsubsection{Ks signals}
+Ks signals are combined signals that combines the features of main signals and distant signals. The system was developed by the Deutsche Bahn AG after the Deutsche Bundesbahn in West Germany and the Deutsche Reichsbahn in East Germany merged, and the goal was to replace the other four signaling system in use in Germany, which still exist today.
+
+A real-life Ks signal looks similar to this:
+\begin{centeredtikzpicture}
+  \pic at (0,0) {Ks signal};
+\end{centeredtikzpicture}
+
+Ks signals in \advtrains{} have the following aspects:
+\begin{apidoc}{Signal aspects!Ks signals}
+\item \apiasp{Hp 0} Red light: Stop.
+  \begin{centeredtikzpicture}
+    \pic at (0,0) {Ks signal Hp 0};
+  \end{centeredtikzpicture}
+\item \apiasp{Ks 1} Green light: Proceed at maximum speed or with the speed limit shown on the Zs 3 indicator on the main signal (if present) and expect to pass the next main signal at maximum speed or, if the green light is flashing, with the speed limit shown on the Zs 3v indicator directly below the main signal.
+  \begin{centeredtikzpicture}
+    \pic at (0,0) {Ks signal Ks 1};
+  \end{centeredtikzpicture}
+\item \apiasp{Ks 2} Yellow light: Proceed at maximum speed or with the speed limit shown on the Zs 3 indicator on the main signal (if present) and expect to stop at the next main signal.
+  \begin{centeredtikzpicture}
+    \pic at (0,0) {Ks signal Ks 2};
+  \end{centeredtikzpicture}
+\end{apidoc}
+
+In addition, Sh 1 (see below) may also appear along with Hp 0:
+\begin{centeredtikzpicture}
+  \pic at (0,0) {Ks signal Hp 0 with Sh 1};
+\end{centeredtikzpicture}
+In this case, the train proceeds in shunt mode.
+
+\subsubsection{Shunt signals}
+\begin{apidoc}{Signal aspects!Shunt signals}
+\item \apiasp{Sh 0} Two horizontally aligned red lights: Stop.
+  \begin{centeredtikzpicture}
+    \pic at (0,0) {shunt signal Sh 0};
+  \end{centeredtikzpicture}
+\item \apiasp{Sh 1/(ex-DR) Ra 12} Two white lights aligned on a slanted line: Shunting allowed.
+  \begin{centeredtikzpicture}
+    \pic at (0,0) {shunt signal Sh 1};
+  \end{centeredtikzpicture}
+\end{apidoc}
+
+\subsubsection{Signal signs}
+\advtrains{} has a few types of signal signs, which can be placed by the corresponding placers. The aspect of the signal sign can be adjusted with the trackworker, but only in the range limited by the placer.
+
+\begin{apidoc}{Signal aspects!Signal signs}
+\item \apiasp{Zs 3} White number on a black background: Proceed with the main speed restriction shown on the sign.
+  \begin{centeredtikzpicture}
+    \pic at (0,0) {signal sign Zs 3=3};
+  \end{centeredtikzpicture}
+\item \apiasp{Zs 10} An upward-pointing arrow: The speed restriction set by Zs 3 and regular signals is lifted.
+  \begin{centeredtikzpicture}
+    \pic at (0,0) {signal sign Zs 10};
+  \end{centeredtikzpicture}
+\item \apiasp{(ex-DR) Lf 1/2} Black number on an orange background: Proceed with the temporary speed restriction shown on the sign.
+  \begin{centeredtikzpicture}
+    \pic at (0,0) {signal sign Lf 1 and 2=10};
+  \end{centeredtikzpicture}
+\item \apiasp{Lf 3} Black ``E'' on a white background: The temporary speed restriction set by Lf 1/2 is lifted.
+  \begin{centeredtikzpicture}
+    \pic at (0,0) {signal sign Lf 3};
+  \end{centeredtikzpicture}
+\item \apiasp{Lf 7} Black number on a white background: Proceed with the line speed restriction shown on the sign.
+  \begin{centeredtikzpicture}
+    \pic at (0,0) {signal sign Lf 7=6};
+  \end{centeredtikzpicture}
+\item \apiasp{Ra 10} The text ``Halt für Rangierfahrten'' on a white semicircle: Do not proceed if the train is in shunt mode. This signal is conventionally placed on the left side of the track.
+  \begin{centeredtikzpicture}
+    \pic at (0,0) {signal sign Ra 10};
+  \end{centeredtikzpicture}
+\item \apiasp{PAM} The text ``S'' below a green arrow: Proceed without shunt mode. This sign does not have a real-life counterpart.
+  \begin{centeredtikzpicture}
+    \pic at (0,0) {signal sign PAM};
+  \end{centeredtikzpicture}
+\end{apidoc}
+
+\subsubsection{Differences from real-life signals}
+The signal book at \url{https://www.bahnstatistik.de/Signale_pdf/SB-DBAG.pdf} is used for reference. This list is not comprehensive.
+\begin{itemize}
+\item The speed is indicated in m/s instead of multiples of 10km/h.
+\item Certain visual effects, such as making signal signs reflective or lit at night, are not implemented.
+\item Distant signaling is not implemented.
+\item The location of most signals are not checked. The location of the mounted Zs 3(v) indicators are checked relative to the main signal.
+\item The shunt signals described in this chapter are actually called \textit{Schutzsignale}. The word \textit{Rangiersignale} refers to a different set of signals (including acoustic signals) given by the person specifically responsible for train shunting.
+\item The ex-DB definition of Sh 1 is that the track section ahead is clear and does not imply that the driver is allowed to proceed. The driver is expected to ask for permission before proceeding.
+\item Distant signal signs (Zs 3v, Lf 6) are currently not available.
+\item The Lf 1/2 signal is no longer set up in new rail lines in real life. Lf 1 (expect temporary speed restriction) and Lf 2 (beginning of temporary speed restriction) are used instead.
+\end{itemize}
+
+%%% Local Variables:
+%%% TeX-master: "a4manual"
+%%% End:

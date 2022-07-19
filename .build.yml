@@ -19,7 +19,7 @@ sources :
 - https://git.sr.ht/~gpcf/advtrains
 artifacts:
 - .minetest/mods/advtrains/assets/manual/acceleration-distance.pdf
-- .minetest/mods/advtrains/assets/manual/manual.pdf
+- .minetest/mods/advtrains/assets/manual/a4manual.pdf
 - .minetest/mods/advtrains/assets/manual/a5manual.pdf
 - .minetest/mods/advtrains/assets/manuals.tar.xz
 
@@ -62,13 +62,12 @@ tasks:
     ~/bin/minetestserver --port 31111 --gameid minetest_game --config ~/minetest.conf --world ~/.minetest/worlds/advtrains_testworld
 - generate_documentation: |
     cd ~/.minetest/mods/advtrains/assets/manual
-    sed -E '5s/a4paper/a5paper/' manual.tex > a5manual.tex
-    for i in manual.tex a5manual.tex; do
+    for i in a4manual.tex a5manual.tex; do
         for run in {1..2}; do
             pdflatex -interaction=nonstopmode -halt-on-error -output-format=pdf $i
         done
     done
-    make4ht -f 'html5+tidy' manual.tex
+    make4ht -f 'html5+tidy' a4manual.tex
     for i in acceleration-distance.ps; do
         ps2pdf $i
     done

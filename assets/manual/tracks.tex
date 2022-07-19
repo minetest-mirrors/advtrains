@@ -1,0 +1,152 @@
+\part{User Guide}
+\section{Tracks}
+
+\subsection{Angles}
+
+Unlike regular carts in Minetest, tracks can connect in 16 cardinal directions instead of four:
+
+\begin{centeredtikzpicture}
+  \draw[step=1,gray,very thin] (0,0) grid (5,5);
+  \def\dirs{
+    0/1,1/2,1/1,2/1,1/0,2/-1,1/-1,1/-2,
+    0/-1,-1/-2,-1/-1,-2/-1,-1/0,-2/1,-1/1,-1/2
+  }
+  \foreach \dx/\dy in \dirs {
+    \draw[pattern or line fill,shift={(\dx,\dy)}] (2,2) rectangle +(1,1);
+  }
+  \foreach \dx/\dy in \dirs {
+    \draw[very thick,->] (2.5,2.5) -- +(\dx,\dy);
+  }
+  \node[circle,draw=black,fill=white,text=black] at (2.5,2.5) {A};
+\end{centeredtikzpicture}
+
+In the figure above, the filled squares show possible connections from the track at A.
+
+Tracks that are not axis-aligned are sometimes referred to as 30\textdegree{} (although it is technically $\arcsin 0.5$) or 45\textdegree{} tracks. However, the specific meaning of the terms may depend on the context of the discussion.
+
+The use of 16 cardinal directions instead of four allows the creation of curves that are more realistic than their counterparts made using minecart rails. A typical 90\textdegree{} curve looks like this:
+
+\begin{centeredtikzpicture}
+  \draw[step=1,gray,very thin] (0,0) grid (6,6);
+  \foreach \x/\y in {0/0,0/1,1/3,2/4,4/5,5/5} {
+    \draw[pattern or line fill] (\x,\y) rectangle +(1,1);
+  }
+  \draw[<->,very thick] (0.5,0.5) -- ++(0,1) -- ++(1,2) -- ++(1,1) -- ++(2,1) -- ++(1,0);
+\end{centeredtikzpicture}
+
+However, this is still notably smaller than in real life. For comparison, the smallest curve for the H0 model (1:87) has a radius of 360mm, which is 31.32m when scaled to real life.
+
+\subsection{Track placement}
+
+The usual way of placing a track is with a ``track placer'', a tool that places the tracks and, in many cases, automatically adjusts them to connect to nearby tracks.
+
+You can get track placers from the creative inventory or by crafting. Please refer to the crafting guide for the recipe.
+
+To place the track, simply right click the node to place the track on with the trace placer. To place slopes, face the upper end of the slope and click on the $n$th node before the upper end of the slope for a slope with an incline of $1/n$. For example, if you want to build a slope with an incline of 50\% (the slope marked gray), you would look at node A and click on node B while standing in such a way that the direction you are looking at is also the direction in which the slope goes up (e.g. at node P):
+\begin{centeredtikzpicture}
+  \draw[step=1,gray!50!white,thin] (-2,0) grid (3,2);
+  \draw[fill=black!40!gray] (0,1) -- ++(2,0) -- ++(0,1) -- cycle;
+  \foreach \x/\y/\l in {0/0/B,1/0/,2/1/A}{
+    \draw[fill=cyan] (\x,\y) rectangle +(1,1);
+    \node[text=black,shift={(0.5,0.5)}] at (\x,\y) {\l};
+  }
+  \node[text=black] at (-1.5,1.5) {P};
+\end{centeredtikzpicture}
+
+Please note that, in the figure above, the three colored nodes must already be placed.
+
+\subsection{Track adjustment}
+You can use a trackworker to make certain adjustments to tracks. Specifically,
+\begin{itemize}
+\item Left-clicking on a track with the trackworker toggles between the variants of the particular track, if any.
+\item Right-clicking on a track with the trackworker rotates the track counterclockwise.
+\end{itemize}
+
+Typical examples of ``variants'' of tracks include turnouts and curves. Please note that Y-turnouts and different types of crossings have their own variants. These variants are described below. Additionally, special tracks (ATC track, station tracks, etc.) are usually only straight, and certain mods that provide additional tracks (e.g. linetrack) may not provide a full set of tracks available in the official track set.
+
+\subsection{Turnouts}
+Turnouts are tracks that connect tracks from more than one direction. Some examples of turnouts are shown below.
+
+\begin{centeredtikzpicture}
+  \draw[step=1,gray,thin,shift={(-0.5,-0.5)}] (0,0) grid (10,4);
+  \def\turnouts{
+    1/{0/-1, 0/1, -1/2},
+    2/{0/-1, 0/1, 1/2},
+    5/{0/-1, -1/2, 1/2},
+    8/{0/-1, 0/1, -1/2, 1/2},
+  }
+  \foreach \base/\dirs in \turnouts {
+    \draw[->, very thick] (\base,1) -- +(0,-1);
+    \foreach \dx/\dy in \dirs {
+      \draw[->, very thick] (\base,1) -- +(\dx,\dy);
+    }
+  }
+\end{centeredtikzpicture}
+
+The figure above aligns the tracks in a way that they always merge into the track that connects to the south. This is mainly done for intuitivity - you can rotate the turnouts freely in any of the 16 directions.
+
+\subsection{Crossings}\label{s:xings}
+There are a few crossing nodes that allow you to create intersections:
+\begin{itemize}
+\item Perpendicular crossings: intersections where two tracks are perpendicular to each other
+\item $90^\circ+x$ crossings: intersections where only one of the two tracks is axis-aligned
+\item diagonal crossings: other crossings that do not fit in the two categories mentioned above
+\end{itemize}
+
+Each type of crossing has its own track placer. The trackworker can not be used to switch between the different types of crossing tracks.
+
+The figure below shows a few examples of crossings that are available.
+\begin{centeredtikzpicture}[scale=0.9]
+  \draw[gray,thin, shift={(-0.5,-0.5)}] (0,0) grid (11,11);
+  \def\xings{
+    2/2/1/2/2/1,
+    2/8/2/1/1/-2,
+    8/1/2/1/1/0,
+    8/5/2/1/2/-1,
+    8/9/2/1/1/-1
+  }
+  \foreach \x/\y/\ax/\ay/\bx/\by in \xings {
+    \foreach \dx/\dy in {\ax/\ay,\bx/\by} {
+      \draw [<->, very thick] ($(\x,\y)-(\dx,\dy)$) -- +($2*(\dx,\dy)$);
+    }
+  }
+\end{centeredtikzpicture}
+
+It is also possible to create track layouts without using crossings. Some examples are shown below.
+
+\begin{centeredtikzpicture}[scale=0.9]
+  \draw[gray,thin, shift={(-0.5,-0.5)}] (0,0) grid (12,4);
+  \def\lines{
+    0/0/3/3,0/3/3/0,
+    5/0/11/3,6/3/9/0
+  }
+  \def\squares{
+    0/0,1/1,2/2,3/3,0/3,1/2,2/1,3/0,
+    5/0,7/1,9/2,11/3,6/3,7/2,8/1,9/0
+  }
+  \foreach \x/\y in \squares {
+    \draw [pattern or line fill,shift={(-0.5,-0.5)}] (\x,\y) rectangle +(1,1);
+  }
+  \foreach \ax/\ay/\bx/\by in \lines {
+    \draw [<->, very thick] (\ax,\ay) -- (\bx,\by);
+  }
+\end{centeredtikzpicture}
+
+Exercise: Build a T junction. You will need this later in section \ref{s:iljunctions}. You can also look at the scheme in that section if you need a hint.
+
+\subsection{Special tracks}
+
+\advtrains{} also have a few special tracks, some of which are explain in their own sections.
+
+\begin{apidoc}{Special tracks}
+\item \apiitem{ATC track} Track that sends ATC commands to a train (see section \ref{s:atc} for more information)
+\item \apiitem{Loading track} Track that makes a train load as many items as possible from a chest below the track if the train is moving in the direction indicated by the arrow on the track at a speed lower than 2m/s.
+\item \apiitem{Unloading track} Track that makes a train unload as many items as possible into a chest below the track if the train is moving in the direction indicated by the arrow on the track at a speed lower than 2m/s.
+\item \apiitem{Temporary speed restriction rail} Track that forces a train to pass with an arbitrary speed limit.
+\item \apiitem{Station track} Track that makes trains temporarily stop at a given point (see section \ref{s:stoprail} for more information)
+\item \apiitem{LuaATC track} Track that can be programmed in Lua (see section \ref{s:luaatc} for more information).
+\end{apidoc}
+
+%%% Local Variables:
+%%% TeX-master: "a4manual"
+%%% End:

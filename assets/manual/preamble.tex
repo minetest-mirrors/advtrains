@@ -1,0 +1,202 @@
+\ifdefined\HCode
+  \def\pgfsysdriver{pgfsys-dvisvgm4ht.def} % for HTML output
+\fi
+
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\ifx\HCode\undefined
+\usepackage{beton}
+\usepackage{eulervm}
+\fi
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1ex}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{amsmath,amssymb,siunitx}
+\usepackage[x11names,svgnames]{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{arrows,backgrounds,calc,patterns,shapes.geometric}
+
+\usepackage{imakeidx}
+\makeindex[columns=1,title=Alphabetical Index,intoc]
+
+% Font substitution: taken from https://ctan.org/tex-archive/macros/latex/contrib/beton/beton.pdf
+\ifx\HCode\undefined
+\AtBeginDocument{
+  \DeclareFontShape\encodingdefault{ccr}{bx}{n}{<->sub*cmss/sbc/n}{}
+  \DeclareFontShape\encodingdefault{ccr}{bx}{it}{<->sub*cmss/sbc/it}{}
+  \DeclareFontShape\encodingdefault{ccr}{bx}{sl}{<->sub*cmss/sbc/sl}{}
+  \DeclareFontShape\encodingdefault{ccr}{bx}{sc}{<->sub*cmss/sbc/sc}{}
+}
+\fi
+
+\lstdefinestyle{luastyle}{
+  language=[5.1]Lua,
+  basicstyle=\ttfamily,
+  columns=spaceflexible,
+  tabsize=2
+}
+
+\ifdefined\HCode
+\newcommand{\var}[1]{$\langle$\texttt{#1}$\rangle$}
+\newcommand{\varnth}[2]{\var{#1\HCode{<sub>}#2\HCode{</sub>}}}
+\newcommand{\ovar}[1]{$[\langle$\texttt{#1}$\rangle]$}
+\else
+\newcommand{\var}[1]{$\mathit{\langle}$\textrm{\textmd{\textit{#1}}}$\mathit{\rangle}$}
+\newcommand{\varnth}[2]{\var{#1$_{#2}$}}
+\newcommand{\ovar}[1]{$\mathit{[\langle}$\textrm{\textmd{\textit{#1}}}$\mathit{\rangle]}$}
+\fi
+
+\newcommand{\varzero}[1]{\varnth{#1}{0}}
+\newcommand{\vari}[1]{\varnth{#1}{1}}
+\newcommand{\varii}[1]{\varnth{#1}{2}}
+
+\def\luatrue{\texttt{true}}
+\def\luafalse{\texttt{false}}
+\def\luanil{\texttt{nil}}
+\def\luanan{\texttt{nan}}
+\def\advtrains{\textsc{advtrains}}
+
+\newenvironment{centeredtikzpicture}[1][]{
+  \begin{center}
+    \begin{tikzpicture}[#1]
+    }{
+    \end{tikzpicture}
+  \end{center}
+}
+
+\newenvironment{apidoc}[1]{
+  \begin{list}{}{
+  \setlength{\labelwidth}{0pt}
+  \setlength{\labelsep}{0pt}
+  \setlength{\leftmargin}{0pt}
+  \setlength{\listparindent}{1em}
+}
+\index{#1}
+\ifdefined\HCode
+\providecommand{\apientp}[2]{\HCode{<br/>}##1\HCode{<span style="float:right">}##2\HCode{</span><br/>}}
+\else
+\providecommand{\apientp}[2]{##1\hfill {##2}\par}
+\fi
+\providecommand{\apient}[2]{\apientp{##1}{##2}\index{##1}}
+\providecommand{\apip}[2]{\apientp{\texttt{##1}}{##2}}
+\providecommand{\api}[2]{\apient{\texttt{##1}}{##2}}
+\providecommand{\apiasp}[1]{\apientp{##1}{signal aspect}\index{#1!##1}}
+\providecommand{\apicmd}[1]{\api{##1}{command}}
+\providecommand{\apienum}[1]{\apip{##1}{enumeration}}
+\providecommand{\apifield}[1]{\apip{##1}{field}}
+\providecommand{\apiitem}[1]{\apient{##1}{item}}
+\providecommand{\apivar}[1]{\apip{##1}{variable}\index{#1!\texttt{##1}}}
+\providecommand{\apifunc}[2]{\apip{##1(##2)}{function}\index{#1!\texttt{##1}}}
+\providecommand{\apilex}[1]{\apip{##1}{lexical syntax}}
+\providecommand{\apipat}[1]{\apip{##1}{pattern}}
+\providecommand{\apiterm}[1]{\apient{##1}{term}}
+\providecommand{\apitrainmode}[1]{\apient{##1}{train mode}}
+\providecommand{\apiui}[1]{\apientp{##1}{UI element}}
+}{\end{list}}
+
+\tikzset{
+  signal/.pic = {
+    \draw (0,0) -- (0,0.2) -- (0.15,0.2);
+    \draw [fill=#1] (0.15,0.2) circle [radius=0.05];
+  },
+  tcb/.pic = {
+    \draw (0,0) -- (0,0.2);
+    \draw [<->] (-0.15,0.2) -- (0.15,0.2);
+  },
+  Ks signal/.pic = {
+    \fill[black] (-1,-1.3) rectangle (1,1.6);
+    \fill[gray] (-0.7,1.3) circle [radius=0.1];
+    \fill[gray] (0,1) circle [radius=0.2];
+    \fill[gray] (-0.4,0.2) circle [radius=0.2];
+    \fill[gray] (0.4,0.2) circle [radius=0.2];
+    \foreach \x in {-0.3,0,0.3} {
+      \fill[gray] (\x,-0.5) circle [radius=0.1];
+    }
+    \foreach \x in {-0.3,0} {
+      \fill[gray] (\x,-0.8) circle [radius=0.1];
+    }
+  },
+  Ks signal Hp 0/.pic = {
+    \pic at (0,0) {Ks signal};
+    \fill[red] (0,1) circle [radius=0.2];
+  },
+  Ks signal Hp 0 with Sh 1/.pic = {
+    \pic at (0,0) {Ks signal Hp 0};
+    \foreach \x/\y in {0/-0.5,-0.3/-0.8} {
+      \fill[white] (\x,\y) circle [radius=0.1];
+    }
+  },
+  Ks signal Ks 1/.pic = {
+    \pic at (0,0) {Ks signal};
+    \fill[green] (-0.4,0.2) circle [radius=0.2];
+  },
+  Ks signal Ks 2/.pic = {
+    \pic at (0,0) {Ks signal};
+    \fill[orange] (0.4,0.2) circle [radius=0.2];
+  },
+  shunt signal/.pic = {
+    \fill[black] (-1,0) -- (-1,-1) -- (1,-1) -- (1,0) -- (0.5,0.5) -- (-0.5,0.5) -- cycle;
+    \fill[gray] (-0.5,0) circle [radius=0.1];
+    \fill[gray] (0.5,0) circle [radius=0.1];
+    \fill[gray] (-0.5,-0.7) circle [radius=0.1];
+    \fill[gray] (0.2,0) circle [radius=0.1];
+  },
+  shunt signal Sh 0/.pic = {
+    \pic at (0,0) {shunt signal};
+    \fill[red] (-0.5,0) circle [radius=0.1];
+    \fill[red] (0.5,0) circle [radius=0.1];
+  },
+  shunt signal Sh 1/.pic = {
+    \pic at (0,0) {shunt signal};
+    \fill[white] (-0.5,-0.7) circle [radius=0.1];
+    \fill[white] (0.2,0) circle [radius=0.1];
+  },
+  signal sign Zs 3/.pic = {
+    \node[fill=black,text=white,regular polygon,regular polygon sides=3,inner sep=0.5ex,shape border rotate=180] at (0,0) {\Huge #1};
+  },
+  signal sign Zs 10/.pic = {
+    \fill[black] (-1,-1) -- (0,0) -- (1,-1) -- (1,4) -- (0,5) -- (-1,4) -- cycle;
+    \fill[white] (-0.8,-0.6) -- (0,0.2) -- (0.8,-0.6) -- (0.8,4) -- (0,4.8) -- (-0.8,4) -- cycle;
+    \fill[black] (-0.6,-0.2) -- (0,0.4) -- (0.6,-0.2) -- (0.6,4) -- (0,4.6) -- (-0.6,4) -- cycle;
+  },
+  signal sign Lf 1 and 2/.pic = {
+    \draw[fill=orange] (-0.5,-0.75) rectangle (0.5,0.75);
+    \node at (0,0) {\Huge #1};
+  },
+  signal sign Lf 3/.pic = {
+    \draw (-0.5,-0.75) rectangle (0.5,0.75);
+    \node at (0,0) {\Huge E};
+  },
+  signal sign Lf 7/.pic = {
+    \draw (-0.5,-0.75) rectangle (0.5,0.75);
+    \node at (0,0) {\Huge #1};
+  },
+  signal sign Ra 10/.pic = {
+    \draw (-1.5,0) -- (1.5,0) arc [start angle=0, end angle=180, radius=1.5];
+    \node [above] at ($(0,0)+(0,2.4em)$) {\large Halt};
+    \node [above] at ($(0,0)+(0,1.2em)$) {für};
+    \node [above] at (0,0) {Rangierfahrten};
+  },
+  signal sign PAM/.pic = {
+    \draw (-0.5,-0.5) rectangle (0.5,1);
+    \node at (0,0) {\huge S};
+    \draw [green,->,very thick,line width=2pt] (0,0.4) -- (0,0.8);
+  }
+}
+\ifdefined\HCode
+\tikzset{
+  pattern or line fill/.style={fill=cyan}
+}
+\else
+\tikzset{
+  pattern or line fill/.style={pattern=north west lines,pattern color=gray}
+}
+\fi
+
+\title{The \advtrains{} mod for Minetest}
+\author{}
+
+%%% Local Variables:
+%%% TeX-master: "a4manual"
+%%% End:

@@ -1,0 +1,197 @@
+\section{LuaATC}\label{s:luaatc}
+
+LuaATC (sometimes also called \textit{atlatc} for \textit{Advtrains Lua ATC}) offers the ability to run Lua code. It is provided by the \texttt{advtrains\_luaautomation} mod.
+
+Players need the \texttt{atlatc} privilege to perform any operation with this mod (except punching operation panels to trigger an event). The Lua environment is only sandboxed with Lua's \texttt{pcall} and is therefore not protected against infinite loops or fork bombs. It is therefore advised to grant the privilege with care.
+
+In this chapter, an \textit{active component} is a LuaATC component that can run Lua code, triggered by specific events. A \textit{passive component} cannot perform actions on its own; its state can be read and set by active components or other players.
+
+\subsection{Environments}
+
+Each active component in LuaATC is assigned to an environment where all relevant information is held. Components in different environments cannot interfere with each other via LuaATC, but can communicate using other methods (e.g. digilines). The separation of LuaATC environments allows multiple systems to run simultaneously and independently without polluting each other's environment.
+
+The following chat commands are available. These commands also require the \texttt{atlatc} privilege.
+
+\begin{apidoc}{LuaATC}
+\item \apicmd{/env\_create \var{name}} Create an environment named \var{name}. Please choose the name wisely, as you can't rename environments without deleting and recreating the environment.
+\item \apicmd{/env\_setup \var{name}} Edit the initialization code for the environment named \var{name}. You can also delete the environment from the editor or re-run the init code.
+\item \apicmd{/env\_subscribe \var{name}} Subscribe to the environment named \var{name}.
+\item \apicmd{/env\_unsubscribe \var{name}} Unsubscribe from the environment named \var{name}.
+\item \apicmd{/env\_subscriptions \ovar{name}} List your subscriptions or, if \var{name} is provided, list the players subscribed to the environment named \var{name}.
+\end{apidoc}
+
+After subscribing to an environment, you will receive messages related to the environment.
+
+Each environment can contain some \textit{initialization code} (called \textit{init code} for short). The initialization code is run every time the server starts or when the ``Run InitCode'' button in the init code editor is clicked. Please note that you need to click the button to apply the changes to the init code.
+
+The init code is typically used to add functions shared among LuaATC components.
+
+\subsection{LuaATC components}
+\begin{apidoc}{LuaATC!Component}
+\item \apiitem{LuaATC track} Tracks that can execute LuaATC code.
+\item \apiitem{LuaATC operator panel} Simple node that can execute LuaATC code (similar to Luacontrollers in the mesecons modpack).
+\end{apidoc}
+
+\subsection{Standard Lua variables}
+The following standard Lua libraries are available:
+\begin{itemize} \ttfamily
+\item math
+\item os
+\item string
+\item table
+\end{itemize}
+
+Please note that the libraries mentioned above are still limited to the ones in Minetest's own sandbox. Certain function-specific modifications may exist for safety reasons.
+
+The following standard Lua functions are available:
+\begin{itemize} \ttfamily
+\item assert
+\item error
+\item ipairs
+\item next
+\item pairs
+\item select
+\item tonumber
+\item tostring
+\item type
+\item unpack
+\end{itemize}
+
+It is an error to globally override the provided Lua library functions.
+
+\subsection{Environment-specific variables}
+\begin{apidoc}{LuaATC}
+\item \apivar{F} Global table shared between all components of the environment. The content of this table is discarded on server shutdown or execution of the init code. Functions are allowed in the table.
+\item \apivar{S} Global table persistently shared between all components of the environment. This variable may not contain functions. The existence of certain patterns in this table may violate implementation restrictions.
+\end{apidoc}
+
+\subsection{LuaATC helpers}
+\begin{apidoc}{LuaATC}
+\item \apifunc{POS}{\var{x},\var{y},\var{z}} Returns a position vector of the form \texttt{\{x=\var{x}, y=\var{y}, z=\var{z}\}}.
+\end{apidoc}
+
+\subsection{Passive components}\index{LuaATC!Passive components}
+The \var{pos} arguments in this section accept a position vector or the name of a passive component.
+\begin{apidoc}{LuaATC}
+\item \apifunc{getstate}{\var{pos}} Returns the state of the passive component at \var{pos}.
+\item \apifunc{setstate}{\var{pos},\var{state}} Sets the state of the passive component at \var{pos} to \var{state}.
+\item \apifunc{is\_passive}{\var{pos}} Returns a boolean indicating whether a passive component exists at \var{pos} and whether \var{pos} is a name of an existing passive component.
+\end{apidoc}
+
+The basic light signals provided by \advtrains{} (the ones that can only show red or green) can be accessed with this API. The following \var{state}s are accepted:
+\begin{apidoc}{LuaATC!Passive components!Basic light signals}
+\item \apienum{green} The signal shows a green light.
+\item \apienum{red} The signal shows a red light.
+\end{apidoc}
+
+Two-way turnouts with one straight direction accept the following \var{state}s:
+\begin{apidoc}{LuaATC!Passive components!Two-way turnouts}
+\item \apienum{st} The turnout lets the train continue in the direction that can be reached with a straight track.
+\item \apienum{cr} The turnout lets the train continue in the direction that needs to be reached with a curve.
+\end{apidoc}
+
+The Y-shaped and three-way turnouts can have a few \var{state}s, looking from the convergence point:
+\begin{apidoc}{LuaATC!Passive components!Y-/three-way turnouts}
+\item \apienum{l} The turnout points to the left.
+\item \apienum{c} The turnout is straight (three-way turnouts only).
+\item \apienum{r} The turnout points to the right.
+\end{apidoc}
+
+Unprotected full-node mesecon switches and Andrew's crosses can have one of the following \var{state}s:
+\begin{apidoc}{LuaATC!Passive components!Switches}
+\item \apienum{off} The item is turned off.
+\item \apienum{on} The item is turned on.
+\end{apidoc}
+
+Passive components can be named using the passive component naming tool. Passive component names (as strings) can be used as coordinates, provided that the passive component with the name exists. Please note that the ``Signal Name'' field in the signal formspec is unrelated to the passive component name of the signal.
+
+\subsection{Interrupts}
+\begin{apidoc}{LuaATC}
+\item \apifunc{interrupt}{\var{time},\var{message}} Triggers an \texttt{int} event on this component after \var{time} seconds with \var{message} as the message. \var{Message} can be any Lua data type. This function is not available for the init code.
+\item \apifunc{interrupt\_safe}{\var{time},\var{message}} Like \texttt{interrupt}, but does not add an interrupt and when an interrupt of any type is present for this component. The return value is a boolean indicating whether the interrupt was successfully added.
+\item \apifunc{interrupt\_pos}{\var{pos},\var{message}} Immediately triggers an \texttt{ext\_int} event on the active component at \var{pos} with \var{message} passed like with \texttt{interrupt}. Please keep in mind that this function can be a source of a fork bomb.
+\item \apifunc{clear\_interrupts}{} Removes any pending interrupts of this node.
+\end{apidoc}
+
+\subsection{Diglines}
+\begin{apidoc}{LuaATC}
+\item \apifunc{digiline\_send}{\var{channel},\var{message}} Sends \var{message} to the digiline channel named \var{channel}. This function is only available for active components.
+\end{apidoc}
+
+\subsection{Interlocking}
+The following are available if \texttt{advtrains\_interlocking} is enabled.
+\begin{apidoc}{LuaATC}
+\item \apifunc{can\_set\_route}{\var{pos},\var{name}} Returns a boolean indicating whether the route named \var{name} of the signal at \var{pos} can be set.
+\item \apifunc{set\_route}{\var{pos},\var{name}} Sets the route named \var{name} of the signal at \var{pos}.
+\item \apifunc{cancel\_route}{\var{pos}} Cancels the route that is set from the signal at \var{pos}.
+\item \apifunc{get\_aspect}{\var{pos}} Returns the signal aspect of the signal at \var{pos}. Please refer to section \ref{s:sigasp} for the structure of signal aspect tables.
+\end{apidoc}
+
+\subsection{Railway time}
+the railway time API described in section \ref{s:tilrwt} is available in the \texttt{rwt} table.
+\begin{apidoc}{LuaATC}
+\item \apifunc{schedule}{\var{time},\var{message}} Triggers a \texttt{schedule} event at \var{time} with the message \var{message}. Only one event can be scheduled this way.
+\item \apifunc{schedule\_in}{\var{time},\var{message}} Like \texttt{schedule}, but \var{time} is given as the time until the event is triggered.
+\end{apidoc}
+
+\subsection{Train control}{LuaATC}
+These functions and variables described in this section are only available to LuaATC tracks. Exceptions are explicitly stated. These functions, except \texttt{atc\_send\_to\_train}, require that a reference to the train can be made, i.e. when a train is on (or passing) the track or when execution of the code takes place as part of the approach callback.
+\begin{apidoc}{LuaATC}
+\item \apivar{atc\_arrow} A boolean indicating whether the train is driving in the direction of the arrow indicated on the ATC track, or \luanil{} when there is no train.
+\item \apivar{atc\_id} A string containing the ID of the train, or \luanil{} if there is no train.
+\item \apifunc{atc\_reset}{} Resets the ATC command of the train or returns \luafalse{} if there is no train.
+\item \apifunc{atc\_send}{\var{command}} Sends the ATC command \var{command} to the train and returns a boolean indicating whether the ATC command is successfully set for the train.
+\item \apifunc{atc\_send\_to\_train}{\var{id},\var{command}} Sends the ATC command \var{command} to the train with the ID \var{id}. This function is not limited to LuaATC tracks.
+\item \apifunc{atc\_set\_ars\_disable}{\var{bool}} Disables ARS for the train when \var{bool} is \luatrue{}; enables ARS for the train when \var{bool} is \luafalse{}.
+\item \apifunc{atc\_set\_text\_inside}{\var{text}} Sets \var{text} as the text shown on the inside of the train.
+\item \apifunc{atc\_set\_text\_outside}{\var{text}} Sets \var{text} as the text shown on the outside of the train.
+\item \apifunc{get\_line}{} Returns the line name of the train.
+\item \apifunc{get\_rc}{} Returns the routing code of the train.
+\item \apifunc{set\_line}{\var{text}} Sets \var{text} as the line name of the train.
+\item \apifunc{set\_rc}{\var{text}} Sets \var{text} as the routing code of the train.
+\item \apifunc{train\_length}{} Returns the number of wagons in the train.
+\end{apidoc}
+
+\subsubsection{Shunting and freight code}\label{s:freightcode}
+Freight codes are delimited with exclamation marks (\texttt{!}).
+\begin{apidoc}{LuaATC}
+\item \apifunc{set\_autocouple}{} Enables autocouple mode for the train.
+\item \apifunc{unset\_autocouple}{} Disables autocouple mode for the train.
+\item \apifunc{split\_at\_fc}{\var{command},\var{len}} Like \texttt{split\_at\_index}, but the train is split in a way that all wagons in the first part of the train have an empty freight code or the same freight code. \var{Len} specifies the maximum length of the first part of the train. The freight code of the wagons of the first part is returned.
+\item \apifunc{split\_at\_index}{\var{index},\var{command}} Splits the train at \var{index}, where all wagons with an index greater than or equal to \var{index} are in the second train, and sends the ATC command \var{command} to the second train.
+\item \apifunc{split\_off\_locomotive}{\var{command},\var{len}} Like \texttt{split\_at\_fc}, but the train is split in a way that the locomotives at the beginning of the train make up the first part of the train.
+\item \apifunc{step\_fc}{} Steps the freight codes of all wagos forward. The first code is selected if the end of the freight code string is reached, unless the string ends with a question mark (\texttt{?}), in which case the order of the freight code is reversed.
+\end{apidoc}
+
+\subsection{Events}
+The event table is passed as the \texttt{event} global variable when an event is triggered. The \texttt{type} field of the event is a string indicating the type of the event, and the field indexed by the event type string includes the \luatrue{} constant. Additional fields may be provided, depending on the event type.
+
+The following events are available in LuaATC:
+\begin{apidoc}{LuaATC!Event types}
+\item \apienum{approach} Triggered when a train approaches the track. This event can be triggered multiple times for the same train.
+\item \apienum{digiline} Like \texttt{int} (see below), but triggered with digiline. The channel and message are included in the \texttt{channel} and \texttt{message} fields, respectively.
+\item \apienum{ext\_int} Like \texttt{int} (see below), but triggered when the interrupt is called by a different active component. The message is only included in the \texttt{message} field.
+\item \apienum{int} Triggered by a call to \texttt{interrupt}. The message is included in the \texttt{msg} and (supposedly for backward compatibility) \texttt{message} fields.
+\item \apienum{punch} Triggered when the LuaATC operator panel is punched.
+\item \apienum{schedule} Like \texttt{int}, but triggered by the scheduler instead. The message is included in the \texttt{msg} field.
+\item \apienum{train} Triggered when a train drives pass the LuaATC track. The event table contains an \texttt{id} field, which holds the train ID. This event is only available to LuaATC tracks.
+\end{apidoc}
+
+\subsubsection{Approach callback}
+This subsection is relevant to the \texttt{approach} event.
+\begin{apidoc}{LuaATC}
+\item \apifunc{atc\_set\_lzb\_tsr}{\var{speed}} Set the temporary speed restriction of the train to \var{speed} at the position of the track. This needs to be called every time the \texttt{approach} callback is triggered.
+\end{apidoc}
+Approach callbacks are executing during the train step. This may be problematic when performing actions with side effects on the environment that the train is in, such as switching turnouts or setting routes. It is encouraged to only run things that are necessary and defer everything else to an interrupt or a schedule.
+
+The following operations are safe in the approach callback:
+\begin{itemize}
+\item Anything related only to the LuaATC environment.
+\item Sending information via digilines.
+\item Setting the display text of the train.
+\item Using the functions specific to the \texttt{approach} event.
+\end{itemize}
+
+%%% Local Variables:
+%%% TeX-master: "a4manual"
+%%% End:
