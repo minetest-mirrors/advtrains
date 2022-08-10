@@ -19,16 +19,16 @@ add_filter {
 			for k, v in pairs(seealso) do
 				seealso[k] = v[1].text
 			end
-			blocks:insert(pandoc.Str(table.concat(seealso, ", ")))
+			blocks:insert(pandoc.Plain(table.concat(seealso, ", ")))
 		else
 			local list = {}
 			for _, i in ipairs(seealso) do
 				local page = i[1].text
 				local pgname, pgsection = string.match(page, "^([^%)]+)%(([^%)]+)%)$")
-				local item = pandoc.Str(page)
+				local item = pandoc.Plain(page)
 				if is_latex and pgname and pgsection then
 					pgname = pgname:gsub("_","\\string_")
-					item = pandoc.RawInline("latex", string.format("\\manref{%s}{%s}", pgname, pgsection))
+					item = pandoc.RawBlock("latex", string.format("\\manref{%s}{%s}", pgname, pgsection))
 				end
 				table.insert(list, item)
 			end
