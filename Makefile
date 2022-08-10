@@ -20,7 +20,7 @@ all: doc
 doc: doc-pdf doc-man
 
 doc-pdf: $(TEX_MAIN_DSTS)
-%.pdf:: %.tex $(MAN_TEX)
+%.pdf:: %.tex $(MAN_TEX) $(wildcard $(TEX_PATH)/*.tex)
 	$(LATEXMK) -cd -pdf $<
 
 doc-man: $(MAN_DSTS)
@@ -32,5 +32,5 @@ doc-man: $(MAN_DSTS)
 $(MAN_TEX): $(MAN_TEXS)
 	find $(MAN_PATH) -name '*.tex' -printf '\\input{../man/%P}\n' | sort > $(MAN_TEX)
 
-%.tex:: %.md
+%.tex:: %.md ${MANUAL_ROOT}/filter_man_md2tex.lua
 	$(PANDOC) -L ${MANUAL_ROOT}/filter_man_md2tex.lua -t latex -o $@ $<

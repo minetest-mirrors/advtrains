@@ -8,7 +8,10 @@ return {
 	},
 	{
 		Header = function(elem)
-			return pandoc.Header(elem.level+1, elem.content)
+			local attr = {
+				class = "unnumbered unlisted",
+			}
+			return pandoc.Header(elem.level+1, elem.content, attr)
 		end,
 	},
 	{
