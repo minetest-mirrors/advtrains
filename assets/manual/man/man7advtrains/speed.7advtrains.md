@@ -3,6 +3,7 @@ title: 'SPEED(7ADVTRAINS) | Advtrains Developer''s Manual'
 seealso:
 - speed_lessp(3advtrains)
 - speed_set_restriction(3advtrains)
+- signal_aspects(7advtrains)
 ---
 
 # NAME
