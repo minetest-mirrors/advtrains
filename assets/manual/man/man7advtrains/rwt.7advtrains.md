@@ -1,4 +1,11 @@
-% RWT(7ADVTRAINS) | Advtrains Developer's Manual
+---
+title: 'RWT(7ADVTRAINS) | Advtrains Developer''s Manual'
+seealso:
+- rwt_add(3advtrains)
+- rwt_copy(3advtrains)
+- rwt_last_rpt(3advtrains)
+- rwt_now(3advtrains)
+---
 
 # NAME
 `rwt` - Advtrains railway time

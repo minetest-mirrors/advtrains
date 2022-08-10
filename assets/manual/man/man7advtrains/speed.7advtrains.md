@@ -1,4 +1,9 @@
-% SPEED(7ADVTRAINS) | Advtrains Developer's Manual
+---
+title: 'SPEED(7ADVTRAINS) | Advtrains Developer''s Manual'
+seealso:
+- speed_lessp(3advtrains)
+- speed_set_restriction(3advtrains)
+---
 
 # NAME
 `speed` - Advtrains speed limit library

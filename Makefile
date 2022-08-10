@@ -9,6 +9,7 @@ MAN_PATH = $(MANUAL_ROOT)/man
 MAN_SRCS = $(wildcard $(MAN_PATH)/*/*.md)
 MAN_DSTS = $(MAN_SRCS:%.md=%)
 MAN_TEXS = $(MAN_SRCS:%.md=%.tex)
+MAN_FILTER = $(MANUAL_ROOT)/filter_man.lua
 
 TEX_PATH = $(MANUAL_ROOT)/tex
 MAN_TEX = $(TEX_PATH)/man.tex
@@ -26,11 +27,11 @@ doc-pdf: $(TEX_MAIN_DSTS)
 doc-man: $(MAN_DSTS)
 	find assets/manual/man -regex '.*/[^.]+\.[^.]+$$' | tar -cJf ${MANUAL_ROOT}/man.tar.xz -T -
 
-%:: %.md
-	$(PANDOC) -s -t man -o $@ $<
+%:: %.md ${MAN_FILTER}
+	$(PANDOC) -L ${MAN_FILTER} -s -t man -o $@ $<
 
 $(MAN_TEX): $(MAN_TEXS)
 	find $(MAN_PATH) -name '*.tex' -printf '\\input{../man/%P}\n' | sort > $(MAN_TEX)
 
-%.tex:: %.md ${MANUAL_ROOT}/filter_man_md2tex.lua
-	$(PANDOC) -L ${MANUAL_ROOT}/filter_man_md2tex.lua -t latex -o $@ $<
+%.tex:: %.md ${MAN_FILTER}
+	$(PANDOC) -L ${MAN_FILTER} -t latex -o $@ $<
