@@ -3,7 +3,7 @@
 \begin{tikzpicture}[remember picture,overlay]
   \newcommand{\HUGE}[1]{\scalebox{2}{\Huge #1}}
   \fill[Turquoise] (current page.south west) rectangle (current page.north east);
-  \node [below,inner sep=0,outer sep=0,name=coverimage] at (current page.north) {\includegraphics[width=2\paperwidth]{../../screenshot.png}};
+  \node [below,inner sep=0,outer sep=0,name=coverimage] at (current page.north) {\includegraphics[width=2\paperwidth]{screenshot.png}};
   \draw ($0.5*(coverimage.south)+0.5*(current page.south)$)
   +(0,0.5) node [above] {\HUGE{Advanced Trains}}
   +(0,-0.5) node [below] {\HUGE{for Minetest}};

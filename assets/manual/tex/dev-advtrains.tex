@@ -1,0 +1,36 @@
+\part{Developer's Manual}
+
+This part is mostly relevant only to those interested in working on internal mechanisms of \advtrains{} or making mods related to \advtrains{}. Please note that this part is still incomplete.
+
+\section{The \texttt{advtrains} table}\label{s:tadvtrains}
+
+\subsection{\texttt{advtrains.speed}}\label{s:tspeed}
+The \texttt{speed} library allows comparison of speed limits, which can be represented with:
+\begin{itemize}
+\item $v \geq 0$, which stands for a speed restriction of $v$.
+\item $-1$ or \luanil, which lifts the speed restriction.
+\end{itemize}
+The use of other values (in particular, \luanan{} and $\pm\infty$) may result in undefined behavior.
+
+Note that the meaning of \luanil{} here differ from the meaning used in signal aspect tables (see section \ref{s:sigasp}): \luanil{} lifts the speed limit instead of keeping it.
+
+For speed limits, it is said that $a < b$ if $a$ is more strict than $b$, and $a = b$ if $a$ and $b$ refer to the same speed limit.
+
+The following entries are present in \texttt{advtrains.speed}:
+
+\begin{apidoc}{\texttt{advtrains}!\texttt{speed}}
+\item \apifunc{lessp}{\var{a},\var{b}} Returns a boolean indicating whether $a < b$.
+\item \apifunc{greaterp}{\var{a},\var{b}} Returns a boolean indicating whether $a > b$.
+\item \apifunc{equalp}{\var{a},\var{b}} Returns a boolean indicating whether $a = b$.
+\item \apifunc{not\_lessp}{\var{a},\var{b}} Returns a boolean indicating whether $a \ge b$.
+\item \apifunc{not\_greaterp}{\var{a},\var{b}} Returns a boolean indicating whether $a \le b$.
+\item \apifunc{not\_equalp}{\var{a},\var{b}} Returns a boolean indicating whether $a \ne b$.
+\item \apifunc{min}{\var{a},\var{b}} Returns the strictest limit of \var{a} and \var{b}.
+\item \apifunc{max}{\var{a},\var{b}} Returns the less strict limit of \var{a} and \var{b}.
+\item \apifunc{set\_restriction}{\var{train},\var{type},\var{val}} Set speed restriction of type \var{type} of \var{train} to \var{val} and update the \texttt{speed\_restriction} field of \var{train} accordingly. \var{Type} defaults to \texttt{main}.
+\item \apifunc{merge\_aspect}{\var{train},\var{asp}} Merge the signal aspect \var{asp} into the speed restriction table of \var{train} and update the \texttt{speed\_restriction} field of \var{train} accordingly.
+\end{apidoc}
+
+%%% Local Variables:
+%%% TeX-master: "a4manual"
+%%% End:

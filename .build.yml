@@ -6,8 +6,7 @@ packages:
 - unzip
 - wget
 - lua-busted
-- dvisvgm
-- ghostscript
+- pandoc
 - texlive-extra-utils
 - texlive-latex-base
 - texlive-latex-extra
@@ -18,10 +17,9 @@ packages:
 sources :
 - https://git.sr.ht/~gpcf/advtrains
 artifacts:
-- .minetest/mods/advtrains/assets/manual/acceleration-distance.pdf
-- .minetest/mods/advtrains/assets/manual/a4manual.pdf
-- .minetest/mods/advtrains/assets/manual/a5manual.pdf
-- .minetest/mods/advtrains/assets/manuals.tar.xz
+- .minetest/mods/advtrains/assets/manual/tex/a4manual.pdf
+- .minetest/mods/advtrains/assets/manual/tex/a5manual.pdf
+- .minetest/mods/advtrains/assets/manual/man.tar.xz
 
 tasks:
 
@@ -61,15 +59,4 @@ tasks:
     echo "bind_address = 127.0.0.1" > minetest.conf
     ~/bin/minetestserver --port 31111 --gameid minetest_game --config ~/minetest.conf --world ~/.minetest/worlds/advtrains_testworld
 - generate_documentation: |
-    cd ~/.minetest/mods/advtrains/assets/manual
-    for i in a4manual.tex a5manual.tex; do
-        for run in {1..2}; do
-            pdflatex -interaction=nonstopmode -halt-on-error -output-format=pdf $i
-        done
-    done
-    make4ht -f 'html5+tidy' a4manual.tex
-    for i in acceleration-distance.ps; do
-        ps2pdf $i
-    done
-    cd ..
-    find ./manual -name '*.pdf' -o -name '*.svg' -o -name '*.html' -o -name '*.css' | tar -cJf manuals.tar.xz -T -
+    make -C ~/.minetest/mods/advtrains/ doc

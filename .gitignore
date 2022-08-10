@@ -1,9 +1,13 @@
 ## Eclipse project files & directories
 .project
 .settings
-assets/screenshot.png
-assets/manual/*
-!assets/manual/*.tex
-!assets/manual/*.ps
-!assets/manual/*.lua
-assets/manual/_region_*
+
+assets/manual/tex/*
+!assets/manual/tex/*.tex
+!assets/manual/tex/screenshot.png
+assets/manual/tex/man.tex
+assets/manual/tex/_region_*
+
+assets/manual/man/**/*.*
+!assets/manual/man/**/*.md
+assets/manual/man.tar.xz
