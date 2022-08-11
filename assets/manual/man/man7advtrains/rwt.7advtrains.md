@@ -1,5 +1,6 @@
 ---
-title: 'RWT(7ADVTRAINS) | Advtrains Developer''s Manual'
+title: 'rwt(7advtrains)'
+manual: 'Advtrains Developer''s Manual'
 seealso:
 - rwt_add(3advtrains)
 - rwt_copy(3advtrains)
@@ -7,10 +8,10 @@ seealso:
 - rwt_now(3advtrains)
 ---
 
-# NAME
+# Name
 `rwt` - Advtrains railway time
 
-# DESCRIPTION
+# Description
 Advtrains depends on Minetest's "dtime" for most operations, and may slow itself down when necessary to prevent unexpected behavior, such as in a situation with a significant amount of lag. As a result, the internal time used by Advtrains is not synchronized to real-life time due to lag and server restarts. Railway time was therefore introduced as a method of accurately measuring internal time and, with this information, implementing a scheduling system. It can, however, also be set up to keep in sync with real-life time.
 
 Railway time is counted in cycles, minutes, and seconds, roughly corresponding to their real-life counterparts, with cycles roughly corresponding to hours. For a valid railway time object, it is expected that

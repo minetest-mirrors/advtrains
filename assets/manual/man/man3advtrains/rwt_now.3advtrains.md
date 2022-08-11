@@ -1,7 +1,10 @@
-% RWT_NOW(3ADVTRAINS) | Advtrains Developer's Manual
+---
+title: 'rwt_now(3advtrains)'
+manual: 'Advtrains Developer''s Manual'
+---
 
-# NAME
+# Name
 `now` - Get the current railway time
 
-# DESCRIPTION
+# Description
 `now()` returns the current railway time as a table.

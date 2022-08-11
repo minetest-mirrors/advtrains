@@ -1,23 +1,24 @@
 ---
-title: 'NODE_DEFINITION(7ADVTRAINS) | Advtrains Developer''s Manual'
+title: 'node_definition(7advtrains)'
+manual: 'Advtrains Developer''s Manual'
 seealso:
 - signal_aspects(7advtrains)
 ---
 
-# NAME
+# Name
 `node_definition` - Advtrains-specific node definition entries
 
-# DESCRIPTION
+# Description
 This page describes various fields in node definition tables that are used by Advtrains.
 
-# NODE GROUPS
+# Node Groups
 Advtrains uses node groups to identify certain properties of a node. The following node groups are currently read by Advtrains:
 
 * `advtrains_signal`: When set, this property defines the type of signal this node belongs to. `1` indicates that this node is a static signal, and `2` indicates that this node is a signal with a variable aspect.
 * `not_blocking_trains`: When set to 1, trains can move through this node.
 * `save_in_at_nodedb`: When set to 1, this node should be saved in the internal node database used by Advtrains.
 
-# THE `advtrains` FIELD
+# The `advtrains` Field
 The `advtrains` field in the node definition may contain the following fields:
 
 * `get_aspect(pos, node)`: This function should return the signal aspect of the node at the given position.

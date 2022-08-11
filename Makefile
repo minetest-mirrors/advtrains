@@ -30,8 +30,8 @@ doc-man: $(MAN_DSTS)
 %:: %.md ${MAN_FILTER}
 	$(PANDOC) -L ${MAN_FILTER} -s -t man -o $@ $<
 
-$(MAN_TEX): $(MAN_TEXS)
-	find $(MAN_PATH) -name '*.tex' -printf '\\input{../man/%P}\n' | sort > $(MAN_TEX)
-
 %.tex:: %.md ${MAN_FILTER}
 	$(PANDOC) -L ${MAN_FILTER} -t latex -o $@ $<
+
+$(MAN_TEX): $(MAN_TEXS)
+	find $(MAN_PATH) -name '*.tex' -printf '\\input{../man/%P}\n' | sort > $(MAN_TEX)

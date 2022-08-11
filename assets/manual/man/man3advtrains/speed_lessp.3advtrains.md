@@ -1,9 +1,12 @@
-% SPEED_LESSP(3ADVTRAINS) | Advtrains Developer's Manual
+---
+title: 'speed_lessp(3advtrains)'
+manual: 'Advtrains Developer''s Manual'
+---
 
-# NAME
+# Name
 `lessp`, `greaterp`, `equalp`, `not_lessp`, `not_greaterp`, `not_equalp`, `min`, `max` - Speed limit comparison functions
 
-# SYNOPSIS
+# Synopsis
 
 * `lessp(a, b)`
 * `greaterp(a, b)`
@@ -13,7 +16,7 @@
 * `min(a, b)`
 * `max(a, b)`
 
-# DESCRIPTION
+# Description
 `lessp()`, `greaterp()`, `equalp()`, `not_lessp()`, `not_greaterp()`, and `not_equalp()` are predicate functions that returns, respectively,
 
 * Whether `a` is more strict than `b`
