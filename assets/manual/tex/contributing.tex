@@ -1,12 +1,11 @@
 \part{Contributor Guide}
 
-\section{Recommendations}
 At the time of writing, \advtrains{} uses a mostly email-based workflow. It is therefore recommended to format patches with \texttt{git-format-patch} and send them with \texttt{git-send-email}. Alternatively, if you are unable to send patches via email, you can also post patches onto the forum thread.
 
 When sending patches, please include binary files as well instead of linking those to external sources.
 
 \section{Code changes}
-Please include methods of automated testing if possible.
+\advtrains{} uses \texttt{busted}\footnote{\url{https://olivinelabs.com/busted/}} and \texttt{mineunit}\footnote{\url{https://github.com/S-S-X/mineunit}} for unittesting. Please include unittests along with your changes if possible.
 
 If you want to make significant changes to \advtrains{}, it is recommended to first discuss your proposal with the developers or, at least, with people who have sufficient knowledge of the part of \advtrains{} that you want to work on.
 
