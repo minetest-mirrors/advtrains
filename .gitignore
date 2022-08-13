@@ -2,11 +2,14 @@
 .project
 .settings
 
-assets/manual/tex/*
+assets/manual/tex/*.*
+assets/manual/tex/auto
 !assets/manual/tex/*.tex
 !assets/manual/tex/screenshot.png
 assets/manual/tex/man.tex
 assets/manual/tex/_region_*
+assets/manual/tex/man/*.*
+!assets/manual/tex/man/.gitkeep
 
 assets/manual/man/**/*.*
 !assets/manual/man/**/*.md
