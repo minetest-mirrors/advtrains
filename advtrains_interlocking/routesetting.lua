@@ -341,7 +341,8 @@ function ilrs.update_route(sigd, tcbs, newrte, cancel)
 			end
 		else
 			--atdebug("Committed Route:",tcbs.routeset)
-			has_changed_aspect = true
+			-- set_route now sets the signal aspects
+			--has_changed_aspect = true
 		end
 	end
 	if has_changed_aspect then

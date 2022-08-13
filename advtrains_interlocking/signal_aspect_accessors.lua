@@ -108,6 +108,11 @@ local function set_aspect(pos, asp, skipdst)
 		if (not skipdst) and aspect_changed then
 			D.update_main(pos)
 		end
+		--[[
+		local dbgmsg = string.format("[%s]set_aspect(%s,%s,%s)", os.clock(), minetest.pos_to_string(pos), minetest.serialize(asp), tostring(skipdst))
+		dbgmsg = debug.traceback(dbgmsg, 2)
+		minetest.chat_send_all(dbgmsg)
+		--]]
 	end
 end
 

@@ -227,8 +227,10 @@ function advtrains.interlocking.signal_on_aspect_changed(pos)
 	local ipts, iconn = advtrains.interlocking.db.get_ip_by_signalpos(pos)
 	if not ipts then return end
 	local ipos = minetest.string_to_pos(ipts)
-	
-	advtrains.invalidate_all_paths_ahead(ipos)
+
+	-- FIXME: invalidate_all_paths_ahead does not appear to always work as expected
+	--advtrains.invalidate_all_paths_ahead(ipos)
+	minetest.after(0, advtrains.invalidate_all_paths, ipos)
 end
 
 function advtrains.interlocking.signal_rc_handler(pos, node, player, itemstack, pointed_thing)
