@@ -32,6 +32,21 @@ local function f_dropdown(x, y, w, id, entries, sel, indexed)
 		indexed and ";true" or "")
 end
 
+local function f_image_button(x, y, w, h, texture, id, label, noclip, drawborder, pressed)
+	local st = {string.format("%f,%f;%f,%f;%s;%s;%s", x, y, w, h, fsescape(texture), fsescape(id), fsescape(label))}
+	if pressed then
+		st[#st+1] = tostring(noclip or false)
+		st[#st+1] = tostring(drawborder or false)
+		st[#st+1] = fsescape(pressed)
+	end
+	return sformat("image_button[%s]", table.concat(st, ";"))
+end
+
+local function f_image_button_exit(x, y, w, h, texture, id, label)
+	local st = {string.format("%f,%f;%f,%f;%s;%s;%s", x, y, w, h, fsescape(texture), fsescape(id), fsescape(label))}
+	return sformat("image_button_exit[%s]", table.concat(st, ";"))
+end
+
 local function f_label(x, y, text)
 	return sformat("label[%f,%f;%s]", x, y, fsescape(text))
 end
@@ -61,13 +76,25 @@ local function f_tabheader(x, y, w, h, id, entries, sel, transparent, border)
 	return string.format("tabheader[%s]", table.concat(st, ";"))
 end
 
+local function f_textlist(x, y, w, h, id, entries, sel, transparent)
+	local st = {string.format("%f,%f;%f,%f;%s;%s", x, y, w, h, id, make_list(entries))}
+	if sel then
+		st[#st+1] = tostring(sel)
+		st[#st+1] = tostring(transparent or false)
+	end
+	return string.format("textlist[%s]", table.concat(st, ";"))
+end
+
 return {
 	button = f_button,
 	S_button = S_button,
 	button_exit = f_button_exit,
 	S_button_exit = S_button_exit,
 	dropdown = f_dropdown,
+	image_button = f_image_button,
+	image_button_exit = f_image_button_exit,
 	label = f_label,
 	S_label = S_label,
 	tabheader = f_tabheader,
+	textlist = f_textlist,
 }
