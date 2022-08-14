@@ -1,6 +1,5 @@
 PANDOC = pandoc
-LATEX = pdflatex
-LATEXMK = latexmk
+LATEXMK = latexmk -cd -pdf -silent
 LUA = luajit
 
 MANUAL_ROOT = assets/manual
@@ -23,7 +22,7 @@ doc: doc-pdf doc-man
 
 doc-pdf: $(TEX_MAIN_DSTS)
 %.pdf: %.tex $(MAN_TEX) $(wildcard $(TEX_PATH)/*.tex)
-	$(LATEXMK) -cd -pdf $<
+	$(LATEXMK) $<
 
 doc-man: $(MAN_DSTS)
 	find assets/manual/man -regex '.*/[^.]+\.[^.]+$$' | tar -cJf ${MANUAL_ROOT}/man.tar.xz -T -
