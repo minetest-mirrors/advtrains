@@ -1,10 +1,14 @@
 ---
-title: 'rwt_copy(3advtrains)'
+titles:
+- rwt_copy
+- rwt_new
+- rwt_to_table
+- rwt_to_secs
+- rwt_to_string
+section: 3advtrains
 manual: 'Advtrains Developer''s Manual'
+shortdesc: create and copy railway time objects
 ---
-
-# Name
-`copy`, `new`, `to_table`, `to_secs`, `to_string` - Create and copy railway time objects
 
 # Synopsis
 

@@ -1,10 +1,13 @@
 ---
-title: 'rwt_last_rpt(3advtrains)'
+titles:
+- rwt_last_rpt
+- rwt_next_rpt
+- rwt_time_from_last_rpt
+- rwt_time_to_next_rpt
+section: 3advtrains
 manual: 'Advtrains Developer''s Manual'
+shortdesc: calculate time for repeating events
 ---
-
-# Name
-`last_rpt`, `next_rpt`, `time_from_last_rpt`, `time_to_next_rpt` - Calculate time for repeating events
 
 # Synopsis
 

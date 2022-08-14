@@ -1,12 +1,12 @@
 ---
-title: 'signal_aspects(7advtrains)'
+titles:
+- signal_aspects
+section: 7advtrains
 manual: 'Advtrains Developer''s Manual'
+shortdesc: signal aspect tables for Advtrains
 seealso:
 - speed(7advtrains)
 ---
-
-# Name
-`signal_aspects` - Signal aspect tables for Advtrains
 
 # Description
 A signal aspect table describes the status of a signal in relation to a train following it.

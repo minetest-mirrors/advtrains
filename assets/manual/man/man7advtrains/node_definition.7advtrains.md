@@ -1,12 +1,12 @@
 ---
-title: 'node_definition(7advtrains)'
+titles:
+- node_definition
+section: 7advtrains
 manual: 'Advtrains Developer''s Manual'
+shortdesc: node definition entries specific to Advtrains
 seealso:
 - signal_aspects(7advtrains)
 ---
-
-# Name
-`node_definition` - Advtrains-specific node definition entries
 
 # Description
 This page describes various fields in node definition tables that are used by Advtrains.

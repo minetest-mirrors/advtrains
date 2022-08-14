@@ -1,14 +1,14 @@
 ---
-title: 'speed(7advtrains)'
+titles:
+- speed
+section: 7advtrains
 manual: 'Advtrains Developer''s Manual'
+shortdesc: Advtrains speed limit library
 seealso:
 - speed_lessp(3advtrains)
 - speed_set_restriction(3advtrains)
 - signal_aspects(7advtrains)
 ---
-
-# Name
-`speed` - Advtrains speed limit library
 
 # Description
 The speed library allows the manipulation of speed limits, which can be represented with

@@ -1,10 +1,11 @@
 ---
-title: 'speed_set_restriction(3advtrains)'
+titles:
+- speed_set_restriction
+- speed_merge_aspect
+section: 3advtrains
 manual: 'Advtrains Developer''s Manual'
+shortdesc: apply speed limits to trains
 ---
-
-# Name
-`set_restriction`, `merge_aspect` - Apply speed limits to trains
 
 # Synopsis
 

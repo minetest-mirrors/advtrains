@@ -13,18 +13,48 @@ add_filter {
 	Pandoc = function(elem)
 		local blocks, meta = elem.blocks, elem.meta
 
-		local page_title = utils.stringify(meta.title)
+		local page_names = {}
+		for k, v in ipairs(meta.titles) do
+			page_names[k] = utils.stringify(v)
+		end
+		local page_firstname = page_names[1]
+		local page_section = utils.stringify(meta.section)
 		local page_manual = utils.stringify(meta.manual)
-		local page_name, page_section = page_title:match("^([^%(]+)%(([^%)]+)%)$")
+		local page_firsttitle = string.format("%s(%s)", page_firstname, page_section)
+		local page_shortdesc = meta.shortdesc
 
 		-- add page title
-		meta.title = pandoc.MetaString(string.format("%s | %s", text.upper(page_title), page_manual))
+		meta.title = pandoc.MetaString(string.format("%s | %s", text.upper(page_firsttitle), page_manual))
+		local startidx = 1
 		if is_latex then
-			local titleid = string.format("man:%s.%s", page_name, page_section)
-			local titleobj = pandoc.Header(1, pandoc.Code(page_title))
+			local titleid = string.format("man:%s.%s", page_firstname, page_section)
+			local titleobj = pandoc.Header(1, pandoc.Code(page_firsttitle))
 			titleobj.identifier = titleid
 			blocks:insert(1, titleobj)
+			for i = 2, #page_names do
+				blocks:insert(i, pandoc.RawBlock("latex", string.format("\\label{man:%s.%s}", page_names[i], page_section)))
+			end
+			startidx = #page_names+1
 		end
+
+		-- insert naming information
+		if is_man then
+			blocks:insert(1, pandoc.Header(1, "NAME"))
+			startidx = 2
+		end
+		local format_name = pandoc.Code
+		if is_man then
+			format_name = pandoc.Str
+		end
+		local nameinfo = pandoc.Plain(format_name(page_firstname))
+		for i = 2, #page_names do
+			nameinfo.content:insert(pandoc.Str(", "))
+			nameinfo.content:insert(format_name(page_names[i]))
+		end
+		nameinfo.content:insert(pandoc.Str(" - "))
+		nameinfo.content:extend(page_shortdesc)
+		blocks:insert(startidx, nameinfo)
+		startidx = startidx + 1
 
 		-- add "See Also" section
 		local seealso = elem.meta.seealso
@@ -58,8 +88,8 @@ add_filter {
 if is_latex then
 	add_filter {
 		Str = function(elem)
-			if elem.tex == "Advtrains" then
-				return pandoc.RawInline("latex", "\\advtrains{}")
+			if elem.text == "Advtrains" then
+				return pandoc.SmallCaps("advtrains")
 			end
 		end
 	}

@@ -1,10 +1,12 @@
 ---
-title: 'rwt_add(3advtrains)'
+titles:
+- rwt_add
+- rwt_diff
+- rwt_sub
+section: 3advtrains
 manual: 'Advtrains Developer''s Manual'
+shortdesc: add or subtract railway time objects
 ---
-
-# Name
-`add`, `diff`, `sub` - Add or subtract railway time objects
 
 # Synopsis
 

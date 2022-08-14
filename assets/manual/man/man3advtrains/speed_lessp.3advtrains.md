@@ -1,10 +1,17 @@
 ---
-title: 'speed_lessp(3advtrains)'
+titles:
+- speed_lessp
+- speed_greaterp
+- speed_equalp
+- speed_not_lessp
+- speed_not_greaterp
+- speed_not_equalp
+- speed_min
+- speed_max
+section: 3advtrains
 manual: 'Advtrains Developer''s Manual'
+shortdesc: compare speed limits
 ---
-
-# Name
-`lessp`, `greaterp`, `equalp`, `not_lessp`, `not_greaterp`, `not_equalp`, `min`, `max` - Speed limit comparison functions
 
 # Synopsis
 
