@@ -6,6 +6,7 @@ packages:
 - unzip
 - wget
 - lua-busted
+- lua-ldoc
 - pandoc
 - texlive-extra-utils
 - texlive-latex-base
@@ -19,7 +20,7 @@ sources :
 artifacts:
 - .minetest/mods/advtrains/assets/manual/tex/a4manual.pdf
 - .minetest/mods/advtrains/assets/manual/tex/a5manual.pdf
-- .minetest/mods/advtrains/assets/manual/man.tar.xz
+- .minetest/mods/advtrains/assets/manual/ldoc.tar.xz
 
 tasks:
 

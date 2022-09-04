@@ -124,11 +124,11 @@ The following are available if \texttt{advtrains\_interlocking} is enabled.
 \item \apifunc{can\_set\_route}{\var{pos},\var{name}} Returns a boolean indicating whether the route named \var{name} of the signal at \var{pos} can be set.
 \item \apifunc{set\_route}{\var{pos},\var{name}} Sets the route named \var{name} of the signal at \var{pos}.
 \item \apifunc{cancel\_route}{\var{pos}} Cancels the route that is set from the signal at \var{pos}.
-\item \apifunc{get\_aspect}{\var{pos}} Returns the signal aspect of the signal at \var{pos}. Please refer to \manref{signal\string_aspect}{7advtrains} for the structure of signal aspect tables.
+\item \apifunc{get\_aspect}{\var{pos}} Returns the signal aspect of the signal at \var{pos}.
 \end{apidoc}
 
 \subsection{Railway time}
-Please refer to \manref{rwt}{7advtrains} for information on the railway time API.
+Please refer to the railway time API documentation for more information.
 \begin{apidoc}{LuaATC}
 \item \apifunc{schedule}{\var{time},\var{message}} Triggers a \texttt{schedule} event at \var{time} with the message \var{message}. Only one event can be scheduled this way.
 \item \apifunc{schedule\_in}{\var{time},\var{message}} Like \texttt{schedule}, but \var{time} is given as the time until the event is triggered.

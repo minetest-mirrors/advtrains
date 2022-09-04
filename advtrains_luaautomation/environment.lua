@@ -1,5 +1,6 @@
 -------------
--- lua sandboxed environment
+-- LuaATC sandboxed environment
+-- @module atlatc
 
 -- function to cross out functions and userdata.
 -- modified from dump()
@@ -354,7 +355,7 @@ end
 -- env.subscribers table may be directly altered by callers.
 
 
---- class interface
+-- class interface
 
 function atlatc.env_new(name)
 	local newenv={

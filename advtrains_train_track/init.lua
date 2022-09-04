@@ -140,9 +140,9 @@ minetest.register_craft({
 		{'advtrains:dtrack_placer', '', 'advtrains:dtrack_placer'}
 	}
 })
----- Not included: very shallow crossings like (30/60)+45.
----- At an angle of only 18.4 degrees, the models would not
----- translate well to a block game.
+-- Not included: very shallow crossings like (30/60)+45.
+-- At an angle of only 18.4 degrees, the models would not
+-- translate well to a block game.
 -- END crossings
 
 --slopes

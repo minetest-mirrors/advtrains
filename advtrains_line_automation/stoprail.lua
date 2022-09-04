@@ -3,7 +3,7 @@
 
 
 local function to_int(n)
-	--- Disallow floating-point numbers
+	-- Disallow floating-point numbers
 	local k = tonumber(n)
 	if k then
 		return math.floor(k)

@@ -128,7 +128,8 @@ advtrains.atc_function = function(def, preset, suffix, rotation)
 				local meta=minetest.get_meta(pos)
 				if meta then
 					if not fields.save then 
-						--[[--maybe only the dropdown changed
+						--[[
+						--maybe only the dropdown changed
 						if fields.mode then
 							meta:set_string("mode", idxtrans[fields.mode])
 							if fields.mode=="digiline" then

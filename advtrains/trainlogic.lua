@@ -562,7 +562,7 @@ function advtrains.train_step_b(id, train, dtime)
 		train.acceleration = 0
 	end
 	
-	--- 3b. if braking, modify the velocity BEFORE the movement
+	--- 3b. if braking, modify the velocity BEFORE the movement ---
 	if braking then
 		local dv = advtrains.get_acceleration(train, lever) * dtime
 		local v1 = v0 + dv
@@ -671,7 +671,7 @@ function advtrains.train_step_b(id, train, dtime)
 	recalc_end_index(train)
 	--atprint("in train_step_b: New index",train.index,"end",train.end_index,"vel",train.velocity)
 	
-	--- 4a. if accelerating, modify the velocity AFTER the movement
+	--- 4a. if accelerating, modify the velocity AFTER the movement ---
 	if accelerating then
 		local dv = advtrains.get_acceleration(train, lever) * dtime
 		local v1 = v0 + dv
@@ -715,7 +715,7 @@ function advtrains.train_step_c(id, train, dtime)
 	local train_moves=(train.velocity~=0)
 	local very_short_train = train.trainlen < 3
 
-	--- On-track collision handling - detected in train_step_b, but handled here so all other train movements have already happened.
+	-- On-track collision handling - detected in train_step_b, but handled here so all other train movements have already happened. --
 	if train.ontrack_collision_info then
 		train.velocity = 0
 		train.acceleration = 0
