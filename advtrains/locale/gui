@@ -1,184 +1,638 @@
 #!/usr/bin/tclsh
 package require Tk
 
-global translationTemplate
-global translationData
-global translationLangs
+# Auxiliary functions
+proc maybe_lindex {lst idx fallback} {
+	set val [lindex $lst $idx]
+	if {$val eq {}} {
+		return $fallback
+	} else {
+		return $val
+	}
+}
+
+proc firstupper {str} {
+	return [string cat [string toupper [string index $str 0]] [string range $str 1 end]]
+}
+
+# CLI arguments
+# NOTE: This will likely be changed in the future
+set translationDomain [maybe_lindex $argv 0 "advtrains"]
+set translationDir [maybe_lindex $argv 1 "."]
+
+# Translation file I/O, etc
+
+set translationTemplatePath [file join $translationDir "template.txt"]
+
+proc translationFilePaths {} {
+	global translationDir translationDomain
+	return [glob -path [file join $translationDir $translationDomain] ".*.tr"]
+}
 
 proc readTranslationTemplate {} {
-    global translationTemplate
-    set translationTemplate [list]
-    set handle [open "template.txt" "r"]
-    fconfigure $handle -translation lf
-    set lst [list]
-    while {[gets $handle line] >= 0} {
-	if {$line eq ""} {
-	    lappend lst ""
-        } elseif {[string match "#*" $line]} {
-	    lappend lst $line
-	} elseif {[regexp {^(.+[^@])=.+$} $line x str]} {
-	    lappend lst $str
+	global translationTemplate translationTemplatePath
+	set translationTemplate [list]
+	set handle [open $translationTemplatePath "r"]
+	fconfigure $handle -translation lf
+	while {[gets $handle line] >= 0} {
+		if {$line eq ""} {
+			lappend translationTemplate $line
+		} elseif {[string match {#*} $line]} {
+			lappend translationTemplate $line
+		} elseif {[regexp {^(.+[^@])=.+$} $line x str]} {
+			lappend translationTemplate $str
+		}
 	}
-    }
-    set translationTemplate $lst;
-    close $handle
+	close $handle
 }
 
 proc readTranslationFiles {} {
-    global translationData
-    global translationLangs
-    array set translationData [list]
-    set translationLangs [list]
-    set tbl [list]
-    set filelist [glob "advtrains.*.tr"]
-    foreach fn $filelist {
-	if {[regexp {\.([^.]+)\.} $fn x lang]} {
-	    set handle [open $fn "r"];
-	    fconfigure $handle -translation lf
-	    while {[gets $handle line] >= 0} {
-		if {[regexp {^([^#].+[^@])=(.+)$} $line x ori tr]} {
-		    set translationData($lang,$ori) $tr
+	global translationData translationLangs
+	array set translationData [list]
+	set translationLangs [list]
+	foreach fn [translationFilePaths] {
+		if {[regexp {\.([^.]+)\.tr$} $fn x lang]} {
+			set handle [open $fn "r"]
+			fconfigure $handle -translation lf
+			while {[gets $handle line] >= 0} {
+				if {[regexp {^([^#].+[^@])=(.+)$} $line x ori tr]} {
+					set translationData($lang,$ori) $tr
+				}
+			}
+			lappend translationLangs $lang
+			close $handle
 		}
-	    }
-	    lappend translationLangs $lang
-	    close $handle
 	}
-    }
-    set translationLangs [lsort $translationLangs]
+	set translationLangs [lsort $translationLangs]
 }
 
-proc loadTranslationToTreeView {} {
-    global translationTemplate;
-    global translationData;
-    set lang [.f.langSelect get];
-    set tree .f.translationView;
-    $tree delete [$tree children {}];
-    set parent {};
-    foreach i [lrange $translationTemplate 1 end] {
-	if {$i eq ""} {
-	    # nop
-	} elseif {[regexp {\#+\s*(.+)} $i x comment]} {
-	    set parent [$tree insert {} end -text $comment -tags {notranslate}];
-	} elseif {[info exists translationData($lang,$i)]} {
-	    $tree insert $parent end -text $i -values [list $translationData($lang,$i)]
-	} else {
-	    $tree insert $parent end -text $i -values [list $i]
-	}
-    }
-    updateEntrySelection
+proc readTranslations {} {
+	readTranslationTemplate
+	readTranslationFiles
 }
 
-proc updateTranslations {} {
-    readTranslationTemplate
-    readTranslationFiles
-}
-
-updateTranslations
-
-proc updateTranslationsToGUI {} {
-    updateTranslations
-    loadTranslationToTreeView
-}
-
-proc updateEntrySelection {args} {
-    global translationData
-    global origEntry
-    global trEntry
-    global refEntry
-    set reflang [.f.refLang get]
-    set focuseditem [.f.translationView focus]
-    set origEntry [.f.translationView item $focuseditem -text]
-    if {[.f.translationView tag has notranslate $focuseditem]} {
-	.f.trEntry state disabled
-	set trEntry ""
-    } else {
-	.f.trEntry state !disabled
-	set trEntry [lindex [.f.translationView item $focuseditem -value] 0]
-    }
-    if {[info exists translationData($reflang,$origEntry)]} {
-	set refEntry $translationData($reflang,$origEntry)
-    } else {
-	set refEntry ""
-    }
-}
-
-proc applyTranslationString {args} {
-    global translationData
-    global origEntry
-    global trEntry
-    set focuseditem [.f.translationView focus]
-    if {![.f.translationView tag has notranslate $focuseditem]} {
-	set lang [.f.langSelect get]
-	set translationData($lang,$origEntry) $trEntry
-	.f.translationView item $focuseditem -values [list $trEntry]
-    }
-}
-
-proc applyTranslationChanges {} {
-    global translationTemplate
-    global translationData
-    global translationLangs
-    foreach lang $translationLangs {
-	set handle [open [string cat "advtrains." $lang ".tr"] "w"]
+proc writeTranslationTemplate {} {
+	global translationTemplate translationTemplatePath
+	set handle [open $translationTemplatePath "w"]
 	fconfigure $handle -translation lf
-	foreach i $translationTemplate {
-	    if {$i eq ""} {
-		puts $handle ""
-	    } elseif {[string match "#*" $i]} {
-		puts $handle $i
-	    } elseif {[info exists translationData($lang,$i)]} {
-		puts $handle [string cat $i "=" $translationData($lang,$i)]
-	    } else {
-		puts $handle [string cat $i "=" $i]
-	    }
+	foreach line $translationTemplate {
+		if {$line eq ""} {
+			puts $handle ""
+		} elseif {[string match {#*} $line]} {
+			puts $handle $line
+		} else {
+			puts $handle "$line=$line"
+		}
 	}
 	close $handle
-    }
 }
 
-# GUI
+proc writeTranslationFiles {} {
+	global translationDir translationDomain translationData translationLangs translationTemplate
+	foreach lang $translationLangs {
+		set handle [open [file join $translationDir "$translationDomain.$lang.tr"] "w"]
+		fconfigure $handle -translation lf
+		foreach i $translationTemplate {
+			if {$i eq ""} {
+				puts $handle ""
+			} elseif {[string match {#*} $i]} {
+				puts $handle $i
+			} else {
+				puts $handle [format "%s=%s" $i [getTranslationString $lang $i]]
+			}
+		}
+		close $handle
+	}
+}
 
-wm title . "Advtrains l10n GUI"
-grid [ttk::frame .f -padding 5] -column 0 -row 0 -sticky nsew
+proc writeTranslations {} {
+	writeTranslationTemplate
+	writeTranslationFiles
+}
+
+proc hasTranslationString {lang str} {
+	return [expr {[getTranslationString $lang $str] ne $str}]
+}
+
+proc maybeGetTranslationString {lang str} {
+	set tr [getTranslationString $lang $str]
+	if {$tr eq $str} {
+		return {}
+	} else {
+		return $tr
+	}
+}
+
+proc getTranslationString {lang str} {
+	global translationData
+	if {[info exists translationData($lang,$str)]} {
+		return $translationData($lang,$str)
+	} else {
+		return $str
+	}
+}
+
+proc setTranslationString {lang ori tr} {
+	global translationData
+	set translationData($lang,$ori) $tr
+}
+
+proc rewordTranslationString {old new} {
+	global translationData translationLangs
+	foreach lang $translationLangs {
+		if {[hasTranslationString $lang $old]} {
+			setTranslationString $lang $new [getTranslationString $lang $old]
+		} else {
+			setTranslationString $lang $new $new
+		}
+	}
+}
+
+# GUI helpers
+proc gAddTab {basename title elems dummies} {
+	global gMainNotebook
+	gAddFrame $basename $elems $dummies
+	$gMainNotebook add "$gMainNotebook.$basename" -text $title
+}
+
+proc gAddFrame {basename elems dummies} {
+	global gMainNotebook
+	set varbase [string cat "g" [firstupper $basename]]
+	set varname "${varbase}Frame"
+	set pathname "$gMainNotebook.$basename"
+	global $varname
+	set $varname $pathname
+	ttk::frame $pathname -padding 5
+	foreach i $elems {
+		set varname [string cat $varbase [firstupper $i]]
+		global $varname
+		set $varname "$pathname.$i"
+	}
+	foreach i $dummies {
+		set varname [string cat $varbase [firstupper $i]]
+		global $varname
+		set $varname {}
+	}
+}
+
+proc gReloadTranslations {} {
+	readTranslations
+	gTrLoadTranslations
+	gTmLoadTranslations
+}
+
+proc gAddMenu {varname parent menuname entries} {
+	global $varname
+	set path "${parent}.${menuname}"
+	set $varname $path
+	$parent configure -menu [menu $path -tearoff false]
+	foreach i $entries {
+		$path add {*}$i
+	}
+	return $parent
+}
+set gMenuItemNotImplemented [list command -state disabled -label "(Not implemented)"]
+
+proc gNotImplemented {args} {
+	tk_messageBox -message "Not implemented" -icon error -type ok
+}
+
+# Main window
+
+set gMainFrame ".f"
+set gMainFrameWidgetCount 0
+foreach i [list readBtn writeBtn notebookTopSeparator notebook] {
+	set [string cat "gMain" [firstupper $i]] "$gMainFrame.$i"
+}
+
+wm title . "Advtrains Translation File Editor"
 grid rowconfigure . 0 -weight 1
 grid columnconfigure . 0 -weight 1
 
-grid rowconfigure .f 3 -weight 1
-grid columnconfigure .f 1 -weight 1
+ttk::frame $gMainFrame
+grid $gMainFrame -column 0 -row 0 -sticky nsew
+grid rowconfigure $gMainFrame 2 -weight 1
 
-foreach i [list 4 5 6] {grid rowconfigure .f $i -uniform bottom}
+foreach i [list \
+	[ttk::button $gMainReadBtn -text "Reload translation files" -command gReloadTranslations] \
+	[ttk::button $gMainWriteBtn -text "Write changes" -command writeTranslations] \
+] {
+	grid $i -column $gMainFrameWidgetCount -row 0 -sticky ns
+	incr gMainFrameWidgetCount
+}
 
-ttk::combobox .f.langSelect -values $translationLangs -state readonly
-grid .f.langSelect -column 0 -row 0 -sticky we
-bind .f.langSelect <<ComboboxSelected>> {loadTranslationToTreeView}
-.f.langSelect current 0
+grid columnconfigure $gMainFrame $gMainFrameWidgetCount -weight 1
 
-ttk::button .f.updateBtn -text "Read translation files" -command updateTranslationsToGUI
-grid .f.updateBtn -column 0 -row 1 -sticky we
-ttk::button .f.writeBtn -text "Write changes" -command applyTranslationChanges
-grid .f.writeBtn -column 0 -row 2 -sticky we
+ttk::separator $gMainNotebookTopSeparator -orient horizontal
+grid $gMainNotebookTopSeparator -column 0 -row 1 -columnspan [expr {1+$gMainFrameWidgetCount}] -sticky ew
 
-ttk::treeview .f.translationView -columns "translation" -yscrollcommand ".f.translationScroll set"
-grid .f.translationView -column 1 -row 0 -rowspan 4 -columnspan 2 -sticky nsew
-bind .f.translationView <<TreeviewSelect>> updateEntrySelection
-ttk::scrollbar .f.translationScroll -orient vertical -command ".f.translationView yview"
-grid .f.translationScroll -column 3 -row 0 -sticky ns -rowspan 4
+ttk::notebook $gMainNotebook
+grid $gMainNotebook -column 0 -row 2 -columnspan [expr {1+$gMainFrameWidgetCount}] -sticky nsew
 
-ttk::label .f.origLabel -text "Original" -anchor w
-grid .f.origLabel -column 0 -row 4 -sticky nswe
-ttk::entry .f.origEntry -state readonly -textvariable origEntry
-grid .f.origEntry -column 1 -row 4 -sticky nswe -columnspan 3
+# Translation Manager
+# FIXME?: it seems like Tcl requires -textvariable globals to be set first before they are accessible
 
-ttk::label .f.trLabel -text "Translated" -anchor w
-grid .f.trLabel -column 0 -row 5 -sticky nswe
-ttk::entry .f.trEntry -textvariable trEntry
-grid .f.trEntry -column 1 -row 5 -sticky nswe -columnspan 3
-trace add variable trEntry write applyTranslationString
+gAddTab tr "Translations" \
+	[list langSelect refLangSelect readBtn writeBtn treeviewFrame origTextLabel origTextField translatedTextLabel translatedTextField refTextLabel refTextField] \
+	[list langValue refLangValue origTextValue translatedTextValue refTextValue]
+set gTrTreeview "$gTrTreeviewFrame.main"
+set gTrTreeviewScrollbar "$gTrTreeviewFrame.scrollbar"
 
-ttk::combobox .f.refLang -values [linsert $translationLangs 0 ""] -state readonly
-grid .f.refLang -column 0 -row 6 -sticky nswe
-bind .f.refLang <<ComboboxSelected>> updateEntrySelection
-ttk::entry .f.refEntry -state readonly -textvariable refEntry
-grid .f.refEntry -column 1 -row 6 -sticky nswe -columnspan 3
+grid rowconfigure $gTrFrame 0 -weight 1
+grid columnconfigure $gTrFrame 2 -weight 1
 
-loadTranslationToTreeView
+ttk::frame $gTrTreeviewFrame -borderwidth 1 -relief sunken
+grid $gTrTreeviewFrame -column 0 -row 0 -columnspan 3 -sticky nsew
+grid rowconfigure $gTrTreeviewFrame 0 -weight 1
+grid columnconfigure $gTrTreeviewFrame 0 -weight 1
+ttk::treeview $gTrTreeview -selectmode browse -columns {translation} -yscrollcommand {$gTrTreeviewScrollbar set}
+grid $gTrTreeview -column 0 -row 0 -sticky nsew
+bind $gTrTreeview <<TreeviewSelect>> gTrTreeviewSelectionCallback
+ttk::scrollbar $gTrTreeviewScrollbar -orient vertical -command {$gTrTreeview yview}
+grid $gTrTreeviewScrollbar -column 1 -row 0 -sticky ns
+$gTrTreeview heading #0 -text "Original text"
+
+lmap i [list \
+	[list \
+		[ttk::label $gTrOrigTextLabel -text "Original" -anchor w] \
+		{} \
+		[ttk::entry $gTrOrigTextField -state readonly -textvariable gTrOrigTextValue] \
+	] \
+	[list \
+		[ttk::label $gTrTranslatedTextLabel -text "Translation" -anchor w] \
+		[ttk::combobox $gTrLangSelect -exportselection false -state readonly -textvariable gTrLangValue] \
+		[ttk::entry $gTrTranslatedTextField -textvariable gTrTranslatedTextValue] \
+	] \
+	[list \
+		[ttk::label $gTrRefTextLabel -text "Reference" -anchor w] \
+		[ttk::combobox $gTrRefLangSelect -exportselection false -state readonly -textvariable gTrRefLangValue] \
+		[ttk::entry $gTrRefTextField -state readonly -textvariable gTrRefTextValue] \
+	] \
+] row [list 1 2 3] {
+	lmap item $i col [list 0 1 2] {
+		if {$item eq ""} {
+			continue
+		}
+		grid $item -column $col -row $row -sticky nswe
+	}
+	grid rowconfigure $gTrFrame $row -uniform bottom
+	incr gTrRowCount
+}
+
+bind $gTrLangSelect <<ComboboxSelected>> gTrLoadTranslationsToTreeview
+trace add variable gTrTranslatedTextValue write gTrApplyTranslationString
+bind $gTrRefLangSelect <<ComboboxSelected>> gTrTreeviewSelectionCallback
+
+proc gTrLoadTranslationsToTreeview {} {
+	global translationTemplate gTrTreeview gTrLangValue
+	$gTrTreeview heading translation -text "Translation: $gTrLangValue"
+	set prevFocus [$gTrTreeview item [$gTrTreeview focus] -text]
+	array set openedSections [list]
+	foreach i [$gTrTreeview children {}] {
+		if {[$gTrTreeview item $i -open]} {
+			set openedSections([$gTrTreeview item $i -text]) 1
+		}
+	}
+	$gTrTreeview delete [$gTrTreeview children {}]
+	set parent {}
+	foreach i [lrange $translationTemplate 1 end] {
+		if {[regexp {^\#+\s*(.+)} $i x comment]} {
+			set parent [$gTrTreeview insert {} end -text $comment -tags {notranslate}]
+			if {[info exists openedSections($comment)]} {
+				$gTrTreeview item $parent -open true
+			}
+			if {$comment eq $prevFocus} {
+				$gTrTreeview focus $parent
+				$gTrTreeview selection set $parent
+			}
+		} elseif {$i ne ""} {
+			set last [$gTrTreeview insert $parent end -text $i -values [list [maybeGetTranslationString $gTrLangValue $i]]]
+			if {$i eq $prevFocus} {
+				$gTrTreeview focus $last
+				$gTrTreeview selection set $last
+			}
+		}
+	}
+	gTrTreeviewSelectionCallback
+}
+
+proc gTrTreeviewSelectionCallback {} {
+	global gTrOrigTextValue gTrTreeview gTrLangSelect gTrLangValue gTrRefLangSelect gTrRefLangValue gTrTranslatedTextField gTrTranslatedTextValue gTrRefTextField gTrRefTextValue
+	set focused [$gTrTreeview focus]
+	set gTrOrigTextValue [$gTrTreeview item $focused -text]
+	if {$focused eq ""} {
+		$gTrTranslatedTextField state disabled
+		$gTrRefTextField state disabled
+		set gTrTranslatedTextValue "Select an entry to translate"
+		set gTrRefTextValue ""
+	} elseif {[$gTrTreeview tag has notranslate $focused]} {
+		$gTrTranslatedTextField state disabled
+		$gTrRefTextField state disabled
+		set gTrTranslatedTextValue "Category names cannot be translated"
+		set gTrRefTextValue ""
+	} else {
+		$gTrTranslatedTextField state !disabled
+		set gTrTranslatedTextValue [maybeGetTranslationString $gTrLangValue $gTrOrigTextValue]
+		set gTrRefTextValue [maybeGetTranslationString $gTrRefLangValue $gTrOrigTextValue]
+		if {$gTrRefLangValue eq ""} {
+			$gTrRefTextField state disabled
+			set gTrRefTextValue ""
+		} elseif {$gTrRefTextValue eq ""} {
+			$gTrRefTextField state disabled
+			set gTrRefTextValue "The selected string is not yet translated to the reference language"
+		} else {
+			$gTrRefTextField state !disabled
+		}
+	}
+	$gTrLangSelect selection clear
+	$gTrRefLangSelect selection clear
+}
+
+proc gTrLoadTranslations {} {
+	global translationLangs gTrLangSelect gTrLangValue gTrRefLangSelect gTrRefLangValue
+	set prevLang $gTrLangValue
+	set prevRefLang $gTrRefLangValue
+	$gTrLangSelect configure -values $translationLangs
+	$gTrRefLangSelect configure -values [linsert $translationLangs 0 ""]
+	if {[llength $translationLangs] < 1} {
+		tk_messageBox -icon error type ok -title "Error" -message "No translation files present."
+		exit 1
+	}
+	if {$prevLang ni $translationLangs} {
+		$gTrLangSelect current 0
+	}
+	if {$prevRefLang ni $translationLangs} {
+		$gTrRefLangSelect current 0
+	}
+	gTrLoadTranslationsToTreeview
+}
+
+proc gTrApplyTranslationString args {
+	global gTrTreeview gTrLangValue gTrOrigTextValue gTrTranslatedTextValue
+	set focused [$gTrTreeview focus]
+	if {![$gTrTreeview tag has notranslate $focused]} {
+		setTranslationString $gTrLangValue $gTrOrigTextValue $gTrTranslatedTextValue
+		$gTrTreeview item $focused -values [list $gTrTranslatedTextValue]
+	}
+}
+
+# Translation Template Editor
+
+gAddTab tm "Template" \
+	[list addStringMenuBtn addHeadingMenuBtn removeMenuBtn moveMenuBtn textField setMenuBtn treeviewFrame] \
+	[list textValue]
+set gTmTreeview "$gTmTreeviewFrame.main"
+set gTmTreeviewScrollbar "$gTmTreeviewFrame.scrollbar"
+
+set gTmRowCount 0
+foreach i [list \
+	[gAddMenu gTmAddStringMenu [ttk::menubutton $gTmAddStringMenuBtn -text "Add string"] "menu" [list \
+		[list command -label "Insert before current entry" -command {gTmInsertStringAt true 0}] \
+		[list command -label "Insert after current entry" -command {gTmInsertStringAt true 1}] \
+		[list command -label "Insert as the first entry" -command {gTmInsertStringAt false 0}] \
+		[list command -label "Insert as the last entry" -command {gTmInsertStringAt false end}] \
+	]] \
+	[gAddMenu gTmAddHeadingMenu [ttk::menubutton $gTmAddHeadingMenuBtn -text "Add heading"] "menu" [list \
+		[list command -label "Insert before current section" -command {gTmInsertHeadingAt true 0}] \
+		[list command -label "Insert after current section" -command {gTmInsertHeadingAt true 1}] \
+	]] \
+	[gAddMenu gTmRemoveMenu [ttk::menubutton $gTmRemoveMenuBtn -text "Remove"] "menu" [list \
+		[list command -label "Remove entry" -command gTmDeleteEntry] \
+		[list command -label "Remove section" -command gTmDeleteEntry] \
+		[list command -label "Merge with previous section" -command gTmMergeWithPrevious] \
+	]] \
+	[gAddMenu gTmMoveMenu [ttk::menubutton $gTmMoveMenuBtn -text "Move"] "menu" [list \
+		[list command -label "Up" -command {gTmMoveInSection true -1}] \
+		[list command -label "Down" -command {gTmMoveInSection true 1}] \
+		[list command -label "To first" -command {gTmMoveInSection false 0}] \
+		[list command -label "To last" -command {gTmMoveInSection false end}] \
+	]] \
+] {
+	grid $i -column 1 -row $gTmRowCount -sticky we
+	incr gTmRowCount
+}
+
+ttk::frame $gTmTreeviewFrame -borderwidth 1 -relief sunken
+grid $gTmTreeviewFrame -column 0 -row 0 -rowspan [expr {1+$gTmRowCount}] -sticky nsew
+grid rowconfigure $gTmTreeviewFrame 0 -weight 1
+grid columnconfigure $gTmTreeviewFrame 0 -weight 1
+grid rowconfigure $gTmFrame $gTmRowCount -weight 1
+grid columnconfigure $gTmFrame 0 -weight 1
+ttk::treeview $gTmTreeview -selectmode browse -show tree -yscrollcommand {$gTmTreeviewScrollbar set}
+bind $gTmTreeview <<TreeviewSelect>> gTmTreeviewSelectionCallback
+grid $gTmTreeview -column 0 -row 0 -sticky nsew
+ttk::scrollbar $gTmTreeviewScrollbar -orient vertical -command {$gTmTreeview yview}
+grid $gTmTreeviewScrollbar -column 1 -row 0 -sticky ns
+incr gTmRowCount
+
+ttk::entry $gTmTextField -textvariable gTmTextValue
+grid $gTmTextField -column 0 -row $gTmRowCount -sticky nsew
+
+gAddMenu gTmSetMenu [ttk::menubutton $gTmSetMenuBtn -text "Set"] "menu" [list \
+	[list command -label "Set heading" -command gTmSetEntry] \
+	[list command -label "Set and copy translations" -command gTmSetEntryAndCopy] \
+	[list command -label "Set without copying translations" -command gTmSetEntry] \
+]
+grid $gTmSetMenuBtn -column 1 -row $gTmRowCount -sticky nsew
+
+proc gTmLoadTranslationsToTreeview {} {
+	global translationTemplate gTmTreeview
+	set prevFocus [$gTmTreeview item [$gTmTreeview focus] -text]
+	array set openedSections [list]
+	foreach i [$gTmTreeview children {}] {
+		if {[$gTmTreeview item $i -open]} {
+			set openedSections([$gTmTreeview item $i -text]) 1
+		}
+	}
+	$gTmTreeview delete [$gTmTreeview children {}]
+	set parent {}
+	foreach i [lrange $translationTemplate 1 end] {
+		if {[regexp {^\#+\s*(.+)} $i x comment]} {
+			set parent [$gTmTreeview insert {} end -text $comment -tags {heading}]
+			if {[info exists openedSections($comment)]} {
+				$gTmTreeview item $parent -open true
+			}
+			if {$comment eq $prevFocus} {
+				$gTmTreeview focus $parent
+				$gTmTreeview selection set $parent
+			}
+		} elseif {$i ne ""} {
+			set last [$gTmTreeview insert $parent end -text $i]
+			if {$i eq $prevFocus} {
+				$gTmTreeview focus $last
+				$gTmTreeview selection set $last
+			}
+		}
+	}
+	gTmTreeviewSelectionCallback
+}
+
+proc gTmTreeviewSelectionCallback {} {
+	global gTmTreeview gTmTextField gTmTextValue gTmAddStringMenu gTmAddHeadingMenu gTmRemoveMenu gTmMoveMenu gTmSetMenu
+	set focused [$gTmTreeview focus]
+	if {$focused eq {}} {
+		$gTmTextField state disabled
+		set gTmTextValue "Select an entry to edit"
+		foreach m [list $gTmAddStringMenu $gTmAddHeadingMenu $gTmRemoveMenu $gTmMoveMenu $gTmSetMenu] {
+			for {set i 0} {$i <= [$m index end]} {incr i} { $m entryconfigure $i -state disabled}
+		}
+	} else {
+		$gTmTextField state !disabled
+		set headingSetState disabled
+		set entrySetState normal
+		if {[$gTmTreeview tag has heading $focused]} {
+			set headingSetState normal
+			set entrySetState disabled
+		}
+		foreach ent [list \
+			[list $gTmAddStringMenu \
+				[list 0 -state $entrySetState] \
+				[list 1 -state $entrySetState] \
+				[list 2 -state normal] \
+				[list 3 -state normal] \
+			] \
+			[list $gTmAddHeadingMenu \
+				[list 0 -state normal] \
+				[list 1 -state normal] \
+			] \
+			[list $gTmMoveMenu \
+				[list 0 -state normal] \
+				[list 1 -state normal] \
+				[list 2 -state normal] \
+				[list 3 -state normal] \
+			] \
+			[list $gTmRemoveMenu \
+				[list 0 -state $entrySetState] \
+				[list 1 -state $headingSetState] \
+				[list 2 -state $headingSetState] \
+			] \
+			[list $gTmSetMenu \
+				[list 0 -state $headingSetState] \
+				[list 1 -state $entrySetState] \
+				[list 2 -state $entrySetState] \
+			] \
+		] {
+			set m [lindex $ent 0]
+			lmap i [lrange $ent 1 end] {
+				$m entryconfigure {*}$i
+			}
+		}
+		set gTmTextValue [$gTmTreeview item $focused -text]
+	}
+}
+
+proc gTmUpdateTemplateAux {parent} {
+	global translationTemplate gTmTreeview
+	foreach i [$gTmTreeview children $parent] {
+		set tval [$gTmTreeview item $i -text]
+		if {[$gTmTreeview tag has heading $i]} {
+			lappend translationTemplate {}
+			set tval "# $tval"
+		}
+		lappend translationTemplate $tval
+		gTmUpdateTemplateAux $i
+	}
+}
+
+proc gTmUpdateTemplate {} {
+	global translationTemplate translationDomain
+	set translationTemplate [list "# textdomain: $translationDomain"]
+	gTmUpdateTemplateAux {}
+	gTrLoadTranslations
+	gTmLoadTranslationsToTreeview
+}
+
+proc gTmSetEntry {} {
+	global gTmTreeview gTmTextValue
+	$gTmTreeview item [$gTmTreeview focus] -text $gTmTextValue
+	gTmUpdateTemplate
+}
+
+proc gTmSetEntryAndCopy {} {
+	global gTmTreeview gTmTextValue
+	set focus [$gTmTreeview focus]
+	rewordTranslationString [$gTmTreeview item $focus -text] $gTmTextValue
+	gTmSetEntry
+}
+
+proc gTmInsertStringAt {relative idx} {
+	global gTmTreeview
+	set focus [$gTmTreeview focus]
+	set parent [$gTmTreeview parent $focus]
+	set relidx [$gTmTreeview index $focus]
+	if {[$gTmTreeview tag has heading $focus]} {
+		set parent $focus
+		set relindex 0
+	}
+	set newidx $idx
+	if {$relative} {
+		set newidx [expr {$idx+$relidx}]
+	}
+	set item [$gTmTreeview insert $parent $newidx -text {}]
+	$gTmTreeview focus $item
+	$gTmTreeview selection set $item
+}
+
+proc gTmInsertHeadingAt {relative idx} {
+	global gTmTreeview
+	set focus [$gTmTreeview focus]
+	if {![$gTmTreeview tag has heading $focus]} {
+		set focus [$gTmTreeview parent $focus]
+	}
+	set parent [$gTmTreeview parent $focus]
+	set relidx [$gTmTreeview index $focus]
+	if {$focus eq {}} {
+		set parent {}
+		set relidx 0
+	}
+	set newidx $idx
+	if {$relative} {
+		set newidx [expr {$idx+$relidx}]
+	}
+	set item [$gTmTreeview insert $parent $newidx -text {} -tags {heading}]
+	$gTmTreeview focus $item
+	$gTmTreeview selection set $item
+}
+
+proc gTmMoveInSection {relative idx} {
+	global gTmTreeview
+	set focus [$gTmTreeview focus]
+	set parent [$gTmTreeview parent $focus]
+	set relidx [$gTmTreeview index $focus]
+	set newidx $idx
+	if {$relative} {
+		set newidx [expr {$idx+$relidx}]
+	}
+	$gTmTreeview move $focus $parent $newidx
+	gTmUpdateTemplate
+}
+
+proc gTmDeleteEntry {} {
+	global gTmTreeview
+	$gTmTreeview delete [$gTmTreeview focus]
+	gTmUpdateTemplate
+}
+
+proc gTmMergeWithPrevious {} {
+	global gTmTreeview
+	set parent [$gTmTreeview focus]
+	set prev [$gTmTreeview prev $parent]
+	set newindex end
+	if {$prev eq {}} {
+		set prev [$gTmTreeview parent $parent]
+		set newindex 0
+	}
+	foreach i [$gTmTreeview children $parent] {
+		$gTmTreeview move $i $prev $newindex
+	}
+	$gTmTreeview delete $parent
+	gTmUpdateTemplate
+}
+
+proc gTmLoadTranslations {} {
+	gTmLoadTranslationsToTreeview
+}
+
+# Initialization
+
+gReloadTranslations
