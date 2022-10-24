@@ -44,7 +44,7 @@ world.layout {
 
 describe("API for supposed signal aspects", function()
 	it("should load and save data properly", function()
-		local tbl = {_foo = true}
+		local tbl = {_foo = {}}
 		I.load_supposed_aspects(tbl)
 		assert.same(tbl, I.save_supposed_aspects())
 	end)

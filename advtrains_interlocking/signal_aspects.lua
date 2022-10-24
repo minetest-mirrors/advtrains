@@ -67,7 +67,9 @@ local function get_type2_dst(group, name)
 	return def.main[math.max(1, aspidx-1)].name
 end
 
-local function type2main_to_type1(name, asp)
+local function type2_to_type1(suppasp, asp)
+	local name = suppasp.group
+	local shift = suppasp.dst_shift
 	local def = type2defs[name]
 	if not def then
 		return nil
@@ -78,18 +80,26 @@ local function type2main_to_type1(name, asp)
 	else
 		aspidx = def.main[asp] or 2
 	end
-	local asptbl = def.main[aspidx]
+	local realidx = math.min(#def.main, aspidx+(shift or 0))
+	local asptbl = def.main[realidx]
 	if not asptbl then
 		return nil
 	end
 	if type(asp) == "number" then
 		asp = asptbl.name
 	end
-	local dst = def.main[math.min(#def.main, aspidx+1)].main
+	local main, shunt, dst
+	if shift then
+		dst = asptbl.main
+	else
+		main = asptbl.main
+		shunt = asptbl.shunt
+		dst = def.main[math.min(#def.main, aspidx+1)].main
+	end
 
 	local t = {
-		main = asptbl.main,
-		shunt = asptbl.shunt,
+		main = main,
+		shunt = shunt,
 		proceed_as_main = asptbl.proceed_as_main,
 		type2name = asp,
 		type2group = name,
@@ -101,37 +111,37 @@ local function type2main_to_type1(name, asp)
 	return t
 end
 
-local function type1_to_type2main(asp, group)
+local function type1_to_type2main(asp, group, shift)
 	local def = type2defs[group]
 	if not def then
 		return nil
 	end
-	if group == asp.type2group and def.main[asp.type2name] then
-		return asp.type2name
-	end
 	local t_main = def.main
 	local idx
-	if not asp.main or asp.main == -1 then
+	if group == asp.type2group and t_main[asp.type2name] then
+		idx = t_main[asp.type2name]
+	elseif not asp.main or asp.main == -1 then
 		idx = 1
 	elseif asp.main == 0 then
 		idx = #t_main
 	else
-		idx = math.max(#t_main-1, 1)
+		idx = #t_main-1
 	end
-	return t_main[idx].name
+	return t_main[math.max(1, idx-(shift or 0))].name
 end
 
 local function equalp(asp1, asp2)
 	if asp1 == asp2 then -- same reference
 		return true
-	elseif asp1.type2group and asp1.type2group == asp2.type2group then -- type2 with the same group
-		return asp1.type2name == asp2.type2name
 	else
 		for _, k in pairs {"main", "shunt", "dst"} do
 			if asp1[k] ~= asp2[k] then
 				return false
 			end
 		end
+	end
+	if asp1.type2group and asp1.type2group == asp2.type2group then
+		return asp1.type2name == asp2.type2name
 	end
 	return true
 end
@@ -144,7 +154,7 @@ return {
 	register_type2 = register_type2,
 	get_type2_definition = get_type2_definition,
 	get_type2_dst = get_type2_dst,
-	type2main_to_type1 = type2main_to_type1,
+	type2_to_type1 = type2_to_type1,
 	type1_to_type2main = type1_to_type2main,
 	equalp = equalp,
 	not_equalp = not_equalp,

@@ -401,6 +401,7 @@ for _, rtab in ipairs {
 					supported_aspects = {
 						type = 2,
 						group = siginfo.typename,
+						dst_shift = siginfo.isdst and 0,
 					},
 					get_aspect = function()
 						return asp

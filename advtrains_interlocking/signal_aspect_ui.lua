@@ -219,7 +219,7 @@ local function get_aspect_from_formspec_t1(suppasp, fields)
 end
 
 local function get_aspect_from_formspec_t2(suppasp, fields)
-	local asp = advtrains.interlocking.aspects.type2main_to_type1(suppasp.group, tonumber(fields.asp))
+	local asp = advtrains.interlocking.aspects.type2_to_type1(suppasp, tonumber(fields.asp))
 	return asp
 end
 

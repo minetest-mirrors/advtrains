@@ -4,6 +4,27 @@ local I = advtrains.interlocking
 local N = advtrains.ndb
 local pts = advtrains.roundfloorpts
 
+local signal_aspect_metatable = {
+	__tostring = function(asp)
+		local st = {}
+		if asp.type2group and asp.type2name then
+			table.insert(st, string.format("%q in group %q", asp.type2name, asp.type2group))
+		end
+		if asp.main then
+			table.insert(st, string.format("current %d", asp.main))
+		end
+		if asp.main ~= 0 then
+			if asp.dst then
+				table.insert(st, string.format("next %d", asp.dst))
+			end
+			if asp.proceed_as_main then
+				table.insert(st, "proceed as main")
+			end
+		end
+		return string.format("[%s]", table.concat(st, ", "))
+	end,
+}
+
 local get_aspect
 
 local supposed_aspects = {}
@@ -11,6 +32,9 @@ local supposed_aspects = {}
 function I.load_supposed_aspects(tbl)
 	if tbl then
 		supposed_aspects = tbl
+		for _, v in pairs(tbl) do
+			setmetatable(v, signal_aspect_metatable)
+		end
 	end
 end
 
@@ -41,11 +65,14 @@ end
 
 local function adjust_aspect(pos, asp)
 	asp = table.copy(I.signal_convert_aspect_if_necessary(asp))
+	setmetatable(asp, signal_aspect_metatable)
 
 	local mainpos = D.get_main(pos)
 	local nxtasp
-	if asp.main ~= 0 and mainpos then
+	if mainpos then
 		nxtasp = get_aspect(mainpos)
+	end
+	if asp.main ~= 0 and mainpos then
 		asp.dst = nxtasp.main
 	else
 		asp.dst = nil
@@ -59,7 +86,10 @@ local function adjust_aspect(pos, asp)
 	if stype == 2 then
 		local group = suppasp.group
 		local name
-		if asp.main ~= 0 and nxtasp and nxtasp.type2group == group and nxtasp.type2name then
+		if suppasp.dst_shift and nxtasp then
+			asp.main = nil
+			name = A.type1_to_type2main(nxtasp, group, suppasp.dst_shift)
+		elseif asp.main ~= 0 and nxtasp and nxtasp.type2group == group and nxtasp.type2name then
 			name = A.get_type2_dst(group, nxtasp.type2name)
 		else
 			name = A.type1_to_type2main(asp, group)
@@ -79,7 +109,7 @@ local function get_real_aspect(pos)
 		local asp = ndef.advtrains.get_aspect(pos, node) or I.DANGER
 		local suppasp = get_supported_aspects(pos)
 		if suppasp.type == 2 then
-			asp = A.type2main_to_type1(suppasp.group, asp)
+			asp = A.type2_to_type1(suppasp, asp)
 		end
 		return adjust_aspect(pos, asp)
 	end
@@ -108,11 +138,6 @@ local function set_aspect(pos, asp, skipdst)
 		if (not skipdst) and aspect_changed then
 			D.update_main(pos)
 		end
-		--[[
-		local dbgmsg = string.format("[%s]set_aspect(%s,%s,%s)", os.clock(), minetest.pos_to_string(pos), minetest.serialize(asp), tostring(skipdst))
-		dbgmsg = debug.traceback(dbgmsg, 2)
-		minetest.chat_send_all(dbgmsg)
-		--]]
 	end
 end
 
