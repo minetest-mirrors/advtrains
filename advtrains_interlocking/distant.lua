@@ -1,3 +1,8 @@
+--- Distant signaling.
+-- This module implements a database backend for distant signal assignments.
+-- The actual modifications to signal aspects are still done by signal aspect accessors.
+-- @module advtrains.interlocking.distant
+
 local db_distant = {}
 local db_distant_of = {}
 
@@ -5,6 +10,9 @@ local A = advtrains.interlocking.aspects
 local pts = advtrains.encode_pos
 local stp = advtrains.decode_pos
 
+--- Replace the distant signal assignment database.
+-- @function load
+-- @param db The new database to load.
 local function db_load(x)
 	if type(x) ~= "table" then
 		return
@@ -13,6 +21,9 @@ local function db_load(x)
 	db_distant_of = x.distant_of
 end
 
+--- Retrieve the current distant signal assignment database.
+-- @function save
+-- @return The current database.
 local function db_save()
 	return {
 		distant = db_distant,
@@ -22,6 +33,10 @@ end
 
 local update_signal, update_main, update_dst
 
+--- Unassign a distant signal.
+-- @function unassign_dst
+-- @param dst The position of the distant signal.
+-- @param[opt=false] force Whether to skip callbacks.
 local function unassign_dst(dst, force)
 	local pts_dst = pts(dst)
 	local main = db_distant_of[pts_dst]
@@ -38,6 +53,10 @@ local function unassign_dst(dst, force)
 	end
 end
 
+--- Unassign a main signal.
+-- @function unassign_main
+-- @param main The position of the main signal.
+-- @param[opt=false] force Whether to skip callbacks.
 local function unassign_main(main, force)
 	local pts_main = pts(main)
 	local t = db_distant[pts_main]
@@ -57,11 +76,21 @@ local function unassign_main(main, force)
 	db_distant[pts_main] = nil
 end
 
+--- Remove all (main and distant) signal assignments from a signal.
+-- @function unassign_all
+-- @param pos The position of the signal.
+-- @param[opt=false] force Whether to skip callbacks.
 local function unassign_all(pos, force)
 	unassign_main(pos)
 	unassign_dst(pos, force)
 end
 
+--- Assign a distant signal to a main signal.
+-- @function assign
+-- @param main The position of the main signal.
+-- @param dst The position of the distant signal.
+-- @param[opt="manual"] by The method of assignment.
+-- @param[opt=false] skip_update Whether to skip callbacks.
 local function assign(main, dst, by, skip_update)
 	local pts_main = pts(main)
 	local pts_dst = pts(dst)
@@ -87,11 +116,20 @@ local function pre_occupy(dst, by)
 	db_distant_of[pts_dst] = {nil, by}
 end
 
+--- Get the distant signals assigned to a main signal.
+-- @function get_distant
+-- @param main The position of the main signal.
+-- @treturn {[pos]=by,...} A table of distant signals, with the positions encoded using `advtrains.encode_pos`.
 local function get_distant(main)
 	local pts_main = pts(main)
 	return db_distant[pts_main] or {}
 end
 
+--- Get the main signal assigned the a distant signal.
+-- @function get_main
+-- @param dst The position of the distant signal.
+-- @return The position of the main signal.
+-- @return The method of assignment.
 local function get_main(dst)
 	local pts_dst = pts(dst)
 	local main = db_distant_of[pts_dst]
@@ -105,6 +143,9 @@ local function get_main(dst)
 	end
 end
 
+--- Update all distant signals assigned to a main signal.
+-- @function update_main
+-- @param main The position of the main signal.
 update_main = function(main)
 	local pts_main = pts(main)
 	local t = get_distant(main)
@@ -114,10 +155,16 @@ update_main = function(main)
 	end
 end
 
+--- Update the aspect of a distant signal.
+-- @function update_dst
+-- @param dst The position of the distant signal.
 update_dst = function(dst)
 	advtrains.interlocking.signal_readjust_aspect(dst)
 end
 
+--- Update the aspect of a combined (main and distant) signal and all distant signals assigned to it.
+-- @function update_signal
+-- @param pos The position of the signal.
 update_signal = function(pos)
 	update_main(pos)
 	update_dst(pos)

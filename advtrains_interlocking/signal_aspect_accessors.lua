@@ -1,3 +1,6 @@
+--- Signal aspect accessors
+-- @module advtrains.interlocking
+
 local A = advtrains.interlocking.aspects
 local D = advtrains.distant
 local I = advtrains.interlocking
@@ -29,6 +32,9 @@ local get_aspect
 
 local supposed_aspects = {}
 
+--- Replace the signal aspect cache.
+-- @function load_supposed_aspects
+-- @param db The new database.
 function I.load_supposed_aspects(tbl)
 	if tbl then
 		supposed_aspects = tbl
@@ -38,23 +44,42 @@ function I.load_supposed_aspects(tbl)
 	end
 end
 
+--- Retrieve the signal aspect cache.
+-- @function save_supposed_aspects
+-- @return The current database in use.
 function I.save_supposed_aspects()
 	return supposed_aspects
 end
 
+--- Read the aspect of a signal strictly from cache.
+-- @param pos The position of the signal.
+-- @return[1] The aspect of the signal (if present in cache).
+-- @return[2] The nil constant (otherwise).
 local function get_supposed_aspect(pos)
 	return supposed_aspects[pts(pos)]
 end
 
+--- Update the signal aspect information in cache.
+-- @param pos The position of the signal.
+-- @param asp The new signal aspect
 local function set_supposed_aspect(pos, asp)
 	supposed_aspects[pts(pos)] = asp
 end
 
+--- Get the definition of a node.
+-- @param pos The position of the node.
+-- @return[1] The definition of the node (if present).
+-- @return[2] An empty table (otherwise).
 local function get_ndef(pos)
 	local node = N.get_node(pos)
 	return minetest.registered_nodes[node.name] or {}
 end
 
+--- Get the aspects supported by a signal.
+-- @function signal_get_supported_aspects
+-- @param pos The position of the signal.
+-- @return[1] The table of supported aspects (if present).
+-- @return[2] The nil constant (otherwise).
 local function get_supported_aspects(pos)
 	local ndef = get_ndef(pos)
 	if ndef.advtrains and ndef.advtrains.supported_aspects then
@@ -63,6 +88,11 @@ local function get_supported_aspects(pos)
 	return nil
 end
 
+--- Adjust a new signal aspect to fit a signal.
+-- @param pos The position of the signal.
+-- @param asp The new signal aspect.
+-- @return The adjusted signal aspect.
+-- @return The information to pass to the `advtrains.set_aspect` field in the node definitions.
 local function adjust_aspect(pos, asp)
 	asp = table.copy(I.signal_convert_aspect_if_necessary(asp))
 	setmetatable(asp, signal_aspect_metatable)
@@ -103,6 +133,12 @@ local function adjust_aspect(pos, asp)
 	return asp, asp
 end
 
+--- Get the aspect of a signal without accessing the cache.
+-- For most cases, `get_aspect` should be used instead.
+-- @function signal_get_real_aspect
+-- @param pos The position of the signal.
+-- @return[1] The signal aspect adjusted using `adjust_aspect` (if present).
+-- @return[2] The nil constant (otherwise).
 local function get_real_aspect(pos)
 	local ndef = get_ndef(pos)
 	if ndef.advtrains and ndef.advtrains.get_aspect then
@@ -116,6 +152,11 @@ local function get_real_aspect(pos)
 	return nil
 end
 
+--- Get the aspect of a signal.
+-- @function signal_get_aspect
+-- @param pos The position of the signal.
+-- @return[1] The aspect of the signal (if present).
+-- @return[2] The nil constant (otherwise).
 get_aspect = function(pos)
 	local asp = get_supposed_aspect(pos)
 	if not asp then
@@ -125,6 +166,11 @@ get_aspect = function(pos)
 	return asp
 end
 
+--- Set the aspect of a signal.
+-- @function signal_set_aspect
+-- @param pos The position of the signal.
+-- @param asp The new signal aspect.
+-- @param[opt=false] skipdst Whether to skip updating distant signals.
 local function set_aspect(pos, asp, skipdst)
 	local node = N.get_node(pos)
 	local ndef = minetest.registered_nodes[node.name]
@@ -141,10 +187,16 @@ local function set_aspect(pos, asp, skipdst)
 	end
 end
 
+--- Remove a signal from cache.
+-- @function signal_clear_aspect
+-- @param pos The position of the signal.
 local function clear_aspect(pos)
 	set_supposed_aspect(pos, nil)
 end
 
+--- Readjust the aspect of a signal.
+-- @function signal_readjust_aspect
+-- @param pos The position of the signal.
 local function readjust_aspect(pos)
 	set_aspect(pos, get_aspect(pos))
 end

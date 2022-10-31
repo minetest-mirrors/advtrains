@@ -1,5 +1,11 @@
+--- Signal aspect handling.
+-- @module advtrains.interlocking.aspects
+
 local type2defs = {}
 
+--- Register a type 2 signal group.
+-- @function register_type2
+-- @param def The definition table.
 local function register_type2(def)
 	local t = {type = 2}
 	local name = def.name
@@ -42,19 +48,21 @@ local function register_type2(def)
 	type2defs[name] = t
 end
 
+--- Get the definition of a type 2 signal group.
+-- @function get_type2_definition
+-- @param name The name of the signal group.
+-- @return[1] The definition for the signal group (if present).
+-- @return[2] The nil constant (otherwise).
 local function get_type2_definition(name)
 	return type2defs[name]
 end
 
-local function get_type2_danger(group)
-	local def = type2defs[group]
-	if not def then
-		return nil
-	end
-	local main = def.main
-	return main[#main]
-end
-
+--- Get the name of the distant aspect before the current aspect.
+-- @function get_type2_dst
+-- @param group The name of the group.
+-- @param name The name of the current aspect.
+-- @return[1] The name of the distant aspect (if present).
+-- @return[2] The nil constant (otherwise).
 local function get_type2_dst(group, name)
 	local def = type2defs[group]
 	if not def then
@@ -67,6 +75,12 @@ local function get_type2_dst(group, name)
 	return def.main[math.max(1, aspidx-1)].name
 end
 
+--- Convert a type 2 signal aspect to a type 1 signal aspect.
+-- @function type2_to_type1
+-- @param suppasp The table of supported aspects for the signal.
+-- @param asp The name of the signal aspect.
+-- @return[1] The type 1 signal aspect table (if present).
+-- @return[2] The nil constant (otherwise).
 local function type2_to_type1(suppasp, asp)
 	local name = suppasp.group
 	local shift = suppasp.dst_shift
@@ -111,6 +125,13 @@ local function type2_to_type1(suppasp, asp)
 	return t
 end
 
+--- Convert a type 1 signal aspect table to a type 2 signal aspect.
+-- @function type1_to_type2main
+-- @param asp The type 1 signal aspect table
+-- @param group The signal aspect group
+-- @param[opt=0] shift The shift for the signal aspect.
+-- @return[1] The name of the signal aspect (if present).
+-- @return[2] The nil constant (otherwise).
 local function type1_to_type2main(asp, group, shift)
 	local def = type2defs[group]
 	if not def then
@@ -130,6 +151,11 @@ local function type1_to_type2main(asp, group, shift)
 	return t_main[math.max(1, idx-(shift or 0))].name
 end
 
+--- Compare two signal aspect tables.
+-- @function equalp
+-- @param asp1 The first signal aspect table.
+-- @param asp2 The second signal aspect table.
+-- @return Whether the two signal aspect tables give the same (type 1 aspect) information.
 local function equalp(asp1, asp2)
 	if asp1 == asp2 then -- same reference
 		return true
@@ -146,6 +172,11 @@ local function equalp(asp1, asp2)
 	return true
 end
 
+--- Compare two signal aspect tables.
+-- @function not_equalp
+-- @param asp1 The first signal aspect table.
+-- @param asp2 The second signal aspect table.
+-- @return The negation of `equalp``(asp1, asp2)`.
 local function not_equalp(asp1, asp2)
 	return not equalp(asp1, asp2)
 end

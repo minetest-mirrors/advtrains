@@ -1,5 +1,5 @@
--- Advtrains interlocking system
--- See database.lua for a detailed explanation
+--- Advtrains interlocking system.
+-- @module advtrains.interlocking
 
 advtrains.interlocking = {}
 
