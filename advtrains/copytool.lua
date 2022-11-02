@@ -26,7 +26,7 @@ minetest.register_tool("advtrains:copytool", {
 				return itemstack
 			end
 			if not minetest.check_player_privs(placer, {train_operator = true }) then
-				minetest.chat_send_player(pname, attrans("You don't have the train_operator privilege."))
+				minetest.chat_send_player(pname, attrans.nopriv("train_operator"))
 				return itemstack
 			end
 			if not minetest.check_player_privs(placer, {train_admin = true }) and minetest.is_protected(pointed_thing.under, placer:get_player_name()) then

@@ -15,7 +15,7 @@ Can't get on: wagon full or doors closed!=Can't get on: wagon full or doors clos
 Use Sneak+rightclick to bypass closed doors!=Use Sneak+rightclick to bypass closed doors!
 Doors are closed! Use Sneak+rightclick to ignore the closed doors and get off!=Doors are closed! Use Sneak+rightclick to ignore the closed doors and get off!
 Access to @1=Access to @1
-You don't have the train_operator privilege.=You don't have the train_operator privilege.
+You don't have the @1 privilege.=You don't have the @1 privilege.
 The wagon's inventory is not empty!=The wagon's inventory is not empty!
 Position is occupied by a train.=Position is occupied by a train.
 There's a Track Circuit Break here.=There's a Track Circuit Break here.
@@ -47,6 +47,7 @@ Buffer and Chain Coupler=Buffer and Chain Coupler
 Scharfenberg Coupler=Scharfenberg Coupler
 Japanese Train Inter-Wagon Connection=Japanese Train Inter-Wagon Connection
 Can not couple: The couplers of the trains do not match (@1 and @2).=Can not couple: The couplers of the trains do not match (@1 and @2).
+You are not allowed to couple trains without the train_operator privilege.=You are not allowed to couple trains without the train_operator privilege.
 
 # Clipboard
 The track you are trying to place the wagon on is not long enough!=The track you are trying to place the wagon on is not long enough!
@@ -60,11 +61,11 @@ No such train: @1=No such train: @1
 Train copied!=Train copied!
 
 # Protection
-You are not allowed to build tracks without the track_builder privilege=You are not allowed to build tracks without the track_builder privilege
-You are not allowed to build near tracks without the track_builder privilege=You are not allowed to build near tracks without the track_builder privilege
-You are not allowed to build tracks at this protected position=You are not allowed to build tracks at this protected position
-You are not allowed to build near tracks at this protected position=You are not allowed to build near tracks at this protected position
-You are not allowed to operate turnouts and signals (missing railway_operator privilege)=You are not allowed to operate turnouts and signals (missing railway_operator privilege)
+You are not allowed to build tracks without the track_builder privilege.=You are not allowed to build tracks without the track_builder privilege.
+You are not allowed to build near tracks without the track_builder privilege.=You are not allowed to build near tracks without the track_builder privilege.
+You are not allowed to build tracks at this protected position.=You are not allowed to build tracks at this protected position.
+You are not allowed to build near tracks at this protected position.=You are not allowed to build near tracks at this protected position.
+You are not allowed to operate turnouts and signals without the railway_operator privilege.=You are not allowed to operate turnouts and signals without the railway_operator privilege.
 
 # Train HUD/Formspecs
 Speed:=Speed:

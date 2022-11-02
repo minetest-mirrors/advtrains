@@ -15,7 +15,7 @@ Can't get on: wagon full or doors closed!=Sie können nicht einsteigen: der Wagg
 Use Sneak+rightclick to bypass closed doors!=Nutzen Sie Schleichen+Rechtsklick, um trotz geschlossener Türen einzusteigen.
 Doors are closed! Use Sneak+rightclick to ignore the closed doors and get off!=Die Türen sind geschlossen. Nutzen Sie Schleichen+Rechtsklick, um trotz geschlossener Türen auszusteigen.
 Access to @1=Zugang zu @1
-You don't have the train_operator privilege.=Ihnen fehlt das „train_operator“-Privileg.
+You don't have the @1 privilege.=Ihnen fehlt das „@1“-Privileg.
 The wagon's inventory is not empty!=Das Inventar dieses Waggons ist nicht leer!
 Position is occupied by a train.=Ein Zug steht an dieser Position.
 There's a Track Circuit Break here.=Hier ist eine Gleisabschnittsgrenze (TCB).
@@ -46,7 +46,8 @@ You need to own at least one neighboring wagon to destroy this couple.=Sie müss
 Buffer and Chain Coupler=Schraubenkupplung
 Scharfenberg Coupler=Scharfenbergkupplung
 Japanese Train Inter-Wagon Connection=Waggonzwischenverbindung Japanischer Personenzüge
-Can not couple: The couplers of the trains do not match (@1 and @2).=Kann nicht ankuppeln: Die Kupplungen der Züge passen nicht zueinander (@1 und @2)
+Can not couple: The couplers of the trains do not match (@1 and @2).=Die Kupplungen der Züge passen nicht zueinander (@1 und @2).
+You are not allowed to couple trains without the train_operator privilege.=Sie dürfen ohne das „train_builder“-Privileg keine Züge ankuppeln.
 
 # Clipboard
 The track you are trying to place the wagon on is not long enough!=Das Gleis, auf dem der Waggon platziert werden woll, ist zu kurz.
@@ -60,11 +61,11 @@ No such train: @1=Es gibt keinen mit „@1“ identifizierbaren Zug.
 Train copied!=Der Zug wurde Kopiert.
 
 # Protection
-You are not allowed to build tracks without the track_builder privilege=Sie dürfen ohne das „track_builder“-Privileg kein Gleis bauen.
-You are not allowed to build near tracks without the track_builder privilege=Sie dürfen ohne das „track_builder“-Privileg nicht in der Nähe von Gleisen bauen.
-You are not allowed to build tracks at this protected position=Sie dürfen an geschützten Stellen kein Gleis bauen.
-You are not allowed to build near tracks at this protected position=Sie dürfen an geschützten Stellen nicht in der Nähe von Gleisen bauen.
-You are not allowed to operate turnouts and signals (missing railway_operator privilege)=Sie dürfen ohne das „railway_operator“-Privileg keine Bahnanlage operieren.
+You are not allowed to build tracks without the track_builder privilege.=Sie dürfen ohne das „track_builder“-Privileg kein Gleis bauen.
+You are not allowed to build near tracks without the track_builder privilege.=Sie dürfen ohne das „track_builder“-Privileg nicht in der Nähe von Gleisen bauen.
+You are not allowed to build tracks at this protected position.=Sie dürfen an geschützten Stellen kein Gleis bauen.
+You are not allowed to build near tracks at this protected position.=Sie dürfen an geschützten Stellen nicht in der Nähe von Gleisen bauen.
+You are not allowed to operate turnouts and signals without the railway_operator privilege.=Sie dürfen ohne das „railway_operator“-Privileg keine Bahnanlage operieren.
 
 # Train HUD/Formspecs
 Speed:=Geschw.:

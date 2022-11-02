@@ -15,7 +15,7 @@ Can't get on: wagon full or doors closed!=無法上車：車門已關閉或車�
 Use Sneak+rightclick to bypass closed doors!=請使用潛行+右鍵上車。
 Doors are closed! Use Sneak+rightclick to ignore the closed doors and get off!=車門已關閉，請使用潛行+右鍵單擊下車。
 Access to @1=可前往@1
-You don't have the train_operator privilege.=您沒有「train_operator」許可權。
+You don't have the @1 privilege.=您沒有「@1」許可權。
 The wagon's inventory is not empty!=The wagon's inventory is not empty!
 Position is occupied by a train.=Position is occupied by a train.
 There's a Track Circuit Break here.=There's a Track Circuit Break here.
@@ -47,6 +47,7 @@ Buffer and Chain Coupler=鏈式連結器
 Scharfenberg Coupler=Scharfenberg 式連結器
 Japanese Train Inter-Wagon Connection=日本火車連結器
 Can not couple: The couplers of the trains do not match (@1 and @2).=您無法連結這兩節車廂：這兩節車廂使用不同的連結器 (@1和@2)。
+You are not allowed to couple trains without the train_operator privilege.=您沒有「train_operator」許可權，不能連結這兩節車廂。
 
 # Clipboard
 The track you are trying to place the wagon on is not long enough!=軌道太短。
@@ -60,11 +61,11 @@ No such train: @1=ID 為「@1」的列車不存在。
 Train copied!=已複製
 
 # Protection
-You are not allowed to build tracks without the track_builder privilege=您沒有「train_operator」許可權，不能在這裡建造鐵路。
-You are not allowed to build near tracks without the track_builder privilege=您沒有「train_operator」許可權，不能在鐵路附近建任何東西。
-You are not allowed to build tracks at this protected position=這裡已被保護，您不能在這裡建造鐵路。
-You are not allowed to build near tracks at this protected position=這裡已被保護，您不能在這裡的鐵路附近建任何東西。
-You are not allowed to operate turnouts and signals (missing railway_operator privilege)=您沒有「railway_operator」許可權，不能控制鐵路設施。
+You are not allowed to build tracks without the track_builder privilege.=您沒有「train_operator」許可權，不能在這裡建造鐵路。
+You are not allowed to build near tracks without the track_builder privilege.=您沒有「train_operator」許可權，不能在鐵路附近建任何東西。
+You are not allowed to build tracks at this protected position.=這裡已被保護，您不能在這裡建造鐵路。
+You are not allowed to build near tracks at this protected position.=這裡已被保護，您不能在這裡的鐵路附近建任何東西。
+You are not allowed to operate turnouts and signals without the railway_operator privilege.=您沒有「railway_operator」許可權，不能控制鐵路設施。
 
 # Train HUD/Formspecs
 Speed:=速度

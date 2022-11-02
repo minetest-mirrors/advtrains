@@ -15,7 +15,7 @@ Can't get on: wagon full or doors closed!=Embarquement impossible : le wagon est
 Use Sneak+rightclick to bypass closed doors!=Utilisez "Marcher lentement (Sneak)" et Clic-Droit pour franchir les portes closes !
 Doors are closed! Use Sneak+rightclick to ignore the closed doors and get off!=Portes closes ! Utilisez "Marcher lentement (Sneak)" et Clic-Droit pour franchir les portes et débarquer !
 Access to @1=Accès à @1
-You don't have the train_operator privilege.=Vous ne possédez pas le privilège "train_operator".
+You don't have the @1 privilege.=Vous ne possédez pas le privilège "@1".
 The wagon's inventory is not empty!=Le stock de ce wagon n'est pas vide !
 Position is occupied by a train.=Cet emplacement est occupé par un train.
 There's a Track Circuit Break here.=Il y a un "Track Circuit Break" ici.
@@ -47,6 +47,7 @@ Buffer and Chain Coupler=Attelage à tampon et vis
 Scharfenberg Coupler=Attelage Scharfenberg
 Japanese Train Inter-Wagon Connection=Passage inter-voiture de train Japonais
 Can not couple: The couplers of the trains do not match (@1 and @2).=Accouplement impossible: les attelages des trains ne concordent pas (@1 et @2).
+You are not allowed to couple trains without the train_operator privilege.=You are not allowed to couple trains without the train_operator privilege.
 
 # Clipboard
 The track you are trying to place the wagon on is not long enough!=La voie sur laquelle vous tentez de placer le wagon est trop courte !
@@ -60,11 +61,11 @@ No such train: @1=Pas de tel train : @1
 Train copied!=Train copié !
 
 # Protection
-You are not allowed to build tracks without the track_builder privilege=Vous ne pouvez pas construire une voie sans le privilège "track_builder"
-You are not allowed to build near tracks without the track_builder privilege=Vous ne pouvez pas construire à proximité d'une voie sans le privilège "track_builder" (?)
-You are not allowed to build tracks at this protected position=Vous ne pouvez pas construire une voie à cet emplacement protégé
-You are not allowed to build near tracks at this protected position=Vous ne pouvez pas construire à proximité d'une voie à cet emplacement protégé
-You are not allowed to operate turnouts and signals (missing railway_operator privilege)=Vous ne pouvez pas actionner les aiguillages ou les signaux (privilège "railway_operator" manquant)
+You are not allowed to build tracks without the track_builder privilege.=Vous ne pouvez pas construire une voie sans le privilège "track_builder"
+You are not allowed to build near tracks without the track_builder privilege.=Vous ne pouvez pas construire à proximité d'une voie sans le privilège "track_builder" (?)
+You are not allowed to build tracks at this protected position.=Vous ne pouvez pas construire une voie à cet emplacement protégé
+You are not allowed to build near tracks at this protected position.=Vous ne pouvez pas construire à proximité d'une voie à cet emplacement protégé
+You are not allowed to operate turnouts and signals without the railway_operator privilege.=Vous ne pouvez pas actionner les aiguillages ou les signaux (privilège "railway_operator" manquant)
 
 # Train HUD/Formspecs
 Speed:=Vitesse : 
