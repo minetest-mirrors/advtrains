@@ -1,4 +1,4 @@
-local pole_texture = "advtrains_hud_bg.png^[colorize:#858585:255"
+local pole_texture = "advtrains_signals_japan_mast.png"
 local signal_face_texture = "advtrains_hud_bg.png^[colorize:#000000:255"
 local pole_radius = 1/16
 local pole_box = {-pole_radius,-1/2,-pole_radius,pole_radius,1/2,pole_radius}
