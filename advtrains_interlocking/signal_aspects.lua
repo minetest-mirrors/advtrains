@@ -9,12 +9,14 @@ local type2defs = {}
 local function register_type2(def)
 	local t = {type = 2}
 	local name = def.name
-	if type2defs[name] then
-		return error("Name " .. name .. " already used")
-	elseif type(name) ~= "string" then
+	if type(name) ~= "string" then
 		return error("Name is not a string")
+	elseif type2defs[name] then
+		return error(string.format("Attempt to redefine type 2 signal aspect group %q, previously defined in %s", name, type2defs[name].defined))
 	end
 	t.name = name
+
+	t.defined = debug.getinfo(2, "S").short_src or "[?]"
 
 	local label = def.label or name
 	if type(label) ~= "string" then
@@ -54,7 +56,12 @@ end
 -- @return[1] The definition for the signal group (if present).
 -- @return[2] The nil constant (otherwise).
 local function get_type2_definition(name)
-	return type2defs[name]
+	local t = type2defs[name]
+	if t then
+		return table.copy(t)
+	else
+		return nil
+	end
 end
 
 --- Get the name of the distant aspect before the current aspect.
@@ -151,7 +158,7 @@ local function type1_to_type2main(asp, group, shift)
 	return t_main[math.max(1, idx-(shift or 0))].name
 end
 
---- Compare two signal aspect tables.
+--- Compare two type 1 signal aspect tables.
 -- @function equalp
 -- @param asp1 The first signal aspect table.
 -- @param asp2 The second signal aspect table.
