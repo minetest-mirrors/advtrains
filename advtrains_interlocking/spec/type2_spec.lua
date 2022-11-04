@@ -31,7 +31,6 @@ local type2def = {
 	},
 }
 
-local asps = {}
 for _, v in pairs(type2def.main) do
 	minetest.register_node("advtrains_interlocking:" .. v.name, {
 		advtrains = {
@@ -45,11 +44,10 @@ for _, v in pairs(type2def.main) do
 			end,
 		}
 	})
-	asps[v.name] = {
-		main = v.main,
-		type2group = "foo",
-		type2name = v.name,
-	}
+end
+
+local function asp(group, name, dst)
+	return A.type2_to_type1({group = group, dst_shift = shift}, name)
 end
 
 local origin = vector.new(0, 0, 0)
@@ -71,6 +69,12 @@ describe("type 2 signal group registration", function()
 	it("should handle nonexistant groups", function()
 		assert.is_nil(A.get_type2_definition("something_else"))
 	end)
+	it("should reject invalid definitions", function()
+		assert.has.errors(function() A.register_type2({}) end)
+		assert.has.errors(function() A.register_type2({name="",label={}}) end)
+		assert.has.errors(function() A.register_type2({name="",main={{name={}}}}) end)
+		assert.has.errors(function() A.register_type2({name="",main={{name="",label={}}}}) end)
+	end)
 end)
 
 describe("signal aspect conversion", function()
@@ -79,7 +83,17 @@ describe("signal aspect conversion", function()
 		assert.equal("caution", A.type1_to_type2main({main = 6}, "foo"))
 		assert.equal("proceed", A.type1_to_type2main({}, "foo"))
 	end)
-	-- Type 2 -> type 1 conversion is tested with signal aspect accessors
+	it("should reject invalid type 2 signal information", function()
+		assert.is_nil(A.type1_to_type2main({}, "?"))
+		assert.is_nil(A.type2_to_type1({}, "x"))
+		assert.same(asp("foo","caution"), asp("foo", "x"))
+	end)
+	it("should accept integer indices for type 2 signal aspects", function()
+		assert.same(asp("foo", "caution"), asp("foo", 2))
+		assert.same(asp("foo", "danger"), asp("foo", 10))
+		assert.same(asp("foo", "proceed"), asp("foo", 1))
+		assert.is_nil(asp("foo", -0.5))
+	end)
 end)
 
 describe("type 2 signals", function()
@@ -89,13 +103,13 @@ describe("type 2 signals", function()
 		assert.equal("proceed", A.get_type2_dst("foo", "proceed"))
 	end)
 	it("should work with accessors", function()
-		assert.same(asps.danger, I.signal_get_aspect(origin))
+		assert.same(asp("foo","danger"), I.signal_get_aspect(origin))
 		local newasp = {type2group = "foo", type2name = "proceed", main = 6}
 		I.signal_set_aspect(origin, newasp)
 		assert.same(newasp, I.signal_get_aspect(origin))
 	end)
 	it("should work with distant signaling", function()
-		assert.same(asps.proceed, I.signal_get_aspect(dstpos))
+		assert.same(asp("foo","proceed"), I.signal_get_aspect(dstpos))
 		local dstasp = {type2group = "foo", type2name = "proceed", dst = 6, main = -1}
 		D.assign(origin, dstpos)
 		assert.same(dstasp, I.signal_get_aspect(dstpos))

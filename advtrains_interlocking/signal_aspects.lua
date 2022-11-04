@@ -117,12 +117,15 @@ local function type2_to_type1(suppasp, asp)
 		shunt = asptbl.shunt
 		dst = def.main[math.min(#def.main, aspidx+1)].main
 	end
+	if main == 0 then
+		dst = nil
+	end
 
 	local t = {
 		main = main,
 		shunt = shunt,
 		proceed_as_main = asptbl.proceed_as_main,
-		type2name = asp,
+		type2name = asptbl.name,
 		type2group = name,
 		dst = dst,
 	}
