@@ -110,12 +110,6 @@ local function assign(main, dst, by, skip_update)
 	end
 end
 
-local function pre_occupy(dst, by)
-	local pts_dst = pts(dst)
-	unassign_dst(dst)
-	db_distant_of[pts_dst] = {nil, by}
-end
-
 --- Get the distant signals assigned to a main signal.
 -- @function get_distant
 -- @param main The position of the main signal.

@@ -6,6 +6,10 @@ packages:
 sources :
 - https://git.sr.ht/~gpcf/advtrains
 
+artifacts:
+- advtrains.luacov.report.out
+- advtrains_interlocking.luacov.report.out
+
 tasks:
 
 - install_mineunit : |
@@ -21,4 +25,5 @@ tasks:
         ~/.luarocks/bin/mineunit -c
         ~/.luarocks/bin/mineunit -r
         sed -n '/^File/,$p' luacov.report.out
+        mv luacov.report.out ~/$i.luacov.report.out
     done
