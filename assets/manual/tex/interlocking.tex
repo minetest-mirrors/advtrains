@@ -196,15 +196,16 @@ The previous sections were mainly theoretical in that the sections mostly introd
 
 One of the most important considerations when setting up interlocking at a junction is to make sure that multiple trains can go through the junction at the same time when possible.
 
-As an exercise in section \ref{s:xings}, you were asked to build a T junction. A scheme is shown below if you are stuck. Try to interlock the junction based on what you have learned in the last few sections.
+As an exercise in section \ref{s:xings}, you were asked to build a T junction. An example is shown below if you are stuck.\footnote{Please note that, as in the rest of the manual, the curves in the diagrams only approximate their counterparts in the game. It is up to the reader to figure out which track to use.} Try to interlock the junction based on what you have learned in the last few sections.
 
-\begin{centeredtikzpicture}[ultra thick]
-  \draw [->] (-0.5,-1.5) -- (-0.5,0) arc [start angle=0,end angle=90,radius=1] -- (-3,1);
-  \draw [->] (-3,2) -- (-1.5,2) arc [start angle=90,end angle=0,radius=2] -- (0.5,-1.5);
-  \draw [->] (0.5,-1.5) -- (0.5,0) arc [start angle=180,end angle=90,radius=1] -- (3,1);
-  \draw [->] (3,2) -- (1.5,2) arc [start angle=90,end angle=180,radius=2] -- (-0.5,-1.5);
-  \draw [<->] (-3,2) -- (3,2);
-  \draw (-3,1) -- (3,1);
+\begin{centeredtikzpicture}[ultra thick,scale=0.7]
+  \draw [gray,thin,shift={(-0.5,-0.5)}] (0,0) grid (16,11);
+  \draw [<->] (0,10) -- ++(15,0);
+  \draw [<->] (0,7) -- ++(15,0);
+  \draw [->] (1,10) .. controls +(1,0) .. ++(2,-0.5) .. controls +(1,-0.5) .. ++(2,-1.5) -- ++(2,-2) .. controls +(1,-1) .. ++(1.5,-2) .. controls +(0.5,-1) .. ++(0.5,-2) -- ++(0,-2);
+  \draw (1,7) .. controls +(1,0) .. ++(2,-0.5) .. controls +(1,-0.5) .. ++(1.5,-1) .. controls +(0.5,-0.5) .. ++(1,-1.5) .. controls +(0.5,-1) .. ++(0.5,-2);
+  \draw [->] (14,10) .. controls +(-1,0) .. ++(-2,-0.5) .. controls +(-1,-0.5) .. ++(-2,-1.5) -- ++(-2,-2) .. controls +(-1,-1) .. ++(-1.5,-2) .. controls +(-0.5,-1) .. ++(-0.5,-2) -- ++(0,-2);
+  \draw (14,7) .. controls +(-1,0) .. ++(-2,-0.5) .. controls +(-1,-0.5) .. ++(-1.5,-1) .. controls +(-0.5,-0.5) .. ++(-1,-1.5) .. controls +(-0.5,-1) .. ++(-0.5,-2);
 \end{centeredtikzpicture}
 
 The lazy method would be to set up the entire junction as a single track section - you only need 6 TCBs for that. However, a train passing through would occupy the entire junction, even when two trains could use the junction at the same time - for example, a train going from east to west and another one from west to east. This can be solved by a slightly more complicated setup with four sections, each shown below with a different color:
@@ -224,7 +225,7 @@ The lazy method would be to set up the entire junction as a single track section
   \draw [green] (0.5,0) arc [start angle=0,end angle=15,radius=2];
 \end{centeredtikzpicture}
 
-It is also possible to build the junction on multiple levels. This is known as grade separation. In real life, grade-separated railway junctions are not common, mostly because of the larger curve radii and slopes that are notably less steep (for example, the steepest slope of the Schwarzwaldbahn in Baden, which has an altitude between 384m and 832m, is only 2\%). As an exercise, you can try to make the T junction grade-separated.
+It is also possible to build the junction on multiple levels. This is known as grade separation. In real life, grade-separated railway junctions are not as common as junctions for road vehicles, mostly because of the larger curve radii and slopes that are notably less steep (for example, the steepest slope of the Schwarzwaldbahn in Baden, which has an altitude between 384m and 832m, is only 2\%). As an exercise, you can try to make the T junction grade-separated.
 
 \subsubsection{Track capacity and deadlock}\label{s:ilcapacity}
 You can not infinitely add trains to a line. If you do, you will end up with a deadlock, where every train is stuck at a red light, waiting for the previous train to clear the track section ahead, while the previous train is also stuck at a red light, waiting for the train ahead of it to leave the section ahead, and so on:
