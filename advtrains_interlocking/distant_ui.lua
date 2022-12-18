@@ -3,7 +3,7 @@ local D = advtrains.distant
 local I = advtrains.interlocking
 
 function advtrains.interlocking.show_distant_signal_form(pos, pname)
-	local form = {"size[7,7]"}
+	local form = {"size[7,6.5]"}
 	form[#form+1] = advtrains.interlocking.make_signal_formspec_tabheader(pname, pos, 7, 3)
 	local main, set_by = D.get_main(pos)
 	if main then
@@ -31,9 +31,9 @@ function advtrains.interlocking.show_distant_signal_form(pos, pname)
 		dstlist[#dstlist+1] = minetest.pos_to_string(advtrains.decode_pos(pos))
 	end
 	form[#form+1] = F.S_label(0.5, 2.5, "This signal has the following distant signals:")
-	form[#form+1] = F.textlist(0.5, 3, 4.5, 3.5, "dstlist", dstlist)
-	form[#form+1] = F.image_button_exit(5.5, 3.5, 1, 1, "cdb_add.png", "dst_add", "")
-	form[#form+1] = F.image_button_exit(5.5, 5, 1, 1, "cdb_clear.png", "dst_del", "")
+	form[#form+1] = F.textlist(0.5, 3, 4.5, 3, "dstlist", dstlist)
+	form[#form+1] = F.image_button_exit(5.5, 3.25, 1, 1, "cdb_add.png", "dst_add", "")
+	form[#form+1] = F.image_button_exit(5.5, 4.75, 1, 1, "cdb_clear.png", "dst_del", "")
 	minetest.show_formspec(pname, "advtrains:distant_" .. minetest.pos_to_string(pos), table.concat(form))
 end
 

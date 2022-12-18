@@ -52,16 +52,8 @@ local function describe_supported_aspects_t1(suppasp, isasp)
 	t.main_current = selid
 
 	if suppasp.shunt == nil then
-		selid = 1
-		if isasp and isasp.shunt then
-			selid = 2
-		end
-		entries = {
-			describe_t1_shunt_aspect(false),
-			describe_t1_shunt_aspect(true),
-		}
-		t.shunt = entries
-		t.shunt_current = selid
+		t.shunt = true
+		t.shunt_current = isasp and isasp.shunt
 	end
 
 	entries = {}
@@ -83,8 +75,12 @@ local signal_tabheader_map = {}
 
 local function make_signal_formspec_tabheader(pname, pos, width, selid)
 	signal_tabheader_map[pname] = pos
+	local firstlabel = attrans("Signal aspect")
+	if advtrains.interlocking.db.get_sigd_for_signal(pos) then
+		firstlabel = attrans("Routesetting")
+	end
 	local options = {
-		attrans("Signal aspect"),
+		firstlabel,
 		attrans("Influence point"),
 		attrans("Distant signalling"),
 	}
@@ -112,7 +108,7 @@ advtrains.interlocking.make_signal_formspec_tabheader = make_signal_formspec_tab
 advtrains.interlocking.handle_signal_formspec_tabheader_fields = handle_signal_formspec_tabheader_fields
 
 local function make_signal_aspect_selector_t1(suppasp, purpose, isasp)
-	local form = {"size[7,7.25]"}
+	local form = {"size[7,6.5]"}
 	local t = describe_supported_aspects_t1(suppasp, isasp)
 	if type(purpose) == "table" then
 		form[#form+1] = make_signal_formspec_tabheader(purpose.pname, purpose.pos, 7, 1)
@@ -124,22 +120,21 @@ local function make_signal_aspect_selector_t1(suppasp, purpose, isasp)
 	form[#form+1] = F.S_label(0.5, 1.5, "Main aspect")
 	form[#form+1] = F.dropdown(0.5, 2, 6, "main", t.main, t.main_current, true)
 
-	form[#form+1] = F.S_label(0.5, 3, "Shunt aspect")
+	form[#form+1] = F.S_label(0.5, 3, "Distant aspect")
+	form[#form+1] = F.dropdown(0.5, 3.5, 6, "dst", t.dst, t.dst_current, true)
+
 	if t.shunt then
-		form[#form+1] = F.dropdown(0.5, 3.5, 6, "shunt_free", t.shunt, t.shunt_current, true)
+		form[#form+1] = F.S_checkbox(0.5, 4.25, "shunt", t.shunt_current, "Allow shunting")
 	else
-		form[#form+1] = F.S_label(0.5, 3.5, "The shunt aspect cannot be changed")
+		form[#form+1] = F.S_label(0.5, 4.5, "The shunt aspect cannot be changed.")
 	end
 
-	form[#form+1] = F.S_label(0.5, 4.5, "Distant aspect")
-	form[#form+1] = F.dropdown(0.5, 5, 6, "dst", t.dst, t.dst_current, true)
-
-	form[#form+1] = F.S_button_exit(0.5, 6, 6, 1, "save", "Save signal aspect")
+	form[#form+1] = F.S_button_exit(0.5, 5.25, 6, 1, "save", "Save signal aspect")
 	return table.concat(form)
 end
 
 local function make_signal_aspect_selector_t2(suppasp, purpose, isasp)
-	local form = {"size[7,4]"}
+	local form = {"size[7,6.5]"}
 	local def = advtrains.interlocking.aspects.get_type2_definition(suppasp.group)
 	if not def then
 		return nil
@@ -159,8 +154,13 @@ local function make_signal_aspect_selector_t2(suppasp, purpose, isasp)
 		end
 		entries[idx] = spv.label
 	end
-	form[#form+1] = F.dropdown(0.5, 1.5, 6, "asp", entries, selid, true)
-	form[#form+1] = F.S_button_exit(0.5, 2.5, 6, 1, "save", "Save signal aspect")
+	form[#form+1] = F.S_label(0.5, 1.5, "Signal group: @1", def.label)
+	form[#form+1] = F.dropdown(0.5, 2, 6, "asp", entries, selid, true)
+	form[#form+1] = F.S_label(0.5, 3, "Aspect in effect:")
+	form[#form+1] = F.label(0.5, 3.5, describe_t1_main_aspect(isasp.main))
+	form[#form+1] = F.label(0.5, 4, describe_t1_distant_aspect(isasp.dst))
+	form[#form+1] = F.label(0.5, 4.5, describe_t1_shunt_aspect(isasp.shunt))
+	form[#form+1] = F.S_button_exit(0.5, 5.25, 6, 1, "save", "Save signal aspect")
 	return table.concat(form)
 end
 
@@ -205,7 +205,7 @@ local function usebool(sup, val, free)
 	end
 end
 
-local function get_aspect_from_formspec_t1(suppasp, fields)
+local function get_aspect_from_formspec_t1(suppasp, fields, psl)
 	local maini = tonumber(fields.main)
 	if not maini then return end
 	local dsti = tonumber(fields.dst)
@@ -213,12 +213,12 @@ local function get_aspect_from_formspec_t1(suppasp, fields)
 	return {
 		main = suppasp.main[maini],
 		dst = suppasp.dst[dsti],
-		shunt = usebool(suppasp.shunt, fields.shunt_free, "2"),
+		shunt = usebool(suppasp.shunt, psl.shunt, "true"),
 		info = {},
 	}
 end
 
-local function get_aspect_from_formspec_t2(suppasp, fields)
+local function get_aspect_from_formspec_t2(suppasp, fields, psl)
 	local asp = advtrains.interlocking.aspects.type2_to_type1(suppasp, tonumber(fields.asp))
 	return asp
 end
@@ -232,12 +232,15 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			if handle_signal_formspec_tabheader_fields(pname, fields) then
 				return true
 			end
+			if fields.shunt then
+				psl.shunt = fields.shunt
+			end
 			if fields.save then
 				local asp
 				if suppasp.type == 2 then
-					asp = get_aspect_from_formspec_t2(suppasp, fields)
+					asp = get_aspect_from_formspec_t2(suppasp, fields, psl)
 				else
-					asp = get_aspect_from_formspec_t1(suppasp, fields)
+					asp = get_aspect_from_formspec_t1(suppasp, fields, psl)
 				end
 				if asp then
 					psl.callback(pname, asp)

@@ -137,14 +137,18 @@ function advtrains.interlocking.show_ip_form(pos, pname, only_notset)
 	if not minetest.check_player_privs(pname, "interlocking") then
 		return
 	end
-	local form = "size[7,5]label[0.5,0.5;Signal at "..minetest.pos_to_string(pos).."]"
-	form = form .. advtrains.interlocking.make_signal_formspec_tabheader(pname, pos, 7, 2)
+	local form = "size[7,6.5]label[0.5,0.5;Signal at "..minetest.pos_to_string(pos).."]"
+	local node = advtrains.ndb.get_node(pos)
+	local ndef = minetest.registered_nodes[node.name] or {}
+	if ndef.advtrains and ndef.advtrains.set_aspect then
+		form = form .. advtrains.interlocking.make_signal_formspec_tabheader(pname, pos, 7, 2)
+	end
 	advtrains.interlocking.db.check_for_duplicate_ip(pos)
 	local pts, connid = advtrains.interlocking.db.get_ip_by_signalpos(pos)
 	if pts then
 		form = form.."label[0.5,1.5;Influence point is set at "..pts.."/"..connid.."]"
-		form = form.."button_exit[0.5,2.5;  5,1;set;Move]"
-		form = form.."button_exit[0.5,3.5;  5,1;clear;Clear]"
+		form = form.."button_exit[0.5,4.25;  6,1;set;Move]"
+		form = form.."button_exit[0.5,5.25;  6,1;clear;Clear]"
 		local ipos = minetest.string_to_pos(pts)
 		ipmarker(ipos, connid)
 	else
@@ -152,7 +156,7 @@ function advtrains.interlocking.show_ip_form(pos, pname, only_notset)
 		form = form.."label[0.5,2.0;It is recommended to set an influence point.]"
 		form = form.."label[0.5,2.5;This is the point where trains will obey the signal.]"
 		
-		form = form.."button_exit[0.5,3.5;  5,1;set;Set]"
+		form = form.."button_exit[0.5,5.25;  6,1;set;Set]"
 	end
 	if not only_notset or not pts then
 		minetest.show_formspec(pname, "at_il_ipassign_"..minetest.pos_to_string(pos), form)

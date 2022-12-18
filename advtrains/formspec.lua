@@ -17,6 +17,14 @@ local function S_button(x, y, w, h, id, ...)
 	return f_button(x, y, w, h, id, attrans(...))
 end
 
+local function f_checkbox(x, y, name, selected, label)
+	return sformat("checkbox[%f,%f;%s;%s;%s]", x, y, name, label, selected and "true" or "false")
+end
+
+local function S_checkbox(x, y, name, selected, ...)
+	return f_checkbox(x, y, name, selected, attrans(...))
+end
+
 local function f_button_exit(x, y, w, h, id, text)
 	return sformat("button_exit[%f,%f;%f,%f;%s;%s]", x, y, w, h, id, text)
 end
@@ -88,6 +96,8 @@ end
 return {
 	button = f_button,
 	S_button = S_button,
+	checkbox = f_checkbox,
+	S_checkbox = S_checkbox,
 	button_exit = f_button_exit,
 	S_button_exit = S_button_exit,
 	dropdown = f_dropdown,
