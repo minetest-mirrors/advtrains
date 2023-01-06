@@ -85,6 +85,23 @@ local function unassign_all(pos, force)
 	unassign_dst(pos, force)
 end
 
+--- Check whether a signal is "appropriate" for the distant signal system.
+-- Currently, a signal is considered appropriate if its signal aspect can be set.
+-- @function appropriate_signal
+-- @param pos The position of the signal
+local function appropriate_signal(pos)
+	local node = advtrains.ndb.get_node(pos)
+	local ndef = minetest.registered_nodes[node.name] or {}
+	if not ndef then
+		return false
+	end
+	local atdef = ndef.advtrains
+	if not atdef then
+		return false
+	end
+	return atdef.supported_aspects and atdef.set_aspect and true
+end
+
 --- Assign a distant signal to a main signal.
 -- @function assign
 -- @param main The position of the main signal.
@@ -92,6 +109,9 @@ end
 -- @param[opt="manual"] by The method of assignment.
 -- @param[opt=false] skip_update Whether to skip callbacks.
 local function assign(main, dst, by, skip_update)
+	if not (appropriate_signal(main) and appropriate_signal(dst)) then
+		return
+	end
 	local pts_main = pts(main)
 	local pts_dst = pts(dst)
 	local t = db_distant[pts_main]
@@ -177,4 +197,5 @@ advtrains.distant = {
 	update_main = update_main,
 	update_dst = update_dst,
 	update_signal = update_signal,
+	appropriate_signal = appropriate_signal,
 }

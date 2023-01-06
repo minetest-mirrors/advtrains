@@ -159,16 +159,20 @@ function advtrains.interlocking.show_ip_form(pos, pname, only_notset)
 		return
 	end
 	local ipform, pts, connid = advtrains.interlocking.make_ip_formspec_component(pos, 0.5, 0.5, 7)
-	local form = table.concat {
+	local form = {
 		"formspec_version[4]",
-		"size[8,6.75]",
+		"size[8,2.25]",
 		ipform,
-		advtrains.interlocking.make_dst_formspec_component(pos, 0.5, 2, 7, 4.25),
 	}
 	if pts then
 		local ipos = minetest.string_to_pos(pts)
 		ipmarker(ipos, connid)
 	end
+	if advtrains.distant.appropriate_signal(pos) then
+		form[#form+1] = advtrains.interlocking.make_dst_formspec_component(pos, 0.5, 2, 7, 4.25)
+		form[2] = "size[8,6.75]"
+	end
+	form = table.concat(form)
 	if not only_notset or not pts then
 		minetest.show_formspec(pname, "at_il_propassign_"..minetest.pos_to_string(pos), form)
 	end

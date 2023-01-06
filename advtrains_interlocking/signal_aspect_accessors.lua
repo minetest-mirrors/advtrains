@@ -144,7 +144,7 @@ local function get_real_aspect(pos)
 	if ndef.advtrains and ndef.advtrains.get_aspect then
 		local asp = ndef.advtrains.get_aspect(pos, node) or I.DANGER
 		local suppasp = get_supported_aspects(pos)
-		if suppasp.type == 2 then
+		if suppasp and suppasp.type == 2 then
 			asp = A.type2_to_type1(suppasp, asp)
 		end
 		return adjust_aspect(pos, asp)

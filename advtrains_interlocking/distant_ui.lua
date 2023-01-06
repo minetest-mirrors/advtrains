@@ -56,6 +56,10 @@ local function init_signal_assignment(pname, pos)
 		minetest.chat_send_player(pname, attrans("This operation is not allowed without the @1 privilege.", "interlocking"))
 		return
 	end
+	if not D.appropriate_signal(pos) then
+		minetest.chat_send_player(pname, attrans("Incompatible signal."))
+		return
+	end
 	signal_pos[pname] = pos
 	minetest.chat_send_player(pname, attrans("Please punch the signal to use as the main signal."))
 end
@@ -64,6 +68,10 @@ local distant_pos = {}
 local function init_distant_assignment(pname, pos)
 	if not minetest.check_player_privs(pname, "interlocking") then
 		minetest.send_chat_player(pname, attrans("This operation is now allowed without the @1 privilege.", "interlocking"))
+		return
+	end
+	if not D.appropriate_signal(pos) then
+		minetest.chat_send_player(pname, attrans("Incompatible signal."))
 		return
 	end
 	distant_pos[pname] = pos
@@ -87,7 +95,7 @@ minetest.register_on_punchnode(function(pos, node, player, pointed_thing)
 	signal_pos[pname] = nil
 	distant_pos[pname] = nil
 	local is_signal = minetest.get_item_group(node.name, "advtrains_signal") >= 2
-	if not is_signal then
+	if not (is_signal and D.appropriate_signal(pos)) then
 		minetest.chat_send_player(pname, attrans("Incompatible signal."))
 		return
 	end

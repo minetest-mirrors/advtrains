@@ -23,6 +23,12 @@ sourcefile("signal_api")
 sourcefile("signal_aspect_accessors")
 fixture("../../demosignals")
 
+minetest.register_node("advtrains_interlocking:signal_sign", {
+	advtrains = {
+		get_aspcet = function() return {main = 19} end
+	}
+})
+
 local D = advtrains.distant
 local I = advtrains.interlocking
 
@@ -32,7 +38,7 @@ local stub_aspect_t1 = {
 	danger = {main = 0, shunt = false},
 }
 local stub_pos_t1 = {}
-for i = 1, 3 do
+for i = 1, 4 do
 	stub_pos_t1[i] = {x = 1, y = 0, z = i}
 end
 
@@ -40,6 +46,7 @@ world.layout {
 	{stub_pos_t1[1], "advtrains_interlocking:ds_danger"},
 	{stub_pos_t1[2], "advtrains_interlocking:ds_slow"},
 	{stub_pos_t1[3], "advtrains_interlocking:ds_free"},
+	{stub_pos_t1[4], "advtrains_interlocking:signal_sign"},
 }
 
 describe("API for supposed signal aspects", function()
@@ -83,5 +90,13 @@ describe("Distant signaling", function()
 		assert.same({}, D.get_dst(stub_pos_t1[1]))
 		assert.same({}, {D.get_main(stub_pos_t1[3])})
 		assert.same(stub_aspect_t1.free, I.signal_get_aspect(stub_pos_t1[3]))
+	end)
+	it("should reject signal signs", function()
+		D.assign(stub_pos_t1[1], stub_pos_t1[4])
+		assert.same({}, D.get_dst(stub_pos_t1[1]))
+		assert.same({}, {D.get_main(stub_pos_t1[4])})
+		D.assign(stub_pos_t1[4], stub_pos_t1[1])
+		assert.same({}, D.get_dst(stub_pos_t1[4]))
+		assert.same({}, {D.get_main(stub_pos_t1[1])})
 	end)
 end)
