@@ -37,6 +37,20 @@ advtrains.interlocking.describe_t1_main_aspect = describe_t1_main_aspect
 advtrains.interlocking.describe_t1_shunt_aspect = describe_t1_shunt_aspect
 advtrains.interlocking.describe_t1_distant_aspect = describe_t1_distant_aspect
 
+local function dsel(p, q, x, y)
+	if p == nil then
+		if q then
+			return x
+		else
+			return y
+		end
+	elseif p then
+		return x
+	else
+		return y
+	end
+end
+
 local function describe_supported_aspects_t1(suppasp, isasp)
 	local t = {}
 
@@ -50,11 +64,22 @@ local function describe_supported_aspects_t1(suppasp, isasp)
 	end
 	t.main = entries
 	t.main_current = selid
-
-	if suppasp.shunt == nil then
-		t.shunt = true
-		t.shunt_current = isasp and isasp.shunt
+	t.main_string = tostring(isasp.main)
+	if t.main == nil then
+		t.main_string = ""
 	end
+
+	t.shunt = {
+		attrans("No shunting"),
+		attrans("Shunting allowed"),
+		attrans("Proceed as main"),
+	}
+
+	t.shunt_current = dsel(suppasp.shunt, isasp.shunt, 2, 1)
+	if dsel(suppasp.proceed_as_main, isasp.proceed_as_main, t.shunt_current == 1) then
+		t.shunt_current = 3
+	end
+	t.shunt_const = suppasp.shunt ~= nil
 
 	entries = {}
 	selid = 1
@@ -71,96 +96,98 @@ end
 
 advtrains.interlocking.describe_supported_aspects_t1 = describe_supported_aspects_t1
 
-local signal_tabheader_map = {}
-
-local function make_signal_formspec_tabheader(pname, pos, width, selid)
-	signal_tabheader_map[pname] = pos
-	local firstlabel = attrans("Signal aspect")
-	if advtrains.interlocking.db.get_sigd_for_signal(pos) then
-		firstlabel = attrans("Routesetting")
-	end
-	local options = {
-		firstlabel,
-		attrans("Influence point"),
-		attrans("Distant signalling"),
-	}
-	return F.tabheader(0, 0, nil, nil, "signal_tab", options, selid)
-end
-
-local function handle_signal_formspec_tabheader_fields(pname, fields)
-	local n = tonumber(fields.signal_tab)
-	local pos = signal_tabheader_map[pname]
-	if not (n and pos) then
-		return false
-	end
-	if n == 1 then
-		local node = advtrains.ndb.get_node(pos)
-		advtrains.interlocking.show_signal_form(pos, node, pname)
-	elseif n == 2 then
-		advtrains.interlocking.show_ip_form(pos, pname)
-	elseif n == 3 then
-		advtrains.interlocking.show_distant_signal_form(pos, pname)
-	end
-	return true
-end
-
-advtrains.interlocking.make_signal_formspec_tabheader = make_signal_formspec_tabheader
-advtrains.interlocking.handle_signal_formspec_tabheader_fields = handle_signal_formspec_tabheader_fields
-
 local function make_signal_aspect_selector_t1(suppasp, purpose, isasp)
-	local form = {"size[7,6.5]"}
 	local t = describe_supported_aspects_t1(suppasp, isasp)
+	local formmode = 1
+
+	local pos
 	if type(purpose) == "table" then
-		form[#form+1] = make_signal_formspec_tabheader(purpose.pname, purpose.pos, 7, 1)
-		purpose = ""
+		formmode = 2
+		pos = purpose.pos
 	end
-	form[#form+1] = F.S_label(0.5, 0.5, "Select signal aspect")
-	form[#form+1] = F.label(0.5, 1, purpose)
+
+	local form = {
+		"formspec_version[4]",
+		string.format("size[8,%f]", ({5.75, 9.25})[formmode]),
+		F.S_label(0.5, 0.5, "Select signal aspect"),
+	}
+	if formmode == 1 then
+		form[#form+1] = F.label(0.5, 1, purpose)
+	else
+		form[#form+1] = F.S_label(0.5, 1, "Signal at @1", minetest.pos_to_string(pos))
+	end
 
 	form[#form+1] = F.S_label(0.5, 1.5, "Main aspect")
-	form[#form+1] = F.dropdown(0.5, 2, 6, "main", t.main, t.main_current, true)
-
-	form[#form+1] = F.S_label(0.5, 3, "Distant aspect")
-	form[#form+1] = F.dropdown(0.5, 3.5, 6, "dst", t.dst, t.dst_current, true)
-
-	if t.shunt then
-		form[#form+1] = F.S_checkbox(0.5, 4.25, "shunt", t.shunt_current, "Allow shunting")
+	if formmode == 1 then
+		form[#form+1] = F.field(0.5, 2, 7, "asp_mainval", "", t.main_string)
 	else
-		form[#form+1] = F.S_label(0.5, 4.5, "The shunt aspect cannot be changed.")
+		form[#form+1] = F.dropdown(0.5, 2, 7, "asp_mainsel", t.main, t.main_current, true)
 	end
 
-	form[#form+1] = F.S_button_exit(0.5, 5.25, 6, 1, "save", "Save signal aspect")
+	form[#form+1] = F.S_label(0.5, 3, "Shunt aspect")
+	if formmode == 2 and t.shunt_const then
+		form[#form+1] = F.label(0.5, 3.5, t.shunt[t.shunt_current])
+		form[#form+1] = F.S_label(0.5, 4, "The shunt aspect cannot be changed.")
+	else
+		form[#form+1] = F.dropdown(0.5, 3.5, 7, "asp_shunt", t.shunt, t.shunt_current, true)
+	end
+
+	form[#form+1] = F.S_button_exit(0.5, 4.5, 7, "asp_save", "Save signal aspect")
+
+	if formmode == 2 then
+		form[#form+1] = advtrains.interlocking.make_ip_formspec_component(pos, 0.5, 5.5, 7)
+		form[#form+1] = advtrains.interlocking.make_short_dst_formspec_component(pos, 0.5, 7, 7)
+	end
+
 	return table.concat(form)
 end
 
 local function make_signal_aspect_selector_t2(suppasp, purpose, isasp)
-	local form = {"size[7,6.5]"}
 	local def = advtrains.interlocking.aspects.get_type2_definition(suppasp.group)
 	if not def then
 		return nil
 	end
+	local formmode = 1
+
+	local pos
 	if type(purpose) == "table" then
-		form[#form+1] = make_signal_formspec_tabheader(purpose.pname, purpose.pos, 7, 1)
-		purpose = ""
+		formmode = 2
+		pos = purpose.pos
 	end
-	form[#form+1] = F.S_label(0.5, 0.5, "Select signal aspect")
-	form[#form+1] = F.label(0.5, 1, purpose)
+	local form = {
+		"formspec_version[4]",
+		string.format("size[8,%f]", ({4.25, 10.25})[formmode]),
+		F.S_label(0.5, 0.5, "Select signal aspect")
+	}
+	if formmode == 1 then
+		form[#form+1] = F.label(0.5, 1, purpose)
+	else
+		form[#form+1] = F.S_label(0.5, 1, "Signal at @1", minetest.pos_to_string(pos))
+	end
 
 	local entries = {}
-	local selid = 1
-	for idx, spv in ipairs(def.main) do
-		if isasp and isasp.type2name == spv.name then
-			selid = idx
+	local selid = #def.main
+	if isasp then
+		if isasp.type2name ~= def.main[selid].name then
+			selid = 1
 		end
-		entries[idx] = spv.label
 	end
+	if selid > 1 then
+		selid = 2
+	end
+	local entries = {
+		def.main[1].label,
+		def.main[#def.main].label,
+	}
 	form[#form+1] = F.S_label(0.5, 1.5, "Signal group: @1", def.label)
-	form[#form+1] = F.dropdown(0.5, 2, 6, "asp", entries, selid, true)
-	form[#form+1] = F.S_label(0.5, 3, "Aspect in effect:")
-	form[#form+1] = F.label(0.5, 3.5, describe_t1_main_aspect(isasp.main))
-	form[#form+1] = F.label(0.5, 4, describe_t1_distant_aspect(isasp.dst))
-	form[#form+1] = F.label(0.5, 4.5, describe_t1_shunt_aspect(isasp.shunt))
-	form[#form+1] = F.S_button_exit(0.5, 5.25, 6, 1, "save", "Save signal aspect")
+	form[#form+1] = F.dropdown(0.5, 2, 7, "asp_sel", entries, selid, true)
+	form[#form+1] = F.S_button_exit(0.5, 3, 7, "asp_save", "Save signal aspect")
+
+	if formmode == 2 then
+		form[#form+1] = advtrains.interlocking.make_ip_formspec_component(pos, 0.5, 4, 7)
+		form[#form+1] = advtrains.interlocking.make_dst_formspec_component(pos, 0.5, 5.5, 7, 4.25)
+	end
+
 	return table.concat(form)
 end
 
@@ -188,13 +215,14 @@ function advtrains.interlocking.show_signal_aspect_selector(pname, p_suppasp, p_
 
 	local token = advtrains.random_id()
 	minetest.show_formspec(pname, "at_il_sigaspdia_"..token, form)
-	--minetest.after(1, function()
-	players_aspsel[pname] = {
-		suppasp = suppasp,
-		callback = callback,
-		token = token,
-	}
-	--end)
+	minetest.after(0, function()
+		players_aspsel[pname] = {
+			purpose = purpose,
+			suppasp = suppasp,
+			callback = callback,
+			token = token,
+		}
+	end)
 end
 
 local function usebool(sup, val, free)
@@ -206,20 +234,45 @@ local function usebool(sup, val, free)
 end
 
 local function get_aspect_from_formspec_t1(suppasp, fields, psl)
-	local maini = tonumber(fields.main)
-	if not maini then return end
-	local dsti = tonumber(fields.dst)
-	if not dsti then return end
+	local maini = tonumber(fields.asp_mainsel)
+	local main = suppasp.main[maini]
+	if not maini then
+		local mainval = fields.asp_mainval
+		if mainval == "-1" then
+			main = -1
+		elseif string.match(mainval, "^%d+$") then
+			main = tonumber(mainval)
+		else
+			main = nil
+		end
+	end
+	local shunti = tonumber(fields.asp_shunt)
+	local shunt = suppasp.shunt
+	if shunt == nil then
+		shunt = shunti == 2
+	end
+	local proceed_as_main = suppasp.proceed_as_main
+	if proceed_as_main == nil then
+		proceed_as_main = shunti == 3
+	end
 	return {
-		main = suppasp.main[maini],
-		dst = suppasp.dst[dsti],
-		shunt = usebool(suppasp.shunt, psl.shunt, "true"),
+		main = main,
+		shunt = shunt,
+		proceed_as_main = proceed_as_main,
 		info = {},
 	}
 end
 
 local function get_aspect_from_formspec_t2(suppasp, fields, psl)
-	local asp = advtrains.interlocking.aspects.type2_to_type1(suppasp, tonumber(fields.asp))
+	local sel = tonumber(fields.asp_sel)
+	local def = advtrains.interlocking.aspects.get_type2_definition(suppasp.group)
+	if not (sel and def) then
+		return
+	end
+	if sel ~= 1 then
+		sel = #def.main
+	end
+	local asp = advtrains.interlocking.aspects.type2_to_type1(suppasp, sel)
 	return asp
 end
 
@@ -229,13 +282,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	if psl then
 		if formname == "at_il_sigaspdia_"..psl.token then
 			local suppasp = psl.suppasp
-			if handle_signal_formspec_tabheader_fields(pname, fields) then
-				return true
-			end
-			if fields.shunt then
-				psl.shunt = fields.shunt
-			end
-			if fields.save then
+			if fields.asp_save then
 				local asp
 				if suppasp.type == 2 then
 					asp = get_aspect_from_formspec_t2(suppasp, fields, psl)
@@ -245,6 +292,11 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				if asp then
 					psl.callback(pname, asp)
 				end
+			end
+			if type(psl.purpose) == "table" then
+				local pos = psl.purpose.pos
+				advtrains.interlocking.handle_ip_formspec_fields(pname, pos, fields)
+				advtrains.interlocking.handle_dst_formspec_fields(pname, pos, fields)
 			end
 		else
 			players_aspsel[pname] = nil

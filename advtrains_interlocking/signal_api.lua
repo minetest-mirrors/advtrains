@@ -1,5 +1,7 @@
 -- Signal API implementation
 
+local F = advtrains.formspec
+
 local DANGER = {
 	main = 0,
 	shunt = false,
@@ -131,57 +133,68 @@ local function ipmarker(ipos, connid)
 	})
 end
 
--- shows small info form for signal IP state/assignment
+function advtrains.interlocking.make_ip_formspec_component(pos, x, y, w)
+	advtrains.interlocking.db.check_for_duplicate_ip(pos)
+	local pts, connid = advtrains.interlocking.db.get_ip_by_signalpos(pos)
+	if pts then
+		return table.concat {
+			F.S_label(x, y, "Influence point is set at @1.", string.format("%s/%s", pts, connid)),
+			F.S_button_exit(x, y+0.5, w/2-0.125, "ip_set", "Modify"),
+			F.S_button_exit(x+w/2+0.125, y+0.5, w/2-0.125, "ip_clear", "Clear"),
+		}, pts, connid
+	else
+		return table.concat {
+			F.S_label(x, y, "Influence point is not set."),
+			F.S_button_exit(x, y+0.5, w, "ip_set", "Set influence point"),
+		}
+	end
+end
+
+-- shows small info form for signal properties
+-- This function is named show_ip_form because it was originally only intended
+-- for assigning/changing the influence point.
 -- only_notset: show only if it is not set yet (used by signal tcb assignment)
 function advtrains.interlocking.show_ip_form(pos, pname, only_notset)
 	if not minetest.check_player_privs(pname, "interlocking") then
 		return
 	end
-	local form = "size[7,6.5]label[0.5,0.5;Signal at "..minetest.pos_to_string(pos).."]"
-	local node = advtrains.ndb.get_node(pos)
-	local ndef = minetest.registered_nodes[node.name] or {}
-	if ndef.advtrains and ndef.advtrains.set_aspect then
-		form = form .. advtrains.interlocking.make_signal_formspec_tabheader(pname, pos, 7, 2)
-	end
-	advtrains.interlocking.db.check_for_duplicate_ip(pos)
-	local pts, connid = advtrains.interlocking.db.get_ip_by_signalpos(pos)
+	local ipform, pts, connid = advtrains.interlocking.make_ip_formspec_component(pos, 0.5, 0.5, 7)
+	local form = table.concat {
+		"formspec_version[4]",
+		"size[8,6.75]",
+		ipform,
+		advtrains.interlocking.make_dst_formspec_component(pos, 0.5, 2, 7, 4.25),
+	}
 	if pts then
-		form = form.."label[0.5,1.5;Influence point is set at "..pts.."/"..connid.."]"
-		form = form.."button_exit[0.5,4.25;  6,1;set;Move]"
-		form = form.."button_exit[0.5,5.25;  6,1;clear;Clear]"
 		local ipos = minetest.string_to_pos(pts)
 		ipmarker(ipos, connid)
-	else
-		form = form.."label[0.5,1.5;Influence point is not set.]"
-		form = form.."label[0.5,2.0;It is recommended to set an influence point.]"
-		form = form.."label[0.5,2.5;This is the point where trains will obey the signal.]"
-		
-		form = form.."button_exit[0.5,5.25;  6,1;set;Set]"
 	end
 	if not only_notset or not pts then
-		minetest.show_formspec(pname, "at_il_ipassign_"..minetest.pos_to_string(pos), form)
+		minetest.show_formspec(pname, "at_il_propassign_"..minetest.pos_to_string(pos), form)
+	end
+end
+
+function advtrains.interlocking.handle_ip_formspec_fields(pname, pos, fields)
+	if not (pos and minetest.check_player_privs(pname, {train_operator=true, interlocking=true})) then
+		return
+	end
+	if fields.ip_set then
+		advtrains.interlocking.signal_init_ip_assign(pos, pname)
+	elseif fields.ip_clear then
+		advtrains.interlocking.db.clear_ip_by_signalpos(pos)
 	end
 end
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
 	local pname = player:get_player_name()
-	if advtrains.interlocking.handle_signal_formspec_tabheader_fields(pname, fields) then
-		return true
-	end
-	if not minetest.check_player_privs(pname, {train_operator=true, interlocking=true}) then
-		return
-	end
-	local pts = string.match(formname, "^at_il_ipassign_([^_]+)$")
+	local pts = string.match(formname, "^at_il_propassign_([^_]+)$")
 	local pos
 	if pts then
 		pos = minetest.string_to_pos(pts)
 	end
 	if pos then
-		if fields.set then
-			advtrains.interlocking.signal_init_ip_assign(pos, pname)
-		elseif fields.clear then
-			advtrains.interlocking.db.clear_ip_by_signalpos(pos)
-		end
+		advtrains.interlocking.handle_ip_formspec_fields(pname, pos, fields)
+		advtrains.interlocking.handle_dst_formspec_fields(pname, pos, fields)
 	end
 end)
 

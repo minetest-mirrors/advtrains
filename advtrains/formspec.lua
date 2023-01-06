@@ -9,32 +9,28 @@ local function make_list(entries)
 	return table.concat(t, ",")
 end
 
-local function f_button(x, y, w, h, id, text)
-	return sformat("button[%f,%f;%f,%f;%s;%s]", x, y, w, h, id, text)
+local function S_wrapper(f, i0)
+	return function(...)
+		local args = {...}
+		args[i0] = attrans(unpack(args,i0))
+		return f(unpack(args,1,i0))
+	end
 end
 
-local function S_button(x, y, w, h, id, ...)
-	return f_button(x, y, w, h, id, attrans(...))
+local function f_button(x, y, w, id, text)
+	return sformat("button[%f,%f;%f,0.75;%s;%s]", x, y, w, id, text)
 end
 
 local function f_checkbox(x, y, name, selected, label)
-	return sformat("checkbox[%f,%f;%s;%s;%s]", x, y, name, label, selected and "true" or "false")
+	return sformat("checkbox[%f,%f;%s;%s;%s]", x, y+0.25, name, label, selected and "true" or "false")
 end
 
-local function S_checkbox(x, y, name, selected, ...)
-	return f_checkbox(x, y, name, selected, attrans(...))
-end
-
-local function f_button_exit(x, y, w, h, id, text)
-	return sformat("button_exit[%f,%f;%f,%f;%s;%s]", x, y, w, h, id, text)
-end
-
-local function S_button_exit(x, y, w, h, id, ...)
-	return f_button_exit(x, y, w, h, id, attrans(...))
+local function f_button_exit(x, y, w, id, text)
+	return sformat("button_exit[%f,%f;%f,0.75;%s;%s]", x, y, w, id, text)
 end
 
 local function f_dropdown(x, y, w, id, entries, sel, indexed)
-	return sformat("dropdown[%f,%f;%f;%s;%s;%d%s]",
+	return sformat("dropdown[%f,%f;%f,0.75;%s;%s;%d%s]",
 		x, y, w, id, make_list(entries),
 		sel or 1,
 		indexed and ";true" or "")
@@ -56,11 +52,15 @@ local function f_image_button_exit(x, y, w, h, texture, id, label)
 end
 
 local function f_label(x, y, text)
-	return sformat("label[%f,%f;%s]", x, y, fsescape(text))
+	return sformat("label[%f,%f;%s]", x, y+0.25, fsescape(text))
 end
 
-local function S_label(x, y, ...)
-	return f_label(x, y, attrans(...))
+local function f_field_aux(x, y, w, id, default)
+	return sformat("field[%f,%f;%f,0.75;%s;;%s]", x, y, w, id, default)
+end
+
+local function f_field(x, y, w, id, label, default)
+	return f_label(x, y-0.5, label) .. f_field_aux(x, y, w, id, default)
 end
 
 local function f_tabheader(x, y, w, h, id, entries, sel, transparent, border)
@@ -95,16 +95,17 @@ end
 
 return {
 	button = f_button,
-	S_button = S_button,
+	S_button = S_wrapper(f_button, 5),
 	checkbox = f_checkbox,
-	S_checkbox = S_checkbox,
+	S_checkbox = S_wrapper(f_checkbox, 5),
 	button_exit = f_button_exit,
-	S_button_exit = S_button_exit,
+	S_button_exit = S_wrapper(f_button_exit, 5),
 	dropdown = f_dropdown,
+	field = f_field,
 	image_button = f_image_button,
 	image_button_exit = f_image_button_exit,
 	label = f_label,
-	S_label = S_label,
+	S_label = S_wrapper(f_label, 3),
 	tabheader = f_tabheader,
 	textlist = f_textlist,
 }

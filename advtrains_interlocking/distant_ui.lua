@@ -2,39 +2,52 @@ local F = advtrains.formspec
 local D = advtrains.distant
 local I = advtrains.interlocking
 
-function advtrains.interlocking.show_distant_signal_form(pos, pname)
-	local form = {"size[7,6.5]"}
-	form[#form+1] = advtrains.interlocking.make_signal_formspec_tabheader(pname, pos, 7, 3)
+function I.make_short_dst_formspec_component(pos, x, y, w)
 	local main, set_by = D.get_main(pos)
 	if main then
 		local pts_main = minetest.pos_to_string(main)
-		form[#form+1] = F.S_label(0.5, 0.5, "This signal is a distant signal of @1.", pts_main)
+		local desc = attrans("The assignment is made with an unknown method.")
 		if set_by == "manual" then
-			form[#form+1] = F.S_label(0.5, 1, "The assignment is made manually.")
+			desc = attrans("The assignment is made manually.")
 		elseif set_by == "routesetting" then
-			form[#form+1] = F.S_label(0.5, 1, "The assignment is made by the routesetting system.")
+			desc = attrans("The assignment is made by the routesetting system.")
 		end
+		return table.concat {
+			F.S_label(x, y, "This signal is a distant signal of @1.", pts_main),
+			F.label(x, y+0.5, desc),
+			F.S_button_exit(x, y+1, w/2-0.125, "dst_assign", "Reassign"),
+			F.S_button_exit(x+w/2+0.125, y+1, w/2-0.125, "dst_unassign", "Unassign"),
+		}
 	else
-		form[#form+1] = F.S_label(0.5, 0.5, "This signal is not assigned to a main signal.")
-		form[#form+1] = F.S_label(0.5, 1, "The distant aspect of the signal is not used.")
+		return table.concat {
+			F.S_label(x, y, "This signal is not assigned to a main signal."),
+			F.S_label(x, y+0.5, "The distant aspect of the signal is not used."),
+			F.S_button_exit(x, y+1, w, "dst_assign", "Assign")
+		}
 	end
-	if set_by ~= nil then
-		form[#form+1] = F.S_button_exit(0.5, 1.5, 3, 1, "unassign_dst", "Unassign")
-		form[#form+1] = F.S_button_exit(3.5, 1.5, 3, 1, "assign_dst", "Reassign")
-	else
-		form[#form+1] = F.S_button_exit(0.5, 1.5, 6, 1, "assign_dst", "Assign")
-	end
+end
 
-	local dsts = D.get_dst(pos)
+function I.make_dst_list_formspec_component(pos, x, y, w, h)
+	local ymid = y+0.25+h/2
 	local dstlist = {}
-	for pos, _ in pairs(dsts) do
-		dstlist[#dstlist+1] = minetest.pos_to_string(advtrains.decode_pos(pos))
+	for pos, _ in pairs(D.get_dst(pos)) do
+		table.insert(dstlist, minetest.pos_to_string(advtrains.decode_pos(pos)))
 	end
-	form[#form+1] = F.S_label(0.5, 2.5, "This signal has the following distant signals:")
-	form[#form+1] = F.textlist(0.5, 3, 4.5, 3, "dstlist", dstlist)
-	form[#form+1] = F.image_button_exit(5.5, 3.25, 1, 1, "cdb_add.png", "dst_add", "")
-	form[#form+1] = F.image_button_exit(5.5, 4.75, 1, 1, "cdb_clear.png", "dst_del", "")
-	minetest.show_formspec(pname, "advtrains:distant_" .. minetest.pos_to_string(pos), table.concat(form))
+	return table.concat {
+		F.S_label(x, y, "Distant signals:"),
+		F.textlist(x, y+0.5, w-1, h-0.5, "dstlist", dstlist),
+		F.image_button_exit(x+w-0.75, ymid-0.875, 0.75, 0.75, "cdb_add.png", "dst_add", ""),
+		F.image_button_exit(x+w-0.75, ymid+0.125, 0.75, 0.75, "cdb_clear.png", "dst_del", ""),
+	}
+end
+
+function I.make_dst_formspec_component(pos, x, y, w, h)
+	return I.make_short_dst_formspec_component(pos, x, y, w, h)
+		.. I.make_dst_list_formspec_component(pos, x, y+2, w, h-2)
+end
+
+function I.show_distant_signal_form(pos, pname)
+	return I.show_ip_form(pos, pname)
 end
 
 local signal_pos = {}
@@ -87,21 +100,14 @@ minetest.register_on_punchnode(function(pos, node, player, pointed_thing)
 end)
 
 local dstsel = {}
-minetest.register_on_player_receive_fields(function(player, formname, fields)
-	local pname = player:get_player_name()
-	local pos = minetest.string_to_pos(string.match(formname, "^advtrains:distant_(.+)$") or "")
-	if not pos then
+
+function advtrains.interlocking.handle_dst_formspec_fields(pname, pos, fields)
+	if not (pos and minetest.check_player_privs(pname, "interlocking")) then
 		return
 	end
-	if not minetest.check_player_privs(pname, "interlocking") then
-		return
-	end
-	if advtrains.interlocking.handle_signal_formspec_tabheader_fields(pname, fields) then
-		return true
-	end
-	if fields.unassign_dst then
+	if fields.dst_unassign then
 		D.unassign_dst(pos)
-	elseif fields.assign_dst then
+	elseif fields.dst_assign then
 		init_signal_assignment(pname, pos)
 	elseif fields.dst_add then
 		init_distant_assignment(pname, pos)
@@ -124,4 +130,4 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			end
 		end
 	end
-end)
+end

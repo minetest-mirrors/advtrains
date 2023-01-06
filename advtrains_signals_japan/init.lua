@@ -294,6 +294,7 @@ local function process_signal(name, sigdata, isrpt)
 	local type2def = {}
 	type2def.name = typename
 	type2def.main = {}
+	type2def.label = S(string.format("Japanese signal (type %s)", string.upper(name)))
 	local def = {}
 	local tx = {}
 	def.typename = typename

@@ -614,7 +614,6 @@ function advtrains.interlocking.show_signalling_form(sigd, pname, sel_rte, calle
 	if not tcbs.routes then tcbs.routes = {} end
 	
 	local form = "size[7,10.25]label[0.5,0.5;Signal at "..minetest.pos_to_string(sigd.p).."]"
-	form = form .. advtrains.interlocking.make_signal_formspec_tabheader(pname, tcbs.signal, 7, 1)
 	form = form.."field[0.8,1.5;5.2,1;name;Signal name;"..minetest.formspec_escape(tcbs.signal_name).."]"
 	form = form.."button[5.5,1.2;1,1;setname;Set]"
 	
@@ -708,10 +707,6 @@ end
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
 	local pname = player:get_player_name()
-	if string.find(formname, "^at_il_signalling_")
-		and advtrains.interlocking.handle_signal_formspec_tabheader_fields(pname, fields) then
-		return true
-	end
 	if not minetest.check_player_privs(pname, "train_operator") then
 		return
 	end
