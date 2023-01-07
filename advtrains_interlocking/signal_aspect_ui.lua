@@ -199,12 +199,20 @@ function advtrains.interlocking.show_signal_aspect_selector(pname, p_suppasp, p_
 		info = {},
 	}
 	local purpose = p_purpose or ""
+	local pos
 	if type(p_purpose) == "table" then
-		purpose = {pname = pname, pos = p_purpose}
+		pos = p_purpose
+		purpose = {pname = pname, pos = pos}
 	end
 
 	local form
 	if suppasp.type == 2 then
+		if suppasp.dst_shift then
+			if pos then
+				advtrains.interlocking.show_ip_form(pos, pname)
+			end
+			return
+		end
 		form = make_signal_aspect_selector_t2(suppasp, purpose, isasp)
 	else
 		form = make_signal_aspect_selector_t1(suppasp, purpose, isasp)
