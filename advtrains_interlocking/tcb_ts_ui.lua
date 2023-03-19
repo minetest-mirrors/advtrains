@@ -88,12 +88,8 @@ minetest.register_node("advtrains_interlocking:tcb_node", {
 			local tcb = ildb.get_tcb(tcbpos)
 			if not tcb then return true end
 			for connid=1,2 do
-				if tcb[connid].ts_id or tcb[connid].signal then
-					minetest.chat_send_player(pname, "Can't remove TCB: Both sides must have no track section and no signal assigned!")
-					return false
-				end
-				if not ildb.may_modify_tcbs(tcb[connid]) then
-					minetest.chat_send_player(pname, "Can't remove TCB: Side "..connid.." forbids modification (shouldn't happen).")
+				if tcb[connid].signal then
+					minetest.chat_send_player(pname, "Can't remove TCB: Both sides must have no signal assigned!")
 					return false
 				end
 			end
@@ -105,15 +101,7 @@ minetest.register_node("advtrains_interlocking:tcb_node", {
 		local tcbpts = oldmetadata.fields.tcb_pos
 		if tcbpts and tcbpts ~= "" then
 			local tcbpos = minetest.string_to_pos(tcbpts)
-			local success = ildb.remove_tcb(tcbpos)
-			if success and player then
-				minetest.chat_send_player(player:get_player_name(), "TCB has been removed.")
-			else
-				minetest.chat_send_player(player:get_player_name(), "Failed to remove TCB!")
-				minetest.set_node(pos, oldnode)
-				local meta = minetest.get_meta(pos)
-				meta:set_string("tcb_pos", minetest.pos_to_string(tcbpos))
-			end
+			ildb.remove_tcb_at(tcbpos)
 		end
 	end,
 })
@@ -167,15 +155,13 @@ minetest.register_on_punchnode(function(pos, node, player, pointed_thing)
 		if vector.distance(pos, tcbnpos)<=20 then
 			local node_ok, conns, rhe = advtrains.get_rail_info_at(pos, advtrains.all_tracktypes)
 			if node_ok and #conns == 2 then
-				local ok = ildb.create_tcb(pos)
-				
-				if not ok then
-					minetest.chat_send_player(pname, "Configuring TCB: TCB already exists at this position! It has now been re-assigned.")
+				-- if there is already a tcb here, reassign it
+				if ildb.get_tcb(pos) then
+					minetest.chat_send_player(pname, "Configuring TCB: Already existed at this position, it is now linked to this TCB marker")
+				else
+					ildb.create_tcb_at(pos)
 				end
-				
-				ildb.sync_tcb_neighbors(pos, 1)
-				ildb.sync_tcb_neighbors(pos, 2)
-				
+
 				local meta = minetest.get_meta(tcbnpos)
 				meta:set_string("tcb_pos", minetest.pos_to_string(pos))
 				meta:set_string("infotext", "TCB assigned to "..minetest.pos_to_string(pos))
@@ -234,22 +220,12 @@ local function mktcbformspec(tcbs, btnpref, offset, pname)
 		ts = ildb.get_ts(tcbs.ts_id)
 	end
 	if ts then
-		form = form.."label[0.5,"..offset..";Side "..btnpref..": "..minetest.formspec_escape(ts.name).."]"
+		form = form.."label[0.5,"..offset..";Side "..btnpref..": "..minetest.formspec_escape(ts.name or tcbs.ts_id).."]"
 		form = form.."button[0.5,"..(offset+0.5)..";5,1;"..btnpref.."_gotots;Show track section]"
-		if ildb.may_modify_tcbs(tcbs) then
-			-- Note: the security check to prohibit those actions is located in database.lua in the corresponding functions.
-			form = form.."button[0.5,"..(offset+1.5)..";2.5,1;"..btnpref.."_update;Update near TCBs]"
-			form = form.."button[3  ,"..(offset+1.5)..";2.5,1;"..btnpref.."_remove;Remove from section]"
-		end
 	else
 		tcbs.ts_id = nil
 		form = form.."label[0.5,"..offset..";Side "..btnpref..": ".."End of interlocking]"
 		form = form.."button[0.5,"..(offset+0.5)..";5,1;"..btnpref.."_makeil;Create Interlocked Track Section]"
-		--if tcbs.section_free then
-			--form = form.."button[0.5,"..(offset+1.5)..";5,1;"..btnpref.."_setlocked;Section is free]"
-		--else
-			--form = form.."button[0.5,"..(offset+1.5)..";5,1;"..btnpref.."_setfree;Section is blocked]"		
-		--end
 	end
 	if tcbs.signal then
 		form = form.."button[0.5,"..(offset+2.5)..";5,1;"..btnpref.."_sigdia;Signalling]"	
@@ -297,11 +273,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		local tcb = ildb.get_tcb(pos)
 		if not tcb then return end
 		local f_gotots = {fields.A_gotots, fields.B_gotots}
-		local f_update = {fields.A_update, fields.B_update}
-		local f_remove = {fields.A_remove, fields.B_remove}
 		local f_makeil = {fields.A_makeil, fields.B_makeil}
-		local f_setlocked = {fields.A_setlocked, fields.B_setlocked}
-		local f_setfree = {fields.A_setfree, fields.B_setfree}
 		local f_asnsig = {fields.A_asnsig, fields.B_asnsig}
 		local f_sigdia = {fields.A_sigdia, fields.B_sigdia}
 		
@@ -312,28 +284,11 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 					advtrains.interlocking.show_ts_form(tcbs.ts_id, pname)
 					return
 				end
-				if f_update[connid] then
-					ildb.sync_tcb_neighbors(pos, connid)
-				end
-				if f_remove[connid] then
-					ildb.remove_from_interlocking({p=pos, s=connid})
-				end
 			else
 				if f_makeil[connid] then
-					-- try sinc_tcb_neighbors first
-					ildb.sync_tcb_neighbors(pos, connid)
-					-- if that didn't work, create new section
 					if not tcbs.ts_id then
-						ildb.create_ts({p=pos, s=connid})
-						ildb.sync_tcb_neighbors(pos, connid)
+						ildb.create_ts_from_tcbs({p=pos, s=connid})
 					end
-				end
-				-- non-interlocked
-				if f_setfree[connid] then
-					tcbs.section_free = true
-				end
-				if f_setlocked[connid] then
-					tcbs.section_free = nil
 				end
 			end
 			if f_asnsig[connid] and not tcbs.signal then
@@ -357,10 +312,7 @@ end)
 
 -- TS Formspec
 
--- textlist selection temporary storage
-local ts_pselidx = {}
-
-function advtrains.interlocking.show_ts_form(ts_id, pname, sel_tcb)
+function advtrains.interlocking.show_ts_form(ts_id, pname)
 	if not minetest.check_player_privs(pname, "interlocking") then
 		minetest.chat_send_player(pname, "Insufficient privileges to use this!")
 		return
@@ -369,7 +321,7 @@ function advtrains.interlocking.show_ts_form(ts_id, pname, sel_tcb)
 	if not ts_id then return end
 	
 	local form = "size[10,10]label[0.5,0.5;Track Section Detail - "..ts_id.."]"
-	form = form.."field[0.8,2;5.2,1;name;Section name;"..minetest.formspec_escape(ts.name).."]"
+	form = form.."field[0.8,2;5.2,1;name;Section name;"..minetest.formspec_escape(ts.name or "").."]"
 	form = form.."button[5.5,1.7;1,1;setname;Set]"
 	local hint
 	
@@ -382,26 +334,8 @@ function advtrains.interlocking.show_ts_form(ts_id, pname, sel_tcb)
 	form = form.."textlist[0.5,3;5,3;tcblist;"..table.concat(strtab, ",").."]"
 	
 	if ildb.may_modify_ts(ts) then
-		
-		if players_link_ts[pname] then
-			local other_id = players_link_ts[pname]
-			local other_ts = ildb.get_ts(other_id)
-			if other_ts then
-				if ildb.may_modify_ts(other_ts) then
-					form = form.."button[5.5,3;3.5,1;mklink;Join with "..minetest.formspec_escape(other_ts.name).."]"
-					form = form.."button[9  ,3;0.5,1;cancellink;X]"
-				end
-			end
-		else
-			form = form.."button[5.5,3;4,1;link;Join into other section]"
-			hint = 1
-		end
-		form = form.."button[5.5,4;4,1;dissolve;Dissolve Section]"
+		form = form.."button[5.5,4;4,1;remove;Remove Section]"
 		form = form.."tooltip[dissolve;This will remove the track section and set all its end points to End Of Interlocking]"
-		if sel_tcb then
-			form = form.."button[5.5,5;4,1;del_tcb;Unlink selected TCB]"
-			hint = 2
-		end
 	else
 		hint=3
 	end
@@ -420,17 +354,12 @@ function advtrains.interlocking.show_ts_form(ts_id, pname, sel_tcb)
 	end
 	
 	form = form.."button[5.5,7;4,1;reset;Reset section state]"
-	
-	if hint == 1 then
-		form = form.."label[0.5,0.75;Use the 'Join' button to designate rail crosses and link not listed far-away TCBs]"
-	elseif hint == 2 then
-		form = form.."label[0.5,0.75;Unlinking a TCB will set it to non-interlocked mode.]"
-	elseif hint == 3 then
+
+	if hint == 3 then
 		form = form.."label[0.5,0.75;You cannot modify track sections when a route is set or a train is on the section.]"
 		--form = form.."label[0.5,1;Trying to unlink a TCB directly connected to this track will not work.]"
 	end
 	
-	ts_pselidx[pname]=sel_tcb
 	minetest.show_formspec(pname, "at_il_tsconfig_"..ts_id, form)
 	
 end
@@ -442,45 +371,15 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		return
 	end
 	-- independent of the formspec, clear this whenever some formspec event happens
-	local tpsi = ts_pselidx[pname]
-	ts_pselidx[pname] = nil
 	
 	local ts_id = string.match(formname, "^at_il_tsconfig_(.+)$")
 	if ts_id and not fields.quit then
 		local ts = ildb.get_ts(ts_id)
 		if not ts then return end
 		
-		local sel_tcb
-		if fields.tcblist then
-			local tev = minetest.explode_textlist_event(fields.tcblist)
-			sel_tcb = tev.index
-			ts_pselidx[pname] = sel_tcb
-		elseif tpsi then
-			sel_tcb = tpsi
-		end
-		
 		if ildb.may_modify_ts(ts) then
-			if players_link_ts[pname] then
-				if fields.cancellink then
-					players_link_ts[pname] = nil
-				elseif fields.mklink then
-					ildb.link_track_sections(players_link_ts[pname], ts_id)
-					players_link_ts[pname] = nil
-				end
-			end
-			
-			if fields.del_tcb and sel_tcb and sel_tcb > 0 and sel_tcb <= #ts.tc_breaks then
-				if not ildb.remove_from_interlocking(ts.tc_breaks[sel_tcb]) then
-					minetest.chat_send_player(pname, "Please unassign signal first!")
-				end
-				sel_tcb = nil
-			end
-			
-			if fields.link then
-				players_link_ts[pname] = ts_id
-			end
-			if fields.dissolve then
-				ildb.dissolve_ts(ts_id)
+			if fields.remove then
+				ildb.remove_ts(ts_id)
 				minetest.close_formspec(pname, formname)
 				return
 			end
@@ -489,7 +388,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		if fields.setname then
 			ts.name = fields.name
 			if ts.name == "" then
-				ts.name = "Section "..ts_id
+				ts.name = nil
 			end
 		end
 		
@@ -566,7 +465,7 @@ function advtrains.interlocking.show_tcb_marker(pos)
 			ts = ildb.get_ts(tcbs.ts_id)
 		end
 		if ts then
-			itex[connid] = ts.name
+			itex[connid] = ts.name or tcbs.ts_id or "???"
 		else
 			itex[connid] = "--EOI--"
 		end
@@ -587,6 +486,47 @@ function advtrains.interlocking.show_tcb_marker(pos)
 	if le then le.tcbpos = pos end
 	
 	markerent[pts] = obj
+end
+
+function advtrains.interlocking.remove_tcb_marker(pos)
+	local pts = advtrains.roundfloorpts(pos)
+	if markerent[pts] then
+		markerent[pts]:remove()
+	end
+	markerent[pts] = nil
+end
+
+-- Spawns particles to highlight the clicked track section
+-- TODO: Adapt behavior to not dumb-walk anymore
+function advtrains.interlocking.highlight_track_section(pos)
+	local ti = advtrains.get_track_iterator(pos, nil, 100, true)
+	local pos, connid, bconnid, tcb
+	while ti:has_next_branch() do
+		pos, connid = ti:next_branch()
+		--atdebug("highlight_track_section: BRANCH: ",pos, connid)
+		bconnid = nil
+		repeat
+			-- spawn particles
+			minetest.add_particle({
+				pos = pos,
+				velocity = {x=0, y=0, z=0},
+				acceleration = {x=0, y=0, z=0},
+				expirationtime = 10,
+				size = 7,
+				vertical = true,
+				texture = "at_il_ts_highlight_particle.png",
+				glow = 6,
+			})
+			-- abort if TCB is found
+			tcb = ildb.get_tcb(pos)
+			if tcb then
+				advtrains.interlocking.show_tcb_marker(pos)
+				break
+			end
+			pos, connid, bconnid = ti:next_track()
+			--atdebug("highlight_track_section: TRACK: ",pos, connid, bconnid)
+		until not pos
+	end
 end
 
 -- Signalling formspec - set routes a.s.o

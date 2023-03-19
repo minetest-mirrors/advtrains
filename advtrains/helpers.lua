@@ -342,9 +342,10 @@ function advtrains.get_matching_conn(conn, nconns)
 	return connlku[nconns][conn]
 end
 
-function advtrains.random_id()
+function advtrains.random_id(lenp)
 	local idst=""
-	for i=0,5 do
+	local len = lenp or 6
+	for i=1,len do
 		idst=idst..(math.random(0,9))
 	end
 	return idst
@@ -476,6 +477,14 @@ end
 
 -- Metatable:
 local trackiter_mt = {
+	-- Internal State:
+	-- branches: A list of {pos, connid, limit} for where to restart
+	-- pos: The *next* position that the track iterator will return
+	-- bconnid: The connid of the connection of the rail at pos that points backward
+	-- tconns: The connections of the rail at pos
+	-- limit: the current limit
+	-- visited: a key-boolean table of already visited rails
+	
 	-- get whether there are still unprocessed branches
 	has_next_branch = function(self)
 		return #self.branches > 0
@@ -491,13 +500,18 @@ local trackiter_mt = {
 		self.tconns = adj_conns
 		self.limit = br.limit - 1
 		self.visited[advtrains.encode_pos(br.pos)] = true
+		self.last_track_already_visited = false
 		return br.pos, br.connid
 	end,
 	-- get the next track along the current branch,
 	-- potentially adding branching tracks to the unprocessed branches list
-	-- returns status, track_pos, track_connid
-	-- status is true(ok), false(track has ended), nil(traversing limit has been reached) (when status~=true, track_pos and track_connid are nil)
+	-- returns track_pos, track_connid, track_backwards_connid
+	-- On error, returns nil, reason; reason is one of "track_end", "limit_hit", "already_visited"
 	next_track = function(self)
+		if self.last_track_already_visited then
+			-- see comment below
+			return nil, "already_visited"
+		end
 		local pos = self.pos
 		if not pos then
 			-- last run found track end. Return false
@@ -507,12 +521,17 @@ local trackiter_mt = {
 		if self.limit <= 0 then
 			return nil, "limit_hit"
 		end
-		if self.visited[advtrains.encode_pos(pos)] then
-			-- node was already seen. do not continue
-			return nil, "already_visited"
-		end
 		-- select next conn (main conn to follow is the associated connection)
+		local old_bconnid = self.bconnid
 		local mconnid = advtrains.get_matching_conn(self.bconnid, #self.tconns)
+		if self.visited[advtrains.encode_pos(pos)] then
+			-- node was already seen
+			-- Due to special requirements for the track section updater, return this first already visited track once
+			-- but do not process any further rails on this branch
+			-- The next call will then throw already_visited error
+			self.last_track_already_visited = true
+			return pos, mconnid, old_bconnid
+		end
 		-- If there are more connections, add these to branches
 		for nconnid,_ in ipairs(self.tconns) do
 			if nconnid~=mconnid and nconnid~=self.bconnid then
@@ -526,7 +545,16 @@ local trackiter_mt = {
 		self.tconns = adj_conns
 		self.limit = self.limit - 1
 		self.visited[advtrains.encode_pos(pos)] = true
-		return pos, mconnid
+		self.last_track_already_visited = false
+		return pos, mconnid, old_bconnid
+	end,
+
+	add_branch = function(self, pos, connid)
+		table.insert(self.branches, {pos = pos, connid = connid, limit=self.limit})
+	end,
+
+	is_visited = function(self, pos)
+		return self.visited[advtrains.encode_pos(pos)]
 	end,
 }
 
@@ -569,8 +597,8 @@ while ti:has_next_branch() do
 	repeat
 		<do something with the track>
 		if <track satisfies an abort condition> then break end --for example, when traversing should stop at TCBs this can check if there is a tcb here
-		ok, pos, connid = ti:next_track()
-	until not ok -- this stops the loop when either the track end is reached or the limit is hit
+		pos, connid = ti:next_track()
+	until not pos -- this stops the loop when either the track end is reached or the limit is hit
 	-- while loop continues with the next branch ( diverging branch of one of the switches/crossings) until no more are left
 end
 
