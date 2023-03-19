@@ -2,6 +2,7 @@
 
 local players_assign_tcb = {}
 local players_assign_signal = {}
+local players_assign_xlink = {}
 local players_link_ts = {}
 
 local ildb = advtrains.interlocking.db
@@ -166,6 +167,7 @@ minetest.register_on_punchnode(function(pos, node, player, pointed_thing)
 				meta:set_string("tcb_pos", minetest.pos_to_string(pos))
 				meta:set_string("infotext", "TCB assigned to "..minetest.pos_to_string(pos))
 				minetest.chat_send_player(pname, "Configuring TCB: Successfully configured TCB")
+				advtrains.interlocking.show_tcb_marker(pos)
 			else
 				minetest.chat_send_player(pname, "Configuring TCB: This is not a normal two-connection rail! Aborted.")
 			end
@@ -213,9 +215,14 @@ end)
 
 -- TCB Form
 
-local function mktcbformspec(tcbs, btnpref, offset, pname)
+local function mktcbformspec(pos, side, tcbs, offset, pname)
 	local form = ""
+	local btnpref = side==1 and "A" or "B"
 	local ts
+	-- ensure that mapping and xlink are up to date
+	ildb.tcbs_ensure_ts_ref_exists({p=pos, s=side, tcbs=tcbs})
+	ildb.validate_tcb_xlink({p=pos, s=side, tcbs=tcbs})
+	-- Note: repair operations may have been triggered by this
 	if tcbs.ts_id then
 		ts = ildb.get_ts(tcbs.ts_id)
 	end
@@ -226,6 +233,19 @@ local function mktcbformspec(tcbs, btnpref, offset, pname)
 		tcbs.ts_id = nil
 		form = form.."label[0.5,"..offset..";Side "..btnpref..": ".."End of interlocking]"
 		form = form.."button[0.5,"..(offset+0.5)..";5,1;"..btnpref.."_makeil;Create Interlocked Track Section]"
+	end
+	-- xlink
+	if tcbs.xlink then
+		form = form.."label[0.5,"..(offset+1.5)..";Link:"..ildb.sigd_to_string(tcbs.xlink).."]"
+		form = form.."button[4.5,"..(offset+1.5)..";1,1;"..btnpref.."_xlinkdel;X]"
+	else
+		if players_assign_xlink[pname] then
+			form = form.."button[0.5,"..(offset+1.5)..";4,1;"..btnpref.."_xlinklink;Link "..ildb.sigd_to_string(players_assign_xlink[pname]).."]"
+			form = form.."button[4.5,"..(offset+1.5)..";1,1;"..btnpref.."_xlinkabrt;X]"
+		else
+			form = form.."label[0.5,"..(offset+1.5)..";No Link]"
+			form = form.."button[4.5,"..(offset+1.5)..";1,1;"..btnpref.."_xlinkadd;+]"
+		end
 	end
 	if tcbs.signal then
 		form = form.."button[0.5,"..(offset+2.5)..";5,1;"..btnpref.."_sigdia;Signalling]"	
@@ -245,8 +265,8 @@ function advtrains.interlocking.show_tcb_form(pos, pname)
 	if not tcb then return end
 	
 	local form = "size[6,9] label[0.5,0.5;Track Circuit Break Configuration]"
-	form = form .. mktcbformspec(tcb[1], "A", 1, pname)
-	form = form .. mktcbformspec(tcb[2], "B", 5, pname)
+	form = form .. mktcbformspec(pos, 1, tcb[1], 1, pname)
+	form = form .. mktcbformspec(pos, 2, tcb[2], 5, pname)
 	
 	minetest.show_formspec(pname, "at_il_tcbconfig_"..minetest.pos_to_string(pos), form)
 	advtrains.interlocking.show_tcb_marker(pos)
@@ -276,6 +296,10 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		local f_makeil = {fields.A_makeil, fields.B_makeil}
 		local f_asnsig = {fields.A_asnsig, fields.B_asnsig}
 		local f_sigdia = {fields.A_sigdia, fields.B_sigdia}
+		local f_xlinkadd = {fields.A_xlinkadd, fields.B_xlinkadd}
+		local f_xlinkdel = {fields.A_xlinkdel, fields.B_xlinkdel}
+		local f_xlinklink = {fields.A_xlinklink, fields.B_xlinklink}
+		local f_xlinkabrt = {fields.A_xlinkabrt, fields.B_xlinkabrt}
 		
 		for connid=1,2 do
 			local tcbs = tcb[connid]
@@ -288,6 +312,28 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				if f_makeil[connid] then
 					if not tcbs.ts_id then
 						ildb.create_ts_from_tcbs({p=pos, s=connid})
+					end
+				end
+			end
+			if tcbs.xlink then
+				if f_xlinkdel[connid] then
+					ildb.remove_tcb_xlink({p=pos, s=connid})
+				end
+			else
+				local osigd = players_assign_xlink[pname]
+				if osigd then
+					if f_xlinklink[connid] then
+						ildb.add_tcb_xlink({p=pos, s=connid}, osigd)
+						players_assign_xlink[pname] = nil
+					elseif f_xlinkabrt[connid] then
+						players_assign_xlink[pname] = nil
+					end
+				else
+					if f_xlinkadd[connid] then
+						players_assign_xlink[pname] = {p=pos, s=connid}
+						minetest.chat_send_player(pname, "TCB Link: Select linked TCB now!")
+						minetest.close_formspec(pname, formname)
+						return -- to not reopen form
 					end
 				end
 			end
@@ -496,36 +542,25 @@ function advtrains.interlocking.remove_tcb_marker(pos)
 	markerent[pts] = nil
 end
 
+local ts_showparticles_callback = function(pos, connid, bconnid)
+	minetest.add_particle({
+		pos = pos,
+		velocity = {x=0, y=0, z=0},
+		acceleration = {x=0, y=0, z=0},
+		expirationtime = 10,
+		size = 7,
+		vertical = true,
+		texture = "at_il_ts_highlight_particle.png",
+		glow = 6,
+	})
+end
+
 -- Spawns particles to highlight the clicked track section
 -- TODO: Adapt behavior to not dumb-walk anymore
 function advtrains.interlocking.highlight_track_section(pos)
-	local ti = advtrains.get_track_iterator(pos, nil, 100, true)
-	local pos, connid, bconnid, tcb
-	while ti:has_next_branch() do
-		pos, connid = ti:next_branch()
-		--atdebug("highlight_track_section: BRANCH: ",pos, connid)
-		bconnid = nil
-		repeat
-			-- spawn particles
-			minetest.add_particle({
-				pos = pos,
-				velocity = {x=0, y=0, z=0},
-				acceleration = {x=0, y=0, z=0},
-				expirationtime = 10,
-				size = 7,
-				vertical = true,
-				texture = "at_il_ts_highlight_particle.png",
-				glow = 6,
-			})
-			-- abort if TCB is found
-			tcb = ildb.get_tcb(pos)
-			if tcb then
-				advtrains.interlocking.show_tcb_marker(pos)
-				break
-			end
-			pos, connid, bconnid = ti:next_track()
-			--atdebug("highlight_track_section: TRACK: ",pos, connid, bconnid)
-		until not pos
+	local all_tcbs = ildb.get_all_tcbs_adjacent(pos, nil, ts_showparticles_callback)
+	for _,sigd in ipairs(all_tcbs) do
+		advtrains.interlocking.show_tcb_marker(sigd.p)
 	end
 end
 
