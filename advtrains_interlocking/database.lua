@@ -163,6 +163,9 @@ TCB data structure
 -- This is the "A" side of the TCB
 [1] = { -- Variant: with adjacent TCs.
 	ts_id = <id> -- ID of the assigned track section
+	xlink = <other sigd> -- If two sections of track are not physically joined but must function as one TS (e.g. knights move crossing), a bidirectional link can be added with exactly one other TCB.
+	-- TS search will behave as if these two TCBs were physically connected.
+	
 	signal = <pos> -- optional: when set, routes can be set from this tcb/direction and signal
 	-- aspect will be set accordingly.
 	routeset = <index in routes> -- Route set from this signal. This is the entry that is cleared once
@@ -249,17 +252,26 @@ function ildb.get_all_ts()
 	return track_sections
 end
 
--- Checks the consistency of the track section at the given position
--- This method attempts to autorepair track sections if they are inconsistent
+-- Checks the consistency of the track section at the given position, attempts to autorepair track sections if they are inconsistent
+-- There are 2 operation modes:
+--		1: pos is NOT a TCB, tcb_connid MUST be nil
+-- 		2: pos is a TCB, tcb_connid MUST be given
 -- @param pos: the position to start from
+-- @param tcb_connid: If provided node is a TCB, 
 -- Returns:
 -- ts_id - the track section that was found
 -- nil - No track section exists
-function ildb.check_and_repair_ts_at_pos(pos)
-	atdebug("check_and_repair_ts_at_pos", pos)
+function ildb.check_and_repair_ts_at_pos(pos, tcb_connid)
+	atdebug("check_and_repair_ts_at_pos", pos, tcb_connid)
+	-- check prereqs
+	if ildb.get_tcb(pos) then
+		if not tcb_connid then error("check_and_repair_ts_at_pos: Startpoint is TCB, must provide tcb_connid!") end
+	else
+		if tcb_connid then error("check_and_repair_ts_at_pos: Startpoint is not TCB, must not provide tcb_connid!") end
+	end
 	-- STEP 1: Ensure that only one section is at this place
 	-- get all TCBs adjacent to this 
-	local all_tcbs = ildb.get_all_tcbs_adjacent(pos, nil)
+	local all_tcbs = ildb.get_all_tcbs_adjacent(pos, tcb_connid)
 	local first_ts = true
 	local ts_id
 	for _,sigd in ipairs(all_tcbs) do
@@ -321,41 +333,63 @@ end
 -- This function does not trigger a repair.
 -- @param inipos: the initial position
 -- @param inidir: the initial direction, or nil to search in all directions
+-- @param per_track_callback: A callback function called with signature (pos, connid, bconnid) for every track encountered
 -- Returns: a list of sigd's describing the TCBs found (sigd's point inward):
 -- 		{p=<pos>, s=<side>, tcbs=<ref to tcbs table>}
-function ildb.get_all_tcbs_adjacent(inipos, inidir)
+function ildb.get_all_tcbs_adjacent(inipos, inidir, per_track_callback)
 	atdebug("get_all_tcbs_adjacent: inipos",inipos,"inidir",inidir,"")
 	local found_sigd = {}
 	local ti = advtrains.get_track_iterator(inipos, inidir, TS_MAX_SCAN, true)
+	-- if initial start is TCBS and has xlink, need to add that to the TI
+	local inisi = {p=inipos, s=inidir};
+	local initcbs = ildb.get_tcbs(inisi)
+	if initcbs then
+		ildb.validate_tcb_xlink(inisi, true)
+		if initcbs.xlink then
+			-- adding the tcb will happen when this branch is retrieved again using ti:next_branch()
+			atdebug("get_all_tcbs_adjacent: Putting xlink Branch for initial node",initcbs.xlink)
+			ti:add_branch(initcbs.xlink.p, initcbs.xlink.s)
+		end
+	end
 	local pos, connid, bconnid, tcb
 	while ti:has_next_branch() do
 		pos, connid = ti:next_branch()
 		--atdebug("get_all_tcbs_adjacent: BRANCH: ",pos, connid)
 		bconnid = nil
+		is_branch_start = true
 		repeat
+			-- callback
+			if per_track_callback then
+				per_track_callback(pos, connid, bconnid)
+			end
 			tcb = ildb.get_tcb(pos)
 			if tcb then
+				local using_connid = bconnid
 				-- found a tcb
-				if not bconnid then
-					-- A branch start point cannot be a TCB, as that would imply that it was a turnout/crossing (illegal)
-					-- Only exception where this can happen is if the start point is a TCB, then we'd need to add the forward side of it to our list
-					if pos.x==inipos.x and pos.y==inipos.y and pos.z==inipos.z then
-						-- Note "connid" instead of "bconnid"
-						atdebug("get_all_tcbs_adjacent: Found Startpoint TCB: ",pos, connid, "ts=", tcb[connid].ts_id)
-						insert_sigd_if_not_present(found_sigd, {p=pos, s=connid, tcbs=tcb[connid]})
-					else
-						-- this may not happend
-						error("Found TCB at TrackIterator new branch which is not the start point, this is illegal! pos="..minetest.pos_to_string(pos))
-					end
-				
-				else
-					-- add the sigd of this tcb and a reference to the tcb table in it
-					atdebug("get_all_tcbs_adjacent: Found TCB: ",pos, bconnid, "ts=", tcb[bconnid].ts_id)
-					insert_sigd_if_not_present(found_sigd, {p=pos, s=bconnid, tcbs=tcb[bconnid]})
+				if is_branch_start then
+					-- A branch cannot be a TCB, as that would imply that it was a turnout/crossing (illegal)
+					-- UNLESS: (a) it is the start point or (b) it was added via xlink
+					-- Then the correct conn to use is connid (pointing forward)
+					atdebug("get_all_tcbs_adjacent: Inserting TCB at branch start",pos, connid)
+					using_connid = connid
+				end
+				-- add the sigd of this tcb and a reference to the tcb table in it
+				atdebug("get_all_tcbs_adjacent: Found TCB: ",pos, using_connid, "ts=", tcb[using_connid].ts_id)
+				local si = {p=pos, s=using_connid, tcbs=tcb[using_connid]}
+				-- if xlink exists, add it now (only if we are not in branch start)
+				ildb.validate_tcb_xlink(si, true)
+				if not is_branch_start and si.tcbs.xlink then
+					-- adding the tcb will happen when this branch is retrieved again using ti:next_branch()
+					atdebug("get_all_tcbs_adjacent: Putting xlink Branch",si.tcbs.xlink)
+					ti:add_branch(si.tcbs.xlink.p, si.tcbs.xlink.s)
+				end
+				insert_sigd_if_not_present(found_sigd, si)
+				if not is_branch_start then
 					break
 				end
 			end
 			pos, connid, bconnid = ti:next_track()
+			is_branch_start = false
 			--atdebug("get_all_tcbs_adjacent: TRACK: ",pos, connid, bconnid)
 		until not pos
 	end
@@ -464,7 +498,7 @@ function ildb.tcbs_ensure_ts_ref_exists(sigd)
 	local did_insert = insert_sigd_if_not_present(ts.tc_breaks, {p=sigd.p, s=sigd.s})
 	if did_insert then
 		atdebug("tcbs_ensure_ts_ref_exists(",sigd,"): TCBS was missing reference in TS",tcbs.ts_id)
-		ildb.update_ts_cache(ts_id)
+		ildb.update_ts_cache(tcbs.ts_id)
 	end
 end
 
@@ -515,7 +549,7 @@ function ildb.update_ts_cache(ts_id)
 end
 
 local lntrans = { "A", "B" }
-local function sigd_to_string(sigd)
+function ildb.sigd_to_string(sigd)
 	return minetest.pos_to_string(sigd.p).." / "..lntrans[sigd.s]
 end
 
@@ -546,10 +580,96 @@ function ildb.remove_tcb_at(pos)
 	if old_tcb[2].ts_id then
 		ildb.purge_ts_tcb_refs(old_tcb[2].ts_id)
 	end
+	-- update xlink partners
+	if old_tcb[1].xlink then
+		ildb.validate_tcb_xlink(old_tcb[1].xlink)
+	end
+	if old_tcb[2].xlink then
+		ildb.validate_tcb_xlink(old_tcb[2].xlink)
+	end
 	advtrains.interlocking.remove_tcb_marker(pos)
 	-- If needed, merge the track sections here
 	ildb.check_and_repair_ts_at_pos(pos)
 	return true
+end
+
+-- Xlink: Connecting not-physically-connected sections handling
+
+-- Ensures that the xlink of this tcbs is bidirectional
+function ildb.validate_tcb_xlink(sigd, suppress_repairs)
+	local tcbs = sigd.tcbs or ildb.get_tcbs(sigd)
+	local osigd = tcbs.xlink
+	if not osigd then return end
+	local otcbs = ildb.get_tcbs(tcbs.xlink)
+	if not otcbs then
+		atdebug("validate_tcb_xlink",sigd,": Link partner ",osigd,"orphaned")
+		tcbs.xlink = nil
+		if not suppress_repairs then
+			ildb.check_and_repair_ts_at_pos(sigd.p, sigd.s)
+		end
+		return
+	end
+	if otcbs.xlink then
+		if not vector.equals(otcbs.xlink.p, sigd.p) or otcbs.xlink.s~=sigd.s then
+			atdebug("validate_tcb_xlink",sigd,": Link partner ",osigd,"backreferencing to someone else (namely",otcbs.xlink,") clearing it")
+			tcbs.xlink = nil
+			if not suppress_repairs then
+				ildb.check_and_repair_ts_at_pos(sigd.p, sigd.s)
+				atdebug("validate_tcb_xlink",sigd,": Link partner ",osigd," was backreferencing to someone else, now updating that")
+				ildb.validate_tcb_xlink(osigd)
+			end
+		end
+	else
+		atdebug("validate_tcb_xlink",sigd,": Link partner ",osigd,"wasn't backreferencing, clearing it")
+		tcbs.xlink = nil
+		if not suppress_repairs then
+			ildb.check_and_repair_ts_at_pos(sigd.p, sigd.s)
+		end
+	end
+end
+
+function ildb.add_tcb_xlink(sigd1, sigd2)
+	atdebug("add_tcb_xlink",sigd1, sigd2)
+	local tcbs1 = sigd1.tcbs or ildb.get_tcbs(sigd1)
+	local tcbs2 = sigd2.tcbs or ildb.get_tcbs(sigd2)
+	if vector.equals(sigd1.p, sigd2.p) then
+		atdebug("add_tcb_xlink Cannot xlink with same TCB")
+		return
+	end
+	if not tcbs1 or not tcbs2 then
+		atdebug("add_tcb_xlink TCBS doesnt exist")
+		return
+	end
+	if tcbs1.xlink or tcbs2.xlink then
+		atdebug("add_tcb_xlink One already linked")
+		return
+	end
+	-- apply link
+	tcbs1.xlink = {p=sigd2.p, s=sigd2.s}
+	tcbs2.xlink = {p=sigd1.p, s=sigd1.s}
+	-- update section. It should be sufficient to call update only once because the TCBs are linked anyway now
+	ildb.check_and_repair_ts_at_pos(sigd1.p, sigd1.s)
+end
+
+function ildb.remove_tcb_xlink(sigd)
+	atdebug("remove_tcb_xlink",sigd)
+	-- Validate first. If Xlink is gone already then, nothing to do
+	ildb.validate_tcb_xlink(sigd)
+	-- Checking all of these already done by validate
+	local tcbs = sigd.tcbs or ildb.get_tcbs(sigd)
+	local osigd = tcbs.xlink
+	if not osigd then
+		-- validate already cleared us
+		atdebug("remove_tcb_xlink: Already gone by validate")
+		return
+	end
+	local otcbs = ildb.get_tcbs(tcbs.xlink)
+	-- clear it
+	otcbs.xlink = nil
+	tcbs.xlink = nil
+	-- Update section for ourself and the other one
+	ildb.check_and_repair_ts_at_pos(sigd.p, sigd.s)
+	ildb.check_and_repair_ts_at_pos(osigd.p, osigd.s)
 end
 
 function ildb.create_ts_from_tcbs(sigd)

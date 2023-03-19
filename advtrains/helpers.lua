@@ -297,6 +297,7 @@ end
 function advtrains.get_adjacent_rail(this_posnr, this_conns_p, conn_idx, drives_on)
 	local this_pos = advtrains.round_vector_floor_y(this_posnr)
 	local this_conns = this_conns_p
+	local _
 	if not this_conns then
 		_, this_conns = advtrains.get_rail_info_at(this_pos)
 	end
@@ -583,6 +584,7 @@ function advtrains.get_track_iterator(initial_pos, initial_connid, limit, follow
 			table.insert(ti.branches, {pos = initial_pos, connid = coni, limit=limit})
 		end
 	end
+	ti.limit = limit -- safeguard if someone adds a branch before calling anything
 	setmetatable(ti, {__index=trackiter_mt})
 	return ti
 end

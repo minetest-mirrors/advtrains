@@ -26,7 +26,11 @@ local function node_right_click(pos, pname)
 	local node_ok, conns, rail_y=advtrains.get_rail_info_at(pos)
 	if not node_ok then
 		minetest.chat_send_player(pname, "Node is not a track!")
-	return
+		return
+	end
+	if advtrains.interlocking.db.get_tcb(pos) then
+		advtrains.interlocking.show_tcb_form(pos, pname)
+		return
 	end
 
 	local ts_id = advtrains.interlocking.db.check_and_repair_ts_at_pos(pos)
@@ -41,7 +45,12 @@ local function node_left_click(pos, pname)
 	local node_ok, conns, rail_y=advtrains.get_rail_info_at(pos)
 	if not node_ok then
 		minetest.chat_send_player(pname, "Node is not a track!")
-	return
+		return
+	end
+
+	if advtrains.interlocking.db.get_tcb(pos) then
+		advtrains.interlocking.show_tcb_marker(pos)
+		return
 	end
 
 	local ts_id = advtrains.interlocking.db.check_and_repair_ts_at_pos(pos)
