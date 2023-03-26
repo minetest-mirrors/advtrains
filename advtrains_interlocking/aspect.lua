@@ -149,7 +149,7 @@ function signal_aspect:to_group(group)
 		end
 	end
 	self.group = group
-	self.name = group.aspects[newidx][1]
+	self.name = gdef.aspects[newidx][1]
 	return self
 end
 
@@ -169,6 +169,7 @@ function signal_aspect:adjust_distant(dst, shift)
 		self.dst = dst.main
 	else
 		self.dst = nil
+		return self
 	end
 	local dgdef = registered_groups[dst.group]
 	if dgdef then

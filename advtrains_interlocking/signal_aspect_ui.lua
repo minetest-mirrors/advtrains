@@ -58,7 +58,7 @@ local function describe_supported_aspects(suppasp, isasp)
 	local selid = 0
 	local mainasps = suppasp.main
 	if type(mainasps) ~= "table" then
-		mainasps = {mainasps or false}
+		mainasps = {mainasps}
 	end
 	for idx, spv in ipairs(mainasps) do
 		if isasp and spv == rawget(isasp, "main") then
@@ -85,16 +85,24 @@ local function describe_supported_aspects(suppasp, isasp)
 	end
 	t.shunt_const = suppasp.shunt ~= nil
 
-	entries = {}
-	selid = 1
-	for idx, spv in ipairs(suppasp.dst or {}) do
-		if isasp and spv == (isasp.dst or false) then
-			selid = idx
+	if suppasp.group then
+		local gdef = advtrains.interlocking.aspect.get_group_definition(suppasp.group)
+		if gdef then
+			t.group = suppasp.group
+			t.groupdef = gdef
+			local entries = {}
+			local selid = 1
+			for idx, name in ipairs(suppasp.name or {}) do
+				entries[idx] = gdef.aspects[name].label
+				if suppasp.group == isasp.group and name == isasp.name then
+					selid = idx
+				end
+			end
+			t.name = entries
+			t.name_current = selid
 		end
-		entries[idx] = describe_distant_aspect(spv)
 	end
-	t.dst = entries
-	t.dst_current = selid
+
 	return t
 end
 
@@ -112,35 +120,35 @@ local function make_signal_aspect_selector(suppasp, purpose, isasp)
 
 	local form = {
 		"formspec_version[4]",
-		string.format("size[8,%f]", ({5.75, 9.25})[formmode]),
+		string.format("size[8,%f]", ({5.75, 10.75})[formmode]),
 		F.S_label(0.5, 0.5, "Select signal aspect"),
 	}
+	local h0 = ({0, 1.5})[formmode]
+	form[#form+1] = F.S_label(0.5, 1.5+h0, "Main aspect")
+	form[#form+1] = F.S_label(0.5, 3+h0, "Shunt aspect")
+	form[#form+1] = F.S_button_exit(0.5, 4.5+h0, 7, "asp_save", "Save signal aspect")
 	if formmode == 1 then
 		form[#form+1] = F.label(0.5, 1, purpose)
-	else
-		form[#form+1] = F.S_label(0.5, 1, "Signal at @1", minetest.pos_to_string(pos))
-	end
-
-	form[#form+1] = F.S_label(0.5, 1.5, "Main aspect")
-	if formmode == 1 then
 		form[#form+1] = F.field(0.5, 2, 7, "asp_mainval", "", t.main_string)
-	else
-		form[#form+1] = F.dropdown(0.5, 2, 7, "asp_mainsel", t.main, t.main_current, true)
+	elseif formmode == 2 then
+		if t.group then
+			form[#form+1] = F.S_label(0.5, 1.5, "Signal aspect group: @1", t.groupdef.label)
+			form[#form+1] = F.dropdown(0.5, 2, 7, "asp_namesel", t.name, t.name_current, true)
+		else
+			form[#form+1] = F.S_label(0.5, 1.5, "This signal does not belong to a signal aspect group.")
+			form[#form+1] = F.S_label(0.5, 2, "You can not use a predefined signal aspect.")
+		end
+		form[#form+1] = F.S_label(0.5, 1, "Signal at @1", minetest.pos_to_string(pos))
+		form[#form+1] = F.dropdown(0.5, 3.5, 7, "asp_mainsel", t.main, t.main_current, true)
+		form[#form+1] = advtrains.interlocking.make_ip_formspec_component(pos, 0.5, 7, 7)
+		form[#form+1] = advtrains.interlocking.make_short_dst_formspec_component(pos, 0.5, 8.5, 7)
 	end
 
-	form[#form+1] = F.S_label(0.5, 3, "Shunt aspect")
 	if formmode == 2 and t.shunt_const then
-		form[#form+1] = F.label(0.5, 3.5, t.shunt[t.shunt_current])
-		form[#form+1] = F.S_label(0.5, 4, "The shunt aspect cannot be changed.")
+		form[#form+1] = F.label(0.5, 3.5+h0, t.shunt[t.shunt_current])
+		form[#form+1] = F.S_label(0.5, 4+h0, "The shunt aspect cannot be changed.")
 	else
-		form[#form+1] = F.dropdown(0.5, 3.5, 7, "asp_shunt", t.shunt, t.shunt_current, true)
-	end
-
-	form[#form+1] = F.S_button_exit(0.5, 4.5, 7, "asp_save", "Save signal aspect")
-
-	if formmode == 2 then
-		form[#form+1] = advtrains.interlocking.make_ip_formspec_component(pos, 0.5, 5.5, 7)
-		form[#form+1] = advtrains.interlocking.make_short_dst_formspec_component(pos, 0.5, 7, 7)
+		form[#form+1] = F.dropdown(0.5, 3.5+h0, 7, "asp_shunt", t.shunt, t.shunt_current, true)
 	end
 
 	return table.concat(form)
@@ -186,12 +194,22 @@ local function usebool(sup, val, free)
 end
 
 local function get_aspect_from_formspec(suppasp, fields, psl)
+	local namei, group, name = tonumber(fields.asp_namesel), suppasp.group, nil
+	local gdef = advtrains.interlocking.aspect.get_group_definition(group)
+	if gdef then
+		local names = suppasp.name or {}
+		name = names[namei] or names[names]
+	else
+		group = nil
+	end
 	local maini = tonumber(fields.asp_mainsel)
-	local main = suppasp.main[(maini or 0)-1]
+	local main = (suppasp.main or {})[(maini or 0)-1]
 	if not maini then
 		local mainval = fields.asp_mainval
 		if mainval == "-1" then
 			main = -1
+		elseif mainval == "x" then
+			main = false
 		elseif string.match(mainval, "^%d+$") then
 			main = tonumber(mainval)
 		else
@@ -209,11 +227,13 @@ local function get_aspect_from_formspec(suppasp, fields, psl)
 	if proceed_as_main == nil then
 		proceed_as_main = shunti == 3
 	end
-	return {
+	return advtrains.interlocking.aspect {
 		main = main,
 		shunt = shunt,
 		proceed_as_main = proceed_as_main,
 		info = {},
+		name = name,
+		group = group,
 	}
 end
 

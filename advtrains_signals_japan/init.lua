@@ -275,6 +275,34 @@ minetest.register_node("advtrains_signals_japan:pole_0", {
 	drop = "advtrains_signals_japan:pole_0",
 })
 
+advtrains.interlocking.aspect.register_group {
+	name = "advtrains_signals_japan:5a",
+	label = S("Japanese signal"),
+	aspects = {
+		danger = {
+			label = S"Danger (halt)",
+			main = 0,
+		},
+		restrictedspeed = {
+			label = S"Restricted speed",
+		},
+		caution = {
+			label = S"Caution",
+		},
+		reducedspeed = {
+			label = S"Reduced speed",
+		},
+		clear = {
+			label = S"Clear (proceed)",
+		},
+		"clear",
+		"reducedspeed",
+		"caution",
+		"restrictedspeed",
+		"danger",
+	}
+}
+
 local sigdefs = {}
 local lightcolors = {
 	red = "red",
@@ -282,22 +310,9 @@ local lightcolors = {
 	yellow = "orange",
 	distant = "purple",
 }
-local aspnames = {
-	danger = "Danger (halt)",
-	restrictedspeed = "Restricted speed",
-	caution = "Caution",
-	reducedspeed = "Reduced speed",
-	clear = "Clear (proceed)",
-}
 local function process_signal(name, sigdata, isrpt)
-	local typename = "advtrains_signals_japan:" .. name
-	local groupdef = {}
-	groupdef.name = typename
-	groupdef.aspects = {}
-	groupdef.label = S(string.format("Japanese signal (type %s)", string.upper(name)))
 	local def = {}
 	local tx = {}
-	def.typename = typename
 	def.textures = tx
 	def.desc = sigdata.desc
 	def.isdst = isrpt
@@ -307,6 +322,7 @@ local function process_signal(name, sigdata, isrpt)
 		lightcount = lightcount+1
 	end
 	def.lightcount = lightcount
+	def.suppasp_names = {}
 	for idx, asp in ipairs(sigdata.aspects) do
 		local aspname = asp.name
 		local tt = {
@@ -322,8 +338,7 @@ local function process_signal(name, sigdata, isrpt)
 			tt[#tt+1] = string.format("0,%d=(advtrains_hud_bg.png\\^[colorize\\:%s)", lightcount-1, color)
 		end
 		tx[aspname] = table.concat(tt, ":")
-		groupdef.aspects[idx] = {asp.name}
-		groupdef.aspects[asp.name] = {label = S(aspnames[asp.name]), main = asp.main, proceed_as_main = true}
+		def.suppasp_names[idx] = aspname
 	end
 	local invimg = {
 		string.format("[combine:%dx%d", lightcount*4+1, lightcount*4+1),
@@ -337,9 +352,6 @@ local function process_signal(name, sigdata, isrpt)
 		invimg[lightcount+2] = string.format("%d,%d=(advtrains_hud_bg.png\\^[resize\\:3x3\\^[colorize\\:%s)", 2*lightcount-1, 4*lightcount-3, lightcolors.distant)
 	end
 	def.inventory_image = table.concat(invimg, ":")
-	if not isrpt then
-		advtrains.interlocking.aspect.register_group(groupdef)
-	end
 	return def
 end
 for sigtype, sigdata in pairs {
@@ -401,11 +413,17 @@ for _, rtab in ipairs {
 				drop = "advtrains_signals_japan:"..sigtype.."_danger_0",
 				advtrains = {
 					supported_aspects = {
-						group = siginfo.typename,
+						group = "advtrains_signals_japan:5a",
+						name = siginfo.suppasp_names,
 						dst_shift = siginfo.isdst and 0,
+						main = (not siginfo.isdst) and {} or false
 					},
 					get_aspect = function()
-						return {group = siginfo.typename, name = asp}
+						local main
+						if siginfo.isdst then
+							main = false
+						end
+						return {group = "advtrains_signals_japan:5a", name = asp, main = main}
 					end,
 					set_aspect = function(pos, node, asp)
 						advtrains.ndb.swap_node(pos, {name = "advtrains_signals_japan:"..sigtype.."_"..(asp.name).."_"..rot, param2 = node.param2})
