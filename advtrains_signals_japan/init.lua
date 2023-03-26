@@ -291,10 +291,10 @@ local aspnames = {
 }
 local function process_signal(name, sigdata, isrpt)
 	local typename = "advtrains_signals_japan:" .. name
-	local type2def = {}
-	type2def.name = typename
-	type2def.main = {}
-	type2def.label = S(string.format("Japanese signal (type %s)", string.upper(name)))
+	local groupdef = {}
+	groupdef.name = typename
+	groupdef.aspects = {}
+	groupdef.label = S(string.format("Japanese signal (type %s)", string.upper(name)))
 	local def = {}
 	local tx = {}
 	def.typename = typename
@@ -322,7 +322,8 @@ local function process_signal(name, sigdata, isrpt)
 			tt[#tt+1] = string.format("0,%d=(advtrains_hud_bg.png\\^[colorize\\:%s)", lightcount-1, color)
 		end
 		tx[aspname] = table.concat(tt, ":")
-		type2def.main[idx] = {name = asp.name, label = S(aspnames[asp.name]), main = asp.main, proceed_as_main = true}
+		groupdef.aspects[idx] = {asp.name}
+		groupdef.aspects[asp.name] = {label = S(aspnames[asp.name]), main = asp.main, proceed_as_main = true}
 	end
 	local invimg = {
 		string.format("[combine:%dx%d", lightcount*4+1, lightcount*4+1),
@@ -337,7 +338,7 @@ local function process_signal(name, sigdata, isrpt)
 	end
 	def.inventory_image = table.concat(invimg, ":")
 	if not isrpt then
-		advtrains.interlocking.aspects.register_type2(type2def)
+		advtrains.interlocking.aspect.register_group(groupdef)
 	end
 	return def
 end
@@ -400,15 +401,14 @@ for _, rtab in ipairs {
 				drop = "advtrains_signals_japan:"..sigtype.."_danger_0",
 				advtrains = {
 					supported_aspects = {
-						type = 2,
 						group = siginfo.typename,
 						dst_shift = siginfo.isdst and 0,
 					},
 					get_aspect = function()
-						return asp
+						return {group = siginfo.typename, name = asp}
 					end,
 					set_aspect = function(pos, node, asp)
-						advtrains.ndb.swap_node(pos, {name = "advtrains_signals_japan:"..sigtype.."_"..asp.."_"..rot, param2 = node.param2})
+						advtrains.ndb.swap_node(pos, {name = "advtrains_signals_japan:"..sigtype.."_"..(asp.name).."_"..rot, param2 = node.param2})
 					end,
 				},
 				on_rightclick = advtrains.interlocking.signal_rc_handler,

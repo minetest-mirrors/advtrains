@@ -6,7 +6,6 @@
 local db_distant = {}
 local db_distant_of = {}
 
-local A = advtrains.interlocking.aspects
 local pts = advtrains.encode_pos
 local stp = advtrains.decode_pos
 

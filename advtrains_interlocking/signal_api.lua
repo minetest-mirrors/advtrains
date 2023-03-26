@@ -19,27 +19,7 @@ advtrains.interlocking.FULL_FREE = {
 	proceed_as_main = true,
 }
 
-local function convert_aspect_if_necessary(asp)
-	if type(asp.main) == "table" then
-		local newasp = {} 
-		if asp.main.free then
-			newasp.main = asp.main.speed
-		else
-			newasp.main = 0
-		end
-		if asp.dst and asp.dst.free then
-			newasp.dst = asp.dst.speed
-		else
-			newasp.dst = 0
-		end
-		newasp.proceed_as_main = asp.shunt.proceed_as_main
-		newasp.shunt = asp.shunt.free
-		-- Note: info table not transferred, it's not used right now
-		return newasp
-	end
-	return asp
-end
-advtrains.interlocking.signal_convert_aspect_if_necessary = convert_aspect_if_necessary
+advtrains.interlocking.signal_convert_aspect_if_necessary = advtrains.interlocking.aspect
 
 function advtrains.interlocking.update_signal_aspect(tcbs, skipdst)
 	if tcbs.signal then
@@ -79,7 +59,7 @@ function advtrains.interlocking.signal_rc_handler(pos, node, player, itemstack, 
 	end
 	advtrains.interlocking.show_signal_form(pos, node, pname)
 end
-	
+
 function advtrains.interlocking.show_signal_form(pos, node, pname)
 	local sigd = advtrains.interlocking.db.get_sigd_for_signal(pos)
 	if sigd then
@@ -92,7 +72,7 @@ function advtrains.interlocking.show_signal_form(pos, node, pname)
 				advtrains.interlocking.signal_set_aspect(pos, aspect)
 			end
 			local isasp = advtrains.interlocking.signal_get_aspect(pos, node)
-			
+
 			advtrains.interlocking.show_signal_aspect_selector(
 				pname,
 				ndef.advtrains.supported_aspects,
@@ -123,7 +103,7 @@ local function ipmarker(ipos, connid)
 	local node_ok, conns, rhe = advtrains.get_rail_info_at(ipos, advtrains.all_tracktypes)
 	if not node_ok then return end
 	local yaw = advtrains.dir_to_angle(conns[connid].c)
-	
+
 	-- using tcbmarker here
 	local obj = minetest.add_entity(vector.add(ipos, {x=0, y=0.2, z=0}), "advtrains_interlocking:tcbmarker")
 	if not obj then return end

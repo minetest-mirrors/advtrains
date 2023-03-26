@@ -1,32 +1,11 @@
 --- Signal aspect accessors
 -- @module advtrains.interlocking
 
-local A = advtrains.interlocking.aspects
+local A = advtrains.interlocking.aspect
 local D = advtrains.distant
 local I = advtrains.interlocking
 local N = advtrains.ndb
 local pts = advtrains.roundfloorpts
-
-local signal_aspect_metatable = {
-	__tostring = function(asp)
-		local st = {}
-		if asp.type2group and asp.type2name then
-			table.insert(st, string.format("%q in group %q", asp.type2name, asp.type2group))
-		end
-		if asp.main then
-			table.insert(st, string.format("current %d", asp.main))
-		end
-		if asp.main ~= 0 then
-			if asp.dst then
-				table.insert(st, string.format("next %d", asp.dst))
-			end
-			if asp.proceed_as_main then
-				table.insert(st, "proceed as main")
-			end
-		end
-		return string.format("[%s]", table.concat(st, ", "))
-	end,
-}
 
 local get_aspect
 
@@ -37,9 +16,9 @@ local supposed_aspects = {}
 -- @param db The new database.
 function I.load_supposed_aspects(tbl)
 	if tbl then
-		supposed_aspects = tbl
-		for _, v in pairs(tbl) do
-			setmetatable(v, signal_aspect_metatable)
+		supposed_aspects = {}
+		for k, v in pairs(tbl) do
+			supposed_aspects[k] = A(v)
 		end
 	end
 end
@@ -48,7 +27,11 @@ end
 -- @function save_supposed_aspects
 -- @return The current database in use.
 function I.save_supposed_aspects()
-	return supposed_aspects
+	local t = {}
+	for k, v in pairs(supposed_aspects) do
+		t[k] = v:plain(true)
+	end
+	return t
 end
 
 --- Read the aspect of a signal strictly from cache.
@@ -72,7 +55,7 @@ end
 -- @return[2] An empty table (otherwise).
 local function get_ndef(pos)
 	local node = N.get_node(pos)
-	return minetest.registered_nodes[node.name] or {}
+	return (minetest.registered_nodes[node.name] or {}), node
 end
 
 --- Get the aspects supported by a signal.
@@ -94,43 +77,18 @@ end
 -- @return The adjusted signal aspect.
 -- @return The information to pass to the `advtrains.set_aspect` field in the node definitions.
 local function adjust_aspect(pos, asp)
-	asp = table.copy(I.signal_convert_aspect_if_necessary(asp))
-	setmetatable(asp, signal_aspect_metatable)
+	local asp = A(asp)
 
 	local mainpos = D.get_main(pos)
 	local nxtasp
 	if mainpos then
 		nxtasp = get_aspect(mainpos)
 	end
-	if asp.main ~= 0 and mainpos then
-		asp.dst = nxtasp.main
-	else
-		asp.dst = nil
-	end
-
 	local suppasp = get_supported_aspects(pos)
 	if not suppasp then
-		return asp, asp
+		return asp
 	end
-	local stype = suppasp.type
-	if stype == 2 then
-		local group = suppasp.group
-		local name
-		if suppasp.dst_shift and nxtasp then
-			asp.main = nil
-			name = A.type1_to_type2main(nxtasp, group, suppasp.dst_shift)
-		elseif asp.main ~= 0 and nxtasp and nxtasp.type2group == group and nxtasp.type2name then
-			name = A.get_type2_dst(group, nxtasp.type2name)
-		else
-			name = A.type1_to_type2main(asp, group)
-		end
-		asp.type2group = group
-		asp.type2name = name
-		return asp, name
-	end
-	asp.type2name = nil
-	asp.type2group = nil
-	return asp, asp
+	return asp:adjust_distant(nxtasp, suppasp.dst_shift):to_group(suppasp.group)
 end
 
 --- Get the aspect of a signal without accessing the cache.
@@ -140,13 +98,9 @@ end
 -- @return[1] The signal aspect adjusted using `adjust_aspect` (if present).
 -- @return[2] The nil constant (otherwise).
 local function get_real_aspect(pos)
-	local ndef = get_ndef(pos)
+	local ndef, node = get_ndef(pos)
 	if ndef.advtrains and ndef.advtrains.get_aspect then
 		local asp = ndef.advtrains.get_aspect(pos, node) or I.DANGER
-		local suppasp = get_supported_aspects(pos)
-		if suppasp and suppasp.type == 2 then
-			asp = A.type2_to_type1(suppasp, asp)
-		end
 		return adjust_aspect(pos, asp)
 	end
 	return nil
@@ -176,11 +130,11 @@ local function set_aspect(pos, asp, skipdst)
 	local ndef = minetest.registered_nodes[node.name]
 	if ndef and ndef.advtrains and ndef.advtrains.set_aspect then
 		local oldasp = I.signal_get_aspect(pos) or DANGER
-		local newasp, aspval = adjust_aspect(pos, asp)
+		local newasp = adjust_aspect(pos, asp)
 		set_supposed_aspect(pos, newasp)
-		ndef.advtrains.set_aspect(pos, node, aspval)
+		ndef.advtrains.set_aspect(pos, node, newasp)
 		I.signal_on_aspect_changed(pos)
-		local aspect_changed = A.not_equalp(oldasp, newasp)
+		local aspect_changed = oldasp ~= newasp
 		if (not skipdst) and aspect_changed then
 			D.update_main(pos)
 		end
