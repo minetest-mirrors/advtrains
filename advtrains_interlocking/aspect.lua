@@ -3,7 +3,12 @@
 
 local registered_groups = {}
 
-local named_aspect_aspfields = {main = true, shunt = true, proceed_as_main = true}
+local default_aspect = {
+	main = false,
+	dst = false,
+	shunt = true,
+	proceed_as_main = false,
+}
 
 local signal_aspect = {}
 
@@ -21,22 +26,22 @@ local signal_aspect_metatable = {
 		return true
 	end,
 	__index = function(asp, field)
-		local method = signal_aspect[field]
-		if method then
-			return method
+		local val = signal_aspect[field]
+		if val then
+			return val
 		end
-		if not named_aspect_aspfields[field] then
+		val = default_aspect[field]
+		if val == nil then
 			return nil
 		end
 		local group = registered_groups[rawget(asp, "group")]
-		if not group then
-			return false
+		if group then
+			local aspdef = group.aspects[rawget(asp, "name")]
+			if aspdef[field] ~= nil then
+				val = aspdef[field]
+			end
 		end
-		local aspdef = group.aspects[rawget(asp, "name")]
-		if not aspdef then
-			return false
-		end
-		return aspdef[field] or false
+		return val
 	end,
 	__tostring = function(asp)
 		local st = {}
@@ -123,7 +128,7 @@ function signal_aspect:to_group(group)
 		self.name = nil
 	end
 	if not gdef then
-		for k in pairs(named_aspect_aspfields) do
+		for k in pairs(default_aspect) do
 			rawset(self, k, self[k])
 		end
 		self.group = nil
@@ -224,7 +229,7 @@ local function register_group(def)
 			end
 			t.label = label
 
-			for k in pairs(named_aspect_aspfields) do
+			for _, k in pairs{"main", "dst", "shunt"} do
 				t[k] = asp[k]
 			end
 
