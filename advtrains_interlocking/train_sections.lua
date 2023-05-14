@@ -167,13 +167,13 @@ advtrains.te_register_on_create(function(id, train)
 	-- let's see what track sections we find here
 	local index = atround(train.index)
 	local pos = advtrains.path_get(train, index)
-	local ts_id, origin = ildb.get_ts_at_pos(pos)
+	local ts_id = ildb.check_and_repair_ts_at_pos(pos, 1) -- passing connid 1 - that always exists
 	if ts_id then
 		local ts = ildb.get_ts(ts_id)
 		if ts then
 			setsection(id, train, ts_id, ts, origin)
 		else
-			atwarn("ILDB corruption: TCB",origin," has invalid TS reference")
+			atwarn("While placing train, TS didnt exist ",ts_id)
 		end
 		-- Make train a shunt move
 		train.is_shunt = true

@@ -10,9 +10,9 @@ local TS_MAX_SCAN = 1000
 -- The characters will be chosen from the unicode frame set if appropriate
 -- valid character classes -, =, |
 local char_equiv = {
-	["-"] = {"│", "/", "─", "\\"}, -- single-line
-	["="] = {"║", "/", "═", "\\"}, -- double-line
-	["|"] = {"─", "\\", "│", "/"}, -- break (i.e. TCB, perpendicular to orientation)
+	["-"] = {"│", "/", "─", "\\\\"}, -- single-line
+	["="] = {"║", "/", "═", "\\\\"}, -- double-line
+	["|"] = {"─", "\\\\", "│", "/"}, -- break (i.e. TCB, perpendicular to orientation)
 }
 local dir_to_charmap = {
 	[15] = 1,
@@ -33,6 +33,7 @@ local dir_to_charmap = {
 	[14] = 4,
 }
 function tm.rotate_char_class_by_conn(chr, conndir)
+	atdebug("rotatechar", chr, conndir, "dircharmap", dir_to_charmap[conndir], "charequiv", char_equiv[chr])
 	return char_equiv[chr][dir_to_charmap[conndir]]
 end
 
@@ -62,14 +63,16 @@ function tm.generate_grid_map(start_pos, node_callback)
 			local ok, conns = advtrains.get_rail_info_at(pos)
 			local c = node_callback(pos, conns, connid)
 			local chr = c and c.char
+			atdebug("init",pos.x,pos.z,chr,"")
 			if not chr then
-				chr = tm.rotate_char_class_by_conn("=", conns[connid])
+				chr = tm.rotate_char_class_by_conn("=", conns[connid].c)
 			end
 			
 			-- add the char to the grid
 			if not grid[pos.x] then
 				grid[pos.x] = {}
 			end
+			atdebug("final",pos.x,pos.z,chr,"")
 			grid[pos.x][pos.z] = chr
 			
 			gminx = math.min(gminx, pos.x)

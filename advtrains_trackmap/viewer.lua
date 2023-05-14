@@ -15,7 +15,7 @@ local function node_left_click(pos, pname)
 	end
 
 	local gridtbl = tm.generate_grid_map(pos, node_callback)
-	local fslabel = tm.render_grid(gridtbl.grid, gridtbl.min_pos, 100, 100)
+	local fslabel = tm.render_grid(gridtbl.grid, {x=pos.x-30, z=pos.z-25}, 60, 50)
 	
 	minetest.show_formspec(pname, "advtrains_trackmap:test", "size[20,20]"..fslabel)
 end
@@ -30,10 +30,6 @@ minetest.register_craftitem("advtrains_trackmap:tool",{
 	on_use = function(itemstack, player, pointed_thing)
 		local pname = player:get_player_name()
 		if not pname then
-			return
-		end
-		if not minetest.check_player_privs(pname, {interlocking=true}) then
-			minetest.chat_send_player(pname, "Insufficient privileges to use this!")
 			return
 		end
 		if pointed_thing.type=="node" then
