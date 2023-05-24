@@ -33,7 +33,7 @@ local dir_to_charmap = {
 	[14] = 4,
 }
 function tm.rotate_char_class_by_conn(chr, conndir)
-	atdebug("rotatechar", chr, conndir, "dircharmap", dir_to_charmap[conndir], "charequiv", char_equiv[chr])
+	--atdebug("rotatechar", chr, conndir, "dircharmap", dir_to_charmap[conndir], "charequiv", char_equiv[chr])
 	return char_equiv[chr][dir_to_charmap[conndir]]
 end
 
@@ -43,6 +43,7 @@ end
 -- should return a table as follows:
 -- {
 --   char = "X" -- the character to use in this place, defaults to guessing a fitting frame character
+--   color = "colorstring" or nil -- the color to render the character with
 --   stop = false -- if true, the iterator will stop following this branch
 -- }
 -- Returning nil will assume defaults.
@@ -55,6 +56,8 @@ end
 function tm.generate_grid_map(start_pos, node_callback)
 	local ti = advtrains.get_track_iterator(start_pos, nil, TS_MAX_SCAN, true)
 	local grid = {} -- grid[x][y]
+	local gcolor = {} -- grid[x][y]
+	local gylev = {} -- grid[x][y]
 	local gminx, gmaxx, gminz, gmaxz = start_pos.x, start_pos.x, start_pos.z, start_pos.z
 	
 	while ti:has_next_branch() do
@@ -63,7 +66,7 @@ function tm.generate_grid_map(start_pos, node_callback)
 			local ok, conns = advtrains.get_rail_info_at(pos)
 			local c = node_callback(pos, conns, connid)
 			local chr = c and c.char
-			atdebug("init",pos.x,pos.z,chr,"")
+			--atdebug("init",pos.x,pos.z,chr,"")
 			if not chr then
 				chr = tm.rotate_char_class_by_conn("=", conns[connid].c)
 			end
@@ -71,9 +74,19 @@ function tm.generate_grid_map(start_pos, node_callback)
 			-- add the char to the grid
 			if not grid[pos.x] then
 				grid[pos.x] = {}
+				gcolor[pos.x] = {}
+				gylev[pos.x] = {}
 			end
-			atdebug("final",pos.x,pos.z,chr,"")
-			grid[pos.x][pos.z] = chr
+			
+			-- ensure that higher rails are rendered on top
+			local prev_ylev = gylev[pos.x][pos.z]
+			if not prev_ylev or prev_ylev < pos.y then
+				grid[pos.x][pos.z] = chr
+				gylev[pos.x][pos.z] = pos.y
+				if c and c.color then
+					gcolor[pos.x][pos.z] = c.color
+				end
+			end
 			
 			gminx = math.min(gminx, pos.x)
 			gmaxx = math.max(gmaxx, pos.x)
@@ -86,6 +99,7 @@ function tm.generate_grid_map(start_pos, node_callback)
 	end
 	return {
 		grid = grid,
+		gcolor = gcolor,
 		min_pos = {x=gminx, z=gminz},
 		max_pos = {x=gmaxx, z=gmaxz},
 	}

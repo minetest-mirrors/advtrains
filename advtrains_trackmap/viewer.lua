@@ -10,14 +10,17 @@ local function node_left_click(pos, pname)
 		return
 	end
 	
-	local function node_callback()
+	local function node_callback(npos, conns, connid)
+		if vector.equals(pos, npos) then
+			return {color = "red"}
+		end
 		return nil
 	end
 
 	local gridtbl = tm.generate_grid_map(pos, node_callback)
-	local fslabel = tm.render_grid(gridtbl.grid, {x=pos.x-30, z=pos.z-25}, 60, 50)
+	local fslabel = tm.render_grid_formspec(20, 20, gridtbl, {x=pos.x-35, z=pos.z-22}, 70, 44)
 	
-	minetest.show_formspec(pname, "advtrains_trackmap:test", "size[20,20]"..fslabel)
+	minetest.show_formspec(pname, "advtrains_trackmap:test", fslabel)
 end
 
 
