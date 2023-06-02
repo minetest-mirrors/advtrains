@@ -125,12 +125,12 @@ local function add_segmentbar(n, self, x, y, w, h, m, c, ...)
 	local bs = ss - m
 	for k = 1, argc, 3 do
 		local lower, upper, fill = argv[k], argv[k+1], argv[k+2]
-		lower = math.max(0, math.floor(lower)+1)
+		lower = math.max(0, math.floor(lower))+1
 		upper = math.min(c, math.floor(upper))
-		if lower < upper then
+		if lower <= upper then
 			local args = {x, y, w, h, fill}
 			args[n+2] = bs
-			args[n] = args[n] + ss*lower
+			args[n] = args[n] + ss*(lower-1)
 			for i = lower, upper do
 				self:add_fill(unpack(args))
 				args[n] = args[n] + ss

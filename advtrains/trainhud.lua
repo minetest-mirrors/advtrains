@@ -225,6 +225,18 @@ function advtrains.hud_train_format(train, flip)
 	if lzb and lzb.checkpoints then
 		local oc = lzb.checkpoints
 		for i = 1, #oc do
+			if advtrains.interlocking then
+				local udata = oc[i].udata
+				if udata and udata.signal_pos then
+					local sigd = advtrains.interlocking.db.get_sigd_for_signal(udata.signal_pos)
+					if sigd then
+						local tcbs = advtrains.interlocking.db.get_tcbs(sigd) or {}
+						if tcbs.route_rsn then
+							table.insert(st, ("%s: %s"):format(minetest.pos_to_string(sigd.p), tcbs.route_rsn))
+						end
+					end
+				end
+			end
 			local spd = oc[i].speed
 			spd = advtrains.speed.min(spd, train.speed_restriction)
 			if spd == -1 then spd = nil end
