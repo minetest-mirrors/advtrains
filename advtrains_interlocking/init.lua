@@ -24,7 +24,9 @@ dofile(modpath.."tool.lua")
 
 dofile(modpath.."approach.lua")
 dofile(modpath.."ars.lua")
-dofile(modpath.."tsr_rail.lua")
+
+--TODO reenable tsr rail
+--dofile(modpath.."tsr_rail.lua")
 
 
 minetest.register_privilege("interlocking", {description = "Can set up track sections, routes and signals.", give_to_singleplayer = true})

@@ -294,7 +294,7 @@ end
 -- Going from the rail at pos (does not need to be rounded) along connection with id conn_idx, if there is a matching rail, return it and the matching connid
 -- returns: <adjacent pos>, <conn index of adjacent>, <my conn index>, <railheight of adjacent>
 -- parameter this_conns_p is connection table of this rail and is optional, is determined by get_rail_info_at if not provided.
-function advtrains.get_adjacent_rail(this_posnr, this_conns_p, conn_idx, drives_on)
+function advtrains.get_adjacent_rail(this_posnr, this_conns_p, conn_idx)
 	local this_pos = advtrains.round_vector_floor_y(this_posnr)
 	local this_conns = this_conns_p
 	local _
@@ -318,11 +318,11 @@ function advtrains.get_adjacent_rail(this_posnr, this_conns_p, conn_idx, drives_
 		adj_pos.y = adj_pos.y + 1
 	end
 	
-	local nextnode_ok, nextconns, nextrail_y=advtrains.get_rail_info_at(adj_pos, drives_on)
+	local nextnode_ok, nextconns, nextrail_y=advtrains.get_rail_info_at(adj_pos)
 	if not nextnode_ok then
 		adj_pos.y = adj_pos.y - 1
 		conn_y = conn_y + 1
-		nextnode_ok, nextconns, nextrail_y=advtrains.get_rail_info_at(adj_pos, drives_on)
+		nextnode_ok, nextconns, nextrail_y=advtrains.get_rail_info_at(adj_pos)
 		if not nextnode_ok then
 			return nil
 		end

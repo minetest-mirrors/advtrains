@@ -283,7 +283,7 @@ function advtrains.train_ensure_init(id, train)
 	assertdef(train, "id", id)
 	
 	
-	if not train.drives_on or not train.max_speed then
+	if not train.max_speed then
 		--atprint("in ensure_init: missing properties, updating!")
 		advtrains.update_trainpart_properties(id)
 	end
@@ -1034,10 +1034,9 @@ end
 
 -- Note: safe_decouple_wagon() has been moved to wagons.lua
 
--- this function sets wagon's pos_in_train(parts) properties and train's max_speed and drives_on (and more)
+-- this function sets wagon's pos_in_train(parts) properties and train's max_speed (and more)
 function advtrains.update_trainpart_properties(train_id, invert_flipstate)
 	local train=advtrains.trains[train_id]
-	train.drives_on=advtrains.merge_tables(advtrains.all_tracktypes)
 	--FIX: deep-copy the table!!!
 	train.max_speed=20
 	train.extent_h = 0;
@@ -1079,13 +1078,6 @@ function advtrains.update_trainpart_properties(train_id, invert_flipstate)
 			end
 			rel_pos=rel_pos+wagon.wagon_span
 			
-			if wagon.drives_on then
-				for k,_ in pairs(train.drives_on) do
-					if not wagon.drives_on[k] then
-						train.drives_on[k]=nil
-					end
-				end
-			end
 			train.max_speed=math.min(train.max_speed, wagon.max_speed)
 			train.extent_h = math.max(train.extent_h, wagon.extent_h or 1);
 		end

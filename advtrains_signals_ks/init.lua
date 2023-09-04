@@ -113,15 +113,6 @@ local suppasp_ra = {
 		}
 }
 
-advtrains.trackplacer.register_tracktype("advtrains_signals_ks:hs")
-advtrains.trackplacer.register_tracktype("advtrains_signals_ks:ra")
-advtrains.trackplacer.register_tracktype("advtrains_signals_ks:sign")
-advtrains.trackplacer.register_tracktype("advtrains_signals_ks:sign_lf")
-advtrains.trackplacer.register_tracktype("advtrains_signals_ks:sign_lf7")
-advtrains.trackplacer.register_tracktype("advtrains_signals_ks:zs3")
-advtrains.trackplacer.register_tracktype("advtrains_signals_ks:zs3v")
-advtrains.trackplacer.register_tracktype("advtrains_signals_ks:mast")
-
 for _, rtab in ipairs({
 		{rot =  "0", sbox = {-1/8, -1/2, -1/2,  1/8, 1/2, -1/4}, ici=true},
 		{rot = "30", sbox = {-3/8, -1/2, -1/2, -1/8, 1/2, -1/4},},
@@ -201,7 +192,7 @@ for _, rtab in ipairs({
 			after_dig_node = advtrains.interlocking.signal_after_dig,
 		})
 		-- rotatable by trackworker
-		advtrains.trackplacer.add_worked("advtrains_signals_ks:hs", typ, "_"..rot)
+		--TODO add rotation using trackworker
 	end
 	
 	
@@ -246,7 +237,7 @@ for _, rtab in ipairs({
 			after_dig_node = advtrains.interlocking.signal_after_dig,
 		})
 		-- rotatable by trackworker
-		advtrains.trackplacer.add_worked("advtrains_signals_ks:ra", typ, "_"..rot)
+		--TODO add rotation using trackworker
 	end
 
 	-- Schilder:
@@ -283,7 +274,7 @@ for _, rtab in ipairs({
 			after_dig_node = advtrains.interlocking.signal_after_dig,
 		})
 		-- rotatable by trackworker
-		advtrains.trackplacer.add_worked("advtrains_signals_ks:"..prefix, typ, "_"..rot, nxt)
+		--TODO add rotation using trackworker
 	end
 
 	for typ, prts in pairs {
@@ -378,7 +369,7 @@ for _, rtab in ipairs({
 		t.drop = "advtrains_signals_ks:zs3_off_0"
 		t.selection_box.fixed[1][5] = 0
 		minetest.register_node("advtrains_signals_ks:zs3_"..typ.."_"..rot, t)
-		advtrains.trackplacer.add_worked("advtrains_signals_ks:zs3", typ, "_"..rot)
+		--TODO add rotation using trackworker
 
 		-- Zs 3v
 		local t = table.copy(def)
@@ -387,7 +378,7 @@ for _, rtab in ipairs({
 		t.drop = "advtrains_signals_ks:zs3v_off_0"
 		t.tiles[3] = t.tiles[3] .. "^[multiply:yellow"
 		minetest.register_node("advtrains_signals_ks:zs3v_"..typ.."_"..rot, t)
-		advtrains.trackplacer.add_worked("advtrains_signals_ks:zs3v", typ, "_"..rot)
+		--TODO add rotation using trackworker
 	end
 	
 	minetest.register_node("advtrains_signals_ks:mast_mast_"..rot, {
@@ -412,7 +403,7 @@ for _, rtab in ipairs({
 		},
 		drop = "advtrains_signals_ks:mast_mast_0",
 	})
-	advtrains.trackplacer.add_worked("advtrains_signals_ks:mast","mast", "_"..rot)
+	--TODO add rotation using trackworker
 end
 
 -- Crafting

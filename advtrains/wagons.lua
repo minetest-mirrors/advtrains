@@ -1367,7 +1367,7 @@ function advtrains.register_wagon(sysname_p, prototype, desc, inv_img, nincreati
 				local node=minetest.get_node_or_nil(pointed_thing.under)
 				if not node then atprint("[advtrains]Ignore at placer position") return itemstack end
 				local nodename=node.name
-				if(not advtrains.is_track_and_drives_on(nodename, prototype.drives_on)) then
+				if(not advtrains.is_track(nodename)) then
 					atprint("no track here, not placing.")
 					return itemstack
 				end
@@ -1382,7 +1382,7 @@ function advtrains.register_wagon(sysname_p, prototype, desc, inv_img, nincreati
 				local yaw = placer:get_look_horizontal()
 				local plconnid = advtrains.yawToClosestConn(yaw, tconns)
 				
-				local prevpos = advtrains.get_adjacent_rail(pointed_thing.under, tconns, plconnid, prototype.drives_on)
+				local prevpos = advtrains.get_adjacent_rail(pointed_thing.under, tconns, plconnid)
 				if not prevpos then
 					minetest.chat_send_player(pname, "The track you are trying to place the wagon on is not long enough!")
 					return
@@ -1407,7 +1407,6 @@ advtrains.register_wagon("advtrains:wagon_placeholder", {
 	collisionbox = {-0.3,-0.3,-0.3, 0.3,0.3,0.3},
 	visual_size = {x=0.7, y=0.7},
 	initial_sprite_basepos = {x=0, y=0},
-	drives_on = advtrains.all_tracktypes,
 	max_speed = 5,
 	seats = {
 	},

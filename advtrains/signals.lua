@@ -40,9 +40,6 @@ local suppasp = {
 
 for r,f in pairs({on={as="off", ls="green", als="red"}, off={as="on", ls="red", als="green"}}) do
 
-	advtrains.trackplacer.register_tracktype("advtrains:retrosignal", "")
-	advtrains.trackplacer.register_tracktype("advtrains:signal", "")
-
 	for rotid, rotation in ipairs({"", "_30", "_45", "_60"}) do
 		local crea=1
 		if rotid==1 and r=="off" then crea=0 end
@@ -108,8 +105,8 @@ for r,f in pairs({on={as="off", ls="green", als="red"}, off={as="on", ls="red", 
 			},
 			can_dig = can_dig_func,
 			after_dig_node = after_dig_func,
+			--TODO add rotation using trackworker
 		})
-		advtrains.trackplacer.add_worked("advtrains:retrosignal", r, rotation, nil)
 		
 		minetest.register_node("advtrains:signal_"..r..rotation, {
 			drawtype = "mesh",
@@ -179,8 +176,8 @@ for r,f in pairs({on={as="off", ls="green", als="red"}, off={as="on", ls="red", 
 			},
 			can_dig = can_dig_func,
 			after_dig_node = after_dig_func,
+			--TODO add rotation using trackworker
 		})
-		advtrains.trackplacer.add_worked("advtrains:signal", r, rotation, nil)
 	end
 	
 	local crea=1

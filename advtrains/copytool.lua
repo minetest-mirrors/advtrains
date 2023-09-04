@@ -21,7 +21,7 @@ minetest.register_tool("advtrains:copytool", {
 			local node=minetest.get_node_or_nil(pointed_thing.under)
 			if not node then atprint("[advtrains]Ignore at placer position") return itemstack end
 			local nodename=node.name
-			if(not advtrains.is_track_and_drives_on(nodename, {default=true})) then
+			if(not advtrains.is_track(nodename)) then
 				atprint("no track here, not placing.")
 				return itemstack
 			end

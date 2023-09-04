@@ -33,13 +33,12 @@
 -- If you need to proceed along the path by a specific actual distance, it does NOT work to simply add it to the index. You should use the path_get_index_by_offset() function.
 
 -- creates the path data structure, reconstructing the train from a position and a connid
--- Important! train.drives_on must exist while calling this method
 -- returns: true - successful
 --           nil - node not yet available/unloaded, please wait
 --         false - node definitely gone, remove train
 function advtrains.path_create(train, pos, connid, rel_index)
 	local posr = advtrains.round_vector_floor_y(pos)
-	local node_ok, conns, rhe = advtrains.get_rail_info_at(pos, train.drives_on)
+	local node_ok, conns, rhe = advtrains.get_rail_info_at(pos)
 	if not node_ok then
 		return node_ok
 	end
@@ -211,7 +210,7 @@ function advtrains.path_get(train, index)
 		if pef == train.path_trk_f then
 			node_ok, this_conns = advtrains.get_rail_info_at(pos)
 			if not node_ok then error("For train "..train.id..": Path item "..pef.." on-track but not a valid node!") end
-			adj_pos, adj_connid, conn_idx, nextrail_y, next_conns = advtrains.get_adjacent_rail(pos, this_conns, connid, train.drives_on)
+			adj_pos, adj_connid, conn_idx, nextrail_y, next_conns = advtrains.get_adjacent_rail(pos, this_conns, connid)
 		end
 		pef = pef + 1
 		if adj_pos then
@@ -250,7 +249,7 @@ function advtrains.path_get(train, index)
 		if peb == train.path_trk_b then
 			node_ok, this_conns = advtrains.get_rail_info_at(pos)
 			if not node_ok then error("For train "..train.id..": Path item "..peb.." on-track but not a valid node!") end
-			adj_pos, adj_connid, conn_idx, nextrail_y, next_conns = advtrains.get_adjacent_rail(pos, this_conns, connid, train.drives_on)
+			adj_pos, adj_connid, conn_idx, nextrail_y, next_conns = advtrains.get_adjacent_rail(pos, this_conns, connid)
 		end
 		peb = peb - 1
 		if adj_pos then

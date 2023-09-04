@@ -268,17 +268,17 @@ end
 --false  if it's not a rail or the train does not drive on this rail, but it is loaded or
 --nil    if the node is neither loaded nor in trackdb
 --the distraction between false and nil will be needed only in special cases.(train initpos)
-function advtrains.get_rail_info_at(pos, drives_on)
+function advtrains.get_rail_info_at(pos)
 	local rdp=advtrains.round_vector_floor_y(pos)
 	
 	local node=ndb.get_node_or_nil(rdp)
 	if not node then return end
 	
 	local nodename=node.name
-	if(not advtrains.is_track_and_drives_on(nodename, drives_on)) then
+	if(not advtrains.is_track(nodename)) then
 		return false
 	end
-	local conns, railheight, tracktype=advtrains.get_track_connections(node.name, node.param2)
+	local conns, railheight = advtrains.get_track_connections(node.name, node.param2)
 	
 	return true, conns, railheight
 end
