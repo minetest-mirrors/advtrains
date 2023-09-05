@@ -49,7 +49,7 @@ function tp.register_candidate(tpg, name, ndef, as_single, as_double)
 	for i=0,3 do
 		if as_double then
 			g.double[rotate(c1,i*4).."_"..rotate(c2,i*4)] = {name=name, param2=i}
-			if not is_symmmetrical then
+			if not is_symmetrical then
 				g.double[rotate(c2,i*4).."_"..rotate(c1,i*4)] = {name=name, param2=i}
 				-- if the track is unsymmetric (e.g. a curve), we may require the "wrong" orientation to fill a gap.
 			end

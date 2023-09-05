@@ -213,7 +213,6 @@ function advtrains.register_node_4rot(ori_name, ori_ndef, definition_mangling_fu
 		end
 		
 		-- register node
-		atdebug("Registering: ",name, ndef)
 		minetest.register_node(":"..name, ndef)
 		
 		-- if this has the track_place_group set, register as a candidate for the track_place_group
