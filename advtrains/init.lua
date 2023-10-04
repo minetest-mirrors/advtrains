@@ -22,8 +22,6 @@ Copyright (C) 2016-2020  Moritz Blei (orwell96) and contributors
 local lot = os.clock()
 minetest.log("action", "[advtrains] Loading...")
 
-attrans = minetest.get_translator("advtrains")
-
 --advtrains
 advtrains = {trains={}, player_to_train_mapping={}}
 
@@ -200,6 +198,10 @@ advtrains.meseconrules =
 
 advtrains.fpath=minetest.get_worldpath().."/advtrains"
 
+advtrains.poconvert = dofile(advtrains.modpath.."/poconvert.lua")
+advtrains.poconvert.from_flat("advtrains")
+attrans = minetest.get_translator("advtrains")
+
 advtrains.speed = dofile(advtrains.modpath.."/speed.lua")
 advtrains.texture = dofile(advtrains.modpath.."/texture.lua")
 
@@ -232,7 +234,6 @@ end
 
 
 dofile(advtrains.modpath.."/lzb.lua")
-
 
 --load/save
 
