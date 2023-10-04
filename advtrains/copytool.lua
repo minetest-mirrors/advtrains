@@ -38,7 +38,7 @@ minetest.register_tool("advtrains:copytool", {
 
 			local prevpos = advtrains.get_adjacent_rail(pointed_thing.under, tconns, plconnid, {default=true})
 			if not prevpos then
-				minetest.chat_send_player(pname, attrans("The track you are trying to place the wagon on is not long enough!"))
+				minetest.chat_send_player(pname, attrans("The track you are trying to place the wagon on is not long enough."))
 				return
 			end
 
@@ -89,19 +89,19 @@ minetest.register_tool("advtrains:copytool", {
 
 		local le = pointed_thing.ref:get_luaentity()
 		if (le == nil) then
-			minetest.chat_send_player(user:get_player_name(), attrans("No such lua entity!"))
+			minetest.chat_send_player(user:get_player_name(), attrans("No such lua entity."))
 			return
 		end
 
 		local wagon = advtrains.wagons[le.id]
 		if (not (le.id and advtrains.wagons[le.id])) then
-			minetest.chat_send_player(user:get_player_name(), attrans("No such wagon: @1", le.id))
+			minetest.chat_send_player(user:get_player_name(), attrans("No such wagon: @1.", le.id))
 			return
 		end
 
 		local train = advtrains.trains[wagon.train_id]
 		if (not train) then
-			minetest.chat_send_player(user:get_player_name(), attrans("No such train: @1", wagon.train_id))
+			minetest.chat_send_player(user:get_player_name(), attrans("No such train: @1.", wagon.train_id))
 			return
 		end
 
@@ -177,7 +177,7 @@ minetest.register_tool("advtrains:copytool", {
 			return
 		end
 		meta:set_string("clipboard", minetest.serialize(clipboard))
-		minetest.chat_send_player(user:get_player_name(), attrans("Train copied!"))
+		minetest.chat_send_player(user:get_player_name(), attrans("Train copied."))
 		return itemstack
 	end
 })

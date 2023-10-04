@@ -2,6 +2,8 @@
 --a.k.a Passive component naming
 --Allows to assign names to passive components, so they can be called like:
 --setstate("iamasignal", "green")
+local S = atltrans
+
 atlatc.pcnaming={name_map={}}
 function atlatc.pcnaming.load(stuff)
 	if type(stuff)=="table" then
@@ -26,7 +28,7 @@ end
 local pcrename = {}
 
 minetest.register_craftitem("advtrains_luaautomation:pcnaming",{
-	description = attrans("Passive Component Naming Tool\n\nRight-click to name a passive component."),
+	description = S("Passive Component Naming Tool\n\nRight-click to name a passive component."),
 	groups = {cracky=1}, -- key=name, value=rating; rating=1..3.
 	inventory_image = "atlatc_pcnaming.png",
 	wield_image = "atlatc_pcnaming.png",
@@ -37,7 +39,7 @@ minetest.register_craftitem("advtrains_luaautomation:pcnaming",{
 			return
 		end
 		if not minetest.check_player_privs(pname, {atlatc=true}) then
-			minetest.chat_send_player(pname, "Missing privilege: atlatc")
+			minetest.chat_send_player(pname, S("You are not allowed to name LuaATC passive components without the @1 privilege.", "atlatc"))
 			return
 		end
 		if pointed_thing.type=="node" then
@@ -62,7 +64,7 @@ minetest.register_craftitem("advtrains_luaautomation:pcnaming",{
 					end
 				end
 				pcrename[pname] = pos
-				minetest.show_formspec(pname, "atlatc_naming", "field[pn;Set name of component (empty to clear);"..minetest.formspec_escape(pn).."]")
+				minetest.show_formspec(pname, "atlatc_naming", "field[pn;"..S("Set name of component (empty to clear)")..";"..minetest.formspec_escape(pn).."]")
 			end
 		end
 	end,

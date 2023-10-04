@@ -213,7 +213,7 @@ function wagon:on_punch(puncher, time_from_last_punch, tool_capabilities, direct
 			end
 			for listname, _ in pairs(inv:get_lists()) do
 				if not inv:is_empty(listname) then
-					minetest.chat_send_player(puncher:get_player_name(), attrans("The wagon's inventory is not empty!"));
+					minetest.chat_send_player(puncher:get_player_name(), attrans("The wagon's inventory is not empty."));
 					return
 				end
 			end
@@ -711,7 +711,7 @@ function wagon:on_rightclick(clicker)
 				end
 				
 				local doors_open = self:train().door_open~=0 or clicker:get_player_control().sneak
-				local allow, rsn=false, "Wagon has no seats!"
+				local allow, rsn=false, attrans("This wagon has no seats.")
 				for _,sgr in ipairs(self.assign_to_seat_group) do
 					allow, rsn = self:check_seat_group_access(pname, sgr)
 					if allow then
@@ -722,16 +722,16 @@ function wagon:on_rightclick(clicker)
 										self:get_on(clicker, seatid)
 										return
 									else
-										rsn="Wagon is full."
+										rsn=attrans("This wagon is full.")
 									end
 								else
-									rsn="Doors are closed! (try holding sneak key!)"
+									rsn=attrans("Doors are closed! (Try holding sneak key!)")
 								end
 							end
 						end
 					end
 				end
-				minetest.chat_send_player(pname, attrans("Can't get on: "..rsn))
+				minetest.chat_send_player(pname, rsn or attrans("You can't get on this wagon."))
 			else
 				self:show_get_on_form(pname)
 			end
@@ -1262,7 +1262,7 @@ function wagon:seating_from_key_helper(pname, fields, no)
 		self:show_bordcom(pname)
 	end
 	if fields.dcwarn then
-		minetest.chat_send_player(pname, attrans("Doors are closed! Use Sneak+rightclick to ignore the closed doors and get off!"))
+		minetest.chat_send_player(pname, attrans("Doors are closed. Use Sneak+rightclick to ignore the closed doors and get off."))
 	end
 	if fields.off then
 		self:get_off(no)
@@ -1271,7 +1271,7 @@ end
 function wagon:check_seat_group_access(pname, sgr)
 	local data = advtrains.wagons[self.id]
 	if self.seat_groups[sgr].driving_ctrl_access and not (advtrains.check_driving_couple_protection(pname, data.owner, data.whitelist)) then
-		return false, "Not allowed to access a driver stand!"
+		return false, attrans("You are not allowed to access the driver stand.")
 	end
 	if self.seat_groups[sgr].driving_ctrl_access then
 		advtrains.log("Drive", pname, self.object:getpos(), self:train().text_outside)

@@ -1,3 +1,4 @@
+local S = atltrans
 
 local function on_punch(pos,node,player)
 	atlatc.interrupt.add(0, pos, {type="punch", punch=true, name=player:get_player_name()})
@@ -7,7 +8,7 @@ end
 minetest.register_node("advtrains_luaautomation:oppanel", {
 	drawtype = "normal",
 	tiles={"atlatc_oppanel.png"},
-	description = "LuaATC operation panel",
+	description = S("LuaATC Operation Panel"),
 	groups = {
 		cracky = 1,
 		save_in_at_nodedb=1,

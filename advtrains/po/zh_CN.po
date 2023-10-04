@@ -2,17 +2,18 @@ msgid ""
 msgstr ""
 "Project-Id-Version: advtrains\n"
 "Report-Msgid-Bugs-To: advtrains-discuss@lists.sr.ht\n"
-"POT-Creation-Date: 2023-10-04 15:40+0200\n"
-"PO-Revision-Date: 2022-11-02 15:08+0100\n"
+"POT-Creation-Date: 2023-10-09 11:02+0200\n"
+"PO-Revision-Date: 2023-10-09 11:24+0200\n"
 "Last-Translator: Y. Wang <yw05@forksworld.de>\n"
 "Language-Team: Chinese (Simplified)\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.3.2\n"
 
 #: advtrains/atc.lua:109
-msgid "ATC controller, unconfigured."
+msgid "Unconfigured ATC controller"
 msgstr "ATC 控制器 (未配置)"
 
 #: advtrains/atc.lua:150
@@ -37,20 +38,21 @@ msgid "Digiline channel"
 msgstr "Digiline 频道"
 
 #: advtrains/atc.lua:189 advtrains_line_automation/stoprail.lua:65
+#: advtrains_luaautomation/active_common.lua:48
 msgid "Save"
 msgstr "保存"
 
 #: advtrains/atc.lua:236
-msgid "ATC Reverse command warning: didn't reverse train, train moving!"
-msgstr "ATC 警告：未执行“R”命令，火车在移动"
+msgid "ATC Reverse command warning: didn't reverse train, train moving."
+msgstr "ATC 警告：火车正在移动，无法改变行车方向。"
 
 #: advtrains/atc.lua:248
-msgid "ATC Kick command warning: Doors closed"
-msgstr ""
+msgid "ATC Kick command warning: doors are closed."
+msgstr "ATC 警告：车门已关闭，无法踢出乘客。"
 
 #: advtrains/atc.lua:252
-msgid "ATC Kick command warning: Train moving"
-msgstr ""
+msgid "ATC Kick command warning: train moving."
+msgstr "ATC 警告：火车正在移动，无法踢出乘客。"
 
 #: advtrains/atc.lua:322
 msgid "ATC command syntax error: I statement not closed: @1"
@@ -60,12 +62,85 @@ msgstr "ATC 语法错误：“I”命令不完整：@1"
 msgid "ATC command parse error: Unknown command: @1"
 msgstr "ATC 语法错误：未知命令：@1"
 
+#: advtrains/copytool.lua:8
+msgid ""
+"Train copy/paste tool\n"
+"\n"
+"Left-click: copy train\n"
+"Right-click: paste train"
+msgstr ""
+"火车复制工具\n"
+"\n"
+"左键单击：复制\n"
+"右键单击：粘帖"
+
+#: advtrains/copytool.lua:29
+msgid "You do not have the @1 privilege."
+msgstr "您没有“@1”权限。"
+
+#: advtrains/copytool.lua:41
+msgid "The track you are trying to place the wagon on is not long enough."
+msgstr "轨道太短。"
+
+#: advtrains/copytool.lua:47
+msgid "The clipboard couldn't access the metadata. Paste failed."
+msgstr "无法粘贴：剪贴板无法访问元数据。"
+
+#: advtrains/copytool.lua:52 advtrains/copytool.lua:57
+msgid "The clipboard is empty."
+msgstr "剪贴板是空的。"
+
+#: advtrains/copytool.lua:74
+msgid "Back of train would end up off track, cancelling."
+msgstr "火车后部不在轨道上。"
+
+#: advtrains/copytool.lua:92
+msgid "No such lua entity."
+msgstr "您没有指向一个可以用火车复制工具复制的物体。"
+
+#: advtrains/copytool.lua:98
+msgid "No such wagon: @1."
+msgstr "ID 为“@1”的车厢不存在。"
+
+#: advtrains/copytool.lua:104
+msgid "No such train: @1."
+msgstr "ID 为“@1”的列车不存在。"
+
+#: advtrains/copytool.lua:176
+msgid "The clipboard couldn't access the metadata. Copy failed."
+msgstr "无法复制：剪贴板无法访问元数据。"
+
+#: advtrains/copytool.lua:180
+msgid "Train copied."
+msgstr "已复制列车。"
+
+#: advtrains/couple.lua:28
+msgid "Buffer and Chain Coupler"
+msgstr "链式车钩"
+
+#: advtrains/couple.lua:29
+msgid "Scharfenberg Coupler"
+msgstr "Scharfenberg 式车钩"
+
+#: advtrains/couple.lua:185
+msgid ""
+"You are not allowed to couple trains without the train_operator privilege."
+msgstr "您没有“train_operator”权限，不能连接这两节车厢。"
+
+#: advtrains/couple.lua:329 advtrains/couple.lua:333
+msgid "<No coupler>"
+msgstr "<没有车钩>"
+
+#: advtrains/couple.lua:334
+msgid "Can not couple: The couplers of the trains do not match (@1 and @2)."
+msgstr "您无法连接这两节车厢：这两节车厢使用不同的车钩 (@1和@2)。"
+
 #: advtrains/craft_items.lua:3
 msgid "Boiler"
 msgstr "锅炉"
 
 #: advtrains/craft_items.lua:9
-msgid "driver's cab"
+msgid "Driver's cab"
 msgstr "驾驶室"
 
 #: advtrains/craft_items.lua:15
@@ -92,12 +167,78 @@ msgstr "较高的@1站台 (45°)"
 msgid "@1 Platform (low, 45 degree)"
 msgstr "较低的@1站台 (45°)"
 
+#: advtrains/protection.lua:7
+msgid "Can place, remove and operate trains"
+msgstr ""
+
+#: advtrains/protection.lua:12
+msgid ""
+"Can place, remove and operate any train, regardless of owner, whitelist, or "
+"protection"
+msgstr ""
+
+#: advtrains/protection.lua:18
+msgid "Can place and dig tracks in unprotected areas"
+msgstr ""
+
+#: advtrains/protection.lua:24
+msgid "Can operate turnouts and signals in unprotected areas"
+msgstr ""
+
+#: advtrains/protection.lua:148
+msgid ""
+"You are not allowed to build near tracks without the track_builder privilege."
+msgstr "您没有“train_operator”权限，不能在铁路附近建任何东西。"
+
+#: advtrains/protection.lua:148
+msgid ""
+"You are not allowed to build tracks without the track_builder privilege."
+msgstr "您没有“train_operator”权限，不能在这里建造铁路。"
+
+#: advtrains/protection.lua:153
+msgid "You are not allowed to build near tracks at this protected position."
+msgstr "这里已被保护，您不能在这里的铁路附近建任何东西。"
+
+#: advtrains/protection.lua:153
+msgid "You are not allowed to build tracks at this protected position."
+msgstr "这里已被保护，您不能在这里建造铁路。"
+
+#: advtrains/protection.lua:184
+msgid ""
+"You are not allowed to operate turnouts and signals without the "
+"railway_operator privilege."
+msgstr "您没有“railway_operator”权限，不能控制铁路设施。"
+
+#: advtrains/signals.lua:63
+msgid "Lampless Signal"
+msgstr "臂板信号机"
+
+#: advtrains/signals.lua:127
+msgid "Signal"
+msgstr "信号灯"
+
+#: advtrains/signals.lua:191
+msgid "Wallmounted Signal (left)"
+msgstr "壁挂式信号灯 (左侧)"
+
+#: advtrains/signals.lua:192
+msgid "Wallmounted Signal (right)"
+msgstr "壁挂式信号灯 (右侧)"
+
+#: advtrains/signals.lua:193
+msgid "Wallmounted Signal (top)"
+msgstr "悬挂式信号灯"
+
+#: advtrains/signals.lua:281 advtrains/signals.lua:322
+msgid "Andrew's Cross"
+msgstr "铁路道口信号灯"
+
 #: advtrains/trackplacer.lua:313
 msgid ""
 "Track Worker Tool\n"
 "\n"
 "Left-click: change rail type (straight/curve/switch)\n"
-"Right-click: rotate rail/bumper/signal/etc."
+"Right-click: rotate object"
 msgstr ""
 "铁路调整工具\n"
 "\n"
@@ -105,27 +246,71 @@ msgstr ""
 "右键单击：旋转方块"
 
 #: advtrains/trackplacer.lua:340 advtrains/trackplacer.lua:377
-msgid "This node can't be rotated using the trackworker!"
+msgid "This node can't be rotated using the trackworker."
 msgstr "您不能使用铁路调整工具旋转这个方块。"
 
 #: advtrains/trackplacer.lua:350
-msgid "This track can not be rotated!"
+msgid "This track can not be rotated."
 msgstr "您不能旋转这段轨道。"
 
 #: advtrains/trackplacer.lua:404
-msgid "This node can't be changed using the trackworker!"
+msgid "This node can't be changed using the trackworker."
 msgstr "您不能使用铁路调整工具调整这个方块。"
 
 #: advtrains/trackplacer.lua:414
-msgid "This track can not be changed!"
+msgid "This track can not be changed."
 msgstr "您不能调整这段轨道。"
+
+#: advtrains/tracks.lua:449
+msgid "This track can not be removed."
+msgstr "您不能移除这段轨道。"
+
+#: advtrains/tracks.lua:616
+msgid "Position is occupied by a train."
+msgstr ""
+
+#: advtrains/tracks.lua:622
+msgid "There's a Track Circuit Break here."
+msgstr ""
+
+#: advtrains/tracks.lua:626
+msgid "There's a Signal Influence Point here."
+msgstr ""
+
+#: advtrains/tracks.lua:637
+msgid "@1 Slope"
+msgstr "@1斜坡"
+
+#: advtrains/tracks.lua:648 advtrains/tracks.lua:653
+msgid "Can't place slope: not pointing at node."
+msgstr "无法放置斜坡：您没有选择任何方块。"
+
+#: advtrains/tracks.lua:658
+msgid "Can't place slope: space occupied."
+msgstr "无法放置斜坡：此区域已被占用。"
+
+#: advtrains/tracks.lua:711
+msgid "Can't place slope: Not enough slope items left (@1 required)."
+msgstr "无法放置斜坡：您没有足够的铁路斜坡放置工具 (您总共需要@1个)"
+
+#: advtrains/tracks.lua:714
+msgid "Can't place slope: There's no slope of length @1."
+msgstr "无法放置斜坡：advtrains 不支持长度为@1米的斜坡。"
+
+#: advtrains/tracks.lua:721
+msgid "Can't place slope: no supporting node at upper end."
+msgstr "无法放置斜坡：较高端没有支撑方块。"
+
+#: advtrains/trainhud.lua:305
+msgid "OVERRUN RED SIGNAL! Examine situation and reverse train to move again."
+msgstr ""
 
 #: advtrains/wagons.lua:179
 msgid "This wagon is owned by @1, you can't destroy it."
 msgstr "这是 @1 的车厢，您不能摧毁它。"
 
 #: advtrains/wagons.lua:203
-msgid "The wagon's inventory is not empty!"
+msgid "The wagon's inventory is not empty."
 msgstr ""
 
 #: advtrains/wagons.lua:210
@@ -164,13 +349,25 @@ msgstr "强制下车"
 msgid "(Doors closed)"
 msgstr "(车门已关闭)"
 
+#: advtrains/wagons.lua:692
+msgid "This wagon has no seats."
+msgstr "这节车厢没有座位。"
+
+#: advtrains/wagons.lua:703
+msgid "This wagon is full."
+msgstr "车厢已满。"
+
+#: advtrains/wagons.lua:706
+msgid "Doors are closed! (Try holding sneak key!)"
+msgstr ""
+
 #: advtrains/wagons.lua:712
-msgid "Can't get on: "
+msgid "You can't get on this wagon."
 msgstr ""
 
 #: advtrains/wagons.lua:838
 msgid "Select seat:"
-msgstr "请选择座位"
+msgstr "请选择座位："
 
 #: advtrains/wagons.lua:880
 msgid "Save wagon properties"
@@ -194,174 +391,35 @@ msgstr "路由码"
 
 #: advtrains/wagons.lua:1241
 msgid ""
-"Doors are closed! Use Sneak+rightclick to ignore the closed doors and get "
-"off!"
+"Doors are closed. Use Sneak+rightclick to ignore the closed doors and get "
+"off."
 msgstr "车门已关闭，请使用潜行+右键单击下车。"
 
-#: advtrains/trainhud.lua:305
-msgid "OVERRUN RED SIGNAL! Examine situation and reverse train to move again."
+#: advtrains/wagons.lua:1250
+msgid "You are not allowed to access the driver stand."
 msgstr ""
 
-#: advtrains/tracks.lua:449
-msgid "This track can not be removed!"
-msgstr "您不能移除这段轨道。"
-
-#: advtrains/tracks.lua:616
-msgid "Position is occupied by a train."
+#: advtrains_interlocking/tsr_rail.lua:13
+msgid "Point speed restriction: @1"
 msgstr ""
 
-#: advtrains/tracks.lua:622
-msgid "There's a Track Circuit Break here."
+#: advtrains_interlocking/tsr_rail.lua:14
+msgid "Set point speed restriction:"
 msgstr ""
 
-#: advtrains/tracks.lua:626
-msgid "There's a Signal Influence Point here."
+#: advtrains_interlocking/tsr_rail.lua:30
+msgid "You are not allowed to configure this track without the @1 privilege."
+msgstr "您没有“@1”权限，不能调整这段轨道。"
+
+#: advtrains_interlocking/tsr_rail.lua:34
+#: advtrains_line_automation/stoprail.lua:31
+#: advtrains_line_automation/stoprail.lua:76
+msgid "You are not allowed to configure this track."
+msgstr "您不能调整这段轨道。"
+
+#: advtrains_interlocking/tsr_rail.lua:64
+msgid "Point Speed Restriction Track"
 msgstr ""
-
-#: advtrains/tracks.lua:637
-msgid "@1 Slope"
-msgstr "@1斜坡"
-
-#: advtrains/tracks.lua:648 advtrains/tracks.lua:653
-msgid "Can't place: not pointing at node"
-msgstr "无法放置：您没有选择任何方块。"
-
-#: advtrains/tracks.lua:658
-msgid "Can't place: space occupied!"
-msgstr "无法放置：此区域已被占用。"
-
-#: advtrains/tracks.lua:711
-msgid "Can't place: Not enough slope items left (@1 required)"
-msgstr "无法放置：您没有足够的铁路斜坡放置工具 (您总共需要@1个)"
-
-#: advtrains/tracks.lua:714
-msgid "Can't place: There's no slope of length @1"
-msgstr "无法放置：advtrains 不支持长度为@1米的斜坡。"
-
-#: advtrains/tracks.lua:721
-msgid "Can't place: no supporting node at upper end."
-msgstr "无法放置：较高端没有支撑方块。"
-
-#: advtrains/signals.lua:63
-msgid "Lampless Signal"
-msgstr "臂板信号机"
-
-#: advtrains/signals.lua:127
-msgid "Signal"
-msgstr "信号灯"
-
-#: advtrains/signals.lua:191
-msgid "Wallmounted Signal (l)"
-msgstr "壁挂式信号灯 (左侧)"
-
-#: advtrains/signals.lua:192
-msgid "Wallmounted Signal (r)"
-msgstr "壁挂式信号灯 (右侧)"
-
-#: advtrains/signals.lua:193
-msgid "Wallmounted Signal (t)"
-msgstr "悬挂式信号灯"
-
-#: advtrains/signals.lua:281 advtrains/signals.lua:322
-msgid "Andrew's Cross"
-msgstr "铁路道口信号灯"
-
-#: advtrains/couple.lua:28
-msgid "Buffer and Chain Coupler"
-msgstr "链式车钩"
-
-#: advtrains/couple.lua:29
-msgid "Scharfenberg Coupler"
-msgstr "Scharfenberg 式车钩"
-
-#: advtrains/couple.lua:185
-msgid ""
-"You are not allowed to couple trains without the train_operator privilege."
-msgstr "您没有“train_operator”权限，不能连接这两节车厢。"
-
-#: advtrains/couple.lua:329 advtrains/couple.lua:333
-msgid "<none>"
-msgstr ""
-
-#: advtrains/couple.lua:334
-msgid "Can not couple: The couplers of the trains do not match (@1 and @2)."
-msgstr "您无法连接这两节车厢：这两节车厢使用不同的车钩 (@1和@2)。"
-
-#: advtrains/copytool.lua:8
-msgid ""
-"Train copy/paste tool\n"
-"\n"
-"Left-click: copy train\n"
-"Right-click: paste train"
-msgstr ""
-"火车复制工具\n"
-"\n"
-"左键单击：复制\n"
-"右键单击：粘帖"
-
-#: advtrains/copytool.lua:29
-msgid "You do not have the @1 privilege."
-msgstr "您没有“@1”权限。"
-
-#: advtrains/copytool.lua:41
-msgid "The track you are trying to place the wagon on is not long enough!"
-msgstr "轨道太短。"
-
-#: advtrains/copytool.lua:47
-msgid "The clipboard couldn't access the metadata. Paste failed."
-msgstr "无法粘贴：剪贴板无法访问元数据。"
-
-#: advtrains/copytool.lua:52 advtrains/copytool.lua:57
-msgid "The clipboard is empty."
-msgstr "剪贴板是空的。"
-
-#: advtrains/copytool.lua:74
-msgid "Back of train would end up off track, cancelling."
-msgstr "火车后部不在轨道上。"
-
-#: advtrains/copytool.lua:92
-msgid "No such lua entity!"
-msgstr "您没有指向一个可以用火车复制工具复制的物体。"
-
-#: advtrains/copytool.lua:98
-msgid "No such wagon: @1"
-msgstr "ID 为“@1”的车厢不存在。"
-
-#: advtrains/copytool.lua:104
-msgid "No such train: @1"
-msgstr "ID 为“@1”的列车不存在。"
-
-#: advtrains/copytool.lua:176
-msgid "The clipboard couldn't access the metadata. Copy failed."
-msgstr "无法复制：剪贴板无法访问元数据。"
-
-#: advtrains/copytool.lua:180
-msgid "Train copied!"
-msgstr "已复制"
-
-#: advtrains/protection.lua:148
-msgid ""
-"You are not allowed to build near tracks without the track_builder privilege."
-msgstr "您没有“train_operator”权限，不能在铁路附近建任何东西。"
-
-#: advtrains/protection.lua:148
-msgid ""
-"You are not allowed to build tracks without the track_builder privilege."
-msgstr "您没有“train_operator”权限，不能在这里建造铁路。"
-
-#: advtrains/protection.lua:153
-msgid "You are not allowed to build near tracks at this protected position."
-msgstr "这里已被保护，您不能在这里的铁路附近建任何东西。"
-
-#: advtrains/protection.lua:153
-msgid "You are not allowed to build tracks at this protected position."
-msgstr "这里已被保护，您不能在这里建造铁路。"
-
-#: advtrains/protection.lua:184
-msgid ""
-"You are not allowed to operate turnouts and signals without the "
-"railway_operator privilege."
-msgstr "您没有“railway_operator”权限，不能控制铁路设施。"
 
 #: advtrains_line_automation/stoprail.lua:54
 msgid "Station Code"
@@ -394,13 +452,73 @@ msgstr ""
 
 #: advtrains_line_automation/stoprail.lua:62
 msgid "Reverse train"
-msgstr ""
+msgstr "改变行车方向"
 
 #: advtrains_line_automation/stoprail.lua:63
 msgid "Kick out passengers"
+msgstr "踢出乘客"
+
+#: advtrains_line_automation/stoprail.lua:97
+msgid "Station code \"@1\" already exists and is owned by @2."
 msgstr ""
 
-#: advtrains_luaautomation/pcnaming.lua:26
+#: advtrains_line_automation/stoprail.lua:111
+msgid "This station is owned by @1. You are not allowed to edit its name."
+msgstr ""
+
+#: advtrains_line_automation/stoprail.lua:221
+msgid "Station/Stop Track"
+msgstr "车站轨道"
+
+#: advtrains_luaautomation/active_common.lua:17
+msgid "Unconfigured LuaATC component"
+msgstr "LuaATC 部件 (未配置)"
+
+#: advtrains_luaautomation/active_common.lua:46
+msgid "LuaATC Environment"
+msgstr ""
+
+#: advtrains_luaautomation/active_common.lua:49
+msgid "Clear Local Environment"
+msgstr ""
+
+#: advtrains_luaautomation/active_common.lua:50
+msgid "Code"
+msgstr ""
+
+#: advtrains_luaautomation/active_common.lua:64
+msgid ""
+"You are not allowed to configure this LuaATC component without the @1 "
+"privilege."
+msgstr "您没有“@1”权限，不能配置这个 LuaATC 部件。"
+
+#: advtrains_luaautomation/active_common.lua:94
+msgid "LuaATC component assigned to environment '@1'"
+msgstr ""
+
+#: advtrains_luaautomation/active_common.lua:96
+msgid "LuaATC component assigned to an invalid environment"
+msgstr ""
+
+#: advtrains_luaautomation/active_common.lua:171
+msgid "LuaATC component with error: @1"
+msgstr ""
+
+#: advtrains_luaautomation/init.lua:13
+msgid ""
+"Can place and configure LuaATC components, including execute potentially "
+"harmful Lua code"
+msgstr ""
+
+#: advtrains_luaautomation/mesecon_controller.lua:211
+msgid "LuaATC Mesecon Controller"
+msgstr ""
+
+#: advtrains_luaautomation/operation_panel.lua:11
+msgid "LuaATC Operation Panel"
+msgstr ""
+
+#: advtrains_luaautomation/pcnaming.lua:28
 msgid ""
 "Passive Component Naming Tool\n"
 "\n"
@@ -408,47 +526,17 @@ msgid ""
 msgstr ""
 "被动元件命名工具\n"
 "\n"
-"右键单击命名所选元件"
+"右键单击命名所选元件。"
 
-#: advtrains_train_track/init.lua:31
-msgid "Y-turnout"
-msgstr "对称道岔"
+#: advtrains_luaautomation/pcnaming.lua:39
+msgid ""
+"You are not allowed to name LuaATC passive components without the @1 "
+"privilege."
+msgstr "您没有“@1”权限，不能命名被动元件。"
 
-#: advtrains_train_track/init.lua:49
-msgid "3-way turnout"
-msgstr "三开道岔"
-
-#: advtrains_train_track/init.lua:69
-msgid "Perpendicular Diamond Crossing Track"
-msgstr "垂直交叉轨道"
-
-#: advtrains_train_track/init.lua:91
-msgid "90+Angle Diamond Crossing Track"
-msgstr "交叉轨道 (其中一条轨道与坐标轴平行)"
-
-#: advtrains_train_track/init.lua:132
-msgid "Diagonal Diamond Crossing Track"
-msgstr "交叉轨道"
-
-#: advtrains_train_track/init.lua:179
-msgid "Bumper"
-msgstr "保险杠"
-
-#: advtrains_train_track/init.lua:201
-msgid "ATC controller"
-msgstr "ATC 控制器"
-
-#: advtrains_train_track/init.lua:317
-msgid "Unloading Track"
-msgstr "卸货轨道"
-
-#: advtrains_train_track/init.lua:342
-msgid "Loading Track"
-msgstr "装货轨道"
-
-#: advtrains_train_track/init.lua:406
-msgid "Detector Rail"
-msgstr "探测轨道"
+#: advtrains_luaautomation/pcnaming.lua:62
+msgid "Set name of component (empty to clear)"
+msgstr ""
 
 #: advtrains_train_industrial/init.lua:10
 #: advtrains_train_industrial/init.lua:49 advtrains_train_steam/init.lua:20
@@ -514,23 +602,45 @@ msgstr "货运车厢"
 msgid "Subway Passenger Wagon"
 msgstr "地铁车厢"
 
-#~ msgid "This position is protected!"
-#~ msgstr "这里已被保护。"
+#: advtrains_train_track/init.lua:31
+msgid "Y-turnout"
+msgstr "对称道岔"
 
-#~ msgid "Can't place: protected position!"
-#~ msgstr "无法放置：此区域已被保护。"
+#: advtrains_train_track/init.lua:49
+msgid "3-way turnout"
+msgstr "三开道岔"
 
-#~ msgid "Deprecated Track"
-#~ msgstr "请不要使用"
+#: advtrains_train_track/init.lua:69
+msgid "Perpendicular Diamond Crossing Track"
+msgstr "垂直交叉轨道"
 
-#~ msgid "Can't get on: wagon full or doors closed!"
-#~ msgstr "无法上车：车门已关闭或车厢已满。"
+#: advtrains_train_track/init.lua:91
+msgid "90+Angle Diamond Crossing Track"
+msgstr "交叉轨道 (其中一条轨道与坐标轴平行)"
 
-#~ msgid "Use Sneak+rightclick to bypass closed doors!"
-#~ msgstr "请使用潜行+右键上车。"
+#: advtrains_train_track/init.lua:132
+msgid "Diagonal Diamond Crossing Track"
+msgstr "交叉轨道"
 
-#~ msgid "Access to @1"
-#~ msgstr "可前往@1"
+#: advtrains_train_track/init.lua:179
+msgid "Bumper"
+msgstr "保险杠"
+
+#: advtrains_train_track/init.lua:201
+msgid "ATC controller"
+msgstr "ATC 控制器"
+
+#: advtrains_train_track/init.lua:317
+msgid "Unloading Track"
+msgstr "卸货轨道"
+
+#: advtrains_train_track/init.lua:342
+msgid "Loading Track"
+msgstr "装货轨道"
+
+#: advtrains_train_track/init.lua:406
+msgid "Detector Rail"
+msgstr "探测轨道"
 
 #~ msgid ""
 #~ "ATC controller, mode @1\n"
@@ -540,12 +650,26 @@ msgstr "地铁车厢"
 #~ "模式：@1\n"
 #~ "频道：@2"
 
+#~ msgid "Access to @1"
+#~ msgstr "可前往@1"
+
+#~ msgid "Can't get on: wagon full or doors closed!"
+#~ msgstr "无法上车：车门已关闭或车厢已满。"
+
+#~ msgid "Can't place: protected position!"
+#~ msgstr "无法放置：此区域已被保护。"
+
+#~ msgid "Default Seat"
+#~ msgstr "默认座位"
+
+#~ msgid "Default Seat (driver stand)"
+#~ msgstr "默认座位 (司机座位)"
+
+#~ msgid "Deprecated Track"
+#~ msgstr "请不要使用"
+
 #~ msgid "Lock couples"
 #~ msgstr "锁定连接处"
-
-#~ msgid ""
-#~ "You need to own at least one neighboring wagon to destroy this couple."
-#~ msgstr "您必须至少拥有其中一节车厢才能分开这两节车厢。"
 
 #~ msgid "Speed:"
 #~ msgstr "速度"
@@ -553,8 +677,20 @@ msgstr "地铁车厢"
 #~ msgid "Target:"
 #~ msgstr "目标速度"
 
-#~ msgid "Default Seat"
-#~ msgstr "默认座位"
+#, fuzzy
+#~ msgid "This node can't be rotated using the trackworker,"
+#~ msgstr "您不能使用铁路调整工具旋转这个方块。"
 
-#~ msgid "Default Seat (driver stand)"
-#~ msgstr "默认座位 (司机座位)"
+#~ msgid "This position is protected!"
+#~ msgstr "这里已被保护。"
+
+#~ msgid "Use Sneak+rightclick to bypass closed doors!"
+#~ msgstr "请使用潜行+右键上车。"
+
+#, fuzzy
+#~ msgid "You are not allowed to modify this protected track."
+#~ msgstr "这里已被保护，您不能在这里建造铁路。"
+
+#~ msgid ""
+#~ "You need to own at least one neighboring wagon to destroy this couple."
+#~ msgstr "您必须至少拥有其中一节车厢才能分开这两节车厢。"

@@ -188,9 +188,9 @@ for r,f in pairs({on={as="off", ls="green", als="red"}, off={as="on", ls="red", 
 	
 	--tunnel signals. no rotations.
 	local swdesc = { -- needed for xgettext
-		l = attrans("Wallmounted Signal (l)"),
-		r = attrans("Wallmounted Signal (r)"),
-		t = attrans("Wallmounted Signal (t)"),
+		l = attrans("Wallmounted Signal (left)"),
+		r = attrans("Wallmounted Signal (right)"),
+		t = attrans("Wallmounted Signal (top)"),
 	}
 	for loc, sbox in pairs({l={-1/2, -1/2, -1/4, 0, 1/2, 1/4}, r={0, -1/2, -1/4, 1/2, 1/2, 1/4}, t={-1/2, 0, -1/4, 1/2, 1/2, 1/4}}) do
 		minetest.register_node("advtrains:signal_wall_"..loc.."_"..r, {
