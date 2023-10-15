@@ -222,19 +222,6 @@ function advtrains.register_node_4rot(ori_name, ori_ndef, definition_mangling_fu
 	end
 end
 
-
--- Registers an item to place and automatically connect nearby tracks
-function advtrains.register_track_placer(...)
-
-end
-
--- Registers an item to place and adjust slope tracks
-function advtrains.register_slope_placer(...)
-
-end
-
-
-
 -- track-related helper functions
 
 function advtrains.is_track(nodename)
@@ -255,13 +242,10 @@ function advtrains.get_track_connections(name, param2)
 	if not param2 then noderot=0 end
 	if noderot > 3 then atprint(" get_track_connections: rail has invaild param2 of "..noderot) noderot=0 end
 	
-	local tracktype
-	for k,_ in pairs(nodedef.groups) do
-		local tt=string.match(k, "^advtrains_track_(.+)$")
-		if tt then
-			tracktype=tt
-		end
+	if not nodedef.at_conns then
+		return nil
 	end
+	--atdebug("Track connections of ",name,param2,":",nodedef.at_conns)
 	return advtrains.rotate_conn_by(nodedef.at_conns, noderot*AT_CMAX/4), (nodedef.at_rail_y or 0), tracktype
 end
 

@@ -27,21 +27,27 @@ end
 
 -- Register a track node as candidate
 -- tpg: the track place group to register the candidates for
+--        NOTE: This value is automatically added to the node definition (ndef) in field ndef.advtrains.track_place_group!
 -- name, ndef: the node name and node definition table to register
 -- as_single: whether the rail should be considered as candidate for one-endpoint connection
 --            Typically only set for the straight rail variants
 -- as_double: whether the rail should be considered as candidate for two-endpoint connection
 --            Typically set for straights and curves
-function tp.register_candidate(tpg, name, ndef, as_single, as_double)
+-- ignore_2conn_for_legacy_xing: skips the 2-connection assertion - ONLY for compatibility with the legacy crossing nodes, DO NOT USE!
+function tp.register_candidate(tpg, name, ndef, as_single, as_double, ignore_2conn_for_legacy_xing)
+	--atdebug("TP Register candidate:",tpg, name, as_single, as_double)
 	--get or create TP group
 	if not tp.groups[tpg] then
 		tp.groups[tpg] = {double = {}, single1 = {}, single2 = {}, default = {name = name, param2 = 0} }
 		-- note: this causes the first candidate to ever be registered to be the default (which is typically what you want)
+		-- But it can be overwritten using tp.set_default_place_candidate
 	end
 	local g = tp.groups[tpg]
 	
 	-- get conns
-	assert(#ndef.at_conns == 2)
+	if not ignore_2conn_for_legacy_xing then
+		assert(#ndef.at_conns == 2)
+	end
 	local c1, c2 = ndef.at_conns[1].c, ndef.at_conns[2].c
 	local is_symmetrical = (rotate(c1, 8) == c2)
 	
@@ -58,6 +64,21 @@ function tp.register_candidate(tpg, name, ndef, as_single, as_double)
 			g.single1[rotate(c1,i*4)] = {name=name, param2=i}
 			g.single2[rotate(c2,i*4)] = {name=name, param2=i}
 		end
+	end
+	
+	-- Set track place group on the node
+	if not ndef.advtrains then
+		ndef.advtrains = {}
+	end
+	ndef.advtrains.track_place_group = tpg
+end
+
+-- Sets the node that is placed by the track placer when there is no track nearby. param2 defaults to 0
+function tp.set_default_place_candidate(tpg, name, param2)
+	if not tp.groups[tpg] then
+		tp.groups[tpg] = {double = {}, single1 = {}, single2 = {}, default = {name = name, param2 = param2 or 0} }
+	else
+		tp.groups[tpg].default = {name = name, param2 = param2 or 0}
 	end
 end
 
@@ -87,7 +108,7 @@ local function check_or_bend_rail(origin, dir, pname, commit)
 		return false
 	end
 	-- now the track must be two-conn, else it wouldn't be allowed to have track_place_group set.
-	assert(#conns == 2)
+	--assert(#conns == 2) -- cannot check here, because of legacy crossing hack
 	-- Is player and game allowed to do this?
 	if not advtrains.can_dig_or_modify_track(pos) then
 		return false
@@ -132,6 +153,7 @@ local function check_or_bend_rail(origin, dir, pname, commit)
 end
 
 local function track_place_node(pos, node, ndef)
+	--atdebug("track_place_node: ",pos, node)
 	advtrains.ndb.swap_node(pos, node)
 	local ndef = minetest.registered_nodes[node.name]
 	if ndef and ndef.after_place_node then
@@ -151,14 +173,20 @@ end
 -- The function returns true on success.
 function tp.place_track(pos, tpg, pname, yaw)
 	-- 1. collect neighboring tracks and whether they can be connected
+	--atdebug("tp.place_track(",pos, tpg, pname, yaw,")")
 	local cand = {}
 	for i=0,15 do
 		if check_or_bend_rail(pos, i, pname) then
 			cand[#cand+1] = i
 		end
 	end
+	--atdebug("Candidates: ",cand)
 	-- obtain the group table
 	local g = tp.groups[tpg]
+	if not g then
+		error("tp.place_track: for tpg="..tpg.." couldn't find the group table")
+	end
+	--atdebug("Group table:",g)
 	-- 2. try all possible two-endpoint connections
 	for k1, conn1 in ipairs(cand) do
 		for k2, conn2 in ipairs(cand) do
@@ -167,6 +195,7 @@ function tp.place_track(pos, tpg, pname, yaw)
 				-- the combination the other way round will be run through in a later loop iteration
 				if advtrains.yawToDirection(yaw, conn1, conn2) == conn2 then
 					-- does there exist a suitable double-connection rail?
+					--atdebug("Try double conn: ",conn1, conn2)
 					local node = g.double[conn1.."_"..conn2]
 					if node then
 						check_or_bend_rail(pos, conn1, pname, true)
@@ -187,6 +216,7 @@ function tp.place_track(pos, tpg, pname, yaw)
 		else
 			single = g.single2
 		end
+		--atdebug("Try single conn: ",conn1)
 		local node = single[conn1]
 		if node then
 			check_or_bend_rail(pos, conn1, pname, true)

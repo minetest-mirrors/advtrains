@@ -21,8 +21,7 @@ local modpath = minetest.get_modpath(minetest.get_current_modname()) .. DIR_DELI
 dofile(modpath.."railwaytime.lua")
 dofile(modpath.."scheduler.lua")
 
---TODO reenable stop rail
---dofile(modpath.."stoprail.lua")
+dofile(modpath.."stoprail.lua")
 
 
 function advtrains.lines.load(data)
