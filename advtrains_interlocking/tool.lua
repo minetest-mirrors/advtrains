@@ -55,6 +55,7 @@ local function node_left_click(pos, pname)
 
 	local ts_id = advtrains.interlocking.db.check_and_repair_ts_at_pos(pos)
 	if ts_id then
+		advtrains.interlocking.db.update_rs_cache(ts_id)
 		advtrains.interlocking.highlight_track_section(pos)
 	else
 		minetest.chat_send_player(pname, "No track section at this location!")

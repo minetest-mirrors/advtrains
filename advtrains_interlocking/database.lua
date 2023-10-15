@@ -189,10 +189,10 @@ Track section
 [id] = {
 	name = "Some human-readable name"
 	tc_breaks = { <signal specifier>,... } -- Bounding TC's (signal specifiers)
-	rs_cache = { [<x>-<y>] = { [<encoded pos>] = "state" } }
+	rs_cache = { [<x>] = { [<y>] = { [<encoded pos>] = "state" } } }
 	-- Saves the turnout states that need to be locked when a route is set from tcb#x to tcb#y
-	-- e.g. "1-2" = { "800080008000" = "st" }
-	-- Recalculated on every change via update_ts_cache
+	-- e.g. 1 = { 2 = { "800080008000" = "st" } }
+	-- Recalculated on every change via update_rs_cache
 	
 	route = {
 		origin = <signal>,  -- route origin
@@ -477,7 +477,7 @@ function ildb.purge_ts_tcb_refs(ts_id)
 	else
 		if has_changed then
 			-- needs to update route cache
-			ildb.update_ts_cache(ts_id)
+			ildb.update_rs_cache(ts_id)
 		end
 		return ts
 	end
@@ -499,7 +499,7 @@ function ildb.tcbs_ensure_ts_ref_exists(sigd)
 	local did_insert = insert_sigd_if_not_present(ts.tc_breaks, {p=sigd.p, s=sigd.s})
 	if did_insert then
 		atdebug("tcbs_ensure_ts_ref_exists(",sigd,"): TCBS was missing reference in TS",tcbs.ts_id)
-		ildb.update_ts_cache(tcbs.ts_id)
+		ildb.update_rs_cache(tcbs.ts_id)
 	end
 end
 
@@ -532,22 +532,148 @@ function ildb.create_ts_from_tcb_list(sigd_list)
 	end
 	
 	
-	ildb.update_ts_cache(id)
+	ildb.update_rs_cache(id)
 	return id, new_ts
 end
 
+-- RS CACHE --
+
+--[[
+node_from_to_list - cache of from-to connid mappings and their associated state.
+Acts like a cache, built on demand by ildb.get_possible_out_connids(nodename)
+node_name = {
+	from_connid = {
+		to_connid = state
+	}
+}
+]]
+local node_from_to_state_cache = {}
+
+function ildb.get_possible_out_connids(node_name, in_connid)
+	if not node_from_to_state_cache[node_name] then
+		node_from_to_state_cache[node_name] = {}
+	end
+	local nt = node_from_to_state_cache[node_name]
+	if not nt[in_connid] then
+		local ta = {}
+		atdebug("Node From/To State Cache: Caching for ",node_name,"connid",in_connid)
+		local ndef = minetest.registered_nodes[node_name]
+		if ndef.advtrains.node_state_map then
+			for state, tnode in pairs(ndef.advtrains.node_state_map) do
+				local tndef = minetest.registered_nodes[tnode]
+				-- verify that the conns table is identical - this is purely to catch setup errors!
+				if not tndef.at_conns or not tndef.at_conn_map then
+					atdebug("ndef:",ndef,", tndef:",tndef)
+					error("In AT setup for node "..tnode..": Node set as state "..state.." of "..node_name.." in state_map, but is missing at_conns/at_conn/map!")
+				end
+				if #ndef.at_conns ~= #tndef.at_conns then
+					atdebug("ndef:",ndef,", tndef:",tndef)
+					error("In AT setup for node "..tnode..": Conns table does not match that of "..node_name.." (of which this is state "..state..")")
+				end
+				for connid=1,#ndef.at_conns do
+					if ndef.at_conns[connid].c ~= tndef.at_conns[connid].c then
+						atdebug("ndef:",ndef,", tndef:",tndef)
+						error("In AT setup for node "..tnode..": Conns table does not match that of "..node_name.." (of which this is state "..state..")")
+					end
+				end
+				-- do the actual caching by looking at the conn_map
+				local target_connid = tndef.at_conn_map[in_connid]
+				if ta[target_connid] then
+					-- Select the variant for which the other way would back-connect. This way, turnouts will switch to the appropriate branch if the train joins
+					local have_back_conn = (tndef.at_conn_map[target_connid])==in_connid
+					atdebug("Found second state mapping",in_connid,"-",target_connid,"have_back_conn=",have_back_conn)
+					if have_back_conn then
+						atdebug("Overwriting",in_connid,"-",target_connid,"=",state)
+						ta[target_connid] = state
+					end
+				else
+					atdebug("Setting",in_connid,"-",target_connid,"=",state)
+					ta[target_connid] = state
+				end
+			end
+		else
+			error("Node From/To State Cache: "..node_name.." doesn't have a state map, is not a switchable track! Panic!")
+		end
+		nt[in_connid] = ta
+	end
+	return nt[in_connid]
+end
+
+local function recursively_find_routes(s_pos, s_connid, locks_found, result_table, scan_limit)
+	atdebug("Recursively restarting at ",s_pos, s_connid, "limit left", scan_limit)
+	local ti = advtrains.get_track_iterator(s_pos, s_connid, scan_limit, false)
+	local pos, connid, bconnid = ti:next_branch()
+	pos, connid, bconnid = ti:next_track()-- step once to get ahead of previous turnout
+	repeat
+		local node = advtrains.ndb.get_node_or_nil(pos)
+		atdebug("Walk ",pos, "nodename", node.name, "entering at conn",bconnid)
+		local ndef = minetest.registered_nodes[node.name]
+		if ndef.advtrains and ndef.advtrains.node_state_map then
+			-- Stop, this is a switchable node. Find out which conns we can go at
+			atdebug("Found turnout ",pos, "nodename", node.name, "entering at conn",bconnid)
+			local pts = advtrains.encode_pos(pos)
+			if locks_found[pts] then
+				-- we've been here before. Stop
+				atdebug("Was already seen! returning")
+				return
+			end
+			local out_conns = ildb.get_possible_out_connids(node.name, bconnid)
+			for oconnid, state in pairs(out_conns) do
+				atdebug("Going in direction",oconnid,"state",state)
+				locks_found[pts] = state
+				recursively_find_routes(pos, oconnid, locks_found, result_table, ti.limit)
+				locks_found[pts] = nil
+			end
+			return
+		end
+		--otherwise, this might be a tcb
+		local tcbs = ildb.get_tcbs({p=pos, s=bconnid})
+		if tcbs then
+			-- we found a tcb, store the current locks in the result_table
+			local table_key = advtrains.encode_pos(pos).."_"..bconnid
+			atdebug("Found end TCB", table_key,", returning")
+			if result_table[table_key] then
+				atwarn("While caching track section routing, found multiple route paths within same track section. Only first one found will be used")
+			else
+				result_table[table_key] = table.copy(locks_found)
+			end
+			return
+		end
+		-- Go forward
+		pos, connid, bconnid = ti:next_track()
+	until not pos -- this stops the loop when either the track end is reached or the limit is hit
+end
 
 -- Updates the turnout cache of the given track section
-function ildb.update_ts_cache(ts_id)
+function ildb.update_rs_cache(ts_id)
 	local ts = ildb.get_ts(ts_id)
 	if not ts then
 		error("Update TS Cache called with nonexisting ts_id "..(ts_id or "nil"))
 	end
 	local rscache = {}
+	atdebug("== Running update_rs_cache for ",ts_id) 
 	-- start on every of the TS's TCBs, walk the track forward and store locks along the way
-	-- TODO: Need change in handling of switches
-	atdebug("update_ts_cache",ts_id,"TODO: implement")
+	for start_tcbi, start_tcbs in ipairs(ts.tc_breaks) do
+		rscache[start_tcbi] = {}
+		atdebug("Starting for ",start_tcbi, start_tcbs)
+		local locks_found = {}
+		local result_table = {}
+		recursively_find_routes(start_tcbs.p, start_tcbs.s, locks_found, result_table, TS_MAX_SCAN)
+		-- now result_table contains found route locks. Match them with the other TCBs we have in this section
+		for end_tcbi, end_tcbs in ipairs(ts.tc_breaks) do
+			local table_key = advtrains.encode_pos(end_tcbs.p).."_"..end_tcbs.s
+			if result_table[table_key] then
+				atdebug("Set RSCache entry",start_tcbi.."-"..end_tcbi,"=",result_table[table_key])
+				rscache[start_tcbi][end_tcbi] = result_table[table_key]
+			end
+		end
+	end
+	ts.rs_cache = rscache
+	atdebug("== Done update_rs_cache for ",ts_id, "result:",rscache) 
 end
+
+
+--- DB API functions
 
 local lntrans = { "A", "B" }
 function ildb.sigd_to_string(sigd)
