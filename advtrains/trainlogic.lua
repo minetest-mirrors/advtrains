@@ -280,8 +280,10 @@ function advtrains.train_ensure_init(id, train)
 	assertdef(train, "velocity", 0)
 	--assertdef(train, "tarvelocity", 0)
 	assertdef(train, "acceleration", 0)
-	assertdef(train, "id", id)
-	
+	if train.id ~= id then
+		train.id = id
+	end
+	assertdef(train, "path_ori_cp", {})
 	
 	if not train.max_speed then
 		--atprint("in ensure_init: missing properties, updating!")
@@ -861,13 +863,10 @@ local function tnc_call_enter_callback(pos, train_id, train, index)
 	run_callbacks_enter_node(pos, train_id, train, index)
 	
 	-- check for split points
-	if mregnode and mregnode.at_conns and #mregnode.at_conns == 3 and train.path_cp[index] == 3 then
-		-- train came from connection 3 of a switch, so it split points.
-		if not train.points_split then
-			train.points_split = {}
-		end
-		train.points_split[advtrains.encode_pos(pos)] = true
-		--atdebug(train_id,"split points at",pos)
+	if mregnode and mregnode.at_conn_map then
+		-- If this node has >2 conns (and a connmap), remember the connection where we came from to handle split points
+		atdebug("Train",train_id,"at",pos,"saving turnout origin CP",train.path_cp[index],"for path item",index)
+		train.path_ori_cp[advtrains.encode_pos(pos)] = train.path_cp[index]
 	end
 end
 local function tnc_call_leave_callback(pos, train_id, train, index)
@@ -882,18 +881,11 @@ local function tnc_call_leave_callback(pos, train_id, train, index)
 	run_callbacks_leave_node(pos, train_id, train, index)
 	
 	-- split points do not matter anymore. clear them
-	if train.points_split then
-		if train.points_split[advtrains.encode_pos(pos)] then
-			train.points_split[advtrains.encode_pos(pos)] = nil
-			--atdebug(train_id,"has passed split points at",pos)
-		end
-		-- any entries left?
-		for _,_ in pairs(train.points_split) do
-			return
-		end
-		train.points_split = nil
+	if mregnode and mregnode.at_conn_map then
+		-- If this node has >2 conns (and a connmap), remember the connection where we came from to handle split points
+		atdebug("Train",train_id,"at",pos,"removing turnout origin CP for path item",index," because train has left it")
+		train.path_ori_cp[advtrains.encode_pos(pos)] = nil
 	end
-	-- WARNING possibly unreachable place!
 end
 
 function advtrains.tnc_call_approach_callback(pos, train_id, train, index, lzbdata)
@@ -1189,7 +1181,23 @@ function advtrains.invert_train(train_id)
 		return
 	end
 	
+	-- Before flipping the train, we must check if there are any points on the path
+	-- which will become split on rotating, and store their cn (which will become the cp)
+	local ori_cp_after_flip = {}
+	for index = atround(train.end_index),atround(train.index) do
+		local pos = advtrains.path_get(train, index)
+		local ok, conns, railheight, connmap = advtrains.get_rail_info_at(pos)
+		if ok and connmap then
+			atdebug("Reversing Train",train.id," ori_cp Checks: at",pos,"saving turnout origin CP",train.path_cn[index],"for path item",index)
+			ori_cp_after_flip[advtrains.encode_pos(pos)] = train.path_cn[index]
+		end
+	end
+	
+	-- Actual rotation happens here! This sets the path restore position to the end of the train, inverting the connid.
 	advtrains.path_setrestore(train, true)
+	
+	-- clear the origin cp list because it is now invalid, and replace it by what we built prior.
+	train.path_ori_cp = ori_cp_after_flip
 	
 	-- rotate some other stuff
 	if train.door_open then

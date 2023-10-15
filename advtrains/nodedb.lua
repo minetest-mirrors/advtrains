@@ -264,7 +264,7 @@ end
 --get_node with pseudoload. now we only need track data, so we can use the trackdb as second fallback
 --nothing new will be saved inside the trackdb.
 --returns:
---true, conn1, conn2, rely1, rely2, railheight   in case everything's right.
+--true, conns, railheight, connmap   in case everything's right.
 --false  if it's not a rail or the train does not drive on this rail, but it is loaded or
 --nil    if the node is neither loaded nor in trackdb
 --the distraction between false and nil will be needed only in special cases.(train initpos)

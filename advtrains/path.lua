@@ -217,9 +217,8 @@ function advtrains.path_get(train, index)
 			advtrains.occ.set_item(train.id, adj_pos, pef)
 			
 			local mconnid = advtrains.get_matching_conn(adj_connid, next_connmap)
-			-- If we have split points, notify accordingly
-			-- TODO readd support for split points (remember the cp and cn of points)
-		
+			-- NO split points handling here. It is only required for backwards path calculation
+			
 			adj_pos.y = adj_pos.y + nextrail_y
 			train.path_cp[pef] = adj_connid
 			train.path_cn[pef] = mconnid
@@ -253,9 +252,15 @@ function advtrains.path_get(train, index)
 			advtrains.occ.set_item(train.id, adj_pos, peb)
 			
 			local mconnid = advtrains.get_matching_conn(adj_connid, next_connmap)
-			-- If we have split points, notify accordingly
-			-- TODO readd support for split points (remember the cp and cn of points)
-			
+			-- If, for this position, we have remembered the origin conn, apply it here
+			if next_connmap then -- only needs to be done when this track is a turnout (>2 conns)
+				local origin_conn = train.path_ori_cp[advtrains.encode_pos(adj_pos)]
+				if origin_conn then
+					atdebug("Train",train.id,"at",adj_pos,"restoring turnout origin CP",origin_conn,"for path item",index)
+					mconnid = origin_conn
+				end
+			end
+						
 			adj_pos.y = adj_pos.y + nextrail_y
 			train.path_cn[peb] = adj_connid
 			train.path_cp[peb] = mconnid
