@@ -129,7 +129,7 @@ advtrains.ap.t_s3way={
 			switchalt = "s",
 			switchst="l",
 			switchprefix = "",
-			conn_map = {2,1,1},
+			conn_map = {2,1,1,1},
 			stmref = "sw",
 		},
 		s={
@@ -138,7 +138,7 @@ advtrains.ap.t_s3way={
 			switchalt ="r",
 			switchst = "s",
 			switchprefix = "",
-			conn_map = {3,1,1},
+			conn_map = {3,1,1,1},
 			stmref = "sw",
 			tpsingle = true,
 		},
@@ -148,7 +148,7 @@ advtrains.ap.t_s3way={
 			switchalt = "l",
 			switchst="r",
 			switchprefix = "",
-			conn_map = {4,1,1},
+			conn_map = {4,1,1,1},
 			stmref = "sw",
 		}
 	},

@@ -278,9 +278,9 @@ function advtrains.get_rail_info_at(pos)
 	if(not advtrains.is_track(nodename)) then
 		return false
 	end
-	local conns, railheight = advtrains.get_track_connections(node.name, node.param2)
+	local conns, railheight, connmap = advtrains.get_track_connections(node.name, node.param2)
 	
-	return true, conns, railheight
+	return true, conns, railheight, connmap
 end
 
 local IGNORE_WORLD = advtrains.IGNORE_WORLD

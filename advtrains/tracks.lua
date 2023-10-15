@@ -235,6 +235,8 @@ function advtrains.is_track(nodename)
 	return false
 end
 
+-- returns the connection tables of the track with given node details
+-- returns: conns table, railheight, conn_map table
 function advtrains.get_track_connections(name, param2)
 	local nodedef=minetest.registered_nodes[name]
 	if not nodedef then atprint(" get_track_connections couldn't find nodedef for nodename "..(name or "nil")) return nil end
@@ -246,7 +248,7 @@ function advtrains.get_track_connections(name, param2)
 		return nil
 	end
 	--atdebug("Track connections of ",name,param2,":",nodedef.at_conns)
-	return advtrains.rotate_conn_by(nodedef.at_conns, noderot*AT_CMAX/4), (nodedef.at_rail_y or 0), tracktype
+	return advtrains.rotate_conn_by(nodedef.at_conns, noderot*AT_CMAX/4), (nodedef.at_rail_y or 0), nodedef.at_conn_map
 end
 
 -- Function called when a track is about to be dug or modified by the trackworker

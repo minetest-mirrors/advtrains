@@ -292,7 +292,7 @@ function advtrains.conn_matches_to(conn, other_conns)
 end
 
 -- Going from the rail at pos (does not need to be rounded) along connection with id conn_idx, if there is a matching rail, return it and the matching connid
--- returns: <adjacent pos>, <conn index of adjacent>, <my conn index>, <railheight of adjacent>
+-- returns: <adjacent pos>, <conn index of adjacent>, <my conn index>, <railheight of adjacent>, (adjacent conns table), (adjacent connmap table)
 -- parameter this_conns_p is connection table of this rail and is optional, is determined by get_rail_info_at if not provided.
 function advtrains.get_adjacent_rail(this_posnr, this_conns_p, conn_idx)
 	local this_pos = advtrains.round_vector_floor_y(this_posnr)
@@ -303,8 +303,8 @@ function advtrains.get_adjacent_rail(this_posnr, this_conns_p, conn_idx)
 	end
 	if not conn_idx then
 		for coni, _ in ipairs(this_conns) do
-			local adj_pos, adj_conn_idx, _, nry, nco = advtrains.get_adjacent_rail(this_pos, this_conns, coni)
-			if adj_pos then return adj_pos,adj_conn_idx,coni,nry, nco end
+			local adj_pos, adj_conn_idx, _, nry, nco, ncm = advtrains.get_adjacent_rail(this_pos, this_conns, coni)
+			if adj_pos then return adj_pos,adj_conn_idx,coni,nry, nco, ncm end
 		end
 		return nil
 	end
@@ -318,29 +318,40 @@ function advtrains.get_adjacent_rail(this_posnr, this_conns_p, conn_idx)
 		adj_pos.y = adj_pos.y + 1
 	end
 	
-	local nextnode_ok, nextconns, nextrail_y=advtrains.get_rail_info_at(adj_pos)
+	local nextnode_ok, nextconns, nextrail_y, nextconnmap=advtrains.get_rail_info_at(adj_pos)
 	if not nextnode_ok then
 		adj_pos.y = adj_pos.y - 1
 		conn_y = conn_y + 1
-		nextnode_ok, nextconns, nextrail_y=advtrains.get_rail_info_at(adj_pos)
+		nextnode_ok, nextconns, nextrail_y, nextconnmap=advtrains.get_rail_info_at(adj_pos)
 		if not nextnode_ok then
 			return nil
 		end
 	end
 	local adj_connid = advtrains.conn_matches_to({c=conn.c, y=conn_y}, nextconns)
 	if adj_connid then
-		return adj_pos, adj_connid, conn_idx, nextrail_y, nextconns
+		return adj_pos, adj_connid, conn_idx, nextrail_y, nextconns, nextconnmap
 	end
 	return nil
 end
 
 -- when a train enters a rail on connid 'conn', which connid will it go out?
--- nconns: number of connections in connection table:
--- 2 = straight rail; 3 = turnout, 4 = crossing, 5 = three-way turnout (5th entry is a stub)
+-- Since 2.5: This mapping is contained in the conn_map table in the node definition!
 -- returns: connid_out
-local connlku={[2]={2,1}, [3]={2,1,1}, [4]={2,1,4,3}, [5]={2,1,1,1}}
-function advtrains.get_matching_conn(conn, nconns)
-	return connlku[nconns][conn]
+function advtrains.get_matching_conn(conn, conn_map)
+	if tonumber(conn_map) then
+		error("Legacy call to get_matching_conn! Instead of nconns, conn_map needs to be provided!")
+	end
+	if not conn_map then
+		--OK for two-conn rails, just return the other
+		if conn==1 then return 2 end
+		if conn==2 then return 1 end
+		error("get_matching_conn: For connid >=3, conn_map must not be nil!")
+	end
+	local cout = conn_map[conn]
+	if not cout then
+		error("get_matching_conn: Connid "..conn.." not found in conn_map which is "..atdump(conn_map))
+	end
+	return cout
 end
 
 function advtrains.random_id(lenp)
@@ -495,10 +506,11 @@ local trackiter_mt = {
 	next_branch = function(self)
 		local br = table.remove(self.branches, 1)
 		-- Advance internal state
-		local adj_pos, adj_connid, _, _, adj_conns = advtrains.get_adjacent_rail(br.pos, nil, br.connid)
+		local adj_pos, adj_connid, _, _, adj_conns, adj_connmap = advtrains.get_adjacent_rail(br.pos, nil, br.connid)
 		self.pos = adj_pos
 		self.bconnid = adj_connid
 		self.tconns = adj_conns
+		self.tconnmap = adj_connmap
 		self.limit = br.limit - 1
 		self.visited[advtrains.encode_pos(br.pos)] = true
 		self.last_track_already_visited = false
@@ -524,7 +536,7 @@ local trackiter_mt = {
 		end
 		-- select next conn (main conn to follow is the associated connection)
 		local old_bconnid = self.bconnid
-		local mconnid = advtrains.get_matching_conn(self.bconnid, #self.tconns)
+		local mconnid = advtrains.get_matching_conn(self.bconnid, self.tconnmap)
 		if self.visited[advtrains.encode_pos(pos)] then
 			-- node was already seen
 			-- Due to special requirements for the track section updater, return this first already visited track once
@@ -540,10 +552,11 @@ local trackiter_mt = {
 			end
 		end
 		-- Advance internal state
-		local adj_pos, adj_connid, _, _, adj_conns = advtrains.get_adjacent_rail(pos, self.tconns, mconnid)
+		local adj_pos, adj_connid, _, _, adj_conns, adj_connmap = advtrains.get_adjacent_rail(pos, self.tconns, mconnid)
 		self.pos = adj_pos
 		self.bconnid = adj_connid
 		self.tconns = adj_conns
+		self.tconnmap = adj_connmap
 		self.limit = self.limit - 1
 		self.visited[advtrains.encode_pos(pos)] = true
 		self.last_track_already_visited = false

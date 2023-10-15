@@ -68,6 +68,8 @@ function advtrains.setstate(parpos, newstate, pnode)
 	if ndef.advtrains.node_on_switch_state then
 		ndef.advtrains.node_on_switch_state(pos, new_node, old_state, newstate)
 	end
+	-- invalidate paths (only relevant if this is a track)
+	advtrains.invalidate_all_paths(pos)
 
 	return true
 end

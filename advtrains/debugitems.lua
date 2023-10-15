@@ -118,3 +118,22 @@ minetest.register_tool("advtrains:trackitest",
 	end,
 }
 )
+
+minetest.register_chatcommand("at_trackdef_audit",
+	{
+        params = "", 
+        description = "Performs an audit of all track definitions currently loaded and checks for potential problems", 
+        func = function(name, param)
+			for name, ndef in pairs(minetest.registered_nodes) do
+				--TODO finish this!
+				if ndef.at_conns then
+					-- check if conn_map is there and if it has enough entries
+					if #ndef.at_conns > 2 then
+						if #ndef.at_conn_map < #ndef.at_conns then
+							atwarn("AUDIT: Node",name,"- Not enough connmap entries! Check ndef:",ndef)
+						end
+					end
+				end
+			end
+        end,
+})

@@ -38,11 +38,11 @@
 --         false - node definitely gone, remove train
 function advtrains.path_create(train, pos, connid, rel_index)
 	local posr = advtrains.round_vector_floor_y(pos)
-	local node_ok, conns, rhe = advtrains.get_rail_info_at(pos)
+	local node_ok, conns, rhe, connmap = advtrains.get_rail_info_at(pos)
 	if not node_ok then
 		return node_ok
 	end
-	local mconnid = advtrains.get_matching_conn(connid, #conns)
+	local mconnid = advtrains.get_matching_conn(connid, connmap)
 	train.index = rel_index
 	train.path = { [0] = { x=posr.x, y=posr.y+rhe, z=posr.z } }
 	train.path_cn = { [0] = connid }
@@ -206,22 +206,19 @@ function advtrains.path_get(train, index)
 	while index > pef do
 		local pos = train.path[pef]
 		local connid = train.path_cn[pef]
-		local node_ok, this_conns, adj_pos, adj_connid, conn_idx, nextrail_y, next_conns
+		local node_ok, this_conns, adj_pos, adj_connid, conn_idx, nextrail_y, next_conns, next_connmap
 		if pef == train.path_trk_f then
 			node_ok, this_conns = advtrains.get_rail_info_at(pos)
 			if not node_ok then error("For train "..train.id..": Path item "..pef.." on-track but not a valid node!") end
-			adj_pos, adj_connid, conn_idx, nextrail_y, next_conns = advtrains.get_adjacent_rail(pos, this_conns, connid)
+			adj_pos, adj_connid, conn_idx, nextrail_y, next_conns, next_connmap = advtrains.get_adjacent_rail(pos, this_conns, connid)
 		end
 		pef = pef + 1
 		if adj_pos then
 			advtrains.occ.set_item(train.id, adj_pos, pef)
-		
+			
+			local mconnid = advtrains.get_matching_conn(adj_connid, next_connmap)
 			-- If we have split points, notify accordingly
-			local mconnid = advtrains.get_matching_conn(adj_connid, #next_conns)
-			if #next_conns==3 and adj_connid==1 and train.points_split and train.points_split[advtrains.encode_pos(adj_pos)] then
-				--atdebug(id,"has split points restored at",adj_pos)
-				mconnid = 3
-			end
+			-- TODO readd support for split points (remember the cp and cn of points)
 		
 			adj_pos.y = adj_pos.y + nextrail_y
 			train.path_cp[pef] = adj_connid
@@ -245,22 +242,19 @@ function advtrains.path_get(train, index)
 	while index < peb do
 		local pos = train.path[peb]
 		local connid = train.path_cp[peb]
-		local node_ok, this_conns, adj_pos, adj_connid, conn_idx, nextrail_y, next_conns
+		local node_ok, this_conns, adj_pos, adj_connid, conn_idx, nextrail_y, next_conns, next_connmap
 		if peb == train.path_trk_b then
 			node_ok, this_conns = advtrains.get_rail_info_at(pos)
 			if not node_ok then error("For train "..train.id..": Path item "..peb.." on-track but not a valid node!") end
-			adj_pos, adj_connid, conn_idx, nextrail_y, next_conns = advtrains.get_adjacent_rail(pos, this_conns, connid)
+			adj_pos, adj_connid, conn_idx, nextrail_y, next_conns, next_connmap = advtrains.get_adjacent_rail(pos, this_conns, connid)
 		end
 		peb = peb - 1
 		if adj_pos then
 			advtrains.occ.set_item(train.id, adj_pos, peb)
 			
+			local mconnid = advtrains.get_matching_conn(adj_connid, next_connmap)
 			-- If we have split points, notify accordingly
-			local mconnid = advtrains.get_matching_conn(adj_connid, #next_conns)
-			if #next_conns==3 and adj_connid==1 and train.points_split and train.points_split[advtrains.encode_pos(adj_pos)] then
-				-- atdebug(id,"has split points restored at",adj_pos)
-				mconnid = 3
-			end
+			-- TODO readd support for split points (remember the cp and cn of points)
 			
 			adj_pos.y = adj_pos.y + nextrail_y
 			train.path_cn[peb] = adj_connid
