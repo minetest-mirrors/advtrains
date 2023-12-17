@@ -188,9 +188,6 @@ minetest.register_on_punchnode(function(pos, node, player, pointed_thing)
 					local tcbs = ildb.get_tcbs(sigd)
 					if tcbs then
 						tcbs.signal = pos
-						if not tcbs.signal_name then
-							tcbs.signal_name = "Signal at "..minetest.pos_to_string(sigd.p)
-						end
 						if not tcbs.routes then
 							tcbs.routes = {}
 						end
@@ -580,11 +577,10 @@ function advtrains.interlocking.show_signalling_form(sigd, pname, sel_rte, calle
 	local tcbs = ildb.get_tcbs(sigd)
 	
 	if not tcbs.signal then return end
-	if not tcbs.signal_name then tcbs.signal_name = "Signal at "..minetest.pos_to_string(sigd.p) end
 	if not tcbs.routes then tcbs.routes = {} end
 	
 	local form = "size[7,10]label[0.5,0.5;Signal at "..minetest.pos_to_string(sigd.p).."]"
-	form = form.."field[0.8,1.5;5.2,1;name;Signal name;"..minetest.formspec_escape(tcbs.signal_name).."]"
+	form = form.."field[0.8,1.5;5.2,1;name;Signal name;"..minetest.formspec_escape(tcbs.signal_name or "").."]"
 	form = form.."button[5.5,1.2;1,1;setname;Set]"
 	
 	if tcbs.routeset then
@@ -717,7 +713,11 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			sel_rte = tpsi
 		end
 		if fields.setname and fields.name and hasprivs then
-			tcbs.signal_name = fields.name
+			if fields.name == "" then
+				tcbs.signal_name = nil -- do not save a signal name if it isnt used (equivalent to track sections)
+			else
+				tcbs.signal_name = fields.name
+			end
 		end
 		if tcbs.routeset and fields.cancelroute then
 			if tcbs.routes[tcbs.routeset] and tcbs.routes[tcbs.routeset].ars then

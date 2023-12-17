@@ -33,7 +33,7 @@ function atil.show_route_edit_form(pname, sigd, routeid)
 	local function itab(t)
 		tab[#tab+1] = minetest.formspec_escape(string.gsub(t, ",", " "))
 	end
-	itab("TCB "..sigd_to_string(sigd).." ("..tcbs.signal_name..") Route #"..routeid)
+	itab("TCB "..sigd_to_string(sigd).." ("..(tcbs.signal_name or "")..") Route #"..routeid)
 	
 	-- this code is partially copy-pasted from routesetting.lua
 	-- we start at the tc designated by signal

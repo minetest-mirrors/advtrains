@@ -19,6 +19,11 @@ C. punch a turnout (or some other passive component) to fix its state (toggle)
 The route visualization will also be used to visualize routes after they have been programmed.
 ]]--
 
+-- TODO duplicate
+local lntrans = { "A", "B" }
+local function sigd_to_string(sigd)
+	return minetest.pos_to_string(sigd.p).." / "..lntrans[sigd.s]
+end
 
 -- table with objectRefs
 local markerent = {}
@@ -237,10 +242,10 @@ local function get_last_route_item(origin, route)
 	return route[#route].next
 end
 
-local function do_advance_route(pname, rp, sigd, tsname)
+local function do_advance_route(pname, rp, sigd, tsref)
 	table.insert(rp.route, {next = sigd, locks = rp.tmp_lcks})
 	rp.tmp_lcks = {}
-	chat(pname, "Added track section '"..tsname.."' to the route.")
+	chat(pname, "Added track section '"..(tsref and (tsref.name or "") or "--EOI--").."' to the route.")
 end
 
 local function finishrpform(pname)
@@ -253,8 +258,9 @@ local function finishrpform(pname)
 		local term_tcbs = advtrains.interlocking.db.get_tcbs(terminal)
 		
 		if term_tcbs.signal then
+			local signalname = (term_tcbs.signal_name or "") .. sigd_to_string(terminal)
 			form = form .. "label[0.5,1.5;Route ends at signal:]"
-			form = form .. "label[0.5,2  ;"..term_tcbs.signal_name.."]"
+			form = form .. "label[0.5,2  ;"..signalname.."]"
 		else
 			form = form .. "label[0.5,1.5;WARNING: Route does not end at a signal.]"
 			form = form .. "label[0.5,2  ;Routes should in most cases end at signals.]"
@@ -423,20 +429,20 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			if fields.advance then
 				-- advance route
 				if not is_endpoint then
-					do_advance_route(pname, rp, this_sigd, this_ts.name)
+					do_advance_route(pname, rp, this_sigd, this_ts)
 				end
 			end
 			if fields.endhere then
 				if not is_endpoint then
-					do_advance_route(pname, rp, this_sigd, this_ts.name)
+					do_advance_route(pname, rp, this_sigd, this_ts)
 				end
 				finishrpform(pname)
 			end
 			if can_over and fields.endover then
 				if not is_endpoint then
-					do_advance_route(pname, rp, this_sigd, this_ts.name)
+					do_advance_route(pname, rp, this_sigd, this_ts)
 				end
-				do_advance_route(pname, rp, over_sigd, over_ts and over_ts.name or "--EOI--")
+				do_advance_route(pname, rp, over_sigd, over_ts)
 				finishrpform(pname)
 			end
 		end

@@ -43,7 +43,7 @@ function ilrs.set_route(signal, route, try)
 	local first = true
 	local i = 1
 	local rtename = route.name
-	local signalname = ildb.get_tcbs(signal).signal_name
+	local signalname = (ildb.get_tcbs(signal).signal_name or "") .. sigd_to_string(signal)
 	local c_tcbs, c_ts_id, c_ts, c_rseg, c_lckp
 	while c_sigd and i<=#route do
 		c_tcbs = ildb.get_tcbs(c_sigd)

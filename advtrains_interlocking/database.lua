@@ -178,11 +178,40 @@ TCB data structure
 	signal_name = <string> -- The human-readable name of the signal, only for documenting purposes
 	routes = { <route definition> } -- a collection of routes from this signal
 	route_auto = <boolean> -- When set, we will automatically re-set the route (designated by routeset)
+	
+	auto_block_signal_mode = <boolean> -- Simplified mode for simple block signals:
+	-- Signal has only one route which is constantly re-set (route_auto is implied)
+	-- Supposed to be used when only a single track section is ahead and it directly ends at the next signal
+	-- UI only offers to enable or disable the signal
+	-- ARS is implicitly disabled on the signal
 },
 -- This is the "B" side of the TCB
 [2] = { -- Variant: end of track-circuited area (initial state of TC)
 	ts_id = nil, -- this is the indication for end_of_interlocking
 }
+}
+
+Route definition
+routes = {
+	[i] = {
+		-- one table for each track section on the route
+		-- Note that the section ID is implicitly inferred from the TCB
+		1 = {
+			locks = { -- component locks for this section of the route. Not used when use_rscache is true.
+				(-16,9,0) = st
+			}
+			next = S[(-23,9,0)/2] -- the start TCB of the next route segment (pointing forward)
+		}
+		2 = {
+			locks = {}
+			-- if next is omitted, then there is no final TCB (e.g. a buffer)
+		}
+		name = "<the route name>"
+		ars = { <ARS rule definition table> }
+		use_rscache = false -- if true, instead of "locks", the track section's rs_cache will be used to set locks
+		-- Fields used by the autorouter:
+		ar_end_sigd = <sigd> -- the sigd describing the end of the route. Used for merging route options on recalculation
+	}
 }
 
 Track section
