@@ -6,7 +6,7 @@ local ilrs = advtrains.interlocking.route
 local function node_right_click(pos, pname)
 	if advtrains.is_passive(pos) then
 		local form = "size[7,5]label[0.5,0.5;Route lock inspector]"
-		local pts = minetest.pos_to_string(pos)
+		local pts = advtrains.encode_pos(pos)
 		
 		local rtl = ilrs.has_route_lock(pts)
 		
@@ -53,7 +53,7 @@ local function node_left_click(pos, pname)
 		return
 	end
 
-	local ts_id = advtrains.interlocking.db.check_and_repair_ts_at_pos(pos)
+	local ts_id = advtrains.interlocking.db.check_and_repair_ts_at_pos(pos, nil, pname)
 	if ts_id then
 		advtrains.interlocking.db.update_rs_cache(ts_id)
 		advtrains.interlocking.highlight_track_section(pos)
@@ -107,7 +107,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	local pos
 	local pts = string.match(formname, "^at_il_rtool_(.+)$")
 	if pts then
-		pos = minetest.string_to_pos(pts)
+		pos = advtrains.decode_pos(pts)
 	end
 	if pos then
 		if advtrains.is_passive(pos) then

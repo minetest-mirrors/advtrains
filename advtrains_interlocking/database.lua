@@ -84,10 +84,33 @@ function ildb.load(data)
 				if pos then
 					-- that was a pos_to_string
 					local epos = advtrains.encode_pos(pos)
+					atdebug("ILDB converting TCB position format",pts,"->",epos)
 					track_circuit_breaks[epos] = tcb
 				else
 					-- keep entry, it is already new
 					track_circuit_breaks[pts] = tcb
+				end
+				-- convert the routes.[].locks table keys
+				for t_side,tcbs in pairs(tcb) do
+					if tcbs.routes then
+						for t_rnum,route in pairs(tcbs.routes) do
+							for t_rsnm,rseg in ipairs(route) do
+								local locks_n = {}
+								for lpts,state in pairs(rseg.locks) do
+									local lpos = minetest.string_to_pos(lpts)
+									if lpos then
+										local epos = advtrains.encode_pos(lpos)
+										atdebug("ILDB converting tcb",pts,"side",t_side,"route",t_route,"lock position format",lpts,"->",epos)
+										locks_n[epos] = state
+									else
+										-- already correct format
+										locks_n[lpts] = state
+									end
+								end
+								rseg.locks = locks_n
+							end
+						end
+					end
 				end
 			end
 		end
@@ -99,7 +122,23 @@ function ildb.load(data)
 		signal_assignments = data.signalass
 	end
 	if data.rs_locks then
-		advtrains.interlocking.route.rte_locks = data.rs_locks
+		if data.tcbpts_conversion_applied then
+			advtrains.interlocking.route.rte_locks = data.rs_locks
+		else
+			advtrains.interlocking.route.rte_locks = {}
+			for pts, lta in pairs(data.rs_locks) do
+				local pos = minetest.string_to_pos(pts)
+				if pos then
+					-- that was a pos_to_string
+					local epos = advtrains.encode_pos(pos)
+					atdebug("ILDB converting Route Lock position format",pts,"->",epos)
+					advtrains.interlocking.route.rte_locks[epos] = lta
+				else
+					-- keep entry, it is already new
+					advtrains.interlocking.route.rte_locks[pts] = lta
+				end
+			end
+		end
 	end
 	if data.rs_callbacks then
 		advtrains.interlocking.route.rte_callbacks = data.rs_callbacks
@@ -197,8 +236,8 @@ routes = {
 		-- one table for each track section on the route
 		-- Note that the section ID is implicitly inferred from the TCB
 		1 = {
-			locks = { -- component locks for this section of the route. Not used when use_rscache is true.
-				(-16,9,0) = st
+			locks = { -- component locks for this section of the route.
+				800080008000 = st
 			}
 			next = S[(-23,9,0)/2] -- the start TCB of the next route segment (pointing forward)
 		}
@@ -208,7 +247,8 @@ routes = {
 		}
 		name = "<the route name>"
 		ars = { <ARS rule definition table> }
-		use_rscache = false -- if true, instead of "locks", the track section's rs_cache will be used to set locks
+		use_rscache = false -- if true, the track section's rs_cache will be used to set locks in addition to the locks table
+							-- this is disabled for legacy routes, but enabled for all new routes by default
 		-- Fields used by the autorouter:
 		ar_end_sigd = <sigd> -- the sigd describing the end of the route. Used for merging route options on recalculation
 	}
@@ -218,10 +258,12 @@ Track section
 [id] = {
 	name = "Some human-readable name"
 	tc_breaks = { <signal specifier>,... } -- Bounding TC's (signal specifiers)
-	rs_cache = { [<x>] = { [<y>] = { [<encoded pos>] = "state" } } }
+	rs_cache = { [startTcbPosEnc] = { [endTcbPosEnc] = { [componentPosEnc] = "state" } } }
 	-- Saves the turnout states that need to be locked when a route is set from tcb#x to tcb#y
-	-- e.g. 1 = { 2 = { "800080008000" = "st" } }
+	-- e.g. "800080008005" = { "800080007EEA" = { "800080008000" = "st" } }
+	--       start TCB           end TCB             switch pos
 	-- Recalculated on every change via update_rs_cache
+	-- Note that the tcb side number is not saved because it is unnecessary
 	
 	route = {
 		origin = <signal>,  -- route origin
@@ -281,17 +323,24 @@ function ildb.get_all_ts()
 	return track_sections
 end
 
+function tsrepair_notify(notify_pname, ...)
+	if notify_pname then
+		minetest.chat_send_player(notify_pname, advtrains.print_concat_table({"TS Check:",...}))
+	end
+end
+
 -- Checks the consistency of the track section at the given position, attempts to autorepair track sections if they are inconsistent
 -- There are 2 operation modes:
 --		1: pos is NOT a TCB, tcb_connid MUST be nil
 -- 		2: pos is a TCB, tcb_connid MUST be given
 -- @param pos: the position to start from
--- @param tcb_connid: If provided node is a TCB, 
+-- @param tcb_connid: If provided node is a TCB, the direction in which to search
+-- @param notify_pname: the player to notify about reparations
 -- Returns:
 -- ts_id - the track section that was found
 -- nil - No track section exists
-function ildb.check_and_repair_ts_at_pos(pos, tcb_connid)
-	atdebug("check_and_repair_ts_at_pos", pos, tcb_connid)
+function ildb.check_and_repair_ts_at_pos(pos, tcb_connid, notify_pname)
+	--atdebug("check_and_repair_ts_at_pos", pos, tcb_connid)
 	-- check prereqs
 	if ildb.get_tcb(pos) then
 		if not tcb_connid then error("check_and_repair_ts_at_pos: Startpoint is TCB, must provide tcb_connid!") end
@@ -315,15 +364,17 @@ function ildb.check_and_repair_ts_at_pos(pos, tcb_connid)
 			-- these must be the same as the first
 			if ts_id ~= tcbs_ts_id then
 				-- inconsistency is found, repair it
-				atdebug("check_and_repair_ts_at_pos: Inconsistency is found!")
-				return ildb.repair_ts_merge_all(all_tcbs)
+				--atdebug("check_and_repair_ts_at_pos: Inconsistency is found!")
+				tsrepair_notify(notify_pname, "Track section inconsistent here, repairing...")
+				return ildb.repair_ts_merge_all(all_tcbs, false, notify_pname)
 				-- Step2 check is no longer necessary since we just created that new section
 			end
 		end
 	end
 	-- only one found (it is either nil or a ts id)
-	atdebug("check_and_repair_ts_at_pos: TS consistent id=",ts_id,"")
+	--atdebug("check_and_repair_ts_at_pos: TS consistent id=",ts_id,"")
 	if not ts_id then
+		tsrepair_notify(notify_pname, "No track section found here.")
 		return
 		-- All TCBs agreed that there is no section here.
 	end
@@ -338,9 +389,11 @@ function ildb.check_and_repair_ts_at_pos(pos, tcb_connid)
 	-- ildb.tcbs_ensure_ts_ref_exists(sigd) has already make sure that all tcbs are found in the ts's tc_breaks list
 	-- That means it is sufficient to compare the LENGTHS of both lists, if one is longer then it is inconsistent
 	if #ts.tc_breaks ~= #all_tcbs then
-		atdebug("check_and_repair_ts_at_pos: Partition is found!")
-		return ildb.repair_ts_merge_all(all_tcbs)
+		--atdebug("check_and_repair_ts_at_pos: Partition is found!")
+		tsrepair_notify(notify_pname, "Track section partition found, repairing...")
+		return ildb.repair_ts_merge_all(all_tcbs, false, notify_pname)
 	end
+	tsrepair_notify(notify_pname, "Found section", ts.name or ts_id, "here.")
 	return ts_id
 end
 
@@ -367,7 +420,7 @@ end
 -- Returns: a list of sigd's describing the TCBs found (sigd's point inward):
 -- 		{p=<pos>, s=<side>, tcbs=<ref to tcbs table>}
 function ildb.get_all_tcbs_adjacent(inipos, inidir, per_track_callback)
-	atdebug("get_all_tcbs_adjacent: inipos",inipos,"inidir",inidir,"")
+	--atdebug("get_all_tcbs_adjacent: inipos",inipos,"inidir",inidir,"")
 	local found_sigd = {}
 	local ti = advtrains.get_track_iterator(inipos, inidir, TS_MAX_SCAN, true)
 	-- if initial start is TCBS and has xlink, need to add that to the TI
@@ -377,7 +430,7 @@ function ildb.get_all_tcbs_adjacent(inipos, inidir, per_track_callback)
 		ildb.validate_tcb_xlink(inisi, true)
 		if initcbs.xlink then
 			-- adding the tcb will happen when this branch is retrieved again using ti:next_branch()
-			atdebug("get_all_tcbs_adjacent: Putting xlink Branch for initial node",initcbs.xlink)
+			--atdebug("get_all_tcbs_adjacent: Putting xlink Branch for initial node",initcbs.xlink)
 			ti:add_branch(initcbs.xlink.p, initcbs.xlink.s)
 		end
 	end
@@ -400,17 +453,17 @@ function ildb.get_all_tcbs_adjacent(inipos, inidir, per_track_callback)
 					-- A branch cannot be a TCB, as that would imply that it was a turnout/crossing (illegal)
 					-- UNLESS: (a) it is the start point or (b) it was added via xlink
 					-- Then the correct conn to use is connid (pointing forward)
-					atdebug("get_all_tcbs_adjacent: Inserting TCB at branch start",pos, connid)
+					--atdebug("get_all_tcbs_adjacent: Inserting TCB at branch start",pos, connid)
 					using_connid = connid
 				end
 				-- add the sigd of this tcb and a reference to the tcb table in it
-				atdebug("get_all_tcbs_adjacent: Found TCB: ",pos, using_connid, "ts=", tcb[using_connid].ts_id)
+				--atdebug("get_all_tcbs_adjacent: Found TCB: ",pos, using_connid, "ts=", tcb[using_connid].ts_id)
 				local si = {p=pos, s=using_connid, tcbs=tcb[using_connid]}
 				-- if xlink exists, add it now (only if we are not in branch start)
 				ildb.validate_tcb_xlink(si, true)
 				if not is_branch_start and si.tcbs.xlink then
 					-- adding the tcb will happen when this branch is retrieved again using ti:next_branch()
-					atdebug("get_all_tcbs_adjacent: Putting xlink Branch",si.tcbs.xlink)
+					--atdebug("get_all_tcbs_adjacent: Putting xlink Branch",si.tcbs.xlink)
 					ti:add_branch(si.tcbs.xlink.p, si.tcbs.xlink.s)
 				end
 				insert_sigd_if_not_present(found_sigd, si)
@@ -429,8 +482,8 @@ end
 -- Called by frontend functions when multiple tcbs's that logically belong to one section have been determined to have different sections
 -- Parameter is the output of ildb.get_all_tcbs_adjacent(pos)
 -- Returns the ID of the track section that results after the merge
-function ildb.repair_ts_merge_all(all_tcbs, force_create)
-	atdebug("repair_ts_merge_all: Instructed to merge sections of following TCBs:")
+function ildb.repair_ts_merge_all(all_tcbs, force_create, notify_pname)
+	--atdebug("repair_ts_merge_all: Instructed to merge sections of following TCBs:")
 	-- The first loop does the following for each TCBS:
 	-- a) Store the TS ID in the set of TS to update
 	-- b) Set the TS ID to nil, so that the TCBS gets removed from the section
@@ -439,7 +492,7 @@ function ildb.repair_ts_merge_all(all_tcbs, force_create)
 	local any_ts = false
 	for _,sigd in ipairs(all_tcbs) do
 		local ts_id = sigd.tcbs.ts_id
-		atdebug(sigd, "ts=", ts_id)
+		--atdebug(sigd, "ts=", ts_id)
 		if ts_id then
 			local ts = track_sections[ts_id]
 			if ts then
@@ -455,7 +508,7 @@ function ildb.repair_ts_merge_all(all_tcbs, force_create)
 	end
 	if not any_ts and not force_create then
 		-- nothing to do at all, just no interlocking. Why were we even called
-		atdebug("repair_ts_merge_all: No track section present, will not create a new one")
+		--atdebug("repair_ts_merge_all: No track section present, will not create a new one")
 		return nil
 	end
 	-- Purge every TS in turn. TS's that are now empty will be deleted. TS's that still have TCBs will be kept
@@ -464,6 +517,7 @@ function ildb.repair_ts_merge_all(all_tcbs, force_create)
 	end
 	-- Create a new fresh track section with all the TCBs we have in our collection
 	local new_ts_id, new_ts = ildb.create_ts_from_tcb_list(all_tcbs)
+	tsrepair_notify(notify_pname, "Created track section",new_ts_id,"from TCBs:", all_tcbs)
 	return new_ts_id
 end
 
@@ -487,20 +541,20 @@ function ildb.purge_ts_tcb_refs(ts_id)
 				i = i+1
 			else
 				-- this one is to be purged
-				atdebug("purge_ts_tcb_refs(",ts_id,"): purging",sigd,"(backreference = ",tcbs.ts_id,")")
+				--atdebug("purge_ts_tcb_refs(",ts_id,"): purging",sigd,"(backreference = ",tcbs.ts_id,")")
 				table.remove(ts.tc_breaks, i)
 				has_changed = true
 			end
 		else
 			-- if not tcbs: was anyway an orphan, remove it
-			atdebug("purge_ts_tcb_refs(",ts_id,"): purging",sigd,"(referred nonexisting TCB)")
+			--atdebug("purge_ts_tcb_refs(",ts_id,"): purging",sigd,"(referred nonexisting TCB)")
 			table.remove(ts.tc_breaks, i)
 			has_changed = true
 		end
 	end
 	if #ts.tc_breaks == 0 then
 		-- remove the section completely
-		atdebug("purge_ts_tcb_refs(",ts_id,"): after purging, the section is empty, is being deleted")
+		--atdebug("purge_ts_tcb_refs(",ts_id,"): after purging, the section is empty, is being deleted")
 		track_sections[ts_id] = nil
 		return nil
 	else
@@ -520,14 +574,14 @@ function ildb.tcbs_ensure_ts_ref_exists(sigd)
 	if not tcbs or not tcbs.ts_id then return end
 	local ts = ildb.get_ts(tcbs.ts_id)
 	if not ts then
-		atdebug("tcbs_ensure_ts_ref_exists(",sigd,"): TS does not exist, setting to nil")
+		--atdebug("tcbs_ensure_ts_ref_exists(",sigd,"): TS does not exist, setting to nil")
 		-- TS is deleted, clear own ts id
 		tcbs.ts_id = nil
 		return
 	end
 	local did_insert = insert_sigd_if_not_present(ts.tc_breaks, {p=sigd.p, s=sigd.s})
 	if did_insert then
-		atdebug("tcbs_ensure_ts_ref_exists(",sigd,"): TCBS was missing reference in TS",tcbs.ts_id)
+		--atdebug("tcbs_ensure_ts_ref_exists(",sigd,"): TCBS was missing reference in TS",tcbs.ts_id)
 		ildb.update_rs_cache(tcbs.ts_id)
 	end
 end
@@ -538,7 +592,7 @@ function ildb.create_ts_from_tcb_list(sigd_list)
 	while track_sections[id] do
 		id = advtrains.random_id(8)
 	end
-	atdebug("create_ts_from_tcb_list: sigd_list=",sigd_list, "new ID will be ",id)
+	--atdebug("create_ts_from_tcb_list: sigd_list=",sigd_list, "new ID will be ",id)
 
 	local tcbr = {}
 	-- makes a copy of the sigd list, for use in repair mechanisms where sigd may contain a tcbs field which we dont want
@@ -585,23 +639,23 @@ function ildb.get_possible_out_connids(node_name, in_connid)
 	local nt = node_from_to_state_cache[node_name]
 	if not nt[in_connid] then
 		local ta = {}
-		atdebug("Node From/To State Cache: Caching for ",node_name,"connid",in_connid)
+		--atdebug("Node From/To State Cache: Caching for ",node_name,"connid",in_connid)
 		local ndef = minetest.registered_nodes[node_name]
 		if ndef.advtrains.node_state_map then
 			for state, tnode in pairs(ndef.advtrains.node_state_map) do
 				local tndef = minetest.registered_nodes[tnode]
 				-- verify that the conns table is identical - this is purely to catch setup errors!
 				if not tndef.at_conns or not tndef.at_conn_map then
-					atdebug("ndef:",ndef,", tndef:",tndef)
-					error("In AT setup for node "..tnode..": Node set as state "..state.." of "..node_name.." in state_map, but is missing at_conns/at_conn/map!")
+					--atdebug("ndef:",ndef,", tndef:",tndef)
+					error("In AT setup for node "..tnode..": Node set as state "..state.." of "..node_name.." in state_map, but is missing at_conns/at_conn_map!")
 				end
 				if #ndef.at_conns ~= #tndef.at_conns then
-					atdebug("ndef:",ndef,", tndef:",tndef)
+					--atdebug("ndef:",ndef,", tndef:",tndef)
 					error("In AT setup for node "..tnode..": Conns table does not match that of "..node_name.." (of which this is state "..state..")")
 				end
 				for connid=1,#ndef.at_conns do
 					if ndef.at_conns[connid].c ~= tndef.at_conns[connid].c then
-						atdebug("ndef:",ndef,", tndef:",tndef)
+						--atdebug("ndef:",ndef,", tndef:",tndef)
 						error("In AT setup for node "..tnode..": Conns table does not match that of "..node_name.." (of which this is state "..state..")")
 					end
 				end
@@ -610,13 +664,13 @@ function ildb.get_possible_out_connids(node_name, in_connid)
 				if ta[target_connid] then
 					-- Select the variant for which the other way would back-connect. This way, turnouts will switch to the appropriate branch if the train joins
 					local have_back_conn = (tndef.at_conn_map[target_connid])==in_connid
-					atdebug("Found second state mapping",in_connid,"-",target_connid,"have_back_conn=",have_back_conn)
+					--atdebug("Found second state mapping",in_connid,"-",target_connid,"have_back_conn=",have_back_conn)
 					if have_back_conn then
-						atdebug("Overwriting",in_connid,"-",target_connid,"=",state)
+						--atdebug("Overwriting",in_connid,"-",target_connid,"=",state)
 						ta[target_connid] = state
 					end
 				else
-					atdebug("Setting",in_connid,"-",target_connid,"=",state)
+					--atdebug("Setting",in_connid,"-",target_connid,"=",state)
 					ta[target_connid] = state
 				end
 			end
@@ -629,26 +683,27 @@ function ildb.get_possible_out_connids(node_name, in_connid)
 end
 
 local function recursively_find_routes(s_pos, s_connid, locks_found, result_table, scan_limit)
-	atdebug("Recursively restarting at ",s_pos, s_connid, "limit left", scan_limit)
+	--atdebug("Recursively restarting at ",s_pos, s_connid, "limit left", scan_limit)
 	local ti = advtrains.get_track_iterator(s_pos, s_connid, scan_limit, false)
 	local pos, connid, bconnid = ti:next_branch()
 	pos, connid, bconnid = ti:next_track()-- step once to get ahead of previous turnout
+	local last_pos
 	repeat
 		local node = advtrains.ndb.get_node_or_nil(pos)
-		atdebug("Walk ",pos, "nodename", node.name, "entering at conn",bconnid)
+		--atdebug("Walk ",pos, "nodename", node.name, "entering at conn",bconnid)
 		local ndef = minetest.registered_nodes[node.name]
 		if ndef.advtrains and ndef.advtrains.node_state_map then
 			-- Stop, this is a switchable node. Find out which conns we can go at
-			atdebug("Found turnout ",pos, "nodename", node.name, "entering at conn",bconnid)
+			--atdebug("Found turnout ",pos, "nodename", node.name, "entering at conn",bconnid)
 			local pts = advtrains.encode_pos(pos)
 			if locks_found[pts] then
 				-- we've been here before. Stop
-				atdebug("Was already seen! returning")
+				--atdebug("Was already seen! returning")
 				return
 			end
 			local out_conns = ildb.get_possible_out_connids(node.name, bconnid)
 			for oconnid, state in pairs(out_conns) do
-				atdebug("Going in direction",oconnid,"state",state)
+				--atdebug("Going in direction",oconnid,"state",state)
 				locks_found[pts] = state
 				recursively_find_routes(pos, oconnid, locks_found, result_table, ti.limit)
 				locks_found[pts] = nil
@@ -656,21 +711,23 @@ local function recursively_find_routes(s_pos, s_connid, locks_found, result_tabl
 			return
 		end
 		--otherwise, this might be a tcb
-		local tcbs = ildb.get_tcbs({p=pos, s=bconnid})
-		if tcbs then
+		local tcb = ildb.get_tcb(pos)
+		if tcb then
 			-- we found a tcb, store the current locks in the result_table
-			local table_key = advtrains.encode_pos(pos).."_"..bconnid
-			atdebug("Found end TCB", table_key,", returning")
-			if result_table[table_key] then
+			local end_pkey = advtrains.encode_pos(pos)
+			--atdebug("Found end TCB", pos, end_pkey,", returning")
+			if result_table[end_pkey] then
 				atwarn("While caching track section routing, found multiple route paths within same track section. Only first one found will be used")
 			else
-				result_table[table_key] = table.copy(locks_found)
+				result_table[end_pkey] = table.copy(locks_found)
 			end
 			return
 		end
 		-- Go forward
+		last_pos = pos
 		pos, connid, bconnid = ti:next_track()
 	until not pos -- this stops the loop when either the track end is reached or the limit is hit
+	--atdebug("recursively_find_routes: Reached track end or limit at", last_pos, ". This path is not saved, returning")
 end
 
 -- Updates the turnout cache of the given track section
@@ -680,25 +737,33 @@ function ildb.update_rs_cache(ts_id)
 		error("Update TS Cache called with nonexisting ts_id "..(ts_id or "nil"))
 	end
 	local rscache = {}
-	atdebug("== Running update_rs_cache for ",ts_id) 
+	--atdebug("== Running update_rs_cache for ",ts_id) 
 	-- start on every of the TS's TCBs, walk the track forward and store locks along the way
 	for start_tcbi, start_tcbs in ipairs(ts.tc_breaks) do
-		rscache[start_tcbi] = {}
-		atdebug("Starting for ",start_tcbi, start_tcbs)
+		start_pkey = advtrains.encode_pos(start_tcbs.p)
+		rscache[start_pkey] = {}
+		--atdebug("Starting for ",start_tcbi, start_tcbs)
 		local locks_found = {}
 		local result_table = {}
 		recursively_find_routes(start_tcbs.p, start_tcbs.s, locks_found, result_table, TS_MAX_SCAN)
 		-- now result_table contains found route locks. Match them with the other TCBs we have in this section
 		for end_tcbi, end_tcbs in ipairs(ts.tc_breaks) do
-			local table_key = advtrains.encode_pos(end_tcbs.p).."_"..end_tcbs.s
-			if result_table[table_key] then
-				atdebug("Set RSCache entry",start_tcbi.."-"..end_tcbi,"=",result_table[table_key])
-				rscache[start_tcbi][end_tcbi] = result_table[table_key]
+			if end_tcbi ~= start_tcbi then
+				end_pkey = advtrains.encode_pos(end_tcbs.p)
+				if result_table[end_pkey] then
+					--atdebug("Set RSCache entry",end_pkey.."-"..end_pkey,"=",result_table[end_pkey])
+					rscache[start_pkey][end_pkey] = result_table[end_pkey]
+					result_table[end_pkey] = nil
+				end
 			end
+		end
+		-- warn about superfluous entry
+		for sup_end_pkey, sup_entry in pairs(result_table) do
+			--atwarn("In update_rs_cache for section",ts_id,"found superfluous endpoint",sup_end_pkey,"->",sup_entry)
 		end
 	end
 	ts.rs_cache = rscache
-	atdebug("== Done update_rs_cache for ",ts_id, "result:",rscache) 
+	--atdebug("== Done update_rs_cache for ",ts_id, "result:",rscache) 
 end
 
 
@@ -711,21 +776,21 @@ end
 
 -- Create a new TCB at the position and update/repair the adjoining sections
 function ildb.create_tcb_at(pos)
-	atdebug("create_tcb_at",pos)
+	--atdebug("create_tcb_at",pos)
 	local pts = advtrains.encode_pos(pos)
 	track_circuit_breaks[pts] = {[1] = {}, [2] = {}}
 	local all_tcbs_1 = ildb.get_all_tcbs_adjacent(pos, 1)
-	atdebug("TCBs on A side",all_tcbs_1)
+	--atdebug("TCBs on A side",all_tcbs_1)
 	local all_tcbs_2 = ildb.get_all_tcbs_adjacent(pos, 2)
-	atdebug("TCBs on B side",all_tcbs_2)
+	--atdebug("TCBs on B side",all_tcbs_2)
 	-- perform TS repair
-	ildb.repair_ts_merge_all(all_tcbs_1)
-	ildb.repair_ts_merge_all(all_tcbs_2)
+	ildb.repair_ts_merge_all(all_tcbs_1, false)
+	ildb.repair_ts_merge_all(all_tcbs_2, false)
 end
 
--- Create a new TCB at the position and update/repair the now joined section
+-- Remove TCB at the position and update/repair the now joined section
 function ildb.remove_tcb_at(pos)
-	atdebug("remove_tcb_at",pos)
+	--atdebug("remove_tcb_at",pos)
 	local pts = advtrains.encode_pos(pos)
 	local old_tcb = track_circuit_breaks[pts]
 	track_circuit_breaks[pts] = nil
@@ -745,7 +810,7 @@ function ildb.remove_tcb_at(pos)
 	end
 	advtrains.interlocking.remove_tcb_marker(pos)
 	-- If needed, merge the track sections here
-	ildb.check_and_repair_ts_at_pos(pos)
+	ildb.check_and_repair_ts_at_pos(pos, nil)
 	return true
 end
 
@@ -758,7 +823,7 @@ function ildb.validate_tcb_xlink(sigd, suppress_repairs)
 	if not osigd then return end
 	local otcbs = ildb.get_tcbs(tcbs.xlink)
 	if not otcbs then
-		atdebug("validate_tcb_xlink",sigd,": Link partner ",osigd,"orphaned")
+		--atdebug("validate_tcb_xlink",sigd,": Link partner ",osigd,"orphaned")
 		tcbs.xlink = nil
 		if not suppress_repairs then
 			ildb.check_and_repair_ts_at_pos(sigd.p, sigd.s)
@@ -767,16 +832,16 @@ function ildb.validate_tcb_xlink(sigd, suppress_repairs)
 	end
 	if otcbs.xlink then
 		if not vector.equals(otcbs.xlink.p, sigd.p) or otcbs.xlink.s~=sigd.s then
-			atdebug("validate_tcb_xlink",sigd,": Link partner ",osigd,"backreferencing to someone else (namely",otcbs.xlink,") clearing it")
+			--atdebug("validate_tcb_xlink",sigd,": Link partner ",osigd,"backreferencing to someone else (namely",otcbs.xlink,") clearing it")
 			tcbs.xlink = nil
 			if not suppress_repairs then
 				ildb.check_and_repair_ts_at_pos(sigd.p, sigd.s)
-				atdebug("validate_tcb_xlink",sigd,": Link partner ",osigd," was backreferencing to someone else, now updating that")
+				--atdebug("validate_tcb_xlink",sigd,": Link partner ",osigd," was backreferencing to someone else, now updating that")
 				ildb.validate_tcb_xlink(osigd)
 			end
 		end
 	else
-		atdebug("validate_tcb_xlink",sigd,": Link partner ",osigd,"wasn't backreferencing, clearing it")
+		--atdebug("validate_tcb_xlink",sigd,": Link partner ",osigd,"wasn't backreferencing, clearing it")
 		tcbs.xlink = nil
 		if not suppress_repairs then
 			ildb.check_and_repair_ts_at_pos(sigd.p, sigd.s)
@@ -785,19 +850,19 @@ function ildb.validate_tcb_xlink(sigd, suppress_repairs)
 end
 
 function ildb.add_tcb_xlink(sigd1, sigd2)
-	atdebug("add_tcb_xlink",sigd1, sigd2)
+	--("add_tcb_xlink",sigd1, sigd2)
 	local tcbs1 = sigd1.tcbs or ildb.get_tcbs(sigd1)
 	local tcbs2 = sigd2.tcbs or ildb.get_tcbs(sigd2)
 	if vector.equals(sigd1.p, sigd2.p) then
-		atdebug("add_tcb_xlink Cannot xlink with same TCB")
+		--atdebug("add_tcb_xlink Cannot xlink with same TCB")
 		return
 	end
 	if not tcbs1 or not tcbs2 then
-		atdebug("add_tcb_xlink TCBS doesnt exist")
+		--atdebug("add_tcb_xlink TCBS doesnt exist")
 		return
 	end
 	if tcbs1.xlink or tcbs2.xlink then
-		atdebug("add_tcb_xlink One already linked")
+		--atdebug("add_tcb_xlink One already linked")
 		return
 	end
 	-- apply link
@@ -808,7 +873,7 @@ function ildb.add_tcb_xlink(sigd1, sigd2)
 end
 
 function ildb.remove_tcb_xlink(sigd)
-	atdebug("remove_tcb_xlink",sigd)
+	--atdebug("remove_tcb_xlink",sigd)
 	-- Validate first. If Xlink is gone already then, nothing to do
 	ildb.validate_tcb_xlink(sigd)
 	-- Checking all of these already done by validate
@@ -816,7 +881,7 @@ function ildb.remove_tcb_xlink(sigd)
 	local osigd = tcbs.xlink
 	if not osigd then
 		-- validate already cleared us
-		atdebug("remove_tcb_xlink: Already gone by validate")
+		--atdebug("remove_tcb_xlink: Already gone by validate")
 		return
 	end
 	local otcbs = ildb.get_tcbs(tcbs.xlink)
@@ -829,14 +894,14 @@ function ildb.remove_tcb_xlink(sigd)
 end
 
 function ildb.create_ts_from_tcbs(sigd)
-	atdebug("create_ts_from_tcbs",sigd)
+	--atdebug("create_ts_from_tcbs",sigd)
 	local all_tcbs = ildb.get_all_tcbs_adjacent(sigd.p, sigd.s)
 	ildb.repair_ts_merge_all(all_tcbs, true)
 end
 
 -- Remove the given track section, leaving its TCBs with no section assigned
 function ildb.remove_ts(ts_id)
-	atdebug("remove_ts",ts_id)
+	--atdebug("remove_ts",ts_id)
 	local ts = track_sections[ts_id]
 	if not ts then
 		error("remove_ts: "..ts_id.." doesn't exist")
@@ -846,10 +911,10 @@ function ildb.remove_ts(ts_id)
 		local sigd = ts.tc_breaks[i]
 		local tcbs = ildb.get_tcbs(sigd)
 		if tcbs then
-			atdebug("cleared TCB",sigd)
+			--atdebug("cleared TCB",sigd)
 			tcbs.ts_id = nil
 		else
-			atdebug("orphan TCB",sigd)
+			--atdebug("orphan TCB",sigd)
 		end
 		i = i+1
 	end

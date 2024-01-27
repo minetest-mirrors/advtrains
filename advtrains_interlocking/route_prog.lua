@@ -492,6 +492,8 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			local terminal = get_last_route_item(rp.origin, rp.route)
 			rp.route.terminal = terminal
 			rp.route.name = fields.name
+			-- new routes now always use the rscache
+			rp.route.use_rscache = true
 			
 			table.insert(tcbs.routes, rp.route)
 			

@@ -99,10 +99,11 @@ minetest.register_node("advtrains_interlocking:tcb_node", {
 	end,
 	after_dig_node = function(pos, oldnode, oldmetadata, player)
 		if not oldmetadata or not oldmetadata.fields then return end
+		local pname = player:get_player_name()
 		local tcbpts = oldmetadata.fields.tcb_pos
 		if tcbpts and tcbpts ~= "" then
 			local tcbpos = minetest.string_to_pos(tcbpts)
-			ildb.remove_tcb_at(tcbpos)
+			ildb.remove_tcb_at(tcbpos, pname)
 		end
 	end,
 })
@@ -160,7 +161,7 @@ minetest.register_on_punchnode(function(pos, node, player, pointed_thing)
 				if ildb.get_tcb(pos) then
 					minetest.chat_send_player(pname, "Configuring TCB: Already existed at this position, it is now linked to this TCB marker")
 				else
-					ildb.create_tcb_at(pos)
+					ildb.create_tcb_at(pos, pname)
 				end
 
 				local meta = minetest.get_meta(tcbnpos)

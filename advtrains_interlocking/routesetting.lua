@@ -49,7 +49,7 @@ function ilrs.set_route(signal, route, try)
 		c_tcbs = ildb.get_tcbs(c_sigd)
 		if not c_tcbs then
 			if not try then atwarn("Did not find TCBS",c_sigd,"while setting route",rtename,"of",signal) end
-			return false, "No TCB found at "..sigd_to_string(c_sigd)..". Please reconfigure route!"
+			return false, "No TCB found at "..sigd_to_string(c_sigd)..". Please update or reconfigure route!"
 		end
 		c_ts_id = c_tcbs.ts_id
 		if not c_ts_id then
@@ -69,28 +69,49 @@ function ilrs.set_route(signal, route, try)
 			return false, "Section '"..c_ts.name.."' is occupied!", c_ts_id, nil
 		end
 		
-		for pts, state in pairs(c_rseg.locks) do
+		-- collect locks from rs cache and from route def
+		local c_locks = {}
+		if route.use_rscache and c_ts.rs_cache and c_rseg.next then
+			-- rscache needs to be enabled, present and next must be defined
+			start_pkey = advtrains.encode_pos(c_sigd.p)
+			end_pkey = advtrains.encode_pos(c_rseg.next.p)
+			if c_ts.rs_cache[start_pkey] and c_ts.rs_cache[start_pkey][end_pkey] then
+				for lp,lst in pairs(c_ts.rs_cache[start_pkey][end_pkey]) do
+					atdebug("Add lock from RSCache:",lp,"->",lst)
+					c_locks[lp] = lst
+				end
+			elseif not try then
+				atwarn("While setting route",rtename,"of",signal,"segment "..i..",required path from",c_tcbs,"to",c_rseg.next,"was not found in the track section's RS cache. Please check!")
+			end
+		end
+		-- add all from locks, these override the rscache
+		for lpts,lst in pairs(c_rseg.locks) do
+			atdebug("Add lock from Routedef:",lp,"->",lst,"overrides",c_locks[lp] or "none")
+			c_locks[lp] = lst
+		end
+		
+		for lp, state in pairs(c_locks) do
 			local confl = ilrs.has_route_lock(pts, state)
 			
-			local pos = minetest.string_to_pos(pts)
+			local pos = advtrains.decode_pos(lp)
 			if advtrains.is_passive(pos) then
 				local cstate = advtrains.getstate(pos)
 				if cstate ~= state then
-					local confl = ilrs.has_route_lock(pts)
+					local confl = ilrs.has_route_lock(lp)
 					if confl then
-						if not try then atwarn("Encountered route lock while a real run of routesetting routine, at position",pts,"while setting route",rtename,"of",signal) end
-						return false, "Lock conflict at "..pts..", Held locked by:\n"..confl, nil, pts
+						if not try then atwarn("Encountered route lock while a real run of routesetting routine, at position",pos,"while setting route",rtename,"of",signal) end
+						return false, "Lock conflict at "..minetest.pos_to_string(pos)..", Held locked by:\n"..confl, nil, lp
 					elseif not try then
 						advtrains.setstate(pos, state)
 					end
 				end
 				if not try then
-					ilrs.add_route_lock(pts, c_ts_id, "Route '"..rtename.."' from signal '"..signalname.."'", signal)
-					c_lckp[#c_lckp+1] = pts
+					ilrs.add_route_lock(lp, c_ts_id, "Route '"..rtename.."' from signal '"..signalname.."'", signal)
+					c_lckp[#c_lckp+1] = lp
 				end
 			else
 				if not try then atwarn("Encountered route lock misconfiguration (no passive component) while a real run of routesetting routine, at position",pts,"while setting route",rtename,"of",signal) end
-				return false, "No passive component at "..pts..". Please reconfigure route!"
+				return false, "No passive component at "..minetest.pos_to_string(pos)..". Please update track section or reconfigure route!"
 			end
 		end
 		-- reserve ts and write locks
@@ -125,6 +146,8 @@ function ilrs.set_route(signal, route, try)
 	
 	return true
 end
+
+-- Change 2024-01-27: pts is not an encoded pos, not a pos-to-string!
 
 -- Checks whether there is a route lock that prohibits setting the component
 -- to the wanted state. returns string with reasons on conflict
@@ -191,7 +214,7 @@ function ilrs.free_route_locks_indiv(pts, ts, nocallbacks)
 	-- TODO use luaautomation timers?
 	if not nocallbacks then
 		minetest.after(0, ilrs.update_waiting, "lck", pts)
-		minetest.after(0.5, advtrains.set_fallback_state, minetest.string_to_pos(pts))
+		minetest.after(0.5, advtrains.set_fallback_state, advtrains.decode_pos(pts))
 	end
 end
 -- frees all route locks, even manual ones set with the tool, at a specific position
