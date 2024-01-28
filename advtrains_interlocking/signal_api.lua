@@ -19,6 +19,59 @@ advtrains.interlocking.FULL_FREE = {
 	proceed_as_main = true,
 }
 
+--[[
+Implementation plan orwell 2024-01-28:
+Most parts of ywang's implementation are fine, especially I like the formspecs. But I would like to change a few aspects (no pun intended) of this.
+- Signal gets distant assigned via field in signal aspect table (instead of explicitly)
+- Signal speed/shunt are no longer free-text but rather they need to be predefined in the node definition
+To do this: Differentiation between:
+== Aspect Group ==
+This is what a signal is assigned by either the route system or the user.
+It is a string key which has an appropriate entry in the node definition (where it has a description assigned)
+The signal mod defines a function to set a signal to the most appropriate aspect. This function gets
+a) the aspect group name
+b) the distant signal's aspect group name & aspect table
+EVERY signal must define the special aspect group "halt". This must always be the most restrictive aspect possible.
+The "halt" aspect group should ignore any distant info, in most cases it is called without them anyway.
+
+== Aspect ==
+One concrete combination of lights/shapes that a signal signal shows. Handling these is at the discretion of
+the signal mod defining the signal, and they are typically combinations of main aspect and distant aspect
+Example:
+- A Ks signal has the aspect_group="proceed_12" set for a route
+- The signal at the end of the route shows aspect_group="proceed_8", advtrains also passes on that this means {main=8, shunt=false}
+- The ndef.advtrains.apply_aspect(pos, asp_group, dst_aspgrp, dst_aspinfo) determines that the signal should now show
+		blinking green with main indicator 12 and dst indicator 8, and sets the nodes accordingly.
+		This function can now return the Aspect Info table, which will be cached by advtrains until the aspect changes again
+		and will be used when a train approaches the signal. If nil is returned, then the aspect will be queried next time
+		by calling ndef.advtrains.get_aspect_info(pos)
+
+Note that once apply_aspect returns, there is no need for advtrains anymore to query the aspect info.
+When the signal, for any reason, wants to change its aspect by itself *without* going through the signal API then
+it should update the aspect info cache by calling advtrains.interlocking.signal.update_aspect_info(pos)
+
+== Aspect Info ==
+The actual signal aspect in the already-known format. This is what the trains use to determine halt/proceed and speed. In this, the dst field has to be resolved.
+asp = {
+	main = 0 (halt) / -1 (max speed) / false (no info) / <number> (speed limit)
+	shunt = true (shunt free) / false (shunt not free)
+	proceed_as_main = true (shunt move can proceed and become train move when main!=0) / false (no)
+	dst = (like main, informative character, not actually used)
+}
+
+Node definition of signals:
+- The signal needs some logic to figure out, for each combination of its own aspect group and the distant signal's aspect, what aspect info it can/will show.
+ndef.advtrains = {
+	aspect_groups = { [name] = { description = "Proceed at full speed", <more data at discretion of signal>} }
+	apply_aspect = function(pos, asp_group, dst_aspgrp, dst_aspinfo)
+		-- set the node to show the desired aspect
+		-- called by advtrains when this signal's aspect group or the distant signal's aspect changes
+		-- MAY return the aspect_info. If it returns nil then get_aspect_info will be queried at a later point.
+	get_aspect_info(pos)
+		-- Returns the aspect info table (main, shunt, dst etc.)W
+}
+]]
+
 advtrains.interlocking.signal_convert_aspect_if_necessary = advtrains.interlocking.aspect
 
 function advtrains.interlocking.update_signal_aspect(tcbs, skipdst)
