@@ -11,10 +11,9 @@ local function asp_to_zs3type(asp)
 	return math.min(16,4*math.floor(n/4))
 end
 
-local function setzs3(msp, lim, rot)
+local function setzs3(msp, asp, rot)
 	local pos = {x = msp.x, y = msp.y+1, z = msp.z}
 	local node = advtrains.ndb.get_node(pos)
-	local asp = asp_to_zs3type(lim)
 	if node.name:find("^advtrains_signals_ks:zs3_") then
 		advtrains.ndb.swap_node(pos, {name="advtrains_signals_ks:zs3_"..asp.."_"..rot, param2 = node.param2})
 	end
@@ -50,67 +49,106 @@ local function getzs3v(msp)
 end
 
 local setaspectf = function(rot)
- return function(pos, node, asp)
-	setzs3(pos, asp.main, rot)
-	if asp.main == 0 then
-		if asp.shunt then
-			advtrains.ndb.swap_node(pos, {name="advtrains_signals_ks:hs_shunt_"..rot, param2 = node.param2})
-		else
-			advtrains.ndb.swap_node(pos, {name="advtrains_signals_ks:hs_danger_"..rot, param2 = node.param2})
-		end
+ return function(pos, node, main_aspect, dst_aspect, dst_aspect_info)
+	-- set zs3 signal to show speed according to main_aspect
+	setzs3(pos, asp.zs3, rot)
+	-- select appropriate lamps based on mainaspect and dst
+	if main_aspect.shunt then
+		advtrains.ndb.swap_node(pos, {name="advtrains_signals_ks:hs_shunt_"..rot, param2 = node.param2})
+		setzs3v(pos, nil, rot)
+	elseif main_aspect.halt then
+		advtrains.ndb.swap_node(pos, {name="advtrains_signals_ks:hs_danger_"..rot, param2 = node.param2})
 		setzs3v(pos, nil, rot)
 	else
-		if not asp.dst or asp.dst == -1 then
+		if not dst_aspect_info
+				or not dst_aspect_info.main
+				or dst_aspect_info.main == -1 then
 			advtrains.ndb.swap_node(pos, {name="advtrains_signals_ks:hs_free_"..rot, param2 = node.param2})
-		elseif asp.dst == 0 then
+			setzs3v(pos, nil, rot)
+		elseif dst_aspect_info.main == 0 then
 			advtrains.ndb.swap_node(pos, {name="advtrains_signals_ks:hs_slow_"..rot, param2 = node.param2})
+			setzs3v(pos, nil, rot)
 		else
 			advtrains.ndb.swap_node(pos, {name="advtrains_signals_ks:hs_nextslow_"..rot, param2 = node.param2})
+			setzs3v(pos, dst_aspect_info.main, rot)
 		end
-		setzs3v(pos, asp.dst, rot)
 	end
  end
 end
 
-
-local suppasp = {
-		main = {0, 4, 6, 8, 12, 16, -1},
-		dst = {0, 4, 6, 8, 12, 16, -1, false},
-		shunt = nil,
-		proceed_as_main = true,
-		info = {
-			call_on = false,
-			dead_end = false,
-			w_speed = nil,
-		}
+-- Main aspects main signal
+-- These aspects tell only the speed signalization at this signal.
+-- Actual signal aspect is chosen based on this and the Dst signal.
+local mainaspects_main = {
+	{
+		name = "proceed"
+		description = "Proceed",
+		zs3 = "off"
+	},
+	{
+		name = "shunt"
+		description = "Shunt",
+		zs3 = "off",
+		shunt = true,
+	},
+	{
+		name = "proceed_16"
+		description = "Proceed (speed 16)",
+		zs3 = "16",
+	},
+	{
+		name = "proceed_12"
+		description = "Proceed (speed 12)",
+		zs3 = "12",
+	},
+	{
+		name = "proceed_8"
+		description = "Proceed (speed 8)",
+		zs3 = "8",
+	},
+	{
+		name = "proceed_6"
+		description = "Proceed (speed 6)",
+		zs3 = "6",
+	},
+	{
+		name = "proceed_4"
+		description = "Proceed (speed 4)",
+		zs3 = "4",
+	},
+	{
+		name = "halt"
+		description = "Halt",
+		zs3 = "off",
+		halt = true,
+	},
 }
 
 --Rangiersignal
-local setaspectf_ra = function(rot)
- return function(pos, node, asp)
-	if asp.shunt then
+local applyaspectf_ra = function(rot)
+ -- we get here the full main_aspect table
+ return function(pos, node, main_aspect, dst_aspect, dst_aspect_info)
+	if main_aspect.shunt then
 		advtrains.ndb.swap_node(pos, {name="advtrains_signals_ks:ra_shuntd_"..rot, param2 = node.param2})
 	else
 		advtrains.ndb.swap_node(pos, {name="advtrains_signals_ks:ra_danger_"..rot, param2 = node.param2})
 	end
-	local meta = minetest.get_meta(pos)
-	if meta then
-		meta:set_string("infotext", minetest.serialize(asp))
-	end
  end
 end
 
-local suppasp_ra = {
-		main = { false },
-		dst = { false },
-		shunt = nil,
-		proceed_as_main = false,
-		
-		info = {
-			call_on = false,
-			dead_end = false,
-			w_speed = nil,
-		}
+-- Main aspects shunt signal
+-- Shunt signals have only two states, distant doesn't matter
+local mainaspects_shunt = {
+	{
+		name = "shunt"
+		description = "Shunt",
+		shunt = true,
+	},
+	{
+		name = "halt"
+		description = "Halt",
+		halt = true,
+	},
 }
 
 advtrains.trackplacer.register_tracktype("advtrains_signals_ks:hs")
@@ -192,9 +230,9 @@ for _, rtab in ipairs({
 			drop = "advtrains_signals_ks:hs_danger_0",
 			inventory_image = "advtrains_signals_ks_hs_inv.png",
 			advtrains = {
-				set_aspect = setaspectf(rot),
-				supported_aspects = suppasp,
-				get_aspect = afunc,
+				main_aspects = mainaspects_main
+				apply_aspect = applyaspectf_main(rot),
+				get_aspect_info = afunc,
 			},
 			on_rightclick = advtrains.interlocking.signal_rc_handler,
 			can_dig = advtrains.interlocking.signal_can_dig,
@@ -235,11 +273,9 @@ for _, rtab in ipairs({
 			drop = "advtrains_signals_ks:ra_danger_0",
 			inventory_image = "advtrains_signals_ks_ra_inv.png",
 			advtrains = {
-				set_aspect = setaspectf_ra(rot),
-				supported_aspects = suppasp_ra,
-				get_aspect = function(pos, node)
-					return prts.asp
-				end,
+				main_aspects = mainaspects_ra,
+				apply_aspect = applyaspectf_ra(rot),
+				get_aspect_info = prts.asp,
 			},
 			on_rightclick = advtrains.interlocking.signal_rc_handler,
 			can_dig = advtrains.interlocking.signal_can_dig,
@@ -276,7 +312,7 @@ for _, rtab in ipairs({
 			drop = "advtrains_signals_ks:"..prefix.."_"..dtyp.."_0",
 			inventory_image = inv,
 			advtrains = {
-				get_aspect = function() return asp end
+				get_aspect_info = asp
 			},
 			on_rightclick = advtrains.interlocking.signal_rc_handler,
 			can_dig = advtrains.interlocking.signal_can_dig,

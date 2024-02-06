@@ -12,7 +12,7 @@ end
 
 local modpath = minetest.get_modpath(minetest.get_current_modname()) .. DIR_DELIM
 
-advtrains.interlocking.aspect = dofile(modpath.."aspect.lua")
+--advtrains.interlocking.aspect = dofile(modpath.."aspect.lua")
 
 dofile(modpath.."database.lua")
 dofile(modpath.."distant.lua")

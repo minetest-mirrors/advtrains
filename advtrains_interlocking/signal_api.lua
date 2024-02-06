@@ -2,18 +2,19 @@
 
 local F = advtrains.formspec
 
-local DANGER = {
+local signal = {}
+
+signal.MASP_HALT = {
+	name = "halt"
+	halt = true,
+}
+
+signal.ASPI_HALT = {
 	main = 0,
 	shunt = false,
 }
-advtrains.interlocking.DANGER = DANGER
 
-advtrains.interlocking.GENERIC_FREE = {
-	main = -1,
-	shunt = false,
-	dst = false,
-}
-advtrains.interlocking.FULL_FREE = {
+signal.ASPI_FREE = {
 	main = -1,
 	shunt = false,
 	proceed_as_main = true,
@@ -25,14 +26,12 @@ Most parts of ywang's implementation are fine, especially I like the formspecs. 
 - Signal gets distant assigned via field in signal aspect table (instead of explicitly)
 - Signal speed/shunt are no longer free-text but rather they need to be predefined in the node definition
 To do this: Differentiation between:
-== Aspect Group ==
+== Main Aspect ==
 This is what a signal is assigned by either the route system or the user.
 It is a string key which has an appropriate entry in the node definition (where it has a description assigned)
 The signal mod defines a function to set a signal to the most appropriate aspect. This function gets
-a) the aspect group name
+a) the main aspect table (straight from node def)
 b) the distant signal's aspect group name & aspect table
-EVERY signal must define the special aspect group "halt". This must always be the most restrictive aspect possible.
-The "halt" aspect group should ignore any distant info, in most cases it is called without them anyway.
 
 == Aspect ==
 One concrete combination of lights/shapes that a signal signal shows. Handling these is at the discretion of
@@ -50,6 +49,11 @@ Note that once apply_aspect returns, there is no need for advtrains anymore to q
 When the signal, for any reason, wants to change its aspect by itself *without* going through the signal API then
 it should update the aspect info cache by calling advtrains.interlocking.signal.update_aspect_info(pos)
 
+Note that the apply_aspect function MUST accept the following main aspect, even if it is not defined in the main_aspects table:
+{ name = "halt", halt = true }
+It should cause the signal to show its most restrictive aspect. Typically it is a halt aspect, but e.g. for distant-only
+signals this would be "expect stop".
+
 == Aspect Info ==
 The actual signal aspect in the already-known format. This is what the trains use to determine halt/proceed and speed. In this, the dst field has to be resolved.
 asp = {
@@ -62,7 +66,10 @@ asp = {
 Node definition of signals:
 - The signal needs some logic to figure out, for each combination of its own aspect group and the distant signal's aspect, what aspect info it can/will show.
 ndef.advtrains = {
-	aspect_groups = { [name] = { description = "Proceed at full speed", <more data at discretion of signal>} }
+	main_aspects = {
+		{ name = "proceed" description = "Proceed at full speed", <more data at discretion of signal>}
+		{ name = "proceed2" description = "Proceed at full speed", <more data at discretion of signal>}
+	} -- The numerical order determines the layout of the list in the selection dialog.
 	apply_aspect = function(pos, asp_group, dst_aspgrp, dst_aspinfo)
 		-- set the node to show the desired aspect
 		-- called by advtrains when this signal's aspect group or the distant signal's aspect changes
@@ -72,28 +79,61 @@ ndef.advtrains = {
 }
 ]]
 
-advtrains.interlocking.signal_convert_aspect_if_necessary = advtrains.interlocking.aspect
+-- Set a signal's aspect.
+-- Signal aspects should only be set through this function. It takes care of:
+-- - Storing the main aspect and dst pos for this signal permanently (until next change)
+-- - Assigning the distant signal for this signal
+-- - Calling apply_aspect() in the signal's node definition to make the signal show the aspect
+-- - Calling apply_aspect() again whenever the distant signal changes its aspect
+-- - Notifying this signal's distant signals about changes to this signal (unless skip_dst_notify is specified)
+function signal.set_aspect(pos, main_aspect, dst_pos, skip_dst_notify)
+	-- TODO
+end
 
-function advtrains.interlocking.update_signal_aspect(tcbs, skipdst)
+-- Gets the stored main aspect and distant signal position for this signal
+-- This information equals the information last passed to set_aspect
+-- It does not take into consideration the actual speed signalling, please use
+-- get_aspect_info() for this
+-- returns: main_aspect, dst_pos
+function signal.get_aspect(pos)
+	--TODO
+end
+
+function signal.get_distant_signals_of(pos)
+	--TODO
+end
+
+-- Called when either this signal has changed its main aspect
+-- or when this distant signal's currently assigned main signal has changed its aspect
+-- It retrieves the signal's main aspect and aspect info and calls apply_aspect of the node definition
+-- to update the signal's appearance and aspect info
+-- pts: The signal position to update as encoded_pos
+function signal.reapply_aspect(pts, p_mainaspect)
+	--TODO
+end
+
+-- Update this signal's aspect based on the set route
+-- 
+function signal.update_route_aspect(tcbs, skip_dst_notify)
 	if tcbs.signal then
-		local asp = tcbs.aspect or DANGER
-		advtrains.interlocking.signal_set_aspect(tcbs.signal, asp, skipdst)
+		local asp = tcbs.aspect or signal.MASP_HALT
+		signal.set_aspect(tcbs.signal, asp, skip_dst_notify)
 	end
 end
 
-function advtrains.interlocking.signal_can_dig(pos)
+function signal.can_dig(pos)
 	return not advtrains.interlocking.db.get_sigd_for_signal(pos)
 end
 
 function advtrains.interlocking.signal_after_dig(pos)
 	-- clear influence point
-
 	advtrains.interlocking.signal_clear_aspect(pos)
-	advtrains.distant.unassign_all(pos, true)
+	advtrains.distant.unassign_all(pos, true) -- TODO
 end
 
--- should be called when aspect has changed on this signal.
-function advtrains.interlocking.signal_on_aspect_changed(pos)
+-- Update waiting trains and distant signals about a changed signal aspect
+function signal.notify_on_aspect_changed(pos, skip_dst_notify)
+	--TODO update distant?
 	local ipts, iconn = advtrains.interlocking.db.get_ip_by_signalpos(pos)
 	if not ipts then return end
 	local ipos = minetest.string_to_pos(ipts)
@@ -103,7 +143,7 @@ function advtrains.interlocking.signal_on_aspect_changed(pos)
 	minetest.after(0, advtrains.invalidate_all_paths, ipos)
 end
 
-function advtrains.interlocking.signal_rc_handler(pos, node, player, itemstack, pointed_thing)
+function signal.on_rightclick(pos, node, player, itemstack, pointed_thing)
 	local pname = player:get_player_name()
 	local control = player:get_player_control()
 	if control.aux1 then
@@ -122,7 +162,7 @@ function advtrains.interlocking.show_signal_form(pos, node, pname)
 		if ndef.advtrains and ndef.advtrains.set_aspect then
 			-- permit to set aspect manually
 			local function callback(pname, aspect)
-				advtrains.interlocking.signal_set_aspect(pos, aspect)
+				signal.set_aspect(pos, aspect)
 			end
 			local isasp = advtrains.interlocking.signal_get_aspect(pos, node)
 
@@ -136,18 +176,6 @@ function advtrains.interlocking.show_signal_form(pos, node, pname)
 			advtrains.interlocking.show_ip_form(pos, pname)
 		end
 	end
-end
-
--- Returns the aspect the signal at pos is supposed to show
-function advtrains.interlocking.signal_get_supposed_aspect(pos)
-	local sigd = advtrains.interlocking.db.get_sigd_for_signal(pos)
-	if sigd then
-		local tcbs = advtrains.interlocking.db.get_tcbs(sigd)
-		if tcbs.aspect then
-			return convert_aspect_if_necessary(tcbs.aspect)
-		end
-	end
-	return DANGER;
 end
 
 local players_assign_ip = {}
@@ -236,7 +264,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 end)
 
 -- inits the signal IP assignment process
-function advtrains.interlocking.signal_init_ip_assign(pos, pname)
+function signal.init_ip_assign(pos, pname)
 	if not minetest.check_player_privs(pname, "interlocking") then
 		minetest.chat_send_player(pname, "Insufficient privileges to use this!")
 		return
@@ -281,3 +309,6 @@ minetest.register_on_punchnode(function(pos, node, player, pointed_thing)
 		players_assign_ip[pname] = nil
 	end
 end)
+
+
+advtrains.interlocking.signal = signal
