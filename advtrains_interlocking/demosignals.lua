@@ -41,6 +41,7 @@ minetest.register_node("advtrains_interlocking:ds_danger", {
 		advtrains_signal = 2,
 		save_in_at_nodedb = 1,
 	},
+	is_ground_content = false,
 	advtrains = {
 		set_aspect = setaspect,
 		supported_aspects = suppasp,
@@ -60,6 +61,7 @@ minetest.register_node("advtrains_interlocking:ds_free", {
 		advtrains_signal = 2,
 		save_in_at_nodedb = 1,
 	},
+	is_ground_content = false,
 	advtrains = {
 		set_aspect = setaspect,
 		supported_aspects = suppasp,
@@ -81,6 +83,7 @@ minetest.register_node("advtrains_interlocking:ds_slow", {
 		advtrains_signal = 2,
 		save_in_at_nodedb = 1,
 	},
+	is_ground_content = false,
 	advtrains = {
 		set_aspect = setaspect,
 		supported_aspects = suppasp,

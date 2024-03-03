@@ -27,6 +27,7 @@ minetest.register_node("advtrains_signals_ks:mast", {
 		not_blocking_trains=1,
 		--save_in_at_nodedb=2,
 	},
+	is_ground_content = false,
 	after_place_node = place_degrotate,
 })
 
@@ -48,6 +49,7 @@ minetest.register_node("advtrains_signals_ks:head_main", {
 		not_blocking_trains=1,
 		--save_in_at_nodedb=2,
 	},
+	is_ground_content = false,
 	after_place_node = place_degrotate,
 })
 
@@ -69,6 +71,7 @@ minetest.register_node("advtrains_signals_ks:zs_top", {
 		not_blocking_trains=1,
 		--save_in_at_nodedb=2,
 	},
+	is_ground_content = false,
 	after_place_node = place_degrotate,
 })
 
@@ -90,5 +93,6 @@ minetest.register_node("advtrains_signals_ks:zs_bottom", {
 		not_blocking_trains=1,
 		--save_in_at_nodedb=2,
 	},
+	is_ground_content = false,
 	after_place_node = place_degrotate,
 })

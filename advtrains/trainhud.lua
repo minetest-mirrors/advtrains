@@ -178,22 +178,22 @@ Value	Disp	Control	Meaning
 function advtrains.hud_train_format(train, flip)
 	if not train then return "","" end
 	local sformat = string.format -- this appears to be faster than (...):format
-	
+
 	local max = train.max_speed or 10
 	local res = train.speed_restriction
 	local vel = advtrains.abs_ceil(train.velocity)
 	local vel_kmh=advtrains.abs_ceil(advtrains.ms_to_kmh(train.velocity))
-	
+
 	local tlev=train.lever or 1
 	if train.velocity==0 and not train.active_control then tlev=1 end
 	if train.hud_lzb_effect_tmr then
 		tlev=1
 	end
-	
+
 	local ht = {"[combine:440x110:0,0=(advtrains_hud_bg.png^[resize\\:440x110)"}
 	local st = {}
 	if train.debug then st = {train.debug} end
-	
+
 	-- seven-segment display
 	local function sevenseg(digit, x, y, w, h, m)
 		--[[
@@ -231,7 +231,7 @@ function advtrains.hud_train_format(train, flip)
 			end
 		end
 	end
-	
+
 	-- lever
 	ht[#ht+1] = "275,10=(advtrains_hud_bg.png^[colorize\\:cyan^[resize\\:5x18)"
 	ht[#ht+1] = "275,28=(advtrains_hud_bg.png^[colorize\\:white^[resize\\:5x18)"
@@ -288,7 +288,7 @@ function advtrains.hud_train_format(train, flip)
 				ht[#ht+1] = sformat("130,10=(advtrains_hud_bg.png^[resize\\:30x5^[colorize\\:%s)",c)
 				ht[#ht+1] = sformat("130,35=(advtrains_hud_bg.png^[resize\\:30x5^[colorize\\:%s)",c)
 				if spd and spd~=0 then
-					ht[#ht+1] = sformat("%d,50=(advtrains_hud_arrow.png^[multiply\\:red^[makealpha\\:#000000)", 1+spd*11) 
+					ht[#ht+1] = sformat("%d,50=(advtrains_hud_arrow.png^[multiply\\:red^[makealpha\\:#000000)", 1+spd*11)
 				end
 				local floor = math.floor
 				local dist = floor(((oc[i].index or train.index)-train.index))
@@ -300,15 +300,15 @@ function advtrains.hud_train_format(train, flip)
 			end
 		end
 	end
-	
+
 	if res and res == 0 then
 		st[#st+1] = attrans("OVERRUN RED SIGNAL! Examine situation and reverse train to move again.")
 	end
-	
+
 	if train.atc_command then
 			st[#st+1] = sformat("ATC: %s%s", train.atc_delay and advtrains.abs_ceil(train.atc_delay).."s " or "", train.atc_command or "")
 	end
-	
+
 	return table.concat(st,"\n"), table.concat(ht,":")
 end
 
@@ -321,6 +321,7 @@ local _, texture = advtrains.hud_train_format { -- dummy train object to demonst
 minetest.register_node("advtrains:hud_demo",{
 	description = "Train HUD demonstration",
 	tiles = {texture},
+	is_ground_content = false,
 	groups = {cracky = 3, not_in_creative_inventory = 1}
 })
 
