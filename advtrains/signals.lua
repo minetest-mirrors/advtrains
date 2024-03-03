@@ -46,7 +46,7 @@ for r,f in pairs({on={as="off", ls="green", als="red"}, off={as="on", ls="red", 
 	for rotid, rotation in ipairs({"", "_30", "_45", "_60"}) do
 		local crea=1
 		if rotid==1 and r=="off" then crea=0 end
-		
+
 		minetest.register_node("advtrains:retrosignal_"..r..rotation, {
 			drawtype = "mesh",
 			paramtype="light",
@@ -69,6 +69,7 @@ for r,f in pairs({on={as="off", ls="green", als="red"}, off={as="on", ls="red", 
 				save_in_at_nodedb=1,
 				advtrains_signal = 2,
 			},
+			is_ground_content = false,
 			mesecons = {effector = {
 				rules=advtrains.meseconrules,
 				["action_"..f.as] = function (pos, node)
@@ -110,7 +111,7 @@ for r,f in pairs({on={as="off", ls="green", als="red"}, off={as="on", ls="red", 
 			after_dig_node = after_dig_func,
 		})
 		advtrains.trackplacer.add_worked("advtrains:retrosignal", r, rotation, nil)
-		
+
 		minetest.register_node("advtrains:signal_"..r..rotation, {
 			drawtype = "mesh",
 			paramtype="light",
@@ -132,6 +133,7 @@ for r,f in pairs({on={as="off", ls="green", als="red"}, off={as="on", ls="red", 
 				save_in_at_nodedb=1,
 				advtrains_signal = 2,
 			},
+			is_ground_content = false,
 			light_source = 1,
 			sunlight_propagates=true,
 			mesecons = {effector = {
@@ -182,10 +184,10 @@ for r,f in pairs({on={as="off", ls="green", als="red"}, off={as="on", ls="red", 
 		})
 		advtrains.trackplacer.add_worked("advtrains:signal", r, rotation, nil)
 	end
-	
+
 	local crea=1
 	if r=="off" then crea=0 end
-	
+
 	--tunnel signals. no rotations.
 	for loc, sbox in pairs({l={-1/2, -1/2, -1/4, 0, 1/2, 1/4}, r={0, -1/2, -1/4, 1/2, 1/2, 1/4}, t={-1/2, 0, -1/4, 1/2, 1/2, 1/4}}) do
 		minetest.register_node("advtrains:signal_wall_"..loc.."_"..r, {
@@ -208,6 +210,7 @@ for r,f in pairs({on={as="off", ls="green", als="red"}, off={as="on", ls="red", 
 				save_in_at_nodedb=1,
 				advtrains_signal = 2,
 			},
+			is_ground_content = false,
 			light_source = 1,
 			sunlight_propagates=true,
 			mesecons = {effector = {
@@ -280,6 +283,7 @@ minetest.register_node("advtrains:across_off", {
 		save_in_at_nodedb=1,
 		not_in_creative_inventory=nil,
 	},
+	is_ground_content = false,
 	light_source = 1,
 	sunlight_propagates=true,
 	mesecons = {effector = {
@@ -321,6 +325,7 @@ minetest.register_node("advtrains:across_on", {
 		save_in_at_nodedb=1,
 		not_in_creative_inventory=1,
 	},
+	is_ground_content = false,
 	light_source = 1,
 	sunlight_propagates=true,
 	mesecons = {effector = {

@@ -105,7 +105,7 @@ local suppasp_ra = {
 		dst = { false },
 		shunt = nil,
 		proceed_as_main = false,
-		
+
 		info = {
 			call_on = false,
 			dead_end = false,
@@ -172,11 +172,11 @@ for _, rtab in ipairs({
 			drawtype = "mesh",
 			mesh = "advtrains_signals_ks_main_smr"..rot..".obj",
 			tiles = {"advtrains_signals_ks_mast.png", "advtrains_signals_ks_head.png", "advtrains_signals_ks_head.png", tile},
-			
+
 			paramtype="light",
 			sunlight_propagates=true,
 			light_source = 4,
-			
+
 			paramtype2 = "facedir",
 			selection_box = {
 				type = "fixed",
@@ -189,6 +189,7 @@ for _, rtab in ipairs({
 				save_in_at_nodedb = 1,
 				not_in_creative_inventory = (rtab.ici and prts.ici) and 0 or 1,
 			},
+			is_ground_content = false,
 			drop = "advtrains_signals_ks:hs_danger_0",
 			inventory_image = "advtrains_signals_ks_hs_inv.png",
 			advtrains = {
@@ -203,8 +204,8 @@ for _, rtab in ipairs({
 		-- rotatable by trackworker
 		advtrains.trackplacer.add_worked("advtrains_signals_ks:hs", typ, "_"..rot)
 	end
-	
-	
+
+
 	--Rangiersignale:
 	for typ, prts in pairs({
 			danger = {asp = { main = false, shunt = false }, n = "shuntd", ici=true},
@@ -215,11 +216,11 @@ for _, rtab in ipairs({
 			drawtype = "mesh",
 			mesh = "advtrains_signals_ks_sht_smr"..rot..".obj",
 			tiles = {"advtrains_signals_ks_mast.png", "advtrains_signals_ks_head.png", "advtrains_signals_ks_head.png", "advtrains_signals_ks_ltm_"..typ..".png"},
-			
+
 			paramtype="light",
 			sunlight_propagates=true,
 			light_source = 4,
-			
+
 			paramtype2 = "facedir",
 			selection_box = {
 				type = "fixed",
@@ -232,6 +233,7 @@ for _, rtab in ipairs({
 				save_in_at_nodedb = 1,
 				not_in_creative_inventory = (rtab.ici and prts.ici) and 0 or 1,
 			},
+			is_ground_content = false,
 			drop = "advtrains_signals_ks:ra_danger_0",
 			inventory_image = "advtrains_signals_ks_ra_inv.png",
 			advtrains = {
@@ -256,11 +258,11 @@ for _, rtab in ipairs({
 			drawtype = "mesh",
 			mesh = "advtrains_signals_ks_"..mesh.."_smr"..rot..".obj",
 			tiles = {"advtrains_signals_ks_signpost.png", tile2},
-			
+
 			paramtype="light",
 			sunlight_propagates=true,
 			light_source = 4,
-			
+
 			paramtype2 = "facedir",
 			selection_box = {
 				type = "fixed",
@@ -273,6 +275,7 @@ for _, rtab in ipairs({
 				save_in_at_nodedb = 1,
 				not_in_creative_inventory = (rtab.ici and typ == dtyp) and 0 or 1,
 			},
+			is_ground_content = false,
 			drop = "advtrains_signals_ks:"..prefix.."_"..dtyp.."_0",
 			inventory_image = inv,
 			advtrains = {
@@ -297,7 +300,7 @@ for _, rtab in ipairs({
 		end
 		register_sign("sign", typ, prts.n, "Signal Sign", "sign"..mesh, tile2, "hfs", "advtrains_signals_ks_sign_lf7.png", prts.asp)
 	end
-	
+
 	for typ, prts in pairs {
 		-- Speed restrictions:
 		["4"] = {asp = { main = 4, shunt = true }, n = "6"},
@@ -341,7 +344,7 @@ for _, rtab in ipairs({
 		local inv = "advtrains_signals_ks_sign_lf7.png^(advtrains_signals_ks_sign_8.png^[makealpha:255,255,255)"
 		register_sign("sign_lf7", typ, prts.n, "Line speed restriction sign", "sign", tile2, "8", inv, {main = prts.main, shunt = true, type = "line"})
 	end
-	
+
 	-- Geschwindigkeits(vor)anzeiger für Ks-Signale
 	for typ, prts in pairs({
 			["off"] = {n = "4", ici = true},
@@ -368,6 +371,7 @@ for _, rtab in ipairs({
 				save_in_at_nodedb = 1,
 				not_in_creative_inventory = (rtab.ici and prts.ici) and 0 or 1,
 			},
+			is_ground_content = false,
 			after_dig_node = function(pos) advtrains.ndb.update(pos) end
 		}
 
@@ -389,17 +393,17 @@ for _, rtab in ipairs({
 		minetest.register_node("advtrains_signals_ks:zs3v_"..typ.."_"..rot, t)
 		advtrains.trackplacer.add_worked("advtrains_signals_ks:zs3v", typ, "_"..rot)
 	end
-	
+
 	minetest.register_node("advtrains_signals_ks:mast_mast_"..rot, {
 		description = "Ks Mast",
 		drawtype = "mesh",
 		mesh = "advtrains_signals_ks_mast_smr"..rot..".obj",
 		tiles = {"advtrains_signals_ks_mast.png"},
-		
+
 		paramtype="light",
 		sunlight_propagates=true,
 		--light_source = 4,
-		
+
 		paramtype2 = "facedir",
 		selection_box = {
 			type = "fixed",
@@ -410,6 +414,7 @@ for _, rtab in ipairs({
 			not_blocking_trains = 1,
 			not_in_creative_inventory = (rtab.ici) and 0 or 1,
 		},
+		is_ground_content = false,
 		drop = "advtrains_signals_ks:mast_mast_0",
 	})
 	advtrains.trackplacer.add_worked("advtrains_signals_ks:mast","mast", "_"..rot)

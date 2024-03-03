@@ -454,10 +454,10 @@ end
 function advtrains.register_tracks(tracktype, def, preset)
 	advtrains.trackplacer.register_tracktype(def.nodename_prefix, preset.tpdefault)
 	if preset.regtp then
-		advtrains.trackplacer.register_track_placer(def.nodename_prefix, def.texture_prefix, def.description, def)			
+		advtrains.trackplacer.register_track_placer(def.nodename_prefix, def.texture_prefix, def.description, def)
 	end
 	if preset.regsp then
-		advtrains.slope.register_placer(def, preset)			
+		advtrains.slope.register_placer(def, preset)
 	end
 	for suffix, var in pairs(preset.variant) do
 		for rotid, rotation in ipairs(preset.rotation) do
@@ -474,10 +474,10 @@ function advtrains.register_tracks(tracktype, def, preset)
 						type = "fixed",
 						fixed = {-1/2-1/16, -1/2, -1/2, 1/2+1/16, -1/2+2/16, 1/2},
 					},
-					
+
 					mesh = def.shared_model or (def.models_prefix.."_"..img_suffix..def.models_suffix),
 					tiles = {def.shared_texture or (def.texture_prefix.."_"..img_suffix..".png"), def.second_texture},
-					
+
 					groups = {
 						attached_node = advtrains.IGNORE_WORLD and 0 or 1,
 						advtrains_track=1,
@@ -487,7 +487,9 @@ function advtrains.register_tracks(tracktype, def, preset)
 						not_in_creative_inventory=1,
 						not_blocking_trains=1,
 					},
-						
+					
+					is_ground_content = false,
+
 					can_dig = can_dig_callback,
 					after_dig_node=function(pos)
 						advtrains.ndb.update(pos)
@@ -500,19 +502,19 @@ function advtrains.register_tracks(tracktype, def, preset)
 					at_rotation = rotation,
 					at_rail_y = var.rail_y
 				}, def.common or {})
-				
+
 				if preset.regtp then
 					ndef.drop = def.nodename_prefix.."_placer"
 				end
 				if preset.regsp and var.slope then
 					ndef.drop = def.nodename_prefix.."_slopeplacer"
 				end
-				
+
 				--connections
 				ndef.at_conns = advtrains.rotate_conn_by(var.conns, (rotid-1)*preset.regstep)
-				
+
 				local ndef_avt_table
-				
+
 				if var.switchalt and var.switchst then
 					local switchfunc=function(pos, node, newstate)
 						newstate = newstate or var.switchalt -- support for 3 (or more) state switches
@@ -531,7 +533,7 @@ function advtrains.register_tracks(tracktype, def, preset)
 					end
 					if var.switchmc then
 						ndef.mesecons = {effector = {
-							["action_"..var.switchmc] = function(pos, node) 
+							["action_"..var.switchmc] = function(pos, node)
 								advtrains.setstate(pos, nil, node)
 							end,
 							rules=advtrains.meseconrules
@@ -542,13 +544,13 @@ function advtrains.register_tracks(tracktype, def, preset)
 						setstate = switchfunc,
 					}
 				end
-				
+
 				local adef={}
 				if def.get_additional_definiton then
 					adef=def.get_additional_definiton(def, preset, suffix, rotation)
 				end
 				ndef = advtrains.merge_tables(ndef, adef)
-				
+
 				-- insert getstate/setstate functions after merging the additional definitions
 				if ndef_avt_table then
 					ndef.advtrains = advtrains.merge_tables(ndef.advtrains or {}, ndef_avt_table)
@@ -580,7 +582,7 @@ function advtrains.is_track_and_drives_on(nodename, drives_on_p)
 		hasentry=true
 	end
 	if not hasentry then drives_on = advtrains.all_tracktypes end
-	
+
 	if not minetest.registered_nodes[nodename] then
 		return false
 	end
@@ -599,7 +601,7 @@ function advtrains.get_track_connections(name, param2)
 	local noderot=param2
 	if not param2 then noderot=0 end
 	if noderot > 3 then atprint(" get_track_connections: rail has invaild param2 of "..noderot) noderot=0 end
-	
+
 	local tracktype
 	for k,_ in pairs(nodedef.groups) do
 		local tt=string.match(k, "^advtrains_track_(.+)$")
@@ -645,12 +647,12 @@ end
 --(itemstack, placer, pointed_thing)
 function sl.create_slopeplacer_on_place(def, preset)
 	return function(istack, player, pt)
-		if not pt.type=="node" then 
+		if not pt.type=="node" then
 			minetest.chat_send_player(player:get_player_name(), attrans("Can't place: not pointing at node"))
-			return istack 
+			return istack
 		end
 		local pos=pt.above
-		if not pos then 
+		if not pos then
 			minetest.chat_send_player(player:get_player_name(), attrans("Can't place: not pointing at node"))
 			return istack
 		end
@@ -659,14 +661,14 @@ function sl.create_slopeplacer_on_place(def, preset)
 			minetest.chat_send_player(player:get_player_name(), attrans("Can't place: space occupied!"))
 			return istack
 		end
-		if not advtrains.check_track_protection(pos, player:get_player_name()) then 
+		if not advtrains.check_track_protection(pos, player:get_player_name()) then
 			minetest.record_protection_violation(pos, player:get_player_name())
 			return istack
 		end
 		--determine player orientation (only horizontal component)
 		--get_look_horizontal may not be available
 		local yaw=player.get_look_horizontal and player:get_look_horizontal() or (player:get_look_yaw() - math.pi/2)
-		
+
 		--rounding unit vectors is a nice way for selecting 1 of 8 directions since sin(30°) is 0.5.
 		local dirvec={x=math.floor(math.sin(-yaw)+0.5), y=0, z=math.floor(math.cos(-yaw)+0.5)}
 		--translate to direction to look up inside the preset table
@@ -688,13 +690,13 @@ function sl.create_slopeplacer_on_place(def, preset)
 		})[dirvec.x][dirvec.z], dirvec.x~=0 and dirvec.z~=0
 		local lookup=preset.slopeplacer
 		if rot45 then lookup=preset.slopeplacer_45 end
-		
+
 		--go unitvector forward and look how far the next node is
 		local step=1
 		while step<=lookup.max do
 			local node=minetest.get_node(vector.add(pos, dirvec))
 			--next node solid?
-			if not minetest.registered_nodes[node.name] or not minetest.registered_nodes[node.name].buildable_to or advtrains.is_protected(pos, player:get_player_name()) then 
+			if not minetest.registered_nodes[node.name] or not minetest.registered_nodes[node.name].buildable_to or advtrains.is_protected(pos, player:get_player_name()) then
 				--do slopes of this distance exist?
 				if lookup[step] then
 					if minetest.settings:get_bool("creative_mode") or istack:get_count()>=step then

@@ -2,7 +2,7 @@
 
 function advtrains.register_platform(modprefix, preset)
 	local ndef=minetest.registered_nodes[preset]
-	if not ndef then 
+	if not ndef then
 		minetest.log("warning", " register_platform couldn't find preset node "..preset)
 		return
 	end
@@ -16,6 +16,7 @@ function advtrains.register_platform(modprefix, preset)
 		description = attrans("@1 Platform (low)", desc),
 		tiles = {btex.."^advtrains_platform.png", btex, btex, btex, btex, btex},
 		groups = {cracky = 1, not_blocking_trains = 1, platform=1},
+		is_ground_content = false,
 		sounds = ndef.sounds,
 		drawtype = "nodebox",
 		node_box = {
@@ -33,6 +34,7 @@ function advtrains.register_platform(modprefix, preset)
 		description = attrans("@1 Platform (high)", desc),
 		tiles = {btex.."^advtrains_platform.png", btex, btex, btex, btex, btex},
 		groups = {cracky = 1, not_blocking_trains = 1, platform=2},
+		is_ground_content = false,
 		sounds = ndef.sounds,
 		drawtype = "nodebox",
 		node_box = {
@@ -58,6 +60,7 @@ function advtrains.register_platform(modprefix, preset)
 	minetest.register_node(modprefix..":platform_45_"..nodename, {
 		description = attrans("@1 Platform (45 degree)", desc),
 		groups = {cracky = 1, not_blocking_trains = 1, platform=2},
+		is_ground_content = false,
 		sounds = ndef.sounds,
 		drawtype = "mesh",
 		mesh = "advtrains_platform_diag.b3d",
@@ -80,6 +83,7 @@ function advtrains.register_platform(modprefix, preset)
 	minetest.register_node(modprefix..":platform_45_low_"..nodename, {
 		description = attrans("@1 Platform (low, 45 degree)", desc),
 		groups = {cracky = 1, not_blocking_trains = 1, platform=2},
+		is_ground_content = false,
 		sounds = ndef.sounds,
 		drawtype = "mesh",
 		mesh = "advtrains_platform_diag_low.b3d",

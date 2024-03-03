@@ -12,6 +12,7 @@ minetest.register_node("advtrains_luaautomation:oppanel", {
 		cracky = 1,
 		save_in_at_nodedb=1,
 	},
+	is_ground_content = false,
 	after_place_node = atlatc.active.after_place_node,
 	after_dig_node = atlatc.active.after_dig_node,
 	on_receive_fields = atlatc.active.on_receive_fields,
