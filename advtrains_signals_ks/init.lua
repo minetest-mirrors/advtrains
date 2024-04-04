@@ -48,7 +48,7 @@ local function getzs3v(msp)
 	return speed
 end
 
-local setaspectf = function(rot)
+local applyaspectf_main = function(rot)
  return function(pos, node, main_aspect, dst_aspect, dst_aspect_info)
 	-- set zs3 signal to show speed according to main_aspect
 	setzs3(pos, asp.zs3, rot)

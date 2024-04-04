@@ -5,7 +5,8 @@ local F = advtrains.formspec
 local signal = {}
 
 signal.MASP_HALT = {
-	name = "halt"
+	name = "halt",
+	description = "HALT",
 	halt = true,
 }
 
@@ -55,12 +56,12 @@ It should cause the signal to show its most restrictive aspect. Typically it is 
 signals this would be "expect stop".
 
 == Aspect Info ==
-The actual signal aspect in the already-known format. This is what the trains use to determine halt/proceed and speed. In this, the dst field has to be resolved.
+The actual signal aspect in the already-known format. This is what the trains use to determine halt/proceed and speed.
 asp = {
 	main = 0 (halt) / -1 (max speed) / false (no info) / <number> (speed limit)
 	shunt = true (shunt free) / false (shunt not free)
 	proceed_as_main = true (shunt move can proceed and become train move when main!=0) / false (no)
-	dst = (like main, informative character, not actually used)
+	dst = speed of the remote signal (like main, informative character, not actually used)
 }
 
 Node definition of signals:
@@ -68,16 +69,83 @@ Node definition of signals:
 ndef.advtrains = {
 	main_aspects = {
 		{ name = "proceed" description = "Proceed at full speed", <more data at discretion of signal>}
-		{ name = "proceed2" description = "Proceed at full speed", <more data at discretion of signal>}
-	} -- The numerical order determines the layout of the list in the selection dialog.
-	apply_aspect = function(pos, asp_group, dst_aspgrp, dst_aspinfo)
+		{ name = "reduced" description = "Proceed at reduced speed", <more data at discretion of signal>}
+	}
+		-- This list is mainly for the selection dialog. Order of entries determines list order in the dropdown.
+		-- Some fields have special meaning:
+		-- name: A unique key to identify the main aspect. Only this key is saved, but APIs always receive the whole table
+		-- description: Text shown in UI dropdown
+		-- speed: a number. When present, a speed field is shown in the UI next to the dropdown (prefilled with the value).
+		--		When user selects a different speed there, this different speed replaces the value in the table whenever the main_aspect is applied.
+		-- Node can set any other fields at its discretion. They are not touched.
+		-- Note: On first call advtrains automatically inserts into the ndef.advtrains table a main_aspects_lookup hashtable
+		-- Note: Pure distant signals (that cannot show halt) should NOT have a main_aspects table
+	apply_aspect = function(pos, main_aspect, rem_aspect, rem_aspinfo)
 		-- set the node to show the desired aspect
-		-- called by advtrains when this signal's aspect group or the distant signal's aspect changes
+		-- called by advtrains when this signal's aspect group or the remote signal's aspect changes
 		-- MAY return the aspect_info. If it returns nil then get_aspect_info will be queried at a later point.
-	get_aspect_info(pos)
-		-- Returns the aspect info table (main, shunt, dst etc.)W
+	get_aspect_info(pos, main_aspect)
+		-- Returns the aspect info table (main, shunt, dst etc.)
+	distant_support = true or false
+		-- If true, signal is considered in distant signalling. If false or nil, rem_aspect and rem_aspinfo are never set.
+	route_role = one of "main", "shunt", "distant", "distant_repeater", "end"
+		-- Determines how the signal behaves when routes are set. Only in effect when signal is assigned to a TCB.
+		-- main: The signal is a possible endpoint for a train move route. Distant signals before it refer to it.
+		-- shunt: The signal is a possible endpoint for a shunt move route. Ignored for distant signals.
+		-- distant, distant_repeater: When route is set, signal is always assigned its first main aspect. The next signal with role="main" is set as the remote signal. (currently no further distinction)
+		-- end: like main, but signifies that it marks an end of track and trains cannot continue further. (currently no practical implications above main)
 }
+
+== Nomenclature ==
+The distant/main relation is named as follows:
+     V    M
+=====>====>
+Main signal (main) always refers to the signal that is in focus right now (even if that is a distant-only signal)
+From the standpoint of M, V is the distant (dst) signal. M does not need to concern itself with V's aspect but needs to notify V when it changes
+From the standpoint of V, M is the remote (rem) signal. V needs to show an aspect that matches its remote signal M
+
+== Criteria for which signals are eligible for routes ==
+
+All signals must define:
+- get_aspect_info()
+
+Signals that can be assigned to a TCB must satisfy:
+- apply_aspect() defined
+
+Signals that are possible start and end points for a route must satisfy:
+- main_aspects defined (note, pure distant signals should therefore not define main_aspects)
+
 ]]
+
+-- Database
+-- Signal Aspect store
+-- Stores for each signal the main aspect and other info, like the assigned remote signal
+-- [signal encodePos] = { main_aspect = "proceed", [speed = 12], [remote = encodedPos] }
+signal.aspects = {}
+
+-- Distant signal notification. Records for each signal the distant signals that refer to it
+-- Note: this mapping is weak. Needs always backreference check.
+-- [signal encodePos] = { [distant signal encodePos] = true }
+signal.distant_refs = {}
+
+function signal.load(data)
+	signal.aspects = data.aspects or {}
+	-- rebuild distant_refs after load
+	signal.distant_refs = {}
+	for main, aspt in pairs(signal.aspects) do
+		if aspt.remote then
+			if not signal.distant_refs[aspt.remote] then
+				signal.distant_refs[aspt.remote] = {}
+			end
+			signal.distant_refs[aspt.remote][main] = true
+		end
+	end
+end
+
+function signal.save(data)
+	data.aspects = signal.aspects
+end
+
 
 -- Set a signal's aspect.
 -- Signal aspects should only be set through this function. It takes care of:
@@ -86,30 +154,184 @@ ndef.advtrains = {
 -- - Calling apply_aspect() in the signal's node definition to make the signal show the aspect
 -- - Calling apply_aspect() again whenever the distant signal changes its aspect
 -- - Notifying this signal's distant signals about changes to this signal (unless skip_dst_notify is specified)
-function signal.set_aspect(pos, main_aspect, dst_pos, skip_dst_notify)
-	-- TODO
+function signal.set_aspect(pos, main_asp_name, main_asp_speed, rem_pos, skip_dst_notify)
+	local main_pts = advtrains.encode_pos(pos)
+	local old_tbl = signal.aspects[main_pts]
+	local old_remote = old_tbl and old_tbl.remote
+	local new_remote = rem_pos and advtrains.encode_pos(rem_pos)
+	
+	-- if remote has changed, unregister from old remote
+	if old_remote and old_remote~=new_remote and signal.distant_refs[old_remote] then
+		signal.distant_refs[old_remote][main_pts] = nil
+	end
+		
+	signal.aspects[main_pts] = { main_aspect = main_asp_name, speed = main_asp_speed, remote = new_remote }
+	-- apply aspect on main signal, this also checks new_remote
+	signal.reapply_aspect(main_pts)	
+	
+	-- notify my distants about this change (with limit 2)
+	if not skip_dst_notify then
+		signal.notify_distants_of(main_pts, 2)
+	end
+end
+
+function signal.clear_aspect(pos, skip_dst_notify)
+	local main_pts = advtrains.encode_pos(pos)
+	local old_tbl = signal.aspects[main_pts]
+	local old_remote = old_tbl and old_tbl.remote
+	
+	-- unregister from old remote
+	if old_remote then
+		signal.distant_refs[old_remote][main_pts] = nil
+	end
+		
+	signal.aspects[main_pts] = nil
+	-- apply aspect on main signal, this also checks new_remote
+	signal.reapply_aspect(main_pts)	
+	
+	-- notify my distants about this change (with limit 2)
+	if not skip_dst_notify then
+		signal.notify_distants_of(main_pts, 2)
+	end
+end
+
+-- Notify distant signals of main_pts of a change in the aspect of this signal
+-- 
+function signal.notify_distants_of(main_pts, limit)
+	if limit <= 0 then
+		return
+	end
+	local dstrefs = signal.distant_refs[main_pts]
+	if dstrefs then
+		for dst,_ in pairs(dstrefs) do
+			-- ensure that the backref is still valid
+			local dst_asp = signal.aspects[dst]
+			if dst_asp and dst_asp.remote == main_pts then
+				signal.reapply_aspect(dst)
+				signal.notify_distants_of(dst, limit - 1)
+			else
+				atwarn("Distant signal backref is not purged: main =",main_pts,", distant =",dst,", remote =",dst_asp.remote,"")
+			end
+		end
+	end
+end
+
+function signal.notify_trains(pos)
+	local ipts, iconn = advtrains.interlocking.db.get_ip_by_signalpos(pos)
+	if not ipts then return end
+	local ipos = minetest.string_to_pos(ipts)
+
+	-- FIXME: invalidate_all_paths_ahead does not appear to always work as expected
+	--advtrains.invalidate_all_paths_ahead(ipos)
+	minetest.after(0, advtrains.invalidate_all_paths, ipos)
+end
+
+-- Update waiting trains and distant signals about a changed signal aspect
+-- Must be called when a signal's aspect changes through some other means
+-- and not via the signal mechanism
+function signal.notify_on_aspect_changed(pos, skip_dst_notify)
+	signal.notify_trains(pos)
+	if not skip_dst_notify then
+		signal.notify_distants_of(advtrains.encode_pos(pos), 2)
+	end
 end
 
 -- Gets the stored main aspect and distant signal position for this signal
 -- This information equals the information last passed to set_aspect
 -- It does not take into consideration the actual speed signalling, please use
 -- get_aspect_info() for this
+-- pos: the position of the signal
 -- returns: main_aspect, dst_pos
 function signal.get_aspect(pos)
-	--TODO
+	local aspt = signal.aspects[advtrains.encode_pos(pos)]
+	local ma,dp = signal.get_aspect_internal(pos, aspt)
+	return ma, advtrains.decode_pos(dp)
 end
 
-function signal.get_distant_signals_of(pos)
-	--TODO
+local function cache_mainaspects(ndefat)
+	ndefat.main_aspects_lookup = {
+		-- always define halt aspect
+		halt = signal.MASP_HALT
+	}
+	for _,ma in ipairs(ndefat.main_aspects) then
+		ndefat.main_aspects_lookup[ma.name] = ma
+	end
 end
+
+function signal.get_aspect_internal(pos, aspt)
+	if not aspt then
+		-- oh, no main aspect, nevermind
+		return nil, aspt.remote, nil
+	end
+	-- look aspect in nodedef
+	local node = advtrains.ndb.get_node_or_nil(pos)
+	local ndef = node and minetest.registered_nodes[node.name]
+	local ndefat = ndef and ndef.advtrains
+	-- only if signal defines main aspect and its set in aspt
+	if ndefat and ndefat.main_aspects and aspt.main_aspect then
+		if not ndefat.main_aspects_lookup then
+			cache_mainaspects(ndefat)
+		end
+		local masp = ndefat.main_aspects_lookup[aspt.name]
+		-- if speed, then apply speed
+		if masp.speed and aspt.speed then
+			masp = table.copy(masp)
+			masp.speed = aspt.speed
+		end
+		return masp, aspt.remote, ndef
+	end
+	-- invalid node or no main aspect, return nil for masp
+	return nil, aspt.remote, ndef
+end
+
+-- For the signal at pos, get the "aspect info" table. This contains the speed signalling information at this location
+function signal.get_aspect_info(pos)
+	-- get aspect internal
+	local aspt = signal.aspects[advtrains.encode_pos(pos)]
+	local masp, remote, ndef = signal.get_aspect_internal(pos, aspt)
+	-- call into ndef
+	if ndef.advtrains and ndef.advtrains.get_aspect_info then
+		return ndef.advtrains.get_aspect_info(pos, masp)
+	end
+end
+
 
 -- Called when either this signal has changed its main aspect
 -- or when this distant signal's currently assigned main signal has changed its aspect
 -- It retrieves the signal's main aspect and aspect info and calls apply_aspect of the node definition
 -- to update the signal's appearance and aspect info
 -- pts: The signal position to update as encoded_pos
-function signal.reapply_aspect(pts, p_mainaspect)
-	--TODO
+-- returns: the return value of the nodedef call which may be aspect_info
+function signal.reapply_aspect(pts)
+	-- get aspt
+	local aspt = signal.aspects[pts]
+	if not aspt then
+		return -- oop, nothing to do
+	end
+	-- resolve mainaspect table by name
+	local pos = advtrains.decode_pos(pts)
+	-- note: masp may be nil, when aspt.main_aspect was nil. Valid case for distant-only signals
+	local masp, remote, ndef = signal.get_aspect_internal(pos, aspt)
+	-- if we have remote, resolve remote
+	local rem_masp, rem_aspi
+	if remote then
+		local rem_aspt = signal.aspects[remote]
+		if rem_aspt and rem_aspt.name then
+			local rem_pos = advtrains.decode_pos(remote)
+			rem_masp, _, rem_ndef = signal.get_aspect_internal(rem_pos, rem_aspt)
+			if rem_masp then
+				if rem_ndef.advtrains and rem_ndef.advtrains.get_aspect_info then
+					rem_aspi = rem_ndef.advtrains.get_aspect_info(pos, rem_masp)
+				end
+			end
+		end
+	end
+	-- call into ndef
+	if ndef.advtrains and ndef.advtrains.apply_aspect then
+		return ndef.advtrains.apply_aspect(pos, masp, rem_masp, rem_aspi)
+	end
+	-- notify trains
+	signal.notify_trains(pos)
 end
 
 -- Update this signal's aspect based on the set route
@@ -121,26 +343,16 @@ function signal.update_route_aspect(tcbs, skip_dst_notify)
 	end
 end
 
+
+----------------
+
 function signal.can_dig(pos)
 	return not advtrains.interlocking.db.get_sigd_for_signal(pos)
 end
 
 function advtrains.interlocking.signal_after_dig(pos)
-	-- clear influence point
-	advtrains.interlocking.signal_clear_aspect(pos)
-	advtrains.distant.unassign_all(pos, true) -- TODO
-end
-
--- Update waiting trains and distant signals about a changed signal aspect
-function signal.notify_on_aspect_changed(pos, skip_dst_notify)
-	--TODO update distant?
-	local ipts, iconn = advtrains.interlocking.db.get_ip_by_signalpos(pos)
-	if not ipts then return end
-	local ipos = minetest.string_to_pos(ipts)
-
-	-- FIXME: invalidate_all_paths_ahead does not appear to always work as expected
-	--advtrains.invalidate_all_paths_ahead(ipos)
-	minetest.after(0, advtrains.invalidate_all_paths, ipos)
+	-- TODO clear influence point
+	advtrains.interlocking.signal.clear_aspect(pos)
 end
 
 function signal.on_rightclick(pos, node, player, itemstack, pointed_thing)
