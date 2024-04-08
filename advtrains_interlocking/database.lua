@@ -150,6 +150,9 @@ function ildb.load(data)
 		advtrains.interlocking.npr_rails = data.npr_rails
 	end
 	
+	-- let signal_api load data
+	advtrains.interlocking.signal.load(data)
+	
 	--COMPATIBILITY to Signal aspect format
 	-- TODO remove in time...
 	for pts,tcb in pairs(track_circuit_breaks) do
@@ -183,7 +186,7 @@ function ildb.load(data)
 end
 
 function ildb.save()
-	return {
+	local data = {
 		tcbs = track_circuit_breaks,
 		ts=track_sections,
 		signalass = signal_assignments,
@@ -193,6 +196,8 @@ function ildb.save()
 		npr_rails = advtrains.interlocking.npr_rails,
 		tcbpts_conversion_applied = true, -- remark that legacy pos conversion has taken place
 	}
+	advtrains.interlocking.signal.save(data)
+	return data
 end
 
 --

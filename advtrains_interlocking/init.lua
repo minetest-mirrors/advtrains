@@ -1,5 +1,5 @@
--- Advtrains interlocking system
--- See database.lua for a detailed explanation
+--- Advtrains interlocking system.
+-- @module advtrains.interlocking
 
 advtrains.interlocking = {}
 
@@ -12,8 +12,14 @@ end
 
 local modpath = minetest.get_modpath(minetest.get_current_modname()) .. DIR_DELIM
 
+--advtrains.interlocking.aspect = dofile(modpath.."aspect.lua")
+
 dofile(modpath.."database.lua")
+dofile(modpath.."distant.lua")
+dofile(modpath.."distant_ui.lua")
+dofile(modpath.."signal_aspect_accessors.lua")
 dofile(modpath.."signal_api.lua")
+dofile(modpath.."signal_aspect_ui.lua")
 dofile(modpath.."demosignals.lua")
 dofile(modpath.."train_sections.lua")
 dofile(modpath.."route_prog.lua")

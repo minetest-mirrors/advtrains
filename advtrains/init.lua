@@ -24,6 +24,9 @@ minetest.log("action", "[advtrains] Loading...")
 
 -- There is no need to support 0.4.x anymore given that the compatitability with it is already broken by 1bb1d825f46af3562554c12fba35a31b9f7973ff
 attrans = minetest.get_translator ("advtrains")
+function attrans_formspec(...)
+	return minetest.formspec_escape(attrans(...))
+end
 
 --advtrains
 advtrains = {trains={}, player_to_train_mapping={}}
@@ -199,6 +202,7 @@ advtrains.meseconrules =
 advtrains.fpath=minetest.get_worldpath().."/advtrains"
 
 advtrains.speed = dofile(advtrains.modpath.."/speed.lua")
+advtrains.formspec = dofile(advtrains.modpath.."/formspec.lua")
 
 dofile(advtrains.modpath.."/path.lua")
 dofile(advtrains.modpath.."/trainlogic.lua")

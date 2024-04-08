@@ -45,11 +45,16 @@ function ilrs.set_route(signal, route, try)
 	local rtename = route.name
 	local signalname = (ildb.get_tcbs(signal).signal_name or "") .. sigd_to_string(signal)
 	local c_tcbs, c_ts_id, c_ts, c_rseg, c_lckp
+	local signals = {}
+	local nodst
 	while c_sigd and i<=#route do
 		c_tcbs = ildb.get_tcbs(c_sigd)
 		if not c_tcbs then
 			if not try then atwarn("Did not find TCBS",c_sigd,"while setting route",rtename,"of",signal) end
 			return false, "No TCB found at "..sigd_to_string(c_sigd)..". Please update or reconfigure route!"
+		end
+		if i == 1 then
+			nodst = c_tcbs.nodst
 		end
 		c_ts_id = c_tcbs.ts_id
 		if not c_ts_id then
@@ -133,15 +138,36 @@ function ilrs.set_route(signal, route, try)
 			}
 			if c_tcbs.signal then
 				c_tcbs.route_committed = true
-				c_tcbs.aspect = route.aspect or advtrains.interlocking.GENERIC_FREE
+				c_tcbs.aspect = route.aspect or advtrains.interlocking.FULL_FREE
 				c_tcbs.route_origin = signal
-				advtrains.interlocking.update_signal_aspect(c_tcbs)
+				signals[#signals+1] = c_tcbs
 			end
 		end
 		-- advance
 		first = nil
 		c_sigd = c_rseg.next
 		i = i + 1
+	end
+
+	-- Distant signaling
+	local lastsig = nil
+	if c_sigd then
+		local e_tcbs = ildb.get_tcbs(c_sigd)
+		local pos = e_tcbs and e_tcbs.signal
+		if pos then
+			lastsig = pos
+		end
+	end
+	for i = #signals, 1, -1 do
+		if lastsig then
+			local tcbs = signals[i]
+			local pos = tcbs.signal
+			local _, assigned_by = advtrains.distant.get_main(pos)
+			if (not nodst) and (not assigned_by or assigned_by == "routesetting") then
+				advtrains.distant.assign(lastsig, pos, "routesetting", true)
+			end
+			advtrains.interlocking.update_signal_aspect(tcbs, i ~= 1)
+		end
 	end
 	
 	return true
@@ -252,6 +278,13 @@ function ilrs.cancel_route_from(sigd)
 		c_tcbs.route_auto = nil
 		c_tcbs.route_origin = nil
 		
+		if c_tcbs.signal then
+			local pos = c_tcbs.signal
+			local _, assigned_by = advtrains.distant.get_main(pos)
+			if assigned_by == "routesetting" then
+				advtrains.distant.unassign_dst(pos, true)
+			end
+		end
 		advtrains.interlocking.update_signal_aspect(c_tcbs)
 		
 		c_ts_id = c_tcbs.ts_id
@@ -331,7 +364,8 @@ function ilrs.update_route(sigd, tcbs, newrte, cancel)
 			end
 		else
 			--atdebug("Committed Route:",tcbs.routeset)
-			has_changed_aspect = true
+			-- set_route now sets the signal aspects
+			--has_changed_aspect = true
 		end
 	end
 	if has_changed_aspect then
