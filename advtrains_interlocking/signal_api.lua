@@ -80,7 +80,7 @@ ndef.advtrains = {
 		-- Node can set any other fields at its discretion. They are not touched.
 		-- Note: On first call advtrains automatically inserts into the ndef.advtrains table a main_aspects_lookup hashtable
 		-- Note: Pure distant signals (that cannot show halt) should NOT have a main_aspects table
-	apply_aspect = function(pos, main_aspect, rem_aspect, rem_aspinfo)
+	apply_aspect = function(pos, node, main_aspect, rem_aspect, rem_aspinfo)
 		-- set the node to show the desired aspect
 		-- called by advtrains when this signal's aspect group or the remote signal's aspect changes
 		-- MAY return the aspect_info. If it returns nil then get_aspect_info will be queried at a later point.
@@ -120,7 +120,7 @@ Signals that are possible start and end points for a route must satisfy:
 -- Database
 -- Signal Aspect store
 -- Stores for each signal the main aspect and other info, like the assigned remote signal
--- [signal encodePos] = { main_aspect = "proceed", [speed = 12], [remote = encodedPos] }
+-- [signal encodePos] = { name = "proceed", [speed = 12], [remote = encodedPos] }
 signal.aspects = {}
 
 -- Distant signal notification. Records for each signal the distant signals that refer to it
@@ -162,10 +162,11 @@ function signal.set_aspect(pos, main_asp_name, main_asp_speed, rem_pos, skip_dst
 	
 	-- if remote has changed, unregister from old remote
 	if old_remote and old_remote~=new_remote and signal.distant_refs[old_remote] then
+		atdebug("unregister old remote: ",old_remote,"from",main_pts)
 		signal.distant_refs[old_remote][main_pts] = nil
 	end
 		
-	signal.aspects[main_pts] = { main_aspect = main_asp_name, speed = main_asp_speed, remote = new_remote }
+	signal.aspects[main_pts] = { name = main_asp_name, speed = main_asp_speed, remote = new_remote }
 	-- apply aspect on main signal, this also checks new_remote
 	signal.reapply_aspect(main_pts)	
 	
@@ -198,10 +199,12 @@ end
 -- Notify distant signals of main_pts of a change in the aspect of this signal
 -- 
 function signal.notify_distants_of(main_pts, limit)
+	atdebug("notify_distants_of",advtrains.decode_pos(main_pts),"limit",limit)
 	if limit <= 0 then
 		return
 	end
 	local dstrefs = signal.distant_refs[main_pts]
+	atdebug("dstrefs",dstrefs,"")
 	if dstrefs then
 		for dst,_ in pairs(dstrefs) do
 			-- ensure that the backref is still valid
@@ -253,7 +256,7 @@ local function cache_mainaspects(ndefat)
 		-- always define halt aspect
 		halt = signal.MASP_HALT
 	}
-	for _,ma in ipairs(ndefat.main_aspects) then
+	for _,ma in ipairs(ndefat.main_aspects) do
 		ndefat.main_aspects_lookup[ma.name] = ma
 	end
 end
@@ -263,32 +266,37 @@ function signal.get_aspect_internal(pos, aspt)
 		-- oh, no main aspect, nevermind
 		return nil, aspt.remote, nil
 	end
+	atdebug("get_aspect_internal",pos,aspt)
 	-- look aspect in nodedef
 	local node = advtrains.ndb.get_node_or_nil(pos)
 	local ndef = node and minetest.registered_nodes[node.name]
 	local ndefat = ndef and ndef.advtrains
 	-- only if signal defines main aspect and its set in aspt
-	if ndefat and ndefat.main_aspects and aspt.main_aspect then
+	if ndefat and ndefat.main_aspects and aspt.name then
 		if not ndefat.main_aspects_lookup then
 			cache_mainaspects(ndefat)
 		end
 		local masp = ndefat.main_aspects_lookup[aspt.name]
+		if not masp then
+			atwarn(pos,"invalid main aspect",aspt.name,"valid are",ndefat.main_aspects_lookup)
+			return nil, aspt.remote, node, ndef
+		end
 		-- if speed, then apply speed
 		if masp.speed and aspt.speed then
 			masp = table.copy(masp)
 			masp.speed = aspt.speed
 		end
-		return masp, aspt.remote, ndef
+		return masp, aspt.remote, node, ndef
 	end
 	-- invalid node or no main aspect, return nil for masp
-	return nil, aspt.remote, ndef
+	return nil, aspt.remote, node, ndef
 end
 
 -- For the signal at pos, get the "aspect info" table. This contains the speed signalling information at this location
 function signal.get_aspect_info(pos)
 	-- get aspect internal
 	local aspt = signal.aspects[advtrains.encode_pos(pos)]
-	local masp, remote, ndef = signal.get_aspect_internal(pos, aspt)
+	local masp, remote, node, ndef = signal.get_aspect_internal(pos, aspt)
 	-- call into ndef
 	if ndef.advtrains and ndef.advtrains.get_aspect_info then
 		return ndef.advtrains.get_aspect_info(pos, masp)
@@ -305,30 +313,38 @@ end
 function signal.reapply_aspect(pts)
 	-- get aspt
 	local aspt = signal.aspects[pts]
+	atdebug("reapply_aspect",advtrains.decode_pos(pts),"aspt",aspt)
 	if not aspt then
 		return -- oop, nothing to do
 	end
 	-- resolve mainaspect table by name
 	local pos = advtrains.decode_pos(pts)
-	-- note: masp may be nil, when aspt.main_aspect was nil. Valid case for distant-only signals
-	local masp, remote, ndef = signal.get_aspect_internal(pos, aspt)
+	-- note: masp may be nil, when aspt.name was nil. Valid case for distant-only signals
+	local masp, remote, node, ndef = signal.get_aspect_internal(pos, aspt)
 	-- if we have remote, resolve remote
 	local rem_masp, rem_aspi
 	if remote then
+		-- register in remote signal as distant
+		if not signal.distant_refs[remote] then
+			signal.distant_refs[remote] = {}
+		end
+		signal.distant_refs[remote][pts] = true
 		local rem_aspt = signal.aspects[remote]
+		atdebug("resolving remote",advtrains.decode_pos(remote),"aspt",rem_aspt)
 		if rem_aspt and rem_aspt.name then
 			local rem_pos = advtrains.decode_pos(remote)
-			rem_masp, _, rem_ndef = signal.get_aspect_internal(rem_pos, rem_aspt)
+			rem_masp, _, _, rem_ndef = signal.get_aspect_internal(rem_pos, rem_aspt)
 			if rem_masp then
 				if rem_ndef.advtrains and rem_ndef.advtrains.get_aspect_info then
-					rem_aspi = rem_ndef.advtrains.get_aspect_info(pos, rem_masp)
+					rem_aspi = rem_ndef.advtrains.get_aspect_info(rem_pos, rem_masp)
 				end
 			end
 		end
 	end
 	-- call into ndef
+	atdebug("applying to",pos,": main_asp",masp,"rem_masp",rem_masp,"rem_aspi",rem_aspi)
 	if ndef.advtrains and ndef.advtrains.apply_aspect then
-		return ndef.advtrains.apply_aspect(pos, masp, rem_masp, rem_aspi)
+		ndef.advtrains.apply_aspect(pos, node, masp, rem_masp, rem_aspi)
 	end
 	-- notify trains
 	signal.notify_trains(pos)

@@ -275,6 +275,7 @@ minetest.register_node("advtrains_signals_japan:pole_0", {
 	drop = "advtrains_signals_japan:pole_0",
 })
 
+--[[
 advtrains.interlocking.aspect.register_group {
 	name = "advtrains_signals_japan:5a",
 	label = S("Japanese signal"),
@@ -301,7 +302,7 @@ advtrains.interlocking.aspect.register_group {
 		"restrictedspeed",
 		"danger",
 	}
-}
+}]]
 
 local sigdefs = {}
 local lightcolors = {
@@ -316,6 +317,7 @@ local function process_signal(name, sigdata, isrpt)
 	def.textures = tx
 	def.desc = sigdata.desc
 	def.isdst = isrpt
+	def.aspects = sigdata.aspects
 	local lights = sigdata.lights
 	local lightcount = #lights
 	if isrpt then
@@ -359,16 +361,17 @@ for sigtype, sigdata in pairs {
 		desc = "5A",
 		lights = {"yellow", "yellow", "red", "yellow", "green"},
 		aspects = {
-			{name = "clear", lights = {5}, main = -1},
-			{name = "reducedspeed", lights = {2, 5}},
-			{name = "caution", lights = {4}},
-			{name = "restrictedspeed", lights = {1, 4}},
-			{name = "danger", lights = {3}, main = 0},
+			{name = "clear", description = S"Clear (proceed)", lights = {5}, main = -1},
+			{name = "reducedspeed", description = S"Reduced speed", lights = {2, 5}, main = 12},
+			{name = "caution", description = S"Caution", lights = {4}},
+			{name = "restrictedspeed", description = S"Restricted speed", lights = {1, 4}, main = 6},
+			{name = "danger", description = S"Danger (halt)", lights = {3}, main = 0},
 		}
 	}
 } do
 	sigdefs["main_"..sigtype] = process_signal(sigtype, sigdata)
-	sigdefs["rpt_"..sigtype] = process_signal(sigtype, sigdata, true)
+	-- TODO re-enable this once ready
+	--sigdefs["rpt_"..sigtype] = process_signal(sigtype, sigdata, true)
 end
 
 for k in pairs(sigdefs) do
@@ -412,6 +415,24 @@ for _, rtab in ipairs {
 				inventory_image = siginfo.inventory_image,
 				drop = "advtrains_signals_japan:"..sigtype.."_danger_0",
 				advtrains = {
+					main_aspects = siginfo.aspects,
+					apply_aspect = function(pos, node, main_aspect, rem_aspect, rem_aspinfo)
+						local asp_name = main_aspect and main_aspect.name or "danger"
+						-- if this signal is clear and remote signal is restrictive (<= 10) then degrade to caution aspect
+						if not main_aspect or main_aspect.name == "halt" then
+							asp_name = "danger"
+						elseif main_aspect.name == "clear" and rem_aspinfo and rem_aspinfo.main and rem_aspinfo.main >= 0 and rem_aspinfo.main <= 10 then
+							asp_name = "caution"
+						end
+						advtrains.ndb.swap_node(pos, {name="advtrains_signals_japan:"..sigtype.."_"..asp_name.."_"..rot, param2 = node.param2})
+					end,
+					get_aspect_info = function(pos, main_aspect)
+						return {
+							main = main_aspect.main,
+							proceed_as_main = true,
+						}
+					end,
+				--[[
 					supported_aspects = {
 						group = "advtrains_signals_japan:5a",
 						name = siginfo.suppasp_names,
@@ -428,6 +449,7 @@ for _, rtab in ipairs {
 					set_aspect = function(pos, node, asp)
 						advtrains.ndb.swap_node(pos, {name = "advtrains_signals_japan:"..sigtype.."_"..(asp.name).."_"..rot, param2 = node.param2})
 					end,
+				]]
 				},
 				on_rightclick = advtrains.interlocking.signal_rc_handler,
 				can_dig = advtrains.interlocking.signal_can_dig,

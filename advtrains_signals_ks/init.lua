@@ -51,7 +51,7 @@ end
 local applyaspectf_main = function(rot)
  return function(pos, node, main_aspect, dst_aspect, dst_aspect_info)
 	-- set zs3 signal to show speed according to main_aspect
-	setzs3(pos, asp.zs3, rot)
+	setzs3(pos, main_aspect.zs3, rot)
 	-- select appropriate lamps based on mainaspect and dst
 	if main_aspect.shunt then
 		advtrains.ndb.swap_node(pos, {name="advtrains_signals_ks:hs_shunt_"..rot, param2 = node.param2})
@@ -81,43 +81,43 @@ end
 -- Actual signal aspect is chosen based on this and the Dst signal.
 local mainaspects_main = {
 	{
-		name = "proceed"
+		name = "proceed",
 		description = "Proceed",
 		zs3 = "off"
 	},
 	{
-		name = "shunt"
+		name = "shunt",
 		description = "Shunt",
 		zs3 = "off",
 		shunt = true,
 	},
 	{
-		name = "proceed_16"
+		name = "proceed_16",
 		description = "Proceed (speed 16)",
 		zs3 = "16",
 	},
 	{
-		name = "proceed_12"
+		name = "proceed_12",
 		description = "Proceed (speed 12)",
 		zs3 = "12",
 	},
 	{
-		name = "proceed_8"
+		name = "proceed_8",
 		description = "Proceed (speed 8)",
 		zs3 = "8",
 	},
 	{
-		name = "proceed_6"
+		name = "proceed_6",
 		description = "Proceed (speed 6)",
 		zs3 = "6",
 	},
 	{
-		name = "proceed_4"
+		name = "proceed_4",
 		description = "Proceed (speed 4)",
 		zs3 = "4",
 	},
 	{
-		name = "halt"
+		name = "halt",
 		description = "Halt",
 		zs3 = "off",
 		halt = true,
@@ -140,12 +140,12 @@ end
 -- Shunt signals have only two states, distant doesn't matter
 local mainaspects_shunt = {
 	{
-		name = "shunt"
+		name = "shunt",
 		description = "Shunt",
 		shunt = true,
 	},
 	{
-		name = "halt"
+		name = "halt",
 		description = "Halt",
 		halt = true,
 	},
@@ -168,7 +168,7 @@ for _, rtab in ipairs({
 	}) do
 	local rot = rtab.rot
 	for typ, prts in pairs({
-			danger   = {asp = advtrains.interlocking.DANGER, n = "slow", ici=true},
+			danger   = {asp = advtrains.interlocking.signal.ASPI_HALT, n = "slow", ici=true},
 			slow     = {
 				asp = function(pos)
 					return { main = getzs3(pos) or -1, proceed_as_main = true, dst = 0 }
@@ -230,7 +230,7 @@ for _, rtab in ipairs({
 			drop = "advtrains_signals_ks:hs_danger_0",
 			inventory_image = "advtrains_signals_ks_hs_inv.png",
 			advtrains = {
-				main_aspects = mainaspects_main
+				main_aspects = mainaspects_main,
 				apply_aspect = applyaspectf_main(rot),
 				get_aspect_info = afunc,
 			},
