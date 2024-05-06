@@ -188,6 +188,7 @@ local OCC_CLOSE_PROXIMITY = 3
 -- Gets a mapping of train id's to index of trains that have a path item at this position. Selects at most one index based on a given heuristic, or even none if it does not match the heuristic criterion
 -- returns (table with train_id->index), position
 -- "in_train": first index that lies between train index and end index
+-- "train_at_node": first index where the train is standing on that node (like in_train but with +-0.5 added to index)
 -- "first_ahead": smallest index that is > current index
 -- "before_end"(default): smallest index that is > end index
 -- "close_proximity": within 3 indices close to the train index and end_index
@@ -214,6 +215,9 @@ function o.reverse_lookup_sel(pos, heuristic)
 				if heuristic == "in_train" and idx < otrn.index and idx > otrn.end_index then
 					h_value = idx
 				end
+				if heuristic == "train_at_node" and idx < (otrn.index+0.5) and idx > (otrn.end_index-0.5) then
+					h_value = idx
+				end
 				if heuristic == "close_proximity" and idx < (otrn.index + OCC_CLOSE_PROXIMITY) and idx > (otrn.end_index - OCC_CLOSE_PROXIMITY) then
 					h_value = idx
 				end
@@ -228,7 +232,7 @@ end
 -- returns (table with train_id->index)
 function o.get_trains_at(ppos)
 	local pos = advtrains.round_vector_floor_y(ppos)
-	return o.reverse_lookup_sel(pos, "in_train")
+	return o.reverse_lookup_sel(pos, "train_at_node")
 end
 
 advtrains.occ = o
