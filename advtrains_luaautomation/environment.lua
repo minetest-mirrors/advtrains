@@ -224,7 +224,7 @@ if advtrains.interlocking then
 	end
 	static_env.set_aspect = function(signal, asp)
 		local pos = atlatc.pcnaming.resolve_pos(signal)
-		return advtrains.interlocking.signal_set_aspect(pos)
+		return advtrains.interlocking.signal_set_aspect(pos,asp)
 	end
 	
 	--section_occupancy()
