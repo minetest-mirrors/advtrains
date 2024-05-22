@@ -186,7 +186,7 @@ minetest.register_on_punchnode(function(pos, node, player, pointed_thing)
 			local is_signal = minetest.get_item_group(node.name, "advtrains_signal") >= 2
 			if is_signal then
 				local ndef = minetest.registered_nodes[node.name]
-				if ndef and ndef.advtrains and ndef.advtrains.set_aspect then
+				if ndef and ndef.advtrains and ndef.advtrains.apply_aspect then
 					local tcbs = ildb.get_tcbs(sigd)
 					if tcbs then
 						tcbs.signal = pos
@@ -464,7 +464,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		ts.route = nil
 		for _, sigd in ipairs(ts.tc_breaks) do
 			local tcbs = ildb.get_tcbs(sigd)
-			advtrains.interlocking.update_signal_aspect(tcbs)
+			advtrains.interlocking.signal.update_route_aspect(tcbs)
 		end
 		minetest.chat_send_player(pname, "Reset track section "..ts_id.."!")
 	end
@@ -642,7 +642,6 @@ function advtrains.interlocking.show_signalling_form(sigd, pname, sel_rte, calle
 				form = form.."button[0.5,8;2.5,1;newroute;New Route]"
 				form = form.."button[  3,8;2.5,1;unassign;Unassign Signal]"
 				form = form..string.format("checkbox[0.5,8.75;ars;Automatic routesetting;%s]", not tcbs.ars_disabled)
-				form = form..string.format("checkbox[0.5,9.25;dst;Distant signalling;%s]", not tcbs.nodst)
 			end
 		elseif sigd_equal(tcbs.route_origin, sigd) then
 			-- something has gone wrong: tcbs.routeset should have been set...
@@ -660,7 +659,7 @@ function advtrains.interlocking.show_signalling_form(sigd, pname, sel_rte, calle
 	-- always a good idea to update the signal aspect
 	if not called_from_form_update then
 	-- FIX prevent a callback loop
-		advtrains.interlocking.update_signal_aspect(tcbs)
+		advtrains.interlocking.signal.update_route_aspect(tcbs)
 	end
 end
 
@@ -768,10 +767,6 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		
 		if fields.ars then
 			tcbs.ars_disabled = not minetest.is_yes(fields.ars)
-		end
-
-		if fields.dst then
-			tcbs.nodst = not minetest.is_yes(fields.dst)
 		end
 		
 		if fields.auto then

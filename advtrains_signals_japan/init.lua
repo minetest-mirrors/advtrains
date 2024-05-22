@@ -374,10 +374,6 @@ for sigtype, sigdata in pairs {
 	--sigdefs["rpt_"..sigtype] = process_signal(sigtype, sigdata, true)
 end
 
-for k in pairs(sigdefs) do
-	advtrains.trackplacer.register_tracktype("advtrains_signals_japan:"..k)
-end
-
 for _, rtab in ipairs {
 	{rot = "0", ici = true},
 	{rot = "30"},
@@ -455,7 +451,7 @@ for _, rtab in ipairs {
 				can_dig = advtrains.interlocking.signal_can_dig,
 				after_dig_node = advtrains.interlocking.signal_after_dig,
 			})
-			advtrains.trackplacer.add_worked("advtrains_signals_japan:"..sigtype, asp, "_"..rot)
+			--advtrains.trackplacer.add_worked("advtrains_signals_japan:"..sigtype, asp, "_"..rot)
 		end
 	end
 end

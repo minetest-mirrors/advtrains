@@ -15,9 +15,6 @@ local modpath = minetest.get_modpath(minetest.get_current_modname()) .. DIR_DELI
 --advtrains.interlocking.aspect = dofile(modpath.."aspect.lua")
 
 dofile(modpath.."database.lua")
-dofile(modpath.."distant.lua")
-dofile(modpath.."distant_ui.lua")
-dofile(modpath.."signal_aspect_accessors.lua")
 dofile(modpath.."signal_api.lua")
 dofile(modpath.."signal_aspect_ui.lua")
 dofile(modpath.."demosignals.lua")

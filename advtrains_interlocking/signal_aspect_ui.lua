@@ -1,262 +1,188 @@
 local F = advtrains.formspec
-local players_aspsel = {}
 
-local function describe_main_aspect(spv)
-	if spv == 0 then
-		return attrans("Danger (halt)")
-	elseif spv == -1 then
-		return attrans("Continue at maximum speed")
-	elseif not spv then
-		return attrans("Continue with current speed limit")
+function advtrains.interlocking.show_signal_form(pos, node, pname, aux_key)
+	local sigd = advtrains.interlocking.db.get_sigd_for_signal(pos)
+	if sigd and not aux_key then
+		advtrains.interlocking.show_signalling_form(sigd, pname)
 	else
-		return attrans("Continue with the speed limit of @1", tostring(spv))
-	end
-end
-
-local function describe_shunt_aspect(shunt)
-	if shunt then
-		return attrans("Shunting allowed")
-	else
-		return attrans("No shunting")
-	end
-end
-
-local function describe_distant_aspect(spv)
-	if spv == 0 then
-		return attrans("Expect to stop at the next signal")
-	elseif spv == -1 then
-		return attrans("Expect to continue at maximum speed")
-	elseif not spv then
-		return attrans("No distant signal information")
-	else
-		return attrans("Expect to continue with a speed limit of @1", tostring(spv))
-	end
-end
-
-advtrains.interlocking.describe_main_aspect = describe_main_aspect
-advtrains.interlocking.describe_shunt_aspect = describe_shunt_aspect
-advtrains.interlocking.describe_distant_aspect = describe_distant_aspect
-
-local function dsel(p, q, x, y)
-	if p == nil then
-		if q then
-			return x
+		if advtrains.interlocking.signal.get_signal_cap_level(pos) >= 2 then
+			advtrains.interlocking.show_ip_sa_form(pos, pname)
 		else
-			return y
+			advtrains.interlocking.show_ip_form(pos, pname)
 		end
-	elseif p then
-		return x
+	end
+end
+
+local players_assign_ip = {}
+local players_assign_distant = {}
+
+local function ipmarker(ipos, connid)
+	local node_ok, conns, rhe = advtrains.get_rail_info_at(ipos, advtrains.all_tracktypes)
+	if not node_ok then return end
+	local yaw = advtrains.dir_to_angle(conns[connid].c)
+
+	-- using tcbmarker here
+	local obj = minetest.add_entity(vector.add(ipos, {x=0, y=0.2, z=0}), "advtrains_interlocking:tcbmarker")
+	if not obj then return end
+	obj:set_yaw(yaw)
+	obj:set_properties({
+		textures = { "at_il_signal_ip.png" },
+	})
+end
+
+function advtrains.interlocking.make_ip_formspec_component(pos, x, y, w)
+	advtrains.interlocking.db.check_for_duplicate_ip(pos)
+	local pts, connid = advtrains.interlocking.db.get_ip_by_signalpos(pos)
+	if pts then
+		-- display marker
+		local ipos = minetest.string_to_pos(pts)
+		ipmarker(ipos, connid)
+		return table.concat {
+			F.S_label(x, y, "Influence point is set at @1.", string.format("%s/%s", pts, connid)),
+			F.S_button_exit(x, y+0.5, w/2-0.125, "ip_set", "Modify"),
+			F.S_button_exit(x+w/2+0.125, y+0.5, w/2-0.125, "ip_clear", "Clear"),
+		}
 	else
-		return y
+		return table.concat {
+			F.S_label(x, y, "Influence point is not set."),
+			F.S_button_exit(x, y+0.5, w, "ip_set", "Set influence point"),
+		}
 	end
 end
 
-local function describe_supported_aspects(suppasp, isasp)
-	local t = {}
-
-	local entries = {attrans("Use default value")}
-	local selid = 0
-	local mainasps = suppasp.main
-	if type(mainasps) ~= "table" then
-		mainasps = {mainasps}
-	end
-	for idx, spv in ipairs(mainasps) do
-		if isasp and spv == rawget(isasp, "main") then
-			selid = idx
-		end
-		entries[idx+1] = describe_main_aspect(spv)
-	end
-	t.main = entries
-	t.main_current = selid+1
-	t.main_string = tostring(isasp.main)
-	if t.main == nil then
-		t.main_string = ""
-	end
-
-	t.shunt = {
-		attrans("No shunting"),
-		attrans("Shunting allowed"),
-		attrans("Proceed as main"),
-	}
-
-	t.shunt_current = dsel(suppasp.shunt, isasp.shunt, 2, 1)
-	if dsel(suppasp.proceed_as_main, isasp.proceed_as_main, t.shunt_current == 1) then
-		t.shunt_current = 3
-	end
-	t.shunt_const = suppasp.shunt ~= nil
-
-	if suppasp.group then
-		local gdef = advtrains.interlocking.aspect.get_group_definition(suppasp.group)
-		if gdef then
-			t.group = suppasp.group
-			t.groupdef = gdef
-			local entries = {}
-			local selid = 1
-			for idx, name in ipairs(suppasp.name or {}) do
-				entries[idx] = gdef.aspects[name].label
-				if suppasp.group == isasp.group and name == isasp.name then
-					selid = idx
-				end
-			end
-			t.name = entries
-			t.name_current = selid
-		end
-	end
-
-	return t
-end
-
-advtrains.interlocking.describe_supported_aspects = describe_supported_aspects
-
-local function make_signal_aspect_selector(suppasp, purpose, isasp)
-	local t = describe_supported_aspects(suppasp, isasp)
-	local formmode = 1
-
-	local pos
-	if type(purpose) == "table" then
-		formmode = 2
-		pos = purpose.pos
-	end
-
-	local form = {
-		"formspec_version[4]",
-		string.format("size[8,%f]", ({5.75, 10.75})[formmode]),
-		F.S_label(0.5, 0.5, "Select signal aspect"),
-	}
-	local h0 = ({0, 1.5})[formmode]
-	form[#form+1] = F.S_label(0.5, 1.5+h0, "Main aspect")
-	form[#form+1] = F.S_label(0.5, 3+h0, "Shunt aspect")
-	form[#form+1] = F.S_button_exit(0.5, 4.5+h0, 7, "asp_save", "Save signal aspect")
-	if formmode == 1 then
-		form[#form+1] = F.label(0.5, 1, purpose)
-		form[#form+1] = F.field(0.5, 2, 7, "asp_mainval", "", t.main_string)
-	elseif formmode == 2 then
-		if t.group then
-			form[#form+1] = F.S_label(0.5, 1.5, "Signal aspect group: @1", t.groupdef.label)
-			form[#form+1] = F.dropdown(0.5, 2, 7, "asp_namesel", t.name, t.name_current, true)
-		else
-			form[#form+1] = F.S_label(0.5, 1.5, "This signal does not belong to a signal aspect group.")
-			form[#form+1] = F.S_label(0.5, 2, "You can not use a predefined signal aspect.")
-		end
-		form[#form+1] = F.S_label(0.5, 1, "Signal at @1", minetest.pos_to_string(pos))
-		form[#form+1] = F.dropdown(0.5, 3.5, 7, "asp_mainsel", t.main, t.main_current, true)
-		form[#form+1] = advtrains.interlocking.make_ip_formspec_component(pos, 0.5, 7, 7)
-		form[#form+1] = advtrains.interlocking.make_short_dst_formspec_component(pos, 0.5, 8.5, 7)
-	end
-
-	if formmode == 2 and t.shunt_const then
-		form[#form+1] = F.label(0.5, 3.5+h0, t.shunt[t.shunt_current])
-		form[#form+1] = F.S_label(0.5, 4+h0, "The shunt aspect cannot be changed.")
-	else
-		form[#form+1] = F.dropdown(0.5, 3.5+h0, 7, "asp_shunt", t.shunt, t.shunt_current, true)
-	end
-
-	return table.concat(form)
-end
-
-function advtrains.interlocking.show_signal_aspect_selector(pname, p_suppasp, p_purpose, callback, isasp)
-	local suppasp = p_suppasp or {
-		main = {0, -1},
-		dst = {false},
-		shunt = false,
-		info = {},
-	}
-	local purpose = p_purpose or ""
-	local pos
-	if type(p_purpose) == "table" then
-		pos = p_purpose
-		purpose = {pname = pname, pos = pos}
-	end
-
-	local form = make_signal_aspect_selector(suppasp, purpose, isasp)
-	if not form then
+-- shows small formspec to set the signal influence point
+-- only_notset: show only if it is not set yet (used by signal tcb assignment)
+function advtrains.interlocking.show_ip_form(pos, pname, only_notset)
+	if not minetest.check_player_privs(pname, "interlocking") then
 		return
 	end
-
-	local token = advtrains.random_id()
-	minetest.show_formspec(pname, "at_il_sigaspdia_"..token, form)
-	minetest.after(0, function()
-		players_aspsel[pname] = {
-			purpose = purpose,
-			suppasp = suppasp,
-			callback = callback,
-			token = token,
-		}
-	end)
-end
-
-local function usebool(sup, val, free)
-	if sup == nil then
-		return val == free
-	else
-		return sup
-	end
-end
-
-local function get_aspect_from_formspec(suppasp, fields, psl)
-	local namei, group, name = tonumber(fields.asp_namesel), suppasp.group, nil
-	local gdef = advtrains.interlocking.aspect.get_group_definition(group)
-	if gdef then
-		local names = suppasp.name or {}
-		name = names[namei] or names[names]
-	else
-		group = nil
-	end
-	local maini = tonumber(fields.asp_mainsel)
-	local main = (suppasp.main or {})[(maini or 0)-1]
-	if not maini then
-		local mainval = fields.asp_mainval
-		if mainval == "-1" then
-			main = -1
-		elseif mainval == "x" then
-			main = false
-		elseif string.match(mainval, "^%d+$") then
-			main = tonumber(mainval)
-		else
-			main = nil
-		end
-	elseif maini <= 1 then
-		main = nil
-	end
-	local shunti = tonumber(fields.asp_shunt)
-	local shunt = suppasp.shunt
-	if shunt == nil then
-		shunt = shunti == 2
-	end
-	local proceed_as_main = suppasp.proceed_as_main
-	if proceed_as_main == nil then
-		proceed_as_main = shunti == 3
-	end
-	return advtrains.interlocking.aspect {
-		main = main,
-		shunt = shunt,
-		proceed_as_main = proceed_as_main,
-		info = {},
-		name = name,
-		group = group,
+	local ipform = advtrains.interlocking.make_ip_formspec_component(pos, 0.5, 0.5, 7)
+	local form = {
+		"formspec_version[4]",
+		"size[8,2.25]",
+		ipform,
 	}
+	if not only_notset or not pts then
+		minetest.show_formspec(pname, "at_il_ipsaform_"..minetest.pos_to_string(pos), table.concat(form))
+	end
+end
+
+-- shows larger formspec to set the signal influence point, main aspect and distant signal pos
+-- only_notset: show only if it is not set yet (used by signal tcb assignment)
+function advtrains.interlocking.show_ip_sa_form(pos, pname)
+	if not minetest.check_player_privs(pname, "interlocking") then
+		return
+	end
+	local ipform = advtrains.interlocking.make_ip_formspec_component(pos, 0.5, 0.5, 7)
+	local ma, rpos = advtrains.interlocking.signal.get_aspect(pos)
+	local saform = F.S_button_exit(0, 2, 4, "sa_dst_assign", rpos and minetest.pos_to_string(rpos) or "<distant signal>")
+			.. F.S_button_exit(0, 3, 2, "sa_tmp_mainfree", "Main to free") .. F.S_button_exit(2, 3, 2, "sa_tmp_mainhalt", "Main to halt")
+	local form = {
+		"formspec_version[4]",
+		"size[8,4]",
+		ipform,
+		saform,
+	}
+	minetest.show_formspec(pname, "at_il_ipsaform_"..minetest.pos_to_string(pos), table.concat(form))
+end
+
+function advtrains.interlocking.handle_ip_sa_formspec_fields(pname, pos, fields)
+	if not (pos and minetest.check_player_privs(pname, {train_operator=true, interlocking=true})) then
+		return
+	end
+	if fields.ip_set then
+		advtrains.interlocking.init_ip_assign(pos, pname)
+	elseif fields.ip_clear then
+		advtrains.interlocking.db.clear_ip_by_signalpos(pos)
+	elseif fields.sa_dst_assign then
+		advtrains.interlocking.init_distant_assign(pos, pname)
+	elseif fields.sa_tmp_mainfree then
+		local ma, rpos = advtrains.interlocking.signal.get_aspect(pos)
+		advtrains.interlocking.signal.set_aspect(pos, "_free", -1, rpos)
+	elseif fields.sa_tmp_mainhalt then
+		local ma, rpos = advtrains.interlocking.signal.get_aspect(pos)
+		advtrains.interlocking.signal.set_aspect(pos, nil, nil, rpos)
+	end
 end
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
 	local pname = player:get_player_name()
-	local psl = players_aspsel[pname]
-	if psl then
-		if formname == "at_il_sigaspdia_"..psl.token then
-			local suppasp = psl.suppasp
-			if fields.asp_save then
-				local asp
-				asp = get_aspect_from_formspec(suppasp, fields, psl)
-				if asp then
-					psl.callback(pname, asp)
-				end
-			end
-			if type(psl.purpose) == "table" then
-				local pos = psl.purpose.pos
-				advtrains.interlocking.handle_ip_formspec_fields(pname, pos, fields)
-				advtrains.interlocking.handle_dst_formspec_fields(pname, pos, fields)
-			end
-		else
-			players_aspsel[pname] = nil
-		end
+	local pts = string.match(formname, "^at_il_ipsaform_([^_]+)$")
+	local pos
+	if pts then
+		pos = minetest.string_to_pos(pts)
+	end
+	if pos then
+		advtrains.interlocking.handle_ip_sa_formspec_fields(pname, pos, fields)
 	end
 end)
+
+-- inits the signal IP assignment process
+function advtrains.interlocking.init_ip_assign(pos, pname)
+	if not minetest.check_player_privs(pname, "interlocking") then
+		minetest.chat_send_player(pname, "Insufficient privileges to use this!")
+		return
+	end
+	--remove old IP
+	--advtrains.interlocking.db.clear_ip_by_signalpos(pos)
+	minetest.chat_send_player(pname, "Configuring Signal: Please look in train's driving direction and punch rail to set influence point.")
+	
+	players_assign_ip[pname] = pos
+end
+
+-- inits the distant signal assignment process
+function advtrains.interlocking.init_distant_assign(pos, pname)
+	if not minetest.check_player_privs(pname, "interlocking") then
+		minetest.chat_send_player(pname, "Insufficient privileges to use this!")
+		return
+	end
+	minetest.chat_send_player(pname, "Set distant signal: Punch the main signal to assign!")
+	
+	players_assign_distant[pname] = pos
+end
+
+minetest.register_on_punchnode(function(pos, node, player, pointed_thing)
+	local pname = player:get_player_name()
+	if not minetest.check_player_privs(pname, "interlocking") then
+		return
+	end
+	-- IP assignment
+	local signalpos = players_assign_ip[pname]
+	if signalpos then
+		if vector.distance(pos, signalpos)<=50 then
+			local node_ok, conns, rhe = advtrains.get_rail_info_at(pos, advtrains.all_tracktypes)
+			if node_ok and #conns == 2 then
+				
+				local yaw = player:get_look_horizontal()
+				local plconnid = advtrains.yawToClosestConn(yaw, conns)
+				
+				-- add assignment if not already present.
+				local pts = advtrains.roundfloorpts(pos)
+				if not advtrains.interlocking.db.get_ip_signal_asp(pts, plconnid) then
+					advtrains.interlocking.db.set_ip_signal(pts, plconnid, signalpos)
+					ipmarker(pos, plconnid)
+					minetest.chat_send_player(pname, "Configuring Signal: Successfully set influence point")
+				else
+					minetest.chat_send_player(pname, "Configuring Signal: Influence point of another signal is already present!")
+				end
+			else
+				minetest.chat_send_player(pname, "Configuring Signal: This is not a normal two-connection rail! Aborted.")
+			end
+		else
+			minetest.chat_send_player(pname, "Configuring Signal: Node is too far away. Aborted.")
+		end
+		players_assign_ip[pname] = nil
+	end
+	-- DST assignment
+	signalpos = players_assign_distant[pname]
+	if signalpos then
+		-- get current mainaspect
+		local ma, rpos = advtrains.interlocking.signal.get_aspect(signalpos)
+		-- if punched pos is valid signal then set it as the new remote, otherwise nil
+		local nrpos
+		if advtrains.interlocking.signal.get_signal_cap_level(pos) > 1 then nrpos = pos end
+		advtrains.interlocking.signal.set_aspect(signalpos, ma.name, ma.speed, nrpos)
+		players_assign_distant[pname] = nil
+	end
+end)
+

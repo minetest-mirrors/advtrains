@@ -57,7 +57,7 @@ function advtrains.setstate(parpos, newstate, pnode)
 		return false, "train_here"
 	end
 	
-	if advtrains.interlocking and advtrains.interlocking.route.has_route_lock(minetest.encode_pos(pos)) then
+	if advtrains.interlocking and advtrains.interlocking.route.has_route_lock(advtrains.encode_pos(pos)) then
 		return false, "route_lock_here"
 	end
 	

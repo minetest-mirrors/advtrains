@@ -1006,7 +1006,7 @@ end
 function ildb.get_ip_signal_asp(pts, connid)
 	local p = ildb.get_ip_signal(pts, connid)
 	if p then
-		local asp = advtrains.interlocking.signal_get_aspect(p)
+		local asp = advtrains.interlocking.signal.get_aspect(p)
 		if not asp then
 			atlog("Clearing orphaned signal influence point", pts, "/", connid)
 			ildb.clear_ip_signal(pts, connid)

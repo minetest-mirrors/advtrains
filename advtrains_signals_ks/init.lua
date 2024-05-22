@@ -50,14 +50,17 @@ end
 
 local applyaspectf_main = function(rot)
  return function(pos, node, main_aspect, dst_aspect, dst_aspect_info)
+	if not main_aspect then
+		-- halt aspect, set red and don't do anything further
+		advtrains.ndb.swap_node(pos, {name="advtrains_signals_ks:hs_danger_"..rot, param2 = node.param2})
+		setzs3v(pos, nil, rot)
+		return
+	end
 	-- set zs3 signal to show speed according to main_aspect
 	setzs3(pos, main_aspect.zs3, rot)
 	-- select appropriate lamps based on mainaspect and dst
 	if main_aspect.shunt then
 		advtrains.ndb.swap_node(pos, {name="advtrains_signals_ks:hs_shunt_"..rot, param2 = node.param2})
-		setzs3v(pos, nil, rot)
-	elseif main_aspect.halt then
-		advtrains.ndb.swap_node(pos, {name="advtrains_signals_ks:hs_danger_"..rot, param2 = node.param2})
 		setzs3v(pos, nil, rot)
 	else
 		if not dst_aspect_info
@@ -128,7 +131,8 @@ local mainaspects_main = {
 local applyaspectf_ra = function(rot)
  -- we get here the full main_aspect table
  return function(pos, node, main_aspect, dst_aspect, dst_aspect_info)
-	if main_aspect.shunt then
+	if main_aspect then
+		-- any main aspect is fine, there's only one anyway
 		advtrains.ndb.swap_node(pos, {name="advtrains_signals_ks:ra_shuntd_"..rot, param2 = node.param2})
 	else
 		advtrains.ndb.swap_node(pos, {name="advtrains_signals_ks:ra_danger_"..rot, param2 = node.param2})
@@ -143,11 +147,6 @@ local mainaspects_shunt = {
 		name = "shunt",
 		description = "Shunt",
 		shunt = true,
-	},
-	{
-		name = "halt",
-		description = "Halt",
-		halt = true,
 	},
 }
 
@@ -225,9 +224,9 @@ for _, rtab in ipairs({
 				apply_aspect = applyaspectf_main(rot),
 				get_aspect_info = afunc,
 			},
-			on_rightclick = advtrains.interlocking.signal_rc_handler,
-			can_dig = advtrains.interlocking.signal_can_dig,
-			after_dig_node = advtrains.interlocking.signal_after_dig,
+			on_rightclick = advtrains.interlocking.signal.on_rightclick,
+			can_dig = advtrains.interlocking.signal.can_dig,
+			after_dig_node = advtrains.interlocking.signal.after_dig,
 		})
 		-- rotatable by trackworker
 		--TODO add rotation using trackworker

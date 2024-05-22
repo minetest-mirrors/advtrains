@@ -33,7 +33,7 @@ function atil.show_route_edit_form(pname, sigd, routeid)
 	local function itab(t)
 		tab[#tab+1] = minetest.formspec_escape(string.gsub(t, ",", " "))
 	end
-	itab("TCB "..sigd_to_string(sigd).." ("..(tcbs.signal_name or "")..") Route #"..routeid)
+	itab("("..(tcbs.signal_name or "+")..") Route #"..routeid)
 	
 	-- this code is partially copy-pasted from routesetting.lua
 	-- we start at the tc designated by signal
@@ -56,13 +56,14 @@ function atil.show_route_edit_form(pname, sigd, routeid)
 		c_rseg = route[i]
 		c_lckp = {}
 		
-		itab(""..i.." Entry "..sigd_to_string(c_sigd).." -> Sec. "..(c_ts and c_ts.name or "-").." -> Exit "..(c_rseg.next and sigd_to_string(c_rseg.next) or "END"))
+		itab(""..i.." "..sigd_to_string(c_sigd))
+		itab("= "..(c_ts and c_ts.name or "-").." =")
 		
 		if c_rseg.locks then
 			for pts, state in pairs(c_rseg.locks) do
 				
 				local pos = minetest.string_to_pos(pts)
-				itab("  Lock: "..pts.." -> "..state)
+				itab("L "..pts.." -> "..state)
 				if not advtrains.is_passive(pos) then
 					itab("-!- No passive component at "..pts..". Please reconfigure route!")
 					break
@@ -75,16 +76,17 @@ function atil.show_route_edit_form(pname, sigd, routeid)
 	end
 	if c_sigd then
 		local e_tcbs = ildb.get_tcbs(c_sigd)
-		itab("Route end: "..sigd_to_string(c_sigd).." ("..(e_tcbs and e_tcbs.signal_name or "-")..")")
+		local signame = "-"
+		if e_tcbs and e_tcbs.signal then signame = e_tcbs.signal_name or "+" end
+		itab("E "..sigd_to_string(c_sigd).." ("..signame..")")
 	else
-		itab("Route ends on dead-end")
+		itab("E (none)")
 	end
 	
-	form = form.."textlist[0.5,2;7.75,3.9;rtelog;"..table.concat(tab, ",").."]"
+	form = form.."textlist[0.5,2;3,3.9;rtelog;"..table.concat(tab, ",").."]"
 	
 	form = form.."button[0.5,6;3,1;back;<<< Back to signal]"
-	form = form.."button[4.5,6;2,1;aspect;Signal Aspect]"
-	form = form.."button[6.5,6;2,1;delete;Delete Route]"
+	form = form.."button[5.5,6;3,1;delete;Delete Route]"
 	
 	--atdebug(route.ars)
 	form = form.."style[ars;font=mono]"

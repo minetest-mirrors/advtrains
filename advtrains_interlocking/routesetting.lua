@@ -138,7 +138,7 @@ function ilrs.set_route(signal, route, try)
 			}
 			if c_tcbs.signal then
 				c_tcbs.route_committed = true
-				c_tcbs.aspect = route.aspect or advtrains.interlocking.FULL_FREE
+				c_tcbs.aspect = advtrains.interlocking.signal.MASP_FREE
 				c_tcbs.route_origin = signal
 				signals[#signals+1] = c_tcbs
 			end
@@ -166,7 +166,7 @@ function ilrs.set_route(signal, route, try)
 			if (not nodst) and (not assigned_by or assigned_by == "routesetting") then
 				advtrains.distant.assign(lastsig, pos, "routesetting", true)
 			end
-			advtrains.interlocking.update_signal_aspect(tcbs, i ~= 1)
+			advtrains.interlocking.signal.update_route_aspect(tcbs, i ~= 1)
 		end
 	end
 	
@@ -278,14 +278,7 @@ function ilrs.cancel_route_from(sigd)
 		c_tcbs.route_auto = nil
 		c_tcbs.route_origin = nil
 		
-		if c_tcbs.signal then
-			local pos = c_tcbs.signal
-			local _, assigned_by = advtrains.distant.get_main(pos)
-			if assigned_by == "routesetting" then
-				advtrains.distant.unassign_dst(pos, true)
-			end
-		end
-		advtrains.interlocking.update_signal_aspect(c_tcbs)
+		advtrains.interlocking.signal.update_route_aspect(c_tcbs)
 		
 		c_ts_id = c_tcbs.ts_id
 		if not c_tcbs then
@@ -370,7 +363,7 @@ function ilrs.update_route(sigd, tcbs, newrte, cancel)
 	end
 	if has_changed_aspect then
 		-- FIX: prevent an minetest.after() loop caused by update_signal_aspect dispatching path invalidation, which in turn calls ARS again
-		advtrains.interlocking.update_signal_aspect(tcbs)
+		advtrains.interlocking.signal.update_route_aspect(tcbs)
 	end
 	advtrains.interlocking.update_player_forms(sigd)
 end
