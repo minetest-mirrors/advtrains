@@ -261,9 +261,9 @@ for _, rtab in ipairs({
 				apply_aspect = applyaspectf_ra(rot),
 				get_aspect_info = prts.asp,
 			},
-			on_rightclick = advtrains.interlocking.signal_rc_handler,
-			can_dig = advtrains.interlocking.signal_can_dig,
-			after_dig_node = advtrains.interlocking.signal_after_dig,
+			on_rightclick = advtrains.interlocking.signal.on_rightclick,
+			can_dig = advtrains.interlocking.signal.can_dig,
+			after_dig_node = advtrains.interlocking.signal.after_dig,
 		})
 		-- rotatable by trackworker
 		--TODO add rotation using trackworker
