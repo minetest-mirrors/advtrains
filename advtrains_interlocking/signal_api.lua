@@ -5,13 +5,14 @@ local F = advtrains.formspec
 local signal = {}
 
 signal.MASP_HALT = {
-	name = nil,
-	speed = nil,
+	name = "_halt",
+	speed = 0,
+	halt = true,
 	remote = nil,
 }
 
 signal.MASP_FREE = {
-	name = "_free",
+	name = "_default",
 	speed = -1,
 	remote = nil,
 }
@@ -44,9 +45,9 @@ b) the distant signal's aspect group name & aspect table
 One concrete combination of lights/shapes that a signal signal shows. Handling these is at the discretion of
 the signal mod defining the signal, and they are typically combinations of main aspect and distant aspect
 Example:
-- A Ks signal has the aspect_group="proceed_12" set for a route
-- The signal at the end of the route shows aspect_group="proceed_8", advtrains also passes on that this means {main=8, shunt=false}
-- The ndef.advtrains.apply_aspect(pos, asp_group, dst_aspgrp, dst_aspinfo) determines that the signal should now show
+- A Ks signal has the main_aspect="proceed_12" set for a route
+- The signal at the end of the route shows main_aspect="proceed_8", advtrains also passes on that this means {main=8, shunt=false}
+- The ndef.afunction(pos, node, main_aspect, rem_aspect, rem_aspinfo) determines that the signal should now show
 		blinking green with main indicator 12 and dst indicator 8, and sets the nodes accordingly.
 		This function can now return the Aspect Info table, which will be cached by advtrains until the aspect changes again
 		and will be used when a train approaches the signal. If nil is returned, then the aspect will be queried next time
@@ -56,9 +57,13 @@ Note that once apply_aspect returns, there is no need for advtrains anymore to q
 When the signal, for any reason, wants to change its aspect by itself *without* going through the signal API then
 it should update the aspect info cache by calling advtrains.interlocking.signal.update_aspect_info(pos)
 
-Apply_aspect may also receive nil as the main aspect. It usually means that the signal is not assigned to anything particular,
+Apply_aspect may also receive the special main aspect { name = "_halt", halt = true }. It usually means that the signal is not assigned to anything particular,
 and it should cause the signal to show its most restrictive aspect. Typically it is a halt aspect, but e.g. for distant-only
 signals this would be "expect stop".
+
+A special case occurs for pure distant signals: Such signals must set apply_aspect, but must not set main_aspects. Behavior is as follows:
+- Signal is uninitialized, distant signal is not assigned to a main signal, or no route is set: main_aspect == { name = "_halt", halt = true } and rem_aspect == nil
+- A remote main signal is assigned (either by user or by route): main_aspect is always { name = "_default" } and rem_aspect / rem_aspinfo give the correct information
 
 Main aspect names starting with underscore (e.g. "_default") are reserved and must not be used!
 
@@ -90,6 +95,7 @@ ndef.advtrains = {
 	apply_aspect = function(pos, node, main_aspect, rem_aspect, rem_aspinfo)
 		-- set the node to show the desired aspect
 		-- called by advtrains when this signal's aspect group or the remote signal's aspect changes
+		-- main_aspect is never nil, but can be one of the special aspects { name = "_halt", halt = true } or { name = "_default" }
 		-- MAY return the aspect_info. If it returns nil then get_aspect_info will be queried at a later point.
 	get_aspect_info(pos, main_aspect)
 		-- Returns the aspect info table (main, shunt, dst etc.)
@@ -268,36 +274,41 @@ end
 function signal.get_aspect_internal(pos, aspt)
 	if not aspt then
 		-- oh, no main aspect, nevermind
-		return nil, nil, nil
+		return signal.MASP_HALT, nil, nil
 	end
 	atdebug("get_aspect_internal",pos,aspt)
 	-- look aspect in nodedef
 	local node = advtrains.ndb.get_node_or_nil(pos)
 	local ndef = node and minetest.registered_nodes[node.name]
 	local ndefat = ndef and ndef.advtrains
-	-- only if signal defines main aspect and its set in aspt
-	if ndefat and ndefat.main_aspects and aspt.name then
-		if not ndefat.main_aspects_lookup then
-			cache_mainaspects(ndefat)
+	if ndefat and ndefat.apply_aspect then
+		-- only if signal defines main aspect and its set in aspt
+		if ndefat.main_aspects and aspt.name then
+			if not ndefat.main_aspects_lookup then
+				cache_mainaspects(ndefat)
+			end
+			local masp = ndefat.main_aspects_lookup[aspt.name]
+			-- special handling for the default free aspect ("_default")
+			if aspt.name == "_default" then
+				masp = ndefat.main_aspects[1]
+			end
+			if not masp then
+				atwarn(pos,"invalid main aspect",aspt.name,"valid are",ndefat.main_aspects_lookup)
+				return signal.MASP_HALT, aspt.remote, node, ndef
+			end
+			-- if speed, then apply speed
+			if masp.speed and aspt.speed then
+				masp = table.copy(masp)
+				masp.speed = aspt.speed
+			end
+			return masp, aspt.remote, node, ndef
+		elseif aspt.name then
+			-- Distant-only signal, still supports kind of default aspect
+			return { name = aspt.name, speed = aspt.speed }, aspt.remote, node, ndef
 		end
-		local masp = ndefat.main_aspects_lookup[aspt.name]
-		-- special handling for the default free aspect ("_free")
-		if aspt.name == "_free" then
-			masp = ndefat.main_aspects[1]
-		end
-		if not masp then
-			atwarn(pos,"invalid main aspect",aspt.name,"valid are",ndefat.main_aspects_lookup)
-			return nil, aspt.remote, node, ndef
-		end
-		-- if speed, then apply speed
-		if masp.speed and aspt.speed then
-			masp = table.copy(masp)
-			masp.speed = aspt.speed
-		end
-		return masp, aspt.remote, node, ndef
 	end
-	-- invalid node or no main aspect, return nil for masp
-	return nil, aspt.remote, node, ndef
+	-- invalid node or no main aspect, return default halt aspect for masp
+	return signal.MASP_HALT, aspt.remote, node, ndef
 end
 
 -- For the signal at pos, get the "aspect info" table. This contains the speed signalling information at this location
@@ -327,7 +338,6 @@ function signal.reapply_aspect(pts)
 	end
 	-- resolve mainaspect table by name
 	local pos = advtrains.decode_pos(pts)
-	-- note: masp may be nil, when aspt.name was nil. Valid case for distant-only signals
 	local masp, remote, node, ndef = signal.get_aspect_internal(pos, aspt)
 	-- if we have remote, resolve remote
 	local rem_masp, rem_aspi

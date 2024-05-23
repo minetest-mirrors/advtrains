@@ -50,7 +50,7 @@ end
 
 local applyaspectf_main = function(rot)
  return function(pos, node, main_aspect, dst_aspect, dst_aspect_info)
-	if not main_aspect then
+	if main_aspect.halt then
 		-- halt aspect, set red and don't do anything further
 		advtrains.ndb.swap_node(pos, {name="advtrains_signals_ks:hs_danger_"..rot, param2 = node.param2})
 		setzs3v(pos, nil, rot)
@@ -119,20 +119,14 @@ local mainaspects_main = {
 		description = "Proceed (speed 4)",
 		zs3 = "4",
 	},
-	{
-		name = "halt",
-		description = "Halt",
-		zs3 = "off",
-		halt = true,
-	},
 }
 
 --Rangiersignal
 local applyaspectf_ra = function(rot)
  -- we get here the full main_aspect table
  return function(pos, node, main_aspect, dst_aspect, dst_aspect_info)
-	if main_aspect then
-		-- any main aspect is fine, there's only one anyway
+	if not main_aspect.halt then
+		-- any non-halt main aspect is fine, there's only one anyway
 		advtrains.ndb.swap_node(pos, {name="advtrains_signals_ks:ra_shuntd_"..rot, param2 = node.param2})
 	else
 		advtrains.ndb.swap_node(pos, {name="advtrains_signals_ks:ra_danger_"..rot, param2 = node.param2})

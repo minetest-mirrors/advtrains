@@ -159,15 +159,8 @@ function ilrs.set_route(signal, route, try)
 		end
 	end
 	for i = #signals, 1, -1 do
-		if lastsig then
-			local tcbs = signals[i]
-			local pos = tcbs.signal
-			local _, assigned_by = advtrains.distant.get_main(pos)
-			if (not nodst) and (not assigned_by or assigned_by == "routesetting") then
-				advtrains.distant.assign(lastsig, pos, "routesetting", true)
-			end
-			advtrains.interlocking.signal.update_route_aspect(tcbs, i ~= 1)
-		end
+		-- TODO add logic for distant signal assign
+		advtrains.interlocking.signal.update_route_aspect(signals[i], i ~= 1)
 	end
 	
 	return true

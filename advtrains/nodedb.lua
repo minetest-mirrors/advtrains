@@ -212,6 +212,10 @@ function ndb.get_node(pos)
 	end
 	return n
 end
+function ndb.get_ndef(pos)
+	local n=ndb.get_node_or_nil(pos)
+	return n and minetest.registered_nodes[n.name]
+end
 function ndb.get_node_raw(pos)
 	local cid=ndbget(pos.x, pos.y, pos.z)
 	if cid then
