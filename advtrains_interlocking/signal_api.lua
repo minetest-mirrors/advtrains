@@ -272,14 +272,14 @@ local function cache_mainaspects(ndefat)
 end
 
 function signal.get_aspect_internal(pos, aspt)
-	if not aspt then
-		-- oh, no main aspect, nevermind
-		return signal.MASP_HALT, nil, nil
-	end
 	atdebug("get_aspect_internal",pos,aspt)
 	-- look aspect in nodedef
 	local node = advtrains.ndb.get_node_or_nil(pos)
 	local ndef = node and minetest.registered_nodes[node.name]
+	if not aspt then
+		-- oh, no main aspect, nevermind
+		return signal.MASP_HALT, nil, node, ndef
+	end
 	local ndefat = ndef and ndef.advtrains
 	if ndefat and ndefat.apply_aspect then
 		-- only if signal defines main aspect and its set in aspt
@@ -318,7 +318,9 @@ function signal.get_aspect_info(pos)
 	local masp, remote, node, ndef = signal.get_aspect_internal(pos, aspt)
 	-- call into ndef
 	if ndef.advtrains and ndef.advtrains.get_aspect_info then
-		return ndef.advtrains.get_aspect_info(pos, masp)
+		local ai = ndef.advtrains.get_aspect_info(pos, masp)
+		atdebug(pos,"aspectinfo",ai)
+		return ai
 	end
 end
 
@@ -333,11 +335,12 @@ function signal.reapply_aspect(pts)
 	-- get aspt
 	local aspt = signal.aspects[pts]
 	atdebug("reapply_aspect",advtrains.decode_pos(pts),"aspt",aspt)
+	local pos = advtrains.decode_pos(pts)
 	if not aspt then
+		signal.notify_trains(pos)
 		return -- oop, nothing to do
 	end
 	-- resolve mainaspect table by name
-	local pos = advtrains.decode_pos(pts)
 	local masp, remote, node, ndef = signal.get_aspect_internal(pos, aspt)
 	-- if we have remote, resolve remote
 	local rem_masp, rem_aspi

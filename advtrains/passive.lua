@@ -70,6 +70,12 @@ function advtrains.setstate(parpos, newstate, pnode)
 	end
 	-- invalidate paths (only relevant if this is a track)
 	advtrains.invalidate_all_paths(pos)
+	-- hack for old signals. Compatibility only, DO NOT USE for new signals!
+	if advtrains.interlocking and ndef.advtrains._is_passivenode_signal then
+		-- forcefully clears any set aspect, so that aspect system doesnt override it again
+		-- implicitly does an signal.notify_trains(pos)
+		advtrains.interlocking.signal.clear_aspect(pos)
+	end
 
 	return true
 end

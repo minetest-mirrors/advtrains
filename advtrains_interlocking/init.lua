@@ -17,7 +17,6 @@ local modpath = minetest.get_modpath(minetest.get_current_modname()) .. DIR_DELI
 dofile(modpath.."database.lua")
 dofile(modpath.."signal_api.lua")
 dofile(modpath.."signal_aspect_ui.lua")
-dofile(modpath.."demosignals.lua")
 dofile(modpath.."train_sections.lua")
 dofile(modpath.."route_prog.lua")
 dofile(modpath.."routesetting.lua")
