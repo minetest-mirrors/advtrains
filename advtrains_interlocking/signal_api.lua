@@ -6,15 +6,12 @@ local signal = {}
 
 signal.MASP_HALT = {
 	name = "_halt",
-	speed = 0,
 	halt = true,
-	remote = nil,
 }
 
-signal.MASP_FREE = {
+signal.MASP_DEFAULT = {
 	name = "_default",
-	speed = -1,
-	remote = nil,
+	default = true,
 }
 
 signal.ASPI_HALT = {
@@ -85,17 +82,15 @@ ndef.advtrains = {
 	}
 		-- This list is mainly for the selection dialog. Order of entries determines list order in the dropdown.
 		-- Some fields have special meaning:
-		-- name: A unique key to identify the main aspect. Only this key is saved, but APIs always receive the whole table
+		-- name: A unique key to identify the main aspect. Might be required by some code.
 		-- description: Text shown in UI dropdown
-		-- speed: a number. When present, a speed field is shown in the UI next to the dropdown (prefilled with the value).
-		--		When user selects a different speed there, this different speed replaces the value in the table whenever the main_aspect is applied.
 		-- Node can set any other fields at its discretion. They are not touched.
-		-- Note: On first call advtrains automatically inserts into the ndef.advtrains table a main_aspects_lookup hashtable
-		-- Note: Pure distant signals (that cannot show halt) should NOT have a main_aspects table
+		-- Note: Pure distant signals (that cannot show halt) should NOT have a main_aspects table.
+		--       For these signals no main aspect selection UI is shown and they cannot be startpoint of a route
 	apply_aspect = function(pos, node, main_aspect, rem_aspect, rem_aspinfo)
 		-- set the node to show the desired aspect
 		-- called by advtrains when this signal's aspect group or the remote signal's aspect changes
-		-- main_aspect is never nil, but can be one of the special aspects { name = "_halt", halt = true } or { name = "_default" }
+		-- main_aspect is never nil, but can be one of the special aspects { halt = true } or { default = true }
 		-- MAY return the aspect_info. If it returns nil then get_aspect_info will be queried at a later point.
 	get_aspect_info(pos, main_aspect)
 		-- Returns the aspect info table (main, shunt, dst etc.)
@@ -133,7 +128,9 @@ Signals that are possible start and end points for a route must satisfy:
 -- Database
 -- Signal Aspect store
 -- Stores for each signal the main aspect and other info, like the assigned remote signal
--- [signal encodePos] = { name = "proceed", [speed = 12], [remote = encodedPos] }
+-- [signal encodePos] = { main = <table or string>, [remote = encodedPos] }
+-- main is a string: "named aspect" is looked up in the main_aspects table of the ndef
+-- main is a table: this table directly is the main aspect (used for advanced signals with additional lights/indicators)
 signal.aspects = {}
 
 -- Distant signal notification. Records for each signal the distant signals that refer to it
@@ -167,7 +164,12 @@ end
 -- - Calling apply_aspect() in the signal's node definition to make the signal show the aspect
 -- - Calling apply_aspect() again whenever the remote signal changes its aspect
 -- - Notifying this signal's distant signals about changes to this signal (unless skip_dst_notify is specified)
-function signal.set_aspect(pos, main_asp_name, main_asp_speed, rem_pos, skip_dst_notify)
+-- main_asp: either a string (==name in ndef.advtrains.main_aspects) or the main aspect table directly (for advanced signals)
+function signal.set_aspect(pos, main_asp, rem_pos, skip_dst_notify)
+	-- safeguard for the two integrated aspects (these two must be passed as string key)
+	if type(main_asp)=="table" and (main_asp.name=="_default" or main_asp.name=="_halt") then
+		error("MASP_HALT and MASP_DEFAULT must be passed via string keys _halt or _default, not as tables!")
+	end
 	local main_pts = advtrains.encode_pos(pos)
 	local old_tbl = signal.aspects[main_pts]
 	local old_remote = old_tbl and old_tbl.remote
@@ -179,7 +181,7 @@ function signal.set_aspect(pos, main_asp_name, main_asp_speed, rem_pos, skip_dst
 		signal.distant_refs[old_remote][main_pts] = nil
 	end
 		
-	signal.aspects[main_pts] = { name = main_asp_name, speed = main_asp_speed, remote = new_remote }
+	signal.aspects[main_pts] = { main = main_asp, remote = new_remote }
 	-- apply aspect on main signal, this also checks new_remote
 	signal.reapply_aspect(main_pts)	
 	
@@ -266,49 +268,43 @@ end
 
 local function cache_mainaspects(ndefat)
 	ndefat.main_aspects_lookup = {}
-	for _,ma in ipairs(ndefat.main_aspects) do
+    for _,ma in ipairs(ndefat.main_aspects) do
 		ndefat.main_aspects_lookup[ma.name] = ma
-	end
+    end
+    ndefat.main_aspects_lookup[signal.MASP_HALT.name] = signal.MASP_HALT.name -- halt is always defined
+    ndefat.main_aspects_lookup[signal.MASP_DEFAULT.name] = ndefat.main_aspects[1] -- default is the first one
 end
 
+
+-- gets the main aspect. resolves named aspects to aspect table on demand
 function signal.get_aspect_internal(pos, aspt)
-	atdebug("get_aspect_internal",pos,aspt)
-	-- look aspect in nodedef
+	-- look up node and nodedef
 	local node = advtrains.ndb.get_node_or_nil(pos)
 	local ndef = node and minetest.registered_nodes[node.name]
 	if not aspt then
 		-- oh, no main aspect, nevermind
 		return signal.MASP_HALT, nil, node, ndef
 	end
-	local ndefat = ndef and ndef.advtrains
-	if ndefat and ndefat.apply_aspect then
-		-- only if signal defines main aspect and its set in aspt
-		if ndefat.main_aspects and aspt.name then
+	local ndefat = ndef.advtrains or {}
+	local masp = aspt.main or signal.MASP_HALT
+	
+	if type(masp) == "string" then
+		if masp=="_halt" then
+			masp = signal.MASP_HALT
+		elseif masp=="_default" and not ndefat.main_aspects then
+			-- case is fine, distant only signal
+			masp = signal.MASP_DEFAULT
+		else			
+			assert(ndefat.main_aspects, "With named aspects, node needs advtrains.main_aspects table!")
+			-- resolve the main aspect from the mainaspects table
 			if not ndefat.main_aspects_lookup then
 				cache_mainaspects(ndefat)
 			end
-			local masp = ndefat.main_aspects_lookup[aspt.name]
-			-- special handling for the default free aspect ("_default")
-			if aspt.name == "_default" then
-				masp = ndefat.main_aspects[1]
-			end
-			if not masp then
-				atwarn(pos,"invalid main aspect",aspt.name,"valid are",ndefat.main_aspects_lookup)
-				return signal.MASP_HALT, aspt.remote, node, ndef
-			end
-			-- if speed, then apply speed
-			if masp.speed and aspt.speed then
-				masp = table.copy(masp)
-				masp.speed = aspt.speed
-			end
-			return masp, aspt.remote, node, ndef
-		elseif aspt.name then
-			-- Distant-only signal, still supports kind of default aspect
-			return { name = aspt.name, speed = aspt.speed }, aspt.remote, node, ndef
+			masp = ndefat.main_aspects_lookup[aspt.main] or signal.MASP_DEFAULT
 		end
 	end
-	-- invalid node or no main aspect, return default halt aspect for masp
-	return signal.MASP_HALT, aspt.remote, node, ndef
+	-- return whatever the main aspect is
+	return masp, aspt.remote, node, ndef
 end
 
 -- For the signal at pos, get the "aspect info" table. This contains the speed signalling information at this location
@@ -336,10 +332,6 @@ function signal.reapply_aspect(pts)
 	local aspt = signal.aspects[pts]
 	atdebug("reapply_aspect",advtrains.decode_pos(pts),"aspt",aspt)
 	local pos = advtrains.decode_pos(pts)
-	if not aspt then
-		signal.notify_trains(pos)
-		return -- oop, nothing to do
-	end
 	-- resolve mainaspect table by name
 	local masp, remote, node, ndef = signal.get_aspect_internal(pos, aspt)
 	-- if we have remote, resolve remote
@@ -352,13 +344,11 @@ function signal.reapply_aspect(pts)
 		signal.distant_refs[remote][pts] = true
 		local rem_aspt = signal.aspects[remote]
 		atdebug("resolving remote",advtrains.decode_pos(remote),"aspt",rem_aspt)
-		if rem_aspt and rem_aspt.name then
-			local rem_pos = advtrains.decode_pos(remote)
-			rem_masp, _, _, rem_ndef = signal.get_aspect_internal(rem_pos, rem_aspt)
-			if rem_masp then
-				if rem_ndef.advtrains and rem_ndef.advtrains.get_aspect_info then
-					rem_aspi = rem_ndef.advtrains.get_aspect_info(rem_pos, rem_masp)
-				end
+		local rem_pos = advtrains.decode_pos(remote)
+		rem_masp, _, _, rem_ndef = signal.get_aspect_internal(rem_pos, rem_aspt)
+		if rem_masp then
+			if rem_ndef.advtrains and rem_ndef.advtrains.get_aspect_info then
+				rem_aspi = rem_ndef.advtrains.get_aspect_info(rem_pos, rem_masp)
 			end
 		end
 	end

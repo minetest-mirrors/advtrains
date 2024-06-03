@@ -53,6 +53,7 @@ local applyaspectf_main = function(rot)
 	if main_aspect.halt then
 		-- halt aspect, set red and don't do anything further
 		advtrains.ndb.swap_node(pos, {name="advtrains_signals_ks:hs_danger_"..rot, param2 = node.param2})
+		setzs3(pos, "off", rot)
 		setzs3v(pos, nil, rot)
 		return
 	end

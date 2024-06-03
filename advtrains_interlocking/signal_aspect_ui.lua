@@ -121,11 +121,11 @@ function advtrains.interlocking.handle_ip_sa_formspec_fields(pname, pos, fields)
 				new_ma = ndef.advtrains.main_aspects[idx - 1]
 			end
 		end
-		if new_ma and (new_ma.name ~= ma.name or new_ma.speed ~= ma.speed) then
-			advtrains.interlocking.signal.set_aspect(pos, new_ma.name, new_ma.speed, rpos)
-		elseif not new_ma then
+		if new_ma then
+			advtrains.interlocking.signal.set_aspect(pos, new_ma.name, rpos)
+		else
 			-- reset everything
-			advtrains.interlocking.signal.set_aspect(pos, nil, nil, nil)
+			advtrains.interlocking.signal.clear_aspect(pos)
 		end
 		
 	end
@@ -140,7 +140,7 @@ function advtrains.interlocking.handle_ip_sa_formspec_fields(pname, pos, fields)
 		advtrains.interlocking.init_distant_assign(pos, pname)
 		return
 	elseif fields.sa_undistant then
-		advtrains.interlocking.signal.set_aspect(pos, ma.name, ma.speed, nil)
+		advtrains.interlocking.signal.set_aspect(pos, ma.name, nil)
 		return
 	end
 	-- show the form again unless one of the buttons was clicked
@@ -226,10 +226,10 @@ minetest.register_on_punchnode(function(pos, node, player, pointed_thing)
 		local nrpos
 		if advtrains.interlocking.signal.get_signal_cap_level(pos) > 1 then
 			nrpos = pos
-			if not ma then -- make sure that dst is never set without a main aspect (esp. for pure distant signal case)
-				ma = { name = "_default" }
+			if not ma or ma.halt then -- make sure that dst is never set without a main aspect (esp. for pure distant signal case)
+				ma = "_default"
 			end
-			advtrains.interlocking.signal.set_aspect(signalpos, ma.name, ma.speed, nrpos)
+			advtrains.interlocking.signal.set_aspect(signalpos, ma.name, nrpos)
 		end
 		players_assign_distant[pname] = nil
 	end
