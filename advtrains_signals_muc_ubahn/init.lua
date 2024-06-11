@@ -77,6 +77,7 @@ for r,f in pairs(all_sigs) do
 				main_aspects = not f.distant and mainaspects, -- main aspects only for main
 				apply_aspect = f.distant and applyaspect_distant(loc) or applyaspect_main(loc),
 				get_aspect_info = function() return f.asp end,
+				route_role = f.distant and "distant" or "main"
 			},
 		})
 	end

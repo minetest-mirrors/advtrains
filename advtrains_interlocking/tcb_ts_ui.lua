@@ -756,7 +756,8 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				local signal_pos = tcbs.signal
 				ildb.set_sigd_for_signal(signal_pos, nil)
 				tcbs.signal = nil
-				tcbs.aspect = nil
+				tcbs.route_aspect = nil
+				tcbs.route_remote = nil
 				minetest.close_formspec(pname, formname)
 				minetest.chat_send_player(pname, "Signal has been unassigned. Name and routes are kept for reuse.")
 				return

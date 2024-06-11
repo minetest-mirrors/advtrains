@@ -86,31 +86,22 @@ local function setsection(tid, train, ts_id, ts, sigd)
 			advtrains.interlocking.route.cancel_route_from(ts.route.origin)
 			atwarn("Route was cancelled.")
 		else
-			-- train entered route regularily. Reset route and signal
-			tcbs.route_committed = nil
-			tcbs.route_comitted = nil -- TODO compatibility cleanup
-			tcbs.aspect = nil
-			tcbs.route_origin = nil
-			if tcbs.signal then
-				local spos = tcbs.signal
-				local _, setter = advtrains.distant.get_main(spos)
-				if setter == "routesetting" then
-					advtrains.distant.unassign_dst(spos, true)
-				end
-			end
-			advtrains.interlocking.update_signal_aspect(tcbs)
-			if tcbs.signal and sigd_equal(ts.route.entry, ts.route.origin) then
-				if tcbs.route_auto and tcbs.routeset then
-					--atdebug("Resetting route (",ts.route.origin,")")
-					advtrains.interlocking.route.update_route(ts.route.origin, tcbs)
-				else
-					tcbs.routeset = nil
-				end
-			end
+			-- train entered route regularily.
 		end
 		ts.route = nil
 	end
 	if tcbs.signal then
+		-- Reset route and signal
+		-- Note that the hit-route case is already handled by cancel_route_from
+		-- this code only handles signal at entering tcb and also triggers for non-route ts
+		tcbs.route_committed = nil
+		tcbs.route_aspect = nil
+		tcbs.route_remote = nil
+		tcbs.route_origin = nil
+		if not tcbs.route_auto then
+			tcbs.routeset = nil
+		end
+		advtrains.interlocking.signal.update_route_aspect(tcbs)
 		advtrains.interlocking.route.update_route(sigd, tcbs)
 	end
 end

@@ -96,11 +96,12 @@ ndef.advtrains = {
 		-- Returns the aspect info table (main, shunt, dst etc.)
 	distant_support = true or false
 		-- If true, signal is considered in distant signalling. If false or nil, rem_aspect and rem_aspinfo are never set.
-	route_role = one of "main", "shunt", "distant", "distant_repeater", "end"
+	route_role = one of "main", "main_distant", "shunt", "distant", "distant_repeater", "end"
 		-- Determines how the signal behaves when routes are set. Only in effect when signal is assigned to a TCB.
 		-- main: The signal is a possible endpoint for a train move route. Distant signals before it refer to it.
 		-- shunt: The signal is a possible endpoint for a shunt move route. Ignored for distant signals.
 		-- distant, distant_repeater: When route is set, signal is always assigned its first main aspect. The next signal with role="main" is set as the remote signal. (currently no further distinction)
+		-- main_distant: Combination of main and distant - like "main", but additionally gets assigned to the next main like a "distant"
 		-- end: like main, but signifies that it marks an end of track and trains cannot continue further. (currently no practical implications above main)
 }
 
@@ -329,9 +330,17 @@ function signal.get_aspect_info(pos)
 	local masp, remote, node, ndef = signal.get_aspect_internal(pos, aspt)
 	-- call into ndef
 	if ndef.advtrains and ndef.advtrains.get_aspect_info then
-		local ai = ndef.advtrains.get_aspect_info(pos, masp)
-		atdebug(pos,"aspectinfo",ai)
-		return ai
+		local ai = ndef.advtrains.get_aspect_info
+		if type(ai)=="function" then
+			ai = ai(pos, masp)
+		end
+		if type(ai)=="table" then
+			atdebug(pos,"aspectinfo",ai)
+			return ai
+		else
+			error("For node "..node.name..": ndef.advtrains.get_aspect_info must be function or table")
+		end
+		
 	end
 end
 
@@ -380,8 +389,9 @@ end
 -- 
 function signal.update_route_aspect(tcbs, skip_dst_notify)
 	if tcbs.signal then
-		local asp = tcbs.aspect or signal.MASP_HALT
-		signal.set_aspect(tcbs.signal, asp.name, asp.speed, asp.remote, skip_dst_notify)
+		local asp = tcbs.route_aspect or "_halt"
+		local rem = tcbs.route_remote
+		signal.set_aspect(tcbs.signal, asp, rem, skip_dst_notify)
 	end
 end
 

@@ -45,6 +45,7 @@ function ilrs.set_route(signal, route, try)
 	local rtename = route.name
 	local signalname = (ildb.get_tcbs(signal).signal_name or "") .. sigd_to_string(signal)
 	local c_tcbs, c_ts_id, c_ts, c_rseg, c_lckp
+	-- signals = { { pos = ., tcbs_ref = <tcbs>, role = "main_distant", masp_override = nil, dst_type = "next_main" or "none" } 
 	local signals = {}
 	local nodst
 	while c_sigd and i<=#route do
@@ -67,11 +68,11 @@ function ilrs.set_route(signal, route, try)
 		
 		if c_ts.route then
 			if not try then atwarn("Encountered ts lock during a real run of routesetting routine, at ts=",c_ts_id,"while setting route",rtename,"of",signal) end
-			return false, "Section '"..c_ts.name.."' already has route set from "..sigd_to_string(c_ts.route.origin)..":\n"..c_ts.route.rsn, c_ts_id, nil
+			return false, "Section '"..(c_ts.name or c_ts_id).."' already has route set from "..sigd_to_string(c_ts.route.origin)..":\n"..c_ts.route.rsn, c_ts_id, nil
 		end
 		if c_ts.trains and #c_ts.trains>0 then
 			if not try then atwarn("Encountered ts occupied during a real run of routesetting routine, at ts=",c_ts_id,"while setting route",rtename,"of",signal) end
-			return false, "Section '"..c_ts.name.."' is occupied!", c_ts_id, nil
+			return false, "Section '"..(c_ts.name or c_ts_id).."' is occupied!", c_ts_id, nil
 		end
 		
 		-- collect locks from rs cache and from route def
@@ -138,9 +139,17 @@ function ilrs.set_route(signal, route, try)
 			}
 			if c_tcbs.signal then
 				c_tcbs.route_committed = true
-				c_tcbs.aspect = advtrains.interlocking.signal.MASP_FREE
 				c_tcbs.route_origin = signal
-				signals[#signals+1] = c_tcbs
+				-- determine route role
+				local ndef = advtrains.ndb.get_ndef(c_tcbs.signal)
+				local sig_table = {
+					pos = c_tcbs.signal,
+					tcbs_ref = c_tcbs,
+					role = ndef and ndef.advtrains and ndef.advtrains.route_role,
+					masp_override = c_rseg.masp_override, --TODO implement masp_override on UI side
+					dst_type = "next_main", --TODO allow user differentiate
+				}
+				signals[#signals+1] = sig_table
 			end
 		end
 		-- advance
@@ -149,18 +158,31 @@ function ilrs.set_route(signal, route, try)
 		i = i + 1
 	end
 
-	-- Distant signaling
-	local lastsig = nil
+	-- Get reference to signal at end of route
+	local last_mainsig = nil
 	if c_sigd then
 		local e_tcbs = ildb.get_tcbs(c_sigd)
 		local pos = e_tcbs and e_tcbs.signal
 		if pos then
-			lastsig = pos
+			last_mainsig = pos
 		end
 	end
 	for i = #signals, 1, -1 do
-		-- TODO add logic for distant signal assign
-		advtrains.interlocking.signal.update_route_aspect(signals[i], i ~= 1)
+		-- note the signals are iterated backwards. Switch depending on the role
+		local sig = signals[i]
+		-- apply mainaspect
+		sig.tcbs_ref.route_aspect = sig.masp_override or "_default"
+		if sig.role == "distant" or sig.role == "distant_repeater" or sig.role == "main_distant" then
+			-- assign the remote as the last mainsig
+			sig.tcbs_ref.route_remote = last_mainsig
+		end
+		if sig.role == "main" or sig.role == "main_distant" or sig.role == "end" then
+			-- record this as the new last mainsig
+			last_mainsig = sig.pos
+		end
+		-- for shunt signals nothing happens
+		-- update the signal aspect on map
+		advtrains.interlocking.signal.update_route_aspect(sig.tcbs_ref, i ~= 1)
 	end
 	
 	return true
@@ -266,7 +288,8 @@ function ilrs.cancel_route_from(sigd)
 		--atdebug("cancelling",c_ts.route.rsn)
 		-- clear signal aspect and routesetting state
 		c_tcbs.route_committed = nil
-		c_tcbs.aspect = nil
+		c_tcbs.route_aspect = nil
+		c_tcbs.route_remote = nil
 		c_tcbs.routeset = nil
 		c_tcbs.route_auto = nil
 		c_tcbs.route_origin = nil
@@ -321,7 +344,8 @@ function ilrs.update_route(sigd, tcbs, newrte, cancel)
 			advtrains.interlocking.route.cancel_route_from(sigd)
 		end
 		tcbs.route_committed = nil
-		tcbs.aspect = nil
+		tcbs.route_aspect = nil
+		tcbs.route_remote = nil
 		has_changed_aspect = true
 		tcbs.routeset = nil
 		tcbs.route_auto = nil

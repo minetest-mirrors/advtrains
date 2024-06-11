@@ -428,6 +428,7 @@ for _, rtab in ipairs {
 							proceed_as_main = true,
 						}
 					end,
+					route_role = "main_distant",
 				--[[
 					supported_aspects = {
 						group = "advtrains_signals_japan:5a",
