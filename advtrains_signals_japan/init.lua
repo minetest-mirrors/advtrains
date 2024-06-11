@@ -447,9 +447,9 @@ for _, rtab in ipairs {
 					end,
 				]]
 				},
-				on_rightclick = advtrains.interlocking.signal_rc_handler,
-				can_dig = advtrains.interlocking.signal_can_dig,
-				after_dig_node = advtrains.interlocking.signal_after_dig,
+				on_rightclick = advtrains.interlocking.signal.on_rightclick,
+				can_dig = advtrains.interlocking.signal.can_dig,
+				after_dig_node = advtrains.interlocking.signal.after_dig,
 			})
 			--advtrains.trackplacer.add_worked("advtrains_signals_japan:"..sigtype, asp, "_"..rot)
 		end

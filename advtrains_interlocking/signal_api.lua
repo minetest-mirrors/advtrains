@@ -211,6 +211,21 @@ function signal.clear_aspect(pos, skip_dst_notify)
 	end
 end
 
+-- Clear any info about aspects from this signal, without resetting/reapplying the aspect.
+-- Supposed to be used for legacy on-off signals when the on-off toggle is used
+function signal.unregister_aspect(pos)
+	local main_pts = advtrains.encode_pos(pos)
+	local old_tbl = signal.aspects[main_pts]
+	local old_remote = old_tbl and old_tbl.remote
+	
+	-- unregister from old remote
+	if old_remote then
+		signal.distant_refs[old_remote][main_pts] = nil
+	end
+		
+	signal.aspects[main_pts] = nil
+end
+
 -- Notify distant signals of main_pts of a change in the aspect of this signal
 -- 
 function signal.notify_distants_of(main_pts, limit)

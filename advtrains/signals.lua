@@ -74,8 +74,9 @@ for r,f in pairs({on={as="off", ls="green", als="red"}, off={as="on", ls="red", 
 					advtrains.ndb.swap_node(pos, {name = "advtrains:retrosignal_"..f.as..rotation, param2 = node.param2}, true)
 					if advtrains.interlocking then
 						-- forcefully clears any set aspect, so that aspect system doesnt override it again
-						-- implicitly does an signal.notify_trains(pos)
-						advtrains.interlocking.signal.clear_aspect(pos)
+						advtrains.interlocking.signal.unregister_aspect(pos)
+						-- notify trains
+						advtrains.interlocking.signal.notify_trains(pos)
 					end
 				end
 			}},
@@ -90,8 +91,9 @@ for r,f in pairs({on={as="off", ls="green", als="red"}, off={as="on", ls="red", 
 					advtrains.ndb.swap_node(pos, {name = "advtrains:retrosignal_"..f.as..rotation, param2 = node.param2}, true)
 					if advtrains.interlocking then
 						-- forcefully clears any set aspect, so that aspect system doesnt override it again
-						-- implicitly does an signal.notify_trains(pos)
-						advtrains.interlocking.signal.clear_aspect(pos)
+						advtrains.interlocking.signal.unregister_aspect(pos)
+						-- notify trains
+						advtrains.interlocking.signal.notify_trains(pos)
 					end
 				end
 			end,
@@ -133,9 +135,6 @@ for r,f in pairs({on={as="off", ls="green", als="red"}, off={as="on", ls="red", 
 				rules=advtrains.meseconrules,
 				["action_"..f.as] = function (pos, node)
 					advtrains.setstate(pos, f.als, node)
-					if advtrains.interlocking then
-						advtrains.interlocking.signal.notify_on_aspect_changed(pos)
-					end
 				end
 			}},
 			on_rightclick=function(pos, node, player)
@@ -156,7 +155,14 @@ for r,f in pairs({on={as="off", ls="green", als="red"}, off={as="on", ls="red", 
 				get_aspect_info = function() return aspect(r=="on") end,
 				node_state = f.ls,
 				node_state_map = { red = "advtrains:signal_off"..rotation, green = "advtrains:signal_on"..rotation},
-				_is_passivenode_signal = true
+				node_on_switch_state = function(pos, new_node, old_state, new_state)
+					if advtrains.interlocking then
+						-- forcefully clears any set aspect, so that aspect system doesnt override it again
+						advtrains.interlocking.signal.unregister_aspect(pos)
+						-- notify trains
+						advtrains.interlocking.signal.notify_trains(pos)
+					end
+				end,
 			},
 			can_dig = can_dig_func,
 			after_dig_node = after_dig_func,
@@ -215,7 +221,14 @@ for r,f in pairs({on={as="off", ls="green", als="red"}, off={as="on", ls="red", 
 				get_aspect_info = function() return aspect(r=="on") end,
 				node_state = f.ls,
 				node_state_map = { red = "advtrains:signal_wall_"..loc.."_off", green = "advtrains:signal_wall_"..loc.."_on" },
-				_is_passivenode_signal = true
+				node_on_switch_state = function(pos, new_node, old_state, new_state)
+					if advtrains.interlocking then
+						-- forcefully clears any set aspect, so that aspect system doesnt override it again
+						advtrains.interlocking.signal.unregister_aspect(pos)
+						-- notify trains
+						advtrains.interlocking.signal.notify_trains(pos)
+					end
+				end,
 			},
 			can_dig = can_dig_func,
 			after_dig_node = after_dig_func,
@@ -253,12 +266,8 @@ minetest.register_node("advtrains:across_off", {
 		end
 	}},
 	advtrains = {
-		getstate = "off",
-		setstate = function(pos, node, newstate)
-			if newstate == "on" then
-				advtrains.ndb.swap_node(pos, {name = "advtrains:across_on", param2 = node.param2}, true)
-			end
-		end,
+		node_state = "off",
+		node_state_map = { on = "advtrains:across_on", off = "advtrains:across_off" },
 	},
 	on_rightclick=function(pos, node, player)
 		if advtrains.check_turnout_signal_protection(pos, player:get_player_name()) then
@@ -294,12 +303,8 @@ minetest.register_node("advtrains:across_on", {
 		end
 	}},
 	advtrains = {
-		getstate = "on",
-		setstate = function(pos, node, newstate)
-			if newstate == "off" then
-				advtrains.ndb.swap_node(pos, {name = "advtrains:across_off", param2 = node.param2}, true)
-			end
-		end,
+		node_state = "on",
+		node_state_map = { on = "advtrains:across_on", off = "advtrains:across_off" },
 		fallback_state = "off",
 	},
 	on_rightclick=function(pos, node, player)
