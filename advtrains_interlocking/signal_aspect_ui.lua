@@ -229,7 +229,7 @@ minetest.register_on_punchnode(function(pos, node, player, pointed_thing)
 			if not ma or ma.halt then -- make sure that dst is never set without a main aspect (esp. for pure distant signal case)
 				ma = "_default"
 			end
-			advtrains.interlocking.signal.set_aspect(signalpos, ma.name, nrpos)
+			advtrains.interlocking.signal.set_aspect(signalpos, ma, nrpos)
 		end
 		players_assign_distant[pname] = nil
 	end

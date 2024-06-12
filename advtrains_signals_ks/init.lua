@@ -122,6 +122,30 @@ local mainaspects_main = {
 	},
 }
 
+local applyaspectf_distant = function(rot)
+ return function(pos, node, main_aspect, dst_aspect, dst_aspect_info)
+	if main_aspect.halt then
+		-- halt aspect, set red and don't do anything further
+		advtrains.ndb.swap_node(pos, {name="advtrains_signals_ks:vs_slow_"..rot, param2 = node.param2})
+		setzs3v(pos, nil, rot)
+		return
+	end
+	-- select appropriate lamps based on mainaspect and dst
+	if not dst_aspect_info
+			or not dst_aspect_info.main
+			or dst_aspect_info.main == -1 then
+		advtrains.ndb.swap_node(pos, {name="advtrains_signals_ks:vs_free_"..rot, param2 = node.param2})
+		setzs3v(pos, nil, rot)
+	elseif dst_aspect_info.main == 0 then
+		advtrains.ndb.swap_node(pos, {name="advtrains_signals_ks:vs_slow_"..rot, param2 = node.param2})
+		setzs3v(pos, nil, rot)
+	else
+		advtrains.ndb.swap_node(pos, {name="advtrains_signals_ks:vs_nextslow_"..rot, param2 = node.param2})
+		setzs3v(pos, dst_aspect_info.main, rot)
+	end
+ end
+end
+
 --Rangiersignal
 local applyaspectf_ra = function(rot)
  -- we get here the full main_aspect table
@@ -146,12 +170,14 @@ local mainaspects_shunt = {
 }
 
 for _, rtab in ipairs({
-		{rot =  "0", sbox = {-1/8, -1/2, -1/2,  1/8, 1/2, -1/4}, ici=true},
-		{rot = "30", sbox = {-3/8, -1/2, -1/2, -1/8, 1/2, -1/4},},
-		{rot = "45", sbox = {-1/2, -1/2, -1/2, -1/4, 1/2, -1/4},},
-		{rot = "60", sbox = {-1/2, -1/2, -3/8, -1/4, 1/2, -1/8},},
+		{rot =  "0", sbox = {-1/8, -1/2, -1/2,  1/8, 1/2, -1/4}, ici=true, nextrot = "30"},
+		{rot = "30", sbox = {-3/8, -1/2, -1/2, -1/8, 1/2, -1/4}, nextrot = "45"},
+		{rot = "45", sbox = {-1/2, -1/2, -1/2, -1/4, 1/2, -1/4}, nextrot = "60"},
+		{rot = "60", sbox = {-1/2, -1/2, -3/8, -1/4, 1/2, -1/8}, nextrot = "0"},
 	}) do
 	local rot = rtab.rot
+	
+	-- Hauptsignal
 	for typ, prts in pairs({
 			danger   = {asp = advtrains.interlocking.signal.ASPI_HALT, n = "slow", ici=true},
 			slow     = {
@@ -219,13 +245,86 @@ for _, rtab in ipairs({
 				apply_aspect = applyaspectf_main(rot),
 				get_aspect_info = afunc,
 				route_role = "main_distant",
+				trackworker_next_rot = "advtrains_signals_ks:hs_"..typ.."_"..rtab.nextrot,
+				trackworker_rot_incr_param2 = (rot=="60")
 			},
 			on_rightclick = advtrains.interlocking.signal.on_rightclick,
 			can_dig = advtrains.interlocking.signal.can_dig,
 			after_dig_node = advtrains.interlocking.signal.after_dig,
 		})
 		-- rotatable by trackworker
-		--TODO add rotation using trackworker
+	end
+	
+	-- Vorsignal (NEU!)
+	for typ, prts in pairs({
+			-- note: the names are taken from the main signal equivalent so that the same names for the lamp images can be used
+			slow   = {asp = advtrains.interlocking.signal.ASPI_HALT, n = "nextslow", ici=true},
+			nextslow = {
+				asp = function(pos)
+					return { dst = getzs3v(pos) or 6 }
+				end,
+				n = "free"
+			},
+			free     = {
+				asp = function(pos)
+					return { dst = -1 }
+				end,
+	            n = "slow"
+			},
+		}) do
+		local tile = "advtrains_signals_ks_ltm_"..typ..".png"
+		local afunc = prts.asp
+		if type(afunc) == "table" then
+			afunc = function() return prts.asp end
+		end
+		if typ == "nextslow" then
+			tile = {
+				name = tile,
+				animation = {
+					type = "vertical_frames",
+					aspect_w = 32,
+					aspect_h = 32,
+					length = 1,
+				}
+			}
+		end
+		minetest.register_node("advtrains_signals_ks:vs_"..typ.."_"..rot, {
+			description = "Ks Distant Signal",
+			drawtype = "mesh",
+			mesh = "advtrains_signals_ks_distant_smr"..rot..".obj",
+			tiles = {"advtrains_signals_ks_mast.png", "advtrains_signals_ks_head.png", "advtrains_signals_ks_head.png", tile},
+			
+			paramtype="light",
+			sunlight_propagates=true,
+			light_source = 4,
+			
+			paramtype2 = "facedir",
+			selection_box = {
+				type = "fixed",
+				fixed = {rtab.sbox, {-1/4, -1/2, -1/4, 1/4, -7/16, 1/4}}
+			},
+			groups = {
+				cracky = 2,
+				advtrains_signal = 2,
+				not_blocking_trains = 1,
+				save_in_at_nodedb = 1,
+				not_in_creative_inventory = (rtab.ici and prts.ici) and 0 or 1,
+			},
+			drop = "advtrains_signals_ks:vs_slow_0",
+			inventory_image = "advtrains_signals_ks_vs_inv.png",
+			advtrains = {
+				-- no mainaspect
+				apply_aspect = applyaspectf_distant(rot),
+				get_aspect_info = afunc,
+				route_role = "distant",
+				trackworker_next_rot = "advtrains_signals_ks:vs_"..typ.."_"..rtab.nextrot,
+				trackworker_rot_incr_param2 = (rot=="60")
+			},
+			on_rightclick = advtrains.interlocking.signal.on_rightclick,
+			can_dig = advtrains.interlocking.signal.can_dig,
+			after_dig_node = advtrains.interlocking.signal.after_dig,
+		})
+		-- rotatable by trackworker
 	end
 	
 	
@@ -263,13 +362,14 @@ for _, rtab in ipairs({
 				apply_aspect = applyaspectf_ra(rot),
 				get_aspect_info = prts.asp,
 				route_role = "shunt",
+				trackworker_next_rot = "advtrains_signals_ks:ra_"..typ.."_"..rtab.nextrot,
+				trackworker_rot_incr_param2 = (rot=="60")
 			},
 			on_rightclick = advtrains.interlocking.signal.on_rightclick,
 			can_dig = advtrains.interlocking.signal.can_dig,
 			after_dig_node = advtrains.interlocking.signal.after_dig,
 		})
 		-- rotatable by trackworker
-		--TODO add rotation using trackworker
 	end
 
 	-- Schilder:
