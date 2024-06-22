@@ -639,8 +639,8 @@ function advtrains.interlocking.show_signalling_form(sigd, pname, sel_rte, calle
 				end
 			end
 			if hasprivs then
-				form = form.."button[0.5,8;2.5,1;newroute;New Route]"
-				form = form.."button[  3,8;2.5,1;unassign;Unassign Signal]"
+				form = form.."button[0.5,8;2.5,1;smartroute;Smart Route]"
+				form = form.."button[  3,8;2.5,1;newroute;New (Manual)]"
 				form = form..string.format("checkbox[0.5,8.75;ars;Automatic routesetting;%s]", not tcbs.ars_disabled)
 			end
 		elseif sigd_equal(tcbs.route_origin, sigd) then
@@ -730,6 +730,12 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				tcbs.ars_ignore_next = nil
 				return
 			end
+			if fields.smartroute and hasprivs then
+				advtrains.interlocking.smartroute.init(pname, sigd)
+				minetest.close_formspec(pname, formname)
+				tcbs.ars_ignore_next = nil
+				return
+			end
 			if sel_rte and tcbs.routes[sel_rte] then
 				if fields.setroute then
 					ilrs.update_route(sigd, tcbs, sel_rte)
@@ -745,24 +751,6 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 					--minetest.show_formspec(pname, formname.."_renroute_"..sel_rte, "field[name;Enter new route name;"..rte.name.."]")
 					return
 				end
-			end
-		end
-		
-		if fields.unassign and hasprivs then
-			-- unassigning the signal from the tcbs
-			-- only when no route is set.
-			-- Routes and name remain saved, in case the player wants to reassign a new signal
-			if not tcbs.routeset then
-				local signal_pos = tcbs.signal
-				ildb.set_sigd_for_signal(signal_pos, nil)
-				tcbs.signal = nil
-				tcbs.route_aspect = nil
-				tcbs.route_remote = nil
-				minetest.close_formspec(pname, formname)
-				minetest.chat_send_player(pname, "Signal has been unassigned. Name and routes are kept for reuse.")
-				return
-			else
-				minetest.chat_send_player(pname, "Please cancel route first!")
 			end
 		end
 		

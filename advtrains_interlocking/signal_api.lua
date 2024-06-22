@@ -419,12 +419,29 @@ end
 ----------------
 
 function signal.can_dig(pos)
-	return not advtrains.interlocking.db.get_sigd_for_signal(pos)
+	local sigd = advtrains.interlocking.db.get_sigd_for_signal(pos)
+	if sigd then
+		local tcbs = advtrains.interlocking.db.get_tcbs(sigd)
+		if tcbs.routeset then
+			return false
+		end
+	end
+	return true
 end
 
-function signal.after_dig(pos)
+function signal.after_dig(pos, oldnode, oldmetadata, player)
+	-- unassign signal if necessary
+	local sigd = advtrains.interlocking.db.get_sigd_for_signal(pos)
+	if sigd then
+		local tcbs = advtrains.interlocking.db.get_tcbs(sigd)
+		advtrains.interlocking.db.set_sigd_for_signal(pos, nil)
+		tcbs.signal = nil
+		tcbs.route_aspect = nil
+		tcbs.route_remote = nil
+		minetest.chat_send_player(player:get_player_name(), "Signal has been unassigned. Name and routes are kept for reuse.")
+	end
 	-- TODO clear influence point
-	advtrains.interlocking.signal.clear_aspect(pos)
+	advtrains.interlocking.signal.unregister_aspect(pos)
 end
 
 function signal.on_rightclick(pos, node, player, itemstack, pointed_thing)
