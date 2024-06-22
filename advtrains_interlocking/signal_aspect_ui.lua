@@ -83,6 +83,7 @@ function advtrains.interlocking.show_ip_sa_form(pos, pname)
 	-- Create Signal aspect formspec elements
 	local ndef = advtrains.ndb.get_ndef(pos)
 	if ndef and ndef.advtrains then
+		form[#form+1] = F.label(0.5, 2, "Signal Aspect:")
 		-- main aspect list
 		if ndef.advtrains.main_aspects then
 			local entries = { "<none>" }

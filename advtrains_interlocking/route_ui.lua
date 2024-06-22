@@ -86,6 +86,9 @@ function atil.show_route_edit_form(pname, sigd, routeid)
 	form = form.."textlist[0.5,2;3,3.9;rtelog;"..table.concat(tab, ",").."]"
 	
 	form = form.."button[0.5,6;3,1;back;<<< Back to signal]"
+	if route.smartroute_generated then
+		form = form.."button[3.5,6;2,1;noautogen;Clr Autogen]"
+	end
 	form = form.."button[5.5,6;3,1;delete;Delete Route]"
 	
 	--atdebug(route.ars)
@@ -135,6 +138,11 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			advtrains.interlocking.show_signal_aspect_selector(pname, suppasp, route.name, callback, route.aspect or advtrains.interlocking.GENERIC_FREE)
 			return
 		end
+		
+		if fields.noautogen then
+			route.smartroute_generated = nil
+		end
+		
 		if fields.delete then
 			-- if something set the route in the meantime, make sure this doesn't break.
 			atil.route.update_route(sigd, tcbs, nil, true)

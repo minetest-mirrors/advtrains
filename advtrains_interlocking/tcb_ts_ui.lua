@@ -616,6 +616,9 @@ function advtrains.interlocking.show_signalling_form(sigd, pname, sel_rte, calle
 			local strtab = {}
 			for idx, route in ipairs(tcbs.routes) do
 				local clr = ""
+				if route.smartroute_generated then
+					clr = "#FFFF55"
+				end
 				if route.ars then
 					clr = "#FF5555"
 					if route.ars.default then
