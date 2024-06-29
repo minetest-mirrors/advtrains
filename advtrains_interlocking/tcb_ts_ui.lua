@@ -550,6 +550,13 @@ minetest.register_entity("advtrains_interlocking:tcbmarker", {
 	static_save = false,
 })
 
+function advtrains.interlocking.remove_tcb_marker_pts(pts)
+	if markerent[pts] then
+		markerent[pts]:remove()
+		markerent[pts] = nil
+	end
+end
+
 function advtrains.interlocking.show_tcb_marker(pos)
 	--atdebug("showing tcb marker",pos)
 	local tcb = ildb.get_tcb(pos)
@@ -573,9 +580,7 @@ function advtrains.interlocking.show_tcb_marker(pos)
 	end
 	
 	local pts = advtrains.roundfloorpts(pos)
-	if markerent[pts] then
-		markerent[pts]:remove()
-	end
+	advtrains.interlocking.remove_tcb_marker_pts(pts)
 	
 	local obj = minetest.add_entity(pos, "advtrains_interlocking:tcbmarker")
 	if not obj then return end

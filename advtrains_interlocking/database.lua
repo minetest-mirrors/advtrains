@@ -425,7 +425,7 @@ function ildb.link_track_sections(merge_id, root_id)
 	merge_ts(root_id, merge_id)
 end
 
-function ildb.remove_from_interlocking(sigd)
+function ildb.remove_from_interlocking(sigd, no_tcb_marker)
 	local tcbs = ildb.get_tcbs(sigd)
 	if not ildb.may_modify_tcbs(tcbs) then return false end
 	
@@ -455,7 +455,9 @@ function ildb.remove_from_interlocking(sigd)
 			track_sections[tsid] = nil
 		end
 	end
-	advtrains.interlocking.show_tcb_marker(sigd.p)
+	if not no_tcb_marker then
+		advtrains.interlocking.show_tcb_marker(sigd.p)
+	end
 	if tcbs.signal then
 		return false
 	end
@@ -468,10 +470,11 @@ function ildb.remove_tcb(pos)
 		return true --FIX: not an error, because tcb is already removed
 	end
 	for connid=1,2 do
-		if not ildb.remove_from_interlocking({p=pos, s=connid}) then
+		if not ildb.remove_from_interlocking({p=pos, s=connid}, true) then
 			return false
 		end
 	end
+	advtrains.interlocking.remove_tcb_marker_pts(pts)
 	track_circuit_breaks[pts] = nil
 	return true
 end
