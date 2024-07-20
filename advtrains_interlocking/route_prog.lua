@@ -209,7 +209,7 @@ function advtrains.interlocking.visualize_route(origin, route, context, tmp_lcks
 		end
 	-- display locks set by player		
 		for pts, state in pairs(tmp_lcks) do
-			local pos = minetest.string_to_pos(pts)
+			local pos = advtrains.decode_pos(pts)
 			routesprite(context, pos, "fixp"..pts, "at_il_route_lock_edit.png", "Fixed in state '"..state.."' by route "..route.name.." (punch to unfix)",
 				function() clear_lock(tmp_lcks, pname, pts) end)
 		end
@@ -536,7 +536,7 @@ minetest.register_on_punchnode(function(pos, node, player, pointed_thing)
 			return
 		end
 		if advtrains.is_passive(pos) then
-			local pts = advtrains.roundfloorpts(pos)
+			local pts = advtrains.encode_pos(pos)
 			if rp.tmp_lcks[pts] then
 				clear_lock(rp.tmp_lcks, pname, pts)
 			else

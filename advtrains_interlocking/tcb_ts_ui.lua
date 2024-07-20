@@ -645,6 +645,7 @@ function advtrains.interlocking.show_signalling_form(sigd, pname, sel_rte, calle
 				form = form.."button[0.5,8;2.5,1;smartroute;Smart Route]"
 				form = form.."button[  3,8;2.5,1;newroute;New (Manual)]"
 				form = form..string.format("checkbox[0.5,8.75;ars;Automatic routesetting;%s]", not tcbs.ars_disabled)
+				form = form..string.format("checkbox[0.5,9.25;dstarstrig;Distant signal triggers ARS;%s]", not tcbs.no_dst_ars_trig)
 			end
 		elseif sigd_equal(tcbs.route_origin, sigd) then
 			-- something has gone wrong: tcbs.routeset should have been set...
@@ -669,7 +670,7 @@ end
 function advtrains.interlocking.update_player_forms(sigd)
 	for pname, tsigd in pairs(p_open_sig_form) do
 		if advtrains.interlocking.sigd_equal(sigd, tsigd) then
-			advtrains.interlocking.show_signalling_form(sigd, pname, nil)
+			advtrains.interlocking.show_signalling_form(sigd, pname, nil, true)
 		end
 	end
 end
@@ -759,6 +760,10 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		
 		if fields.ars then
 			tcbs.ars_disabled = not minetest.is_yes(fields.ars)
+		end
+		
+		if fields.dstarstrig then
+			tcbs.no_dst_ars_trig = not minetest.is_yes(fields.dstarstrig)
 		end
 		
 		if fields.auto then

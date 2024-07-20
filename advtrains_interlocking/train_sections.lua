@@ -75,7 +75,10 @@ local function setsection(tid, train, ts_id, ts, sigd)
 	end
 	
 	-- routes
-	local tcbs = advtrains.interlocking.db.get_tcbs(sigd)
+	local tcbs
+	if sigd then
+		tcbs = advtrains.interlocking.db.get_tcbs(sigd)
+	end
 	
 	-- route setting - clear route state
 	if ts.route then
@@ -90,7 +93,7 @@ local function setsection(tid, train, ts_id, ts, sigd)
 		end
 		ts.route = nil
 	end
-	if tcbs.signal then
+	if tcbs and tcbs.signal then
 		-- Reset route and signal
 		-- Note that the hit-route case is already handled by cancel_route_from
 		-- this code only handles signal at entering tcb and also triggers for non-route ts

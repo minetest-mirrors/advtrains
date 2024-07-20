@@ -258,16 +258,16 @@ for _, rtab in ipairs({
 	-- Vorsignal (NEU!)
 	for typ, prts in pairs({
 			-- note: the names are taken from the main signal equivalent so that the same names for the lamp images can be used
-			slow   = {asp = advtrains.interlocking.signal.ASPI_HALT, n = "nextslow", ici=true},
+			slow   = {asp = function(pos) return { dst = 0, shunt = true } end, n = "nextslow", ici=true},
 			nextslow = {
 				asp = function(pos)
-					return { dst = getzs3v(pos) or 6 }
+					return { dst = getzs3v(pos) or 6, shunt = true }
 				end,
 				n = "free"
 			},
 			free     = {
 				asp = function(pos)
-					return { dst = -1 }
+					return { dst = -1, shunt = true }
 				end,
 	            n = "slow"
 			},
@@ -399,7 +399,9 @@ for _, rtab in ipairs({
 			drop = "advtrains_signals_ks:"..prefix.."_"..dtyp.."_0",
 			inventory_image = inv,
 			advtrains = {
-				get_aspect_info = asp
+				get_aspect_info = asp,
+				trackworker_next_rot = "advtrains_signals_ks:"..prefix.."_"..typ.."_"..rtab.nextrot,
+				trackworker_rot_incr_param2 = (rot=="60")
 			},
 			on_rightclick = advtrains.interlocking.signal_rc_handler,
 			can_dig = advtrains.interlocking.signal_can_dig,
@@ -506,6 +508,10 @@ for _, rtab in ipairs({
 		t.mesh = "advtrains_signals_ks_zs_top_smr"..rot..".obj"
 		t.drop = "advtrains_signals_ks:zs3_off_0"
 		t.selection_box.fixed[1][5] = 0
+		t.advtrains = {
+				trackworker_next_rot = "advtrains_signals_ks:zs3_"..typ.."_"..rtab.nextrot,
+				trackworker_rot_incr_param2 = (rot=="60")
+			},
 		minetest.register_node("advtrains_signals_ks:zs3_"..typ.."_"..rot, t)
 		--TODO add rotation using trackworker
 
@@ -515,6 +521,10 @@ for _, rtab in ipairs({
 		t.mesh = "advtrains_signals_ks_zs_bottom_smr"..rot..".obj"
 		t.drop = "advtrains_signals_ks:zs3v_off_0"
 		t.tiles[3] = t.tiles[3] .. "^[multiply:yellow"
+		t.advtrains = {
+				trackworker_next_rot = "advtrains_signals_ks:zs3v_"..typ.."_"..rtab.nextrot,
+				trackworker_rot_incr_param2 = (rot=="60")
+			},
 		minetest.register_node("advtrains_signals_ks:zs3v_"..typ.."_"..rot, t)
 		--TODO add rotation using trackworker
 	end
@@ -538,6 +548,10 @@ for _, rtab in ipairs({
 			cracky = 2,
 			not_blocking_trains = 1,
 			not_in_creative_inventory = (rtab.ici) and 0 or 1,
+		},
+		advtrains = {
+			trackworker_next_rot = "advtrains_signals_ks:mast_mast_"..rtab.nextrot,
+			trackworker_rot_incr_param2 = (rot=="60")
 		},
 		drop = "advtrains_signals_ks:mast_mast_0",
 	})

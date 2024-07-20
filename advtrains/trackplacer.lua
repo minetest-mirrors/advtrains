@@ -288,8 +288,8 @@ minetest.register_craftitem("advtrains:trackworker",{
 			advtrains.ndb.swap_node(pos, new_node)
 		end
 	end,
-	on_use=function(itemstack, user, pointed_thing)
-		local name = user:get_player_name()
+	on_use=function(itemstack, player, pointed_thing)
+		local name = player:get_player_name()
 		if not name then
 		   return
 		end
@@ -305,7 +305,7 @@ minetest.register_craftitem("advtrains:trackworker",{
 			local ndef = minetest.registered_nodes[node.name]
 			
 			if not ndef.advtrains or not ndef.advtrains.trackworker_next_var then
-				minetest.chat_send_player(placer:get_player_name(), attrans("This node can't be changed using the trackworker!"))
+				minetest.chat_send_player(name, attrans("This node can't be changed using the trackworker!"))
 				return
 			end
 			
@@ -318,7 +318,7 @@ minetest.register_craftitem("advtrains:trackworker",{
 					if reason then
 						str = str .. " " .. reason
 					end
-					minetest.chat_send_player(placer:get_player_name(), str)
+					minetest.chat_send_player(name, str)
 					return
 				end
 			end

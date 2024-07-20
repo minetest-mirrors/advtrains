@@ -48,7 +48,7 @@ local params = {
 	ZONE_HOLD  =  5, -- added on top of ZONE_ROLL
 	ZONE_VSLOW =  3, -- When speed is <2, still allow accelerating
 
-	DST_FACTOR =  1.5,
+	DST_FACTOR =  3,--1.5,
 
 	SHUNT_SPEED_MAX = advtrains.SHUNT_SPEED_MAX,
 }

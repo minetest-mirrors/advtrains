@@ -865,7 +865,7 @@ local function tnc_call_enter_callback(pos, train_id, train, index)
 	-- check for split points
 	if mregnode and mregnode.at_conn_map then
 		-- If this node has >2 conns (and a connmap), remember the connection where we came from to handle split points
-		atdebug("Train",train_id,"at",pos,"saving turnout origin CP",train.path_cp[index],"for path item",index)
+		--atdebug("Train",train_id,"at",pos,"saving turnout origin CP",train.path_cp[index],"for path item",index)
 		train.path_ori_cp[advtrains.encode_pos(pos)] = train.path_cp[index]
 	end
 end
@@ -883,7 +883,7 @@ local function tnc_call_leave_callback(pos, train_id, train, index)
 	-- split points do not matter anymore. clear them
 	if mregnode and mregnode.at_conn_map then
 		-- If this node has >2 conns (and a connmap), remember the connection where we came from to handle split points
-		atdebug("Train",train_id,"at",pos,"removing turnout origin CP for path item",index," because train has left it")
+		--atdebug("Train",train_id,"at",pos,"removing turnout origin CP for path item",index," because train has left it")
 		train.path_ori_cp[advtrains.encode_pos(pos)] = nil
 	end
 end
@@ -1188,7 +1188,7 @@ function advtrains.invert_train(train_id)
 		local pos = advtrains.path_get(train, index)
 		local ok, conns, railheight, connmap = advtrains.get_rail_info_at(pos)
 		if ok and connmap then
-			atdebug("Reversing Train",train.id," ori_cp Checks: at",pos,"saving turnout origin CP",train.path_cn[index],"for path item",index)
+			--atdebug("Reversing Train",train.id," ori_cp Checks: at",pos,"saving turnout origin CP",train.path_cn[index],"for path item",index)
 			ori_cp_after_flip[advtrains.encode_pos(pos)] = train.path_cn[index]
 		end
 	end

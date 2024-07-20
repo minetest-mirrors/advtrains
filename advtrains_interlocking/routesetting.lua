@@ -92,8 +92,8 @@ function ilrs.set_route(signal, route, try)
 		end
 		-- add all from locks, these override the rscache
 		for lpts,lst in pairs(c_rseg.locks) do
-			atdebug("Add lock from Routedef:",lp,"->",lst,"overrides",c_locks[lp] or "none")
-			c_locks[lp] = lst
+			atdebug("Add lock from Routedef:",lpts,"->",lst,"overrides",c_locks[lpts] or "none")
+			c_locks[lpts] = lst
 		end
 		
 		for lp, state in pairs(c_locks) do

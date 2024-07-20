@@ -256,7 +256,7 @@ function advtrains.path_get(train, index)
 			if next_connmap then -- only needs to be done when this track is a turnout (>2 conns)
 				local origin_conn = train.path_ori_cp[advtrains.encode_pos(adj_pos)]
 				if origin_conn then
-					atdebug("Train",train.id,"at",adj_pos,"restoring turnout origin CP",origin_conn,"for path item",index)
+					--atdebug("Train",train.id,"at",adj_pos,"restoring turnout origin CP",origin_conn,"for path item",index)
 					mconnid = origin_conn
 				end
 			end

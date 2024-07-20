@@ -279,7 +279,7 @@ end
 function signal.get_aspect(pos)
 	local aspt = signal.aspects[advtrains.encode_pos(pos)]
 	local ma,dp = signal.get_aspect_internal(pos, aspt)
-	return ma, advtrains.decode_pos(dp)
+	return ma, dp and advtrains.decode_pos(dp)
 end
 
 local function cache_mainaspects(ndefat)
