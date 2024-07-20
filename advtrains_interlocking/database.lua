@@ -254,6 +254,13 @@ routes = {
 		ars = { <ARS rule definition table> }
 		use_rscache = false -- if true, the track section's rs_cache will be used to set locks in addition to the locks table
 							-- this is disabled for legacy routes, but enabled for all new routes by default
+		-- Fields to specify the signal aspect of the signal
+		main_aspect = "_free" -- The main aspect that the route start signal is to show
+		assign_dst = false  -- Whether to assign distant signal (affects only the signal at the start of the route)
+							-- false: start signal does not set distant signal (the default), for long blocks
+								-- it is assumed that the next main signal will have its own distant sig
+							-- true: start signal sets distant signal to the next signal on the route with route_role "main" (typically the end signal)
+								-- for short blocks where end signal doesn't have its own distant sig
 		-- Fields used by the autorouter:
 		ar_end_sigd = <sigd> -- the sigd describing the end of the route. Used for merging route options on recalculation
 	}

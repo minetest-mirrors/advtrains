@@ -147,7 +147,7 @@ function ilrs.set_route(signal, route, try)
 					tcbs_ref = c_tcbs,
 					role = ndef and ndef.advtrains and ndef.advtrains.route_role,
 					masp_override = c_rseg.masp_override, --TODO implement masp_override on UI side
-					dst_type = "next_main", --TODO allow user differentiate
+					assign_dst = (i~=1) or route.assign_dst -- Behavior: for first signal assign depending on route.assign_dst, all others always assign
 				}
 				signals[#signals+1] = sig_table
 			end
@@ -171,10 +171,18 @@ function ilrs.set_route(signal, route, try)
 		-- note the signals are iterated backwards. Switch depending on the role
 		local sig = signals[i]
 		-- apply mainaspect
-		sig.tcbs_ref.route_aspect = sig.masp_override or "_default"
+		sig.tcbs_ref.route_aspect = sig.masp_override or route.main_aspect or "_default"
 		if sig.role == "distant" or sig.role == "distant_repeater" or sig.role == "main_distant" then
-			-- assign the remote as the last mainsig
-			sig.tcbs_ref.route_remote = last_mainsig
+			if last_mainsig then
+				-- assign the remote as the last mainsig if desired
+				if sig.assign_dst then
+					sig.tcbs_ref.route_remote = last_mainsig
+				end
+				-- if it wasn't a distant_repeater clear the mainsig
+				if sig.role ~= "distant_repeater" then
+					last_mainsig = false
+				end
+			end
 		end
 		if sig.role == "main" or sig.role == "main_distant" or sig.role == "end" then
 			-- record this as the new last mainsig

@@ -3,6 +3,7 @@
 
 local atil = advtrains.interlocking
 local ildb = atil.db
+local F = advtrains.formspec
 
 -- TODO duplicate
 local lntrans = { "A", "B" }
@@ -83,9 +84,32 @@ function atil.show_route_edit_form(pname, sigd, routeid)
 		itab("E (none)")
 	end
 	
-	form = form.."textlist[0.5,2;3,3.9;rtelog;"..table.concat(tab, ",").."]"
+	form = form.."textlist[0.5,2;3.5,3.9;rtelog;"..table.concat(tab, ",").."]"
 	
-	form = form.."button[0.5,6;3,1;back;<<< Back to signal]"
+	-- to the right of rtelog a signal aspect selection for the start signal
+	form = form..F.label(4.5, 2, "Signal Aspect:")
+	-- main aspect list
+	local signalpos = tcbs.signal
+	local ndef = signalpos and advtrains.ndb.get_ndef(signalpos)
+	if ndef and ndef.advtrains and ndef.advtrains.main_aspects then
+		local entries = { "<Default Aspect>" }
+		local sel = 1
+		for i, mae in ipairs(ndef.advtrains.main_aspects) do
+			entries[i+1] = mae.description
+			if mae.name == route.main_aspect then
+				sel = i+1
+			end
+		end
+		form = form..F.dropdown(4.5, 3.0, 4, "sa_main_aspect", entries, sel, true)
+		-- checkbox for assign distant signal
+		form = form..string.format("checkbox[4.5,4.0;sa_distant;Announce distant signal;%s]", route.assign_dst)
+	end
+	
+	form = form.."button[0.5,6;1,1;prev;<<<]"
+	form = form.."button[1.5,6;1,1;back;Back]"
+	form = form.."button[2.5,6;1,1;next;>>>]"
+	
+	
 	if route.smartroute_generated then
 		form = form.."button[3.5,6;2,1;noautogen;Clr Autogen]"
 	end
@@ -123,20 +147,32 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		local route = tcbs.routes[routeid]
 		if not route then return end
 		
+		if fields.prev then
+			atil.show_route_edit_form(pname, sigd, routeid - 1)
+			return
+		end
+		if fields.next then
+			atil.show_route_edit_form(pname, sigd, routeid + 1)
+			return
+		end
+		
 		if fields.setname and fields.name then
 			route.name = fields.name
 		end
 		
-		if fields.aspect then
-			local suppasp = advtrains.interlocking.signal_get_supported_aspects(tcbs.signal)
-			
-			local callback = function(pname, asp)
-				route.aspect = asp
-				advtrains.interlocking.show_route_edit_form(pname, sigd, routeid)
+		if fields.sa_main_aspect then
+			local idx = tonumber(fields.sa_main_aspect)
+			route.main_aspect = nil
+			if idx > 1 then
+				local signalpos = tcbs.signal
+				local ndef = signalpos and advtrains.ndb.get_ndef(signalpos)
+				if ndef and ndef.advtrains and ndef.advtrains.main_aspects then
+					route.main_aspect = ndef.advtrains.main_aspects[idx - 1].name
+				end
 			end
-			
-			advtrains.interlocking.show_signal_aspect_selector(pname, suppasp, route.name, callback, route.aspect or advtrains.interlocking.GENERIC_FREE)
-			return
+		end
+		if fields.sa_distant then
+			route.assign_dst = minetest.is_yes(fields.sa_distant)
 		end
 		
 		if fields.noautogen then

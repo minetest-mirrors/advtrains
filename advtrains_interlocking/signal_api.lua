@@ -100,7 +100,8 @@ ndef.advtrains = {
 		-- Determines how the signal behaves when routes are set. Only in effect when signal is assigned to a TCB.
 		-- main: The signal is a possible endpoint for a train move route. Distant signals before it refer to it.
 		-- shunt: The signal is a possible endpoint for a shunt move route. Ignored for distant signals.
-		-- distant, distant_repeater: When route is set, signal is always assigned its first main aspect. The next signal with role="main" is set as the remote signal. (currently no further distinction)
+		-- distant, distant_repeater: The next signal with role="main" is set as the remote signal. main_aspects may be undefined, the main aspect passed to apply_aspect is a dummy one in this case.
+		-- distant: if more than one distant signal is before a main signal, only the last one is assigned (but any number of distant_repeater signals are allowed)
 		-- main_distant: Combination of main and distant - like "main", but additionally gets assigned to the next main like a "distant"
 		-- end: like main, but signifies that it marks an end of track and trains cannot continue further. (currently no practical implications above main)
 }
