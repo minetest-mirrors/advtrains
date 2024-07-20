@@ -46,7 +46,7 @@ local function applyaspect_distant(loc)
 end
 
 for r,f in pairs(all_sigs) do
-	for loc, sbox in pairs({l={-1/2, -1/4, -1/8, -1/4, 1/4, 1/8}, r={1/4, -1/4, -1/8, 1/2, 1/4, 1/8}, t={-1/4, 1/4, -1/8, 1/4, 1/2, 1/8}}) do
+	for loc, sbox in pairs({l={-1/2, -1/2, -1/4, 0, 1/2, 1/4}, r={0, -1/2, -1/4, 1/2, 1/2, 1/4}, t={-1/2, 0, -1/4, 1/2, 1/2, 1/4}}) do
 		minetest.register_node("advtrains_signals_muc_ubahn:signal_wall_"..loc.."_"..r, {
 			drawtype = "mesh",
 			paramtype="light",
