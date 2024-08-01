@@ -159,10 +159,8 @@ function o.reverse_lookup(ppos)
 	local r = {}
 	local i = 1
 	while t[i] do
-		if t[i]~=train_id then
-			if not r[t[i]] then r[t[i]] = {} end
-			table.insert(r[t[i]], t[i+1])
-		end
+		if not r[t[i]] then r[t[i]] = {} end
+		table.insert(r[t[i]], t[i+1])
 		i = i + 2
 	end
 	return r
