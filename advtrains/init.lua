@@ -738,6 +738,21 @@ minetest.register_chatcommand("at_whereis",
 			end
 		end,
 })
+minetest.register_chatcommand("at_tp",
+	{
+		params = "<train id>",
+		description = "Teleports you to the position of the train with the given id",
+		privs = {train_operator = true, teleport = true},
+		func = function(name,param)
+			local train = advtrains.trains[param]
+			if not train or not train.last_pos then
+				return false, "Train "..param.." does not exist or is invalid"
+			else
+				minetest.get_player_by_name(name):set_pos(train.last_pos)
+				return true, "Teleporting to train "..param
+			end
+		end,
+})
 minetest.register_chatcommand("at_disable_step",
 	{
         params = "<yes/no>", 
