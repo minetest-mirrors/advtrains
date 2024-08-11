@@ -22,6 +22,9 @@ function atlatc.pcnaming.resolve_pos(pos, func_name)
 	error("Invalid position supplied to " .. (func_name or "???")..": " .. dump(pos))
 end
 
+
+local pcrename = {}
+
 minetest.register_craftitem("advtrains_luaautomation:pcnaming",{
 	description = attrans("Passive Component Naming Tool\n\nRight-click to name a passive component."),
 	groups = {cracky=1}, -- key=name, value=rating; rating=1..3.
@@ -43,6 +46,7 @@ minetest.register_craftitem("advtrains_luaautomation:pcnaming",{
 				minetest.record_protection_violation(pos, pname)
 				return
 			end
+
 			local node = advtrains.ndb.get_node(pos)
 			local ndef = minetest.registered_nodes[node.name]
 			if node.name and (
@@ -57,16 +61,17 @@ minetest.register_craftitem("advtrains_luaautomation:pcnaming",{
 						pn=name
 					end
 				end
-				minetest.show_formspec(pname, "atlatc_naming_"..minetest.pos_to_string(pos), "field[pn;Set name of component (empty to clear);"..minetest.formspec_escape(pn).."]")
+				pcrename[pname] = pos
+				minetest.show_formspec(pname, "atlatc_naming", "field[pn;Set name of component (empty to clear);"..minetest.formspec_escape(pn).."]")
 			end
 		end
 	end,
 })
 minetest.register_on_player_receive_fields(function(player, formname, fields)
-	local pts=string.match(formname, "^atlatc_naming_(.+)")
-	if pts then
-		local pos=minetest.string_to_pos(pts)
-		if fields.pn then
+	if formname == "atlatc_naming" then
+		local pname = player:get_player_name()
+		local pos=pcrename[pname]
+		if fields.pn and pos then
 			--first remove all occurences
 			for name, npos in pairs(atlatc.pcnaming.name_map) do
 				if vector.equals(npos, pos) then
