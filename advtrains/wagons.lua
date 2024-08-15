@@ -971,7 +971,8 @@ function wagon:show_bordcom(pname)
 	local data = advtrains.wagons[self.id]
 	local linhei
 	
-	local form = "size[11,9]label[0.5,0;AdvTrains Boardcom v0.1 | "..attrans("Train ID")..": "..(minetest.formspec_escape(train.id or "")).."]"
+	local form = "size[11,9]label[0.5,0;AdvTrains Boardcom v0.1]"
+	form=form.."textarea[7.5,0.05;10,1;;"..attrans("Train ID")..": "..(minetest.formspec_escape(train.id or ""))..";]"
 	form=form.."textarea[0.5,1.5;7,1;text_outside;"..attrans("Text displayed outside on train")..";"..(minetest.formspec_escape(train.text_outside or "")).."]"
 	form=form.."textarea[0.5,3;7,1;text_inside;"..attrans("Text displayed inside train")..";"..(minetest.formspec_escape(train.text_inside or "")).."]"
 	form=form.."field[7.5,1.75;3,1;line;"..attrans("Line")..";"..(minetest.formspec_escape(train.line or "")).."]"
