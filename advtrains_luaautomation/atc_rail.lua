@@ -113,11 +113,12 @@ function r.fire_event(pos, evtdata, appr_internal)
 				if fc_list[index] then -- has FC to enter to this wagon
 					local data = advtrains.wagons[wagon_id]
 					if data then -- wagon actually exists
-						for _,wagon in pairs(minetest.luaentities) do -- find wagon entity
-							if wagon.is_wagon and wagon.initialized and wagon.id==wagon_id then
-								wagon.set_fc(data,fc_list[index]) -- overwrite to new FC
-								break -- no point cycling through every other entity. we found our wagon
-							end
+						--direct copy from wagons.lua, allowing for the :split function
+						data.fc = fc_list[index]:split("!")
+						if not data.fcind then
+							data.fcind = 1
+						elseif data.fcind > #data.fc then
+							data.fcind = #data.fc
 						end
 					end
 				end
