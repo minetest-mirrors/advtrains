@@ -274,9 +274,11 @@ Each wagon has a current FC, indicating its next destination.
 	Command: `get_fc()`  
 	Result: `{"", "foo!bar", "testing", "fc_1!fc_2!fc_3!?", "hello_world"}`
 	
- - `set_fc(fc_list)`
+ - `set_fc(fc_list, reset_index)`
 	Overwrites the FC list according to a table `fc_list`. A false or nil entry will leave the wagon unaffected, however all others will be overwritten.
-	Useful for mass-programming freight trains that use FC-shunting instead of walking to each wagon individually.  
+	Useful for mass-programming freight trains that use FC-shunting instead of walking to each wagon individually. If the new FC entry for a wagon is shorter than the old entry, the index will clip to the last FC in the new entry.  
+	If `reset_index` is true, all Current FC values will reset to the first entry in the list, instead of remaining at the current index.  
+
 	Example: train has FC lists: `"", "foo!bar", "testing", "fc_1!fc_2!fc_3!?", "hello_world"`  
 	Command: `set_fc({"", "foo!turtle", nil, "4tehlulz", false})`  
 	Result: `""` `"foo!turtle"` `"testing"` `"4tehlulz"` `"hello_world"`
