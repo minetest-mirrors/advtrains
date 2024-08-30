@@ -93,6 +93,9 @@ Removes any pending interrupts of this node.
 Make this active component send a digiline message on the specified channel.
 Not available in init code.
 
+ - `trainparts(train_id)`
+	returns a table with the ids of the cars the train is composed of, or false if `train_id` is invalid. `train_id` can be replaced with `atc_id` when used in LuaATC Rails.
+
  - `atc_send_to_train(<train_id>, <atc_command>)`
 	Sends the specified ATC command to the train specified by its train id. This happens regardless of where the train is in the world, and can be used to remote-control trains. Returns true on success. If the train ID does not exist, returns false and does nothing. See [atc_command.txt](../atc_command.txt) for the ATC command syntax.
 

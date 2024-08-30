@@ -153,6 +153,12 @@ local static_env = {
 		local pos=atlatc.pcnaming.resolve_pos(parpos, "interrupt_pos")
 		atlatc.interrupt.add(0, pos, {type="ext_int", ext_int=true, message=imesg})
 	end,
+	train_parts = function(train_id)
+		if not train_id then return false end
+		local train = advtrains.trains[train_id]
+		if not train then return false end
+		return table.copy(train.trainparts or {})
+	end,
 	-- sends an atc command to train regardless of where it is in the world
 	atc_send_to_train = function(train_id, command)
 		assertt(command, "string")
