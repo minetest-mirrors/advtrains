@@ -13,7 +13,20 @@ local GETOFF_TP_DELAY = 0.5
 local IGNORE_WORLD = advtrains.IGNORE_WORLD
 
 advtrains.wagons = {}
-advtrains.wagon_prototypes = {}
+advtrains.wagon_alias = {}
+advtrains.wagon_prototypes = setmetatable({}, {
+	__index = function(t, k)
+		local rtn_val = rawget(t, k)
+		if rtn_val ~= nil then
+			return rtn_val
+		end
+		local alias = advtrains.wagon_alias[k]
+		if alias then
+			return rawget(t, alias)
+		end
+		return nil
+	end
+})
 advtrains.wagon_objects = {}
 
 local unload_wgn_range = advtrains.wagon_load_range + 32
@@ -1324,6 +1337,10 @@ function advtrains.get_wagon_prototype(data)
 		wt="advtrains:wagon_placeholder"
 	end
 	return wt, advtrains.wagon_prototypes[wt]
+end
+
+function advtrains.register_wagon_alias(src, dst)
+	advtrains.wagon_alias[src] = dst
 end
 
 function advtrains.standard_inventory_formspec(self, pname, invname)
