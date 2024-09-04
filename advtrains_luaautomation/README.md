@@ -145,22 +145,16 @@ asp = {
 	-- the character of call_on and dead_end is purely informative
 	call_on = <boolean>, -- Call-on route, expect train in track ahead (not implemented yet)
 	dead_end = <boolean>, -- Route ends on a dead end (e.g. bumper) (not implemented yet)
-
-	w_speed = <integer>,
-	-- "Warning speed restriction". Supposed for short-term speed
-	-- restrictions which always override any other restrictions
-	-- imposed by "speed" fields, until lifted by a value of -1
-	-- (Example: german Langsamfahrstellen-Signale)
 }
 ```
-As of January 2020, the 'dst', 'call_on' and 'dead_end' fields are not used.
+As of September 2024, the 'dst', 'call_on' and 'dead_end' fields are not used.
 
 #### Lines
 
 The advtrains_line_automation component adds a few contraptions that should make creating timeable systems easier.
 Part of its functionality is also available in LuaATC:
 
-- `rwt.*` - all Railway Time functions are included as documented in [the wiki](https://advtrains.de/wiki/doku.php?id=dev:lines:rwt)
+- `rwt.*` - all Railway Time functions are included as documented in [the wiki](https://advtrains.de/wiki/doku.php?id=dev:api:railway_time_api)
 
  - `schedule(rw_time, msg)`, `schedule_in(rw_dtime, msg)`
 Schedules an event of type {type="schedule", schedule=true, msg=msg} at (resp. after) the specified railway time (which can be in any format). You can only schedule one event this way. (uses the new lines-internal scheduler)
