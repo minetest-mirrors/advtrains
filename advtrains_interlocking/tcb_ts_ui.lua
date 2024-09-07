@@ -657,14 +657,22 @@ function advtrains.interlocking.show_signalling_form(sigd, pname, sel_rte, calle
 				strtab[#strtab+1] = clr .. minetest.formspec_escape(route.name)
 			end
 			form = form.."label[0.5,2.5;Routes:]"
-			form = form.."textlist[0.5,3;5,3;rtelist;"..table.concat(strtab, ",").."]"
+			form = form.."textlist[0.5,3;5,3;rtelist;"..table.concat(strtab, ",")
 			if sel_rte then
+				form = form .. ";" .. sel_rte .."]"
 				form = form.."button[0.5,6;  5,1;setroute;Set Route]"
 				form = form.."button[0.5,7;2,1;dsproute;Show]"
 				if hasprivs then
 					form = form.."button[3.5,7;2,1;editroute;Edit]"
+					if sel_rte > 1 then
+						form = form .. "button[5.5,4;0.5,0.3;moveup;↑]"
+					end
+					if sel_rte < #strtab then
+						form = form .. "button[5.5,4.7;0.5,0.3;movedown;↓]"
+					end
 				end
 			else
+				form = form .. "]"
 				if tcbs.ars_disabled then
 					form = form.."label[0.5,6  ;NOTE: ARS is disabled.]"
 					form = form.."label[0.5,6.5;Routes are not automatically set.]"
@@ -814,6 +822,20 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		end
 		if fields.noauto then
 			tcbs.route_auto = false
+		end
+
+		if sel_rte and tcbs.routes[sel_rte]and not tcbs.routeset then
+			if fields.moveup then
+				if tcbs.routes[sel_rte - 1] then
+					tcbs.routes[sel_rte - 1], tcbs.routes[sel_rte] = tcbs.routes[sel_rte], tcbs.routes[sel_rte - 1]
+					sel_rte = sel_rte - 1
+				end
+			elseif fields.movedown then
+				if tcbs.routes[sel_rte + 1] then
+					tcbs.routes[sel_rte + 1], tcbs.routes[sel_rte] = tcbs.routes[sel_rte], tcbs.routes[sel_rte + 1]
+					sel_rte = sel_rte + 1
+				end
+			end
 		end
 		
 		advtrains.interlocking.show_signalling_form(sigd, pname, sel_rte, true)
