@@ -1393,13 +1393,23 @@ function advtrains.register_wagon(sysname_p, prototype, desc, inv_img, nincreati
 		groups = wagon_groups,
 
 		on_place = function(itemstack, placer, pointed_thing)
-				if not pointed_thing.type == "node" then
+				if pointed_thing.type ~= "node" then
 					return
 				end
+
+				local pos = pointed_thing.under
+				local node = minetest.get_node(pos)
+				local pointed_def = minetest.registered_nodes[node.name]
+				if pointed_def and pointed_def.on_rightclick then
+					local controls = placer:get_player_control()
+					if not controls.sneak then
+						return pointed_def.on_rightclick(pos, node, placer, itemstack, pointed_thing)
+					end
+				end
+
 				local pname = placer:get_player_name()
 
-				local node=minetest.get_node_or_nil(pointed_thing.under)
-				if not node then atprint("[advtrains]Ignore at placer position") return itemstack end
+				if node.name == "ignore" then atprint("[advtrains]Ignore at placer position") return itemstack end
 				local nodename=node.name
 				if(not advtrains.is_track_and_drives_on(nodename, prototype.drives_on)) then
 					atprint("no track here, not placing.")
@@ -1409,14 +1419,14 @@ function advtrains.register_wagon(sysname_p, prototype, desc, inv_img, nincreati
 					minetest.chat_send_player(pname, "You don't have the train_operator privilege.")
 					return itemstack
 				end
-				if not minetest.check_player_privs(placer, {train_admin = true }) and minetest.is_protected(pointed_thing.under, placer:get_player_name()) then
+				if not minetest.check_player_privs(placer, {train_admin = true }) and minetest.is_protected(pos, placer:get_player_name()) then
 					return itemstack
 				end
 				local tconns=advtrains.get_track_connections(node.name, node.param2)
 				local yaw = placer:get_look_horizontal()
 				local plconnid = advtrains.yawToClosestConn(yaw, tconns)
 				
-				local prevpos = advtrains.get_adjacent_rail(pointed_thing.under, tconns, plconnid, prototype.drives_on)
+				local prevpos = advtrains.get_adjacent_rail(pos, tconns, plconnid, prototype.drives_on)
 				if not prevpos then
 					minetest.chat_send_player(pname, "The track you are trying to place the wagon on is not long enough!")
 					return
@@ -1424,7 +1434,7 @@ function advtrains.register_wagon(sysname_p, prototype, desc, inv_img, nincreati
 				
 				local wid = advtrains.create_wagon(sysname, pname)
 				
-				local id=advtrains.create_new_train_at(pointed_thing.under, plconnid, 0, {wid})
+				local id=advtrains.create_new_train_at(pos, plconnid, 0, {wid})
 				
 				if not advtrains.is_creative(pname) then
 					itemstack:take_item()

@@ -275,11 +275,24 @@ function tp.register_track_placer(nnprefix, imgprefix, dispname, def)
 		groups={advtrains_trackplacer=1, digtron_on_place=1},
 		liquids_pointable = def.liquids_pointable,
 		on_place = function(itemstack, placer, pointed_thing)
-				local name = placer:get_player_name()
-				if not name then
-				   return itemstack, false
-				end
 				if pointed_thing.type=="node" then
+					do
+						local pointed_pos = pointed_thing.under
+						local pointed_node = minetest.get_node(pointed_pos)
+						local pointed_def = minetest.registered_nodes[pointed_node.name]
+						if pointed_def and pointed_def.on_rightclick then
+							local controls = placer:get_player_control()
+							if not controls.sneak then
+								return pointed_def.on_rightclick(pointed_pos, pointed_node, placer, itemstack, pointed_thing)
+							end
+						end
+					end
+
+					local name = placer:get_player_name()
+					if not name then
+					return itemstack, false
+					end
+
 					local pos=pointed_thing.above
 					local upos=vector.subtract(pointed_thing.above, {x=0, y=1, z=0})
 					if not advtrains.check_track_protection(pos, name) then
