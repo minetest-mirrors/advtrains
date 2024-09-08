@@ -165,6 +165,55 @@ This function will query get_aspect to retrieve the new aspect.
 
 ]]--
 
+minetest.register_entity("advtrains_interlocking:ipmarker", {
+	visual = "mesh",
+	mesh = "trackplane.b3d",
+	textures = {"at_il_signal_ip.png"},
+	collisionbox = {-1,-0.5,-1, 1,-0.4,1},
+	visual_size = {x=10, y=10},
+	on_punch = function(self)
+		self.object:remove()
+	end,
+	on_rightclick = function(self, player)
+		if self.signalpos and player and player:is_player() then
+			local node = minetest.get_node(self.signalpos)
+			if minetest.get_item_group(node.name, "advtrains_signal") ~= 0 then
+				advtrains.interlocking.show_ip_form(self.signalpos, player:get_player_name())
+			end
+		end
+	end,
+	get_staticdata = function() return "STATIC" end,
+	on_activate = function(self, sdata) if sdata=="STATIC" then self.object:remove() end end,
+	static_save = false,
+})
+
+local function clean_ipmarker(spos)
+	for _, luaentity in pairs(minetest.luaentities) do
+		if luaentity.name == "advtrains_interlocking:ipmarker"
+			and luaentity.signalpos
+			and vector.equals(luaentity.signalpos, spos) then
+			luaentity.object:remove()
+		end
+	end
+end
+
+local function ipmarker(ipos, connid, spos)
+	if spos then
+		clean_ipmarker(spos)
+	end
+
+	local node_ok, conns, rhe = advtrains.get_rail_info_at(ipos, advtrains.all_tracktypes)
+	if not node_ok then return end
+
+	local obj = minetest.add_entity(vector.offset(ipos, 0, 0.2, 0), "advtrains_interlocking:ipmarker")
+	if not obj then return end
+	obj:set_yaw(advtrains.dir_to_angle(conns[connid].c))
+	local luaentity = obj:get_luaentity()
+	if luaentity then
+		luaentity.signalpos = spos
+	end
+end
+
 local DANGER = {
 	main = 0,
 	dst = false,
@@ -213,6 +262,7 @@ end
 function advtrains.interlocking.signal_after_dig(pos)
 	-- clear influence point
 	advtrains.interlocking.db.clear_ip_by_signalpos(pos)
+	clean_ipmarker(pos)
 end
 
 function advtrains.interlocking.signal_set_aspect(pos, asp)
@@ -305,20 +355,6 @@ end
 
 local players_assign_ip = {}
 
-local function ipmarker(ipos, connid)
-	local node_ok, conns, rhe = advtrains.get_rail_info_at(ipos, advtrains.all_tracktypes)
-	if not node_ok then return end
-	local yaw = advtrains.dir_to_angle(conns[connid].c)
-	
-	-- using tcbmarker here
-	local obj = minetest.add_entity(vector.add(ipos, {x=0, y=0.2, z=0}), "advtrains_interlocking:tcbmarker")
-	if not obj then return end
-	obj:set_yaw(yaw)
-	obj:set_properties({
-		textures = { "at_il_signal_ip.png" },
-	})
-end
-
 -- shows small info form for signal IP state/assignment
 -- only_notset: show only if it is not set yet (used by signal tcb assignment)
 function advtrains.interlocking.show_ip_form(pos, pname, only_notset)
@@ -333,7 +369,7 @@ function advtrains.interlocking.show_ip_form(pos, pname, only_notset)
 		form = form.."button_exit[0.5,2.5;  5,1;set;Move]"
 		form = form.."button_exit[0.5,3.5;  5,1;clear;Clear]"
 		local ipos = minetest.string_to_pos(pts)
-		ipmarker(ipos, connid)
+		ipmarker(ipos, connid, pos)
 	else
 		form = form.."label[0.5,1.5;Influence point is not set.]"
 		form = form.."label[0.5,2.0;It is recommended to set an influence point.]"
@@ -361,6 +397,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			advtrains.interlocking.signal_init_ip_assign(pos, pname)
 		elseif fields.clear then
 			advtrains.interlocking.db.clear_ip_by_signalpos(pos)
+			clean_ipmarker(pos)
 		end
 	end
 end)
@@ -397,7 +434,7 @@ minetest.register_on_punchnode(function(pos, node, player, pointed_thing)
 				local pts = advtrains.roundfloorpts(pos)
 				if not advtrains.interlocking.db.get_ip_signal_asp(pts, plconnid) then
 					advtrains.interlocking.db.set_ip_signal(pts, plconnid, signalpos)
-					ipmarker(pos, plconnid)
+					ipmarker(pos, plconnid, signalpos)
 					minetest.chat_send_player(pname, "Configuring Signal: Successfully set influence point")
 				else
 					minetest.chat_send_player(pname, "Configuring Signal: Influence point of another signal is already present!")
