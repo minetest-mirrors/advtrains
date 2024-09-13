@@ -796,9 +796,12 @@ function advtrains.train_step_c(id, train, dtime)
 			if is_loaded_area then
 				local objs = minetest.get_objects_inside_radius(rcollpos, 2)
 				for _,obj in ipairs(objs) do
-					if not obj:is_player() and obj:get_armor_groups().fleshy and obj:get_armor_groups().fleshy > 0 
-							and obj:get_luaentity() and obj:get_luaentity().name~="signs_lib:text" then
-						obj:punch(obj, 1, { full_punch_interval = 1.0, damage_groups = {fleshy = 1000}, }, nil)
+					if not obj:is_player() then
+						local armor = obj:get_armor_groups()
+						local luaentity = obj:get_luaentity()
+						if armor.fleshy and armor.fleshy > 0 and luaentity and luaentity.name ~= "signs_lib:text" then
+							obj:punch(obj, 1, { full_punch_interval = 1.0, damage_groups = {fleshy = 1000}, }, nil)
+						end
 					end
 				end
 			end
