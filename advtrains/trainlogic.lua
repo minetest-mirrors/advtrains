@@ -1113,8 +1113,17 @@ function advtrains.spawn_wagons(train_id)
 				if advtrains.position_in_range(pos, ablkrng) then
 					--atdebug("wagon",w_id,"spawning")
 					local wt = advtrains.get_wagon_prototype(data)
-					local wagon = minetest.add_entity(pos, wt):get_luaentity()
-					wagon:set_id(w_id)
+					local wobj = minetest.add_entity(pos, wt)
+					if not wobj then
+						atwarn("Failed to spawn wagon", w_id, "of type", wt)
+					else
+						local wagon = wobj:get_luaentity()
+						if not wagon then
+							atwarn("Wagon", w_id, "of type", wt, "spawned with nil luaentity")
+						else
+							wagon:set_id(w_id)
+						end
+					end
 				end
 			end
 		else

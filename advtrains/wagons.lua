@@ -16,15 +16,8 @@ advtrains.wagons = {}
 advtrains.wagon_alias = {}
 advtrains.wagon_prototypes = setmetatable({}, {
 	__index = function(t, k)
-		local rtn_val = rawget(t, k)
-		if rtn_val ~= nil then
-			return rtn_val
-		end
-		local alias = advtrains.wagon_alias[k]
-		if alias then
-			return rawget(t, alias)
-		end
-		return nil
+		local _, proto = advtrains.resolve_wagon_alias(k)
+		return proto
 	end
 })
 advtrains.wagon_objects = {}
@@ -1338,15 +1331,33 @@ function advtrains.get_wagon_prototype(data)
 		data.type = data.entity_name
 		data.entity_name = nil
 	end
-	if not wt or not advtrains.wagon_prototypes[wt] then
+	local rt, proto = advtrains.resolve_wagon_alias(wt)
+	if not rt then
 		atwarn("Unable to load wagon type",wt,", using placeholder")
-		wt="advtrains:wagon_placeholder"
+		rt = "advtrains:wagon_placeholder"
+		proto = advtrains.wagon_prototypes[rt]
 	end
-	return wt, advtrains.wagon_prototypes[wt]
+	return rt, proto
 end
 
 function advtrains.register_wagon_alias(src, dst)
 	advtrains.wagon_alias[src] = dst
+end
+
+local function recursive_resolve_alias(name, seen)
+	local prototype = rawget(advtrains.wagon_prototypes, name)
+	if prototype then
+		return name, prototype
+	end
+	local resolved = advtrains.wagon_alias[name]
+	if resolved and not seen[resolved] then
+		seen[name] = true
+		return recursive_resolve_alias(resolved, seen)
+	end
+end
+
+function advtrains.resolve_wagon_alias(name)
+	return recursive_resolve_alias(name, {})
 end
 
 function advtrains.standard_inventory_formspec(self, pname, invname)
