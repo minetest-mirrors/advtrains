@@ -263,6 +263,10 @@ function advtrains.train_ensure_init(id, train)
 		atwarn(debug.traceback())
 		return nil
 	end
+
+	if not train.staticdata then
+		train.staticdata = {}
+	end
 	
 	train.dirty = true
 	if train.no_step then
@@ -1189,6 +1193,8 @@ function advtrains.split_train_at_index(train, index)
 	newtrain.is_shunt = train.is_shunt
 	newtrain.points_split = advtrains.merge_tables(train.points_split)
 	newtrain.autocouple = train.autocouple
+
+	advtrains.te_run_callbacks_on_decouple(train, newtrain, index)
 
 	return newtrain_id -- return new train ID, so new train can be manipulated
 

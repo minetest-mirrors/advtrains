@@ -28,6 +28,20 @@ end
 advtrains.register_coupler_type("chain", attrans("Buffer and Chain Coupler"))
 advtrains.register_coupler_type("scharfenberg", attrans("Scharfenberg Coupler"))
 
+for _, name in pairs {"couple", "decouple"} do
+	local t = {}
+	local function reg(f)
+		table.insert(t, f)
+	end
+	local function cb(...)
+		for _, f in ipairs(t) do
+			f(...)
+		end
+	end
+	advtrains["te_registered_on_" .. name] = t
+	advtrains["te_register_on_" .. name] = reg
+	advtrains["te_run_callbacks_on_" .. name] = cb
+end
 
 local function create_couple_entity(pos, train1, t1_is_front, train2, t2_is_front)
 	local id1 = train1.id
@@ -234,6 +248,8 @@ function advtrains.couple_trains(init_train, invert_init_train, stat_train, stat
 		atwarn("Cannot couple",stat_train.id,"and",init_train.id,"- train would have length",tot_len,"which is above the limit of",advtrains.TRAIN_MAX_WAGONS)
 		return
 	end
+
+	advtrains.te_run_callbacks_on_couple(init_train, stat_train)
 
 	if stat_train_opposite then
 		-- insert wagons in inverse order and set their wagon_flipped state
