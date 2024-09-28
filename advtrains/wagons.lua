@@ -286,7 +286,7 @@ function wagon:on_step(dtime)
 		local data = advtrains.wagons[self.id]
 		
 		if not pos then
-			--atdebug("["..self.id.."][fatal] missing position (object:getpos() returned nil)")
+			--atdebug("["..self.id.."][fatal] missing position (object:get_pos() returned nil)")
 			return
 		end
 		
@@ -820,8 +820,8 @@ function wagon:get_off(seatno)
 		end
 		--if not door_entry, or paths missing, fall back to old method
 		--atdebug("using fallback")
-		local objpos=advtrains.round_vector_floor_y(self.object:getpos())
-		local yaw=self.object:getyaw()
+		local objpos=advtrains.round_vector_floor_y(self.object:get_pos())
+		local yaw=self.object:get_yaw()
 		local isx=(yaw < math.pi/4) or (yaw > 3*math.pi/4 and yaw < 5*math.pi/4) or (yaw > 7*math.pi/4)
 		local offp
 		--abuse helper function
@@ -899,7 +899,7 @@ end
 
 --BordCom
 local function checkcouple(ent)
-	if not ent or not ent:getyaw() then
+	if not ent or not ent:get_yaw() then
 		return nil
 	end
 	local le = ent:get_luaentity()
@@ -1273,7 +1273,7 @@ function wagon:check_seat_group_access(pname, sgr)
 		return false, attrans("You are not allowed to access the driver stand.")
 	end
 	if self.seat_groups[sgr].driving_ctrl_access then
-		advtrains.log("Drive", pname, self.object:getpos(), self:train().text_outside)
+		advtrains.log("Drive", pname, self.object:get_pos(), self:train().text_outside)
 	end
 	return true
 end
