@@ -292,7 +292,13 @@ function ilrs.update_route(sigd, tcbs, newrte, cancel)
 		end
 		if newrte then tcbs.routeset = newrte end
 		--atdebug("Setting:",tcbs.routeset)
-		local succ, rsn, cbts, cblk = ilrs.set_route(sigd, tcbs.routes[tcbs.routeset])
+		local succ, rsn, cbts, cblk
+		if tcbs.routes[tcbs.routeset] then
+			succ, rsn, cbts, cblk = ilrs.set_route(sigd, tcbs.routes[tcbs.routeset])
+		else
+			succ = false
+			rsn = attrans("Route state changed.")
+		end
 		if not succ then
 			tcbs.route_rsn = rsn
 			--atdebug("Routesetting failed:",rsn)
