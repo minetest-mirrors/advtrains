@@ -214,19 +214,32 @@ end
 
 local player_rte_prog = {}
 
-function advtrains.interlocking.init_route_prog(pname, sigd)
+function advtrains.interlocking.init_route_prog(pname, sigd, default_route)
 	if not minetest.check_player_privs(pname, "interlocking") then
 		minetest.chat_send_player(pname, "Insufficient privileges to use this!")
 		return
 	end
-	player_rte_prog[pname] = {
+	local rp = {
 		origin = sigd,
-		route = {
-			name = "PROG["..pname.."]",
-		},
-		tmp_lcks = {},
 	}
-	advtrains.interlocking.visualize_route(sigd, player_rte_prog[pname].route, "prog_"..pname, player_rte_prog[pname].tmp_lcks, pname)
+	if default_route then
+		rp.route = table.copy(default_route)
+
+		-- "Step back one section", but keeping turnouts
+		local last_route = rp.route[#rp.route]
+		if last_route then
+			rp.tmp_lcks = last_route.locks
+			rp.route[#rp.route] = nil
+		end
+		rp.route.name = "PROG["..pname.."]"
+	else
+		rp.route = {
+			name = "PROG["..pname.."]"
+		}
+		rp.tmp_lcks = {}
+	end
+	player_rte_prog[pname] = rp
+	advtrains.interlocking.visualize_route(sigd, rp.route, "prog_"..pname, rp.tmp_lcks, pname)
 	minetest.chat_send_player(pname, "Route programming mode active. Punch TCBs to add route segments, punch turnouts to lock them.")
 end
 

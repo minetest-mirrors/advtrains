@@ -24,7 +24,7 @@ function atil.show_route_edit_form(pname, sigd, routeid)
 	local route = tcbs.routes[routeid]
 	if not route then return end
 	
-	local form = "size[9,10]label[0.5,0.2;Route overview]"
+	local form = "size[9,11]label[0.5,0.2;Route overview]"
 	form = form.."field[0.8,1.2;6.5,1;name;Route name;"..minetest.formspec_escape(route.name).."]"
 	form = form.."button[7.0,0.9;1.5,1;setname;Set]"
 	
@@ -85,11 +85,13 @@ function atil.show_route_edit_form(pname, sigd, routeid)
 	form = form.."button[0.5,6;3,1;back;<<< Back to signal]"
 	form = form.."button[4.5,6;2,1;aspect;Signal Aspect]"
 	form = form.."button[6.5,6;2,1;delete;Delete Route]"
+
+	form = form.."button[5.5,7;3,1;newfrom;New From Route]"
 	
 	--atdebug(route.ars)
 	form = form.."style[ars;font=mono]"
-	form = form.."textarea[0.8,7.3;5,3;ars;ARS Rule List;"..atil.ars_to_text(route.ars).."]"
-	form = form.."button[5.5,7.23;3,1;savears;Save ARS List]"
+	form = form.."textarea[0.8,8.3;5,3;ars;ARS Rule List;"..atil.ars_to_text(route.ars).."]"
+	form = form.."button[5.5,8.23;3,1;savears;Save ARS List]"
 	
 	minetest.show_formspec(pname, "at_il_routeedit_"..minetest.pos_to_string(sigd.p).."_"..sigd.s.."_"..routeid, form)
 
@@ -138,6 +140,13 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			atil.route.update_route(sigd, tcbs, nil, true)
 			table.remove(tcbs.routes, routeid)
 			advtrains.interlocking.show_signalling_form(sigd, pname)
+		end
+
+		if fields.newfrom then
+			advtrains.interlocking.init_route_prog(pname, sigd, route)
+			minetest.close_formspec(pname, formname)
+			tcbs.ars_ignore_next = nil
+			return
 		end
 		
 		if fields.ars and fields.savears then
