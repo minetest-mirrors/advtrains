@@ -95,7 +95,7 @@ function r.fire_event(pos, evtdata, appr_internal)
 			if not train_id then return end
 			local fc_list = {}
 			for index,wagon_id in ipairs(train.trainparts) do
-				fc_list[index] = table.concat(advtrains.wagons[wagon_id].fc,"!") or ""
+				fc_list[index] = table.concat(advtrains.wagons[wagon_id].fc or {},"!")
 			end
 			return fc_list
 		end,
