@@ -270,6 +270,11 @@ Each wagon has a current FC, indicating its next destination.
 	Returns a table with the entire FC list for each wagon in the train.  
 	Command: `get_fc()`  
 	Result: `{"", "foo!bar", "testing", "fc_1!fc_2!fc_3!?", "hello_world"}`
+
+ - `get_fc_index()`
+	Returns a table with the current FC index for each wagon in the train. Use in conjunction with the result from `get_fc()` to find a the current FC for a wagon.
+	Command: `get_fc_index()`  
+	Result: `{1, 1, 1, 2, 1}`
 	
  - `set_fc(fc_list, reset_index)`
 	Overwrites the FC list according to a table `fc_list`. A false or nil entry will leave the wagon unaffected, however all others will be overwritten.
