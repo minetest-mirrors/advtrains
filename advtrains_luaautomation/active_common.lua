@@ -55,6 +55,10 @@ end
 function ac.after_dig_node(pos, node, player)
 	advtrains.invalidate_all_paths(pos)
 	advtrains.ndb.clear(pos)
+	atlatc.interrupt.clear_ints_at_pos(pos)
+	if advtrains.lines and advtrains.lines.sched then
+		advtrains.lines.sched.discard_all(advtrains.encode_pos(pos))
+	end
 	local ph=minetest.pos_to_string(pos)
 	ac.nodes[ph]=nil
 end
