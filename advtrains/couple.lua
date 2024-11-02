@@ -335,7 +335,7 @@ function advtrains.check_matching_coupler_types(t1, t1_front, t2, t2_front)
 	--atdebug("CMCT: t1",t1_cplt,"t2",t2_cplt,"")
 
 	-- if at least one of the trains has no couplers table, it always couples (fallback behavior and mode for universal shunters)
-	if not t1_cplt or not t2_cplt then
+	if minetest.settings:get_bool("advtrains_universal_couplers", false) or not t1_cplt or not t2_cplt then
 		return true
 	end
 
