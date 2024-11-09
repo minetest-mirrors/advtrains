@@ -6,6 +6,7 @@ packages:
 - unzip
 - wget
 - lua-busted
+- luajit
 sources :
 - https://git.sr.ht/~gpcf/advtrains
 
@@ -40,3 +41,8 @@ tasks:
 - run_test_world: | 
     echo "bind_address = 127.0.0.1" > minetest.conf
     minetestserver --port 31111 --gameid minetest_game --config ~/minetest.conf --world ~/.minetest/worlds/advtrains_testworld --logfile ~/minetest.log
+- test_po_files : |
+    cd advtrains/advtrains
+    for f in po/*.po; do
+      luajit -e 'require("poconvert").from_string("advtrains", io.input():read("*a"))' < $f
+    done

@@ -310,7 +310,7 @@ end
 
 
 minetest.register_craftitem("advtrains:trackworker",{
-	description = attrans("Track Worker Tool\n\nLeft-click: change rail type (straight/curve/switch)\nRight-click: rotate rail/bumper/signal/etc."),
+	description = attrans("Track Worker Tool\n\nLeft-click: change rail type (straight/curve/switch)\nRight-click: rotate object"),
 	groups = {cracky=1}, -- key=name, value=rating; rating=1..3.
 	inventory_image = "advtrains_trackworker.png",
 	wield_image = "advtrains_trackworker.png",
@@ -337,7 +337,7 @@ minetest.register_craftitem("advtrains:trackworker",{
 					nnprefix, suffix=string.match(node.name, "^(.+)_([^_]+)$")
 					rotation = ""
 					if not tp.tracks[nnprefix] or not tp.tracks[nnprefix].twrotate[suffix] then
-						minetest.chat_send_player(placer:get_player_name(), attrans("This node can't be rotated using the trackworker!"))
+						minetest.chat_send_player(placer:get_player_name(), attrans("This node can't be rotated using the trackworker."))
 						return
 					end
 				end
@@ -347,7 +347,7 @@ minetest.register_craftitem("advtrains:trackworker",{
 					-- is a track, we can query
 					local can_modify, reason = advtrains.can_dig_or_modify_track(pos)
 					if not can_modify then
-						local str = attrans("This track can not be rotated!")
+						local str = attrans("This track can not be rotated.")
 						if reason then
 							str = str .. " " .. reason
 						end
@@ -374,7 +374,7 @@ minetest.register_craftitem("advtrains:trackworker",{
 						if v==rotation then modpos=k end
 					end
 					if not modpos then
-						minetest.chat_send_player(placer:get_player_name(), attrans("This node can't be rotated using the trackworker!"))
+						minetest.chat_send_player(placer:get_player_name(), attrans("This node can't be rotated using the trackworker."))
 						return
 					end
 					advtrains.ndb.swap_node(pos, {name=nnprefix.."_"..suffix..modext[modpos+1], param2=node.param2})
@@ -401,7 +401,7 @@ minetest.register_craftitem("advtrains:trackworker",{
 				  nnprefix, suffix=string.match(node.name, "^(.+)_([^_]+)$")
 				  rotation = ""
 				  if not tp.tracks[nnprefix] or not tp.tracks[nnprefix].twcycle[suffix] then
-					minetest.chat_send_player(user:get_player_name(), attrans("This node can't be changed using the trackworker!"))
+					minetest.chat_send_player(user:get_player_name(), attrans("This node can't be changed using the trackworker."))
 					return
 				  end
 				end
@@ -411,7 +411,7 @@ minetest.register_craftitem("advtrains:trackworker",{
 					-- is a track, we can query
 					local can_modify, reason = advtrains.can_dig_or_modify_track(pos)
 					if not can_modify then
-						local str = attrans("This track can not be changed!")
+						local str = attrans("This track can not be changed.")
 						if reason then
 							str = str .. " " .. reason
 						end

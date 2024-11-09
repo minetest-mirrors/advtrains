@@ -220,7 +220,7 @@ advtrains.register_tracks("default", {
 	models_prefix="advtrains_dtrack",
 	models_suffix=".b3d",
 	shared_texture="advtrains_dtrack_shared_atc.png",
-	description=atltrans("LuaATC Rail"),
+	description=atltrans("LuaATC Track"),
 	formats={},
 	get_additional_definiton = function(def, preset, suffix, rotation)
 		return {

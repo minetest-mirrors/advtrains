@@ -28,7 +28,7 @@ local function show_stoprailform(pos, player)
 	local pe = advtrains.encode_pos(pos)
 	local pname = player:get_player_name()
 	if minetest.is_protected(pos, pname) then
-		minetest.chat_send_player(pname, "Position is protected!")
+		minetest.chat_send_player(pname, attrans("You are not allowed to configure this track."))
 		return
 	end
 	
@@ -73,7 +73,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	local pos = advtrains.decode_pos(pe)
 	if pos then
 		if minetest.is_protected(pos, pname) then
-			minetest.chat_send_player(pname, "Position is protected!")
+			minetest.chat_send_player(pname, attrans("You are not allowed to configure this track."))
 			return
 		end
 		
@@ -94,7 +94,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 					if (stn.owner == pname or minetest.check_player_privs(pname, "train_admin")) then
 						stdata.stn = fields.stn
 					else
-						minetest.chat_send_player(pname, "Station code '"..fields.stn.."' does already exist and is owned by "..stn.owner)
+						minetest.chat_send_player(pname, attrans("Station code \"@1\" already exists and is owned by @2.", fields.stn, stn.owner))
 						show_stoprailform(pos,player)
 						return
 					end
@@ -108,7 +108,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				if (stn.owner == pname or minetest.check_player_privs(pname, "train_admin")) then
 					stn.name = fields.stnname
 				else
-					minetest.chat_send_player(pname, "Not allowed to edit station name, owned by "..stn.owner)
+					minetest.chat_send_player(pname, attrans("This station is owned by @1. You are not allowed to edit its name.", stn.owner))
 				end
 			end
 			
@@ -218,7 +218,7 @@ if minetest.get_modpath("advtrains_train_track") ~= nil then
 		models_prefix="advtrains_dtrack",
 		models_suffix=".b3d",
 		shared_texture="advtrains_dtrack_shared_stop.png",
-		description="Station/Stop Rail",
+		description=attrans("Station/Stop Track"),
 		formats={},
 		get_additional_definiton = adefunc,
 	}, advtrains.trackpresets.t_30deg_straightonly)

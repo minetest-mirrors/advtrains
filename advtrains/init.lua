@@ -22,9 +22,6 @@ Copyright (C) 2016-2020  Moritz Blei (orwell96) and contributors
 local lot = os.clock()
 minetest.log("action", "[advtrains] Loading...")
 
--- There is no need to support 0.4.x anymore given that the compatitability with it is already broken by 1bb1d825f46af3562554c12fba35a31b9f7973ff
-attrans = minetest.get_translator ("advtrains")
-
 --advtrains
 advtrains = {trains={}, player_to_train_mapping={}}
 
@@ -181,7 +178,7 @@ function assertt(var, typ)
 	end
 end
 
-dofile(advtrains.modpath.."/helpers.lua");
+dofile(advtrains.modpath.."/helpers.lua")
 --dofile(advtrains.modpath.."/debugitems.lua");
 
 advtrains.meseconrules = 
@@ -200,6 +197,10 @@ advtrains.meseconrules =
  {x=0, y=-2, z=0}}
 
 advtrains.fpath=minetest.get_worldpath().."/advtrains"
+
+advtrains.poconvert = dofile(advtrains.modpath.."/poconvert.lua")
+advtrains.poconvert.from_flat("advtrains")
+attrans = minetest.get_translator("advtrains")
 
 advtrains.speed = dofile(advtrains.modpath.."/speed.lua")
 advtrains.texture = dofile(advtrains.modpath.."/texture.lua")
@@ -233,7 +234,6 @@ end
 
 
 dofile(advtrains.modpath.."/lzb.lua")
-
 
 --load/save
 

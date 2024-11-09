@@ -184,8 +184,8 @@ end
 function advtrains.safe_couple_trains(train1, t1_is_front, train2, t2_is_front, pname)
 
 	if pname and not minetest.check_player_privs(pname, "train_operator") then
-		   minetest.chat_send_player(pname, "Missing train_operator privilege")
-		   return false
+		minetest.chat_send_player(pname, S("You are not allowed to couple trains without the train_operator privilege."))
+		return false
 	end
 
 	local wck_t1, wck_t2
@@ -335,11 +335,11 @@ function advtrains.check_matching_coupler_types(t1, t1_front, t2, t2_front)
 	for typ,_ in pairs(t1_cplt) do
 		table.insert(t1_cplhr, advtrains.coupler_types[typ] or typ)
 	end
-	if #t1_cplhr==0 then t1_cplhr[1]=attrans("<none>") end
+	if #t1_cplhr==0 then t1_cplhr[1]=attrans("<No coupler>") end
 	for typ,_ in pairs(t2_cplt) do
 		table.insert(t2_cplhr, advtrains.coupler_types[typ] or typ)
 	end
-	if #t2_cplhr==0 then t2_cplhr[1]=attrans("<none>") end
+	if #t2_cplhr==0 then t2_cplhr[1]=attrans("<No coupler>") end
 	return false, attrans("Can not couple: The couplers of the trains do not match (@1 and @2).", table.concat(t1_cplhr, ","), table.concat(t2_cplhr, ","))
 end
 

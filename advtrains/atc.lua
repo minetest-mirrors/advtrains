@@ -106,7 +106,7 @@ local apn_func=function(pos)
 	-- FIX for long-persisting ndb bug: there's no node in parameter 2 of this function!
 	local meta=minetest.get_meta(pos)
 	if meta then
-		meta:set_string("infotext", attrans("ATC controller, unconfigured."))
+		meta:set_string("infotext", attrans("Unconfigured ATC controller"))
 		meta:set_string("formspec", atc.get_atc_controller_formspec(pos, meta))
 	end
 end
@@ -233,7 +233,7 @@ local matchptn={
 			advtrains.train_ensure_init(id, train)
 			-- no one minds if this failed... this shouldn't even be called without train being initialized...
 		else
-			atwarn(sid(id), attrans("ATC Reverse command warning: didn't reverse train, train moving!"))
+			atwarn(sid(id), attrans("ATC Reverse command warning: didn't reverse train, train moving."))
 		end
 		return 1
 	end,
@@ -245,11 +245,11 @@ local matchptn={
 	end,
 	["K"] = function(id, train)
 		if train.door_open == 0 then
-			atwarn(sid(id), attrans("ATC Kick command warning: Doors closed"))
+			atwarn(sid(id), attrans("ATC Kick command warning: doors are closed."))
 			return 1
 		end
 		if train.velocity > 0 then
-			atwarn(sid(id), attrans("ATC Kick command warning: Train moving"))
+			atwarn(sid(id), attrans("ATC Kick command warning: train moving."))
 			return 1
 		end
 		local tp = train.trainparts

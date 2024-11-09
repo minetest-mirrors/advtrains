@@ -60,7 +60,7 @@ for r,f in pairs({on={as="off", ls="green", als="red"}, off={as="on", ls="red", 
 			tiles = {"advtrains_retrosignal.png"},
 			inventory_image="advtrains_retrosignal_inv.png",
 			drop="advtrains:retrosignal_off",
-			description=attrans("Lampless Signal (@1)", attrans(r..rotation)),
+			description=attrans("Lampless Signal"),
 			sunlight_propagates=true,
 			groups = {
 				cracky=3,
@@ -124,7 +124,7 @@ for r,f in pairs({on={as="off", ls="green", als="red"}, off={as="on", ls="red", 
 			tiles = {"advtrains_signal_"..r..".png"},
 			inventory_image="advtrains_signal_inv.png",
 			drop="advtrains:signal_off",
-			description=attrans("Signal (@1)", attrans(r..rotation)),
+			description=attrans("Signal"),
 			groups = {
 				cracky=3,
 				not_blocking_trains=1,
@@ -187,6 +187,11 @@ for r,f in pairs({on={as="off", ls="green", als="red"}, off={as="on", ls="red", 
 	if r=="off" then crea=0 end
 	
 	--tunnel signals. no rotations.
+	local swdesc = { -- needed for xgettext
+		l = attrans("Wallmounted Signal (left)"),
+		r = attrans("Wallmounted Signal (right)"),
+		t = attrans("Wallmounted Signal (top)"),
+	}
 	for loc, sbox in pairs({l={-1/2, -1/2, -1/4, 0, 1/2, 1/4}, r={0, -1/2, -1/4, 1/2, 1/2, 1/4}, t={-1/2, 0, -1/4, 1/2, 1/2, 1/4}}) do
 		minetest.register_node("advtrains:signal_wall_"..loc.."_"..r, {
 			drawtype = "mesh",
@@ -200,7 +205,7 @@ for r,f in pairs({on={as="off", ls="green", als="red"}, off={as="on", ls="red", 
 			mesh = "advtrains_signal_wall_"..loc..".b3d",
 			tiles = {"advtrains_signal_wall_"..r..".png"},
 			drop="advtrains:signal_wall_"..loc.."_off",
-			description=attrans("Wallmounted Signal ("..loc..")"),
+			description=swdesc[loc],
 			groups = {
 				cracky=3,
 				not_blocking_trains=1,
@@ -314,7 +319,7 @@ minetest.register_node("advtrains:across_on", {
 	mesh = "advtrains_across.obj",
 	tiles = {{name="advtrains_across_anim.png", animation={type="vertical_frames", aspect_w=64, aspect_h=64, length=1.0}}},
 	drop="advtrains:across_off",
-	description=attrans("Andrew's Cross (on) (you hacker you)"),
+	description=attrans("Andrew's Cross"),
 	groups = {
 		cracky=3,
 		not_blocking_trains=1,
