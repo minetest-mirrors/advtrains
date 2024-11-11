@@ -230,10 +230,12 @@ function tp.place_track(pos, tpg, pname, yaw)
 	return true
 end
 
+
 -- TRACK WORKER --
 
+
 minetest.register_craftitem("advtrains:trackworker",{
-	description = attrans("Track Worker Tool\n\nLeft-click: change rail type (straight/curve/switch)\nRight-click: rotate rail/bumper/signal/etc."),
+	description = attrans("Track Worker Tool\n\nLeft-click: change rail type (straight/curve/switch)\nRight-click: rotate object"),
 	groups = {cracky=1}, -- key=name, value=rating; rating=1..3.
 	inventory_image = "advtrains_trackworker.png",
 	wield_image = "advtrains_trackworker.png",

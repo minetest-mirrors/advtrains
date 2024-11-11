@@ -333,6 +333,8 @@ for _, rtab in ipairs({
 			danger = {asp = { main = false, shunt = false }, n = "shuntd", ici=true},
 			shuntd = {asp = { main = false, shunt = true } , n = "danger"},
 		}) do
+		local sbox = table.copy(rtab.sbox)
+		sbox[5] = 0
 		minetest.register_node("advtrains_signals_ks:ra_"..typ.."_"..rot, {
 			description = "Ks Shunting Signal",
 			drawtype = "mesh",
@@ -346,7 +348,11 @@ for _, rtab in ipairs({
 			paramtype2 = "facedir",
 			selection_box = {
 				type = "fixed",
-				fixed = {-1/4, -1/2, -1/4, 1/4, 0, 1/4}
+				fixed = {sbox, rotation_sbox}
+			},
+			collision_box = {
+				type = "fixed",
+				fixed = sbox,
 			},
 			groups = {
 				cracky = 2,

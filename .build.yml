@@ -3,6 +3,12 @@ packages:
 - git
 - lua5.1
 - luarocks
+- curl
+- minetest-server
+- unzip
+- wget
+- lua-busted
+- luajit
 sources :
 - https://git.sr.ht/~gpcf/advtrains
 
@@ -26,4 +32,37 @@ tasks:
         ~/.luarocks/bin/mineunit -r
         sed -n '/^File/,$p' luacov.report.out
         mv luacov.report.out ~/$i.luacov.report.out
+- install_mt_game : |
+    curl -L https://github.com/minetest/minetest_game/archive/master.zip -o master.zip
+    mkdir -p .minetest/games/
+    cd .minetest/games
+    unzip ../../master.zip
+    mv minetest_game-master minetest_game
+- install_test_world: |
+    mkdir -p .minetest/worlds/
+    curl https://lifomaps.de/advtrains-test/testworld.tar.gz -o ~/testworld.tar.gz
+    cd .minetest/worlds/
+    tar xf ../../testworld.tar.gz
+- run_unit_tests : |
+    cd advtrains/advtrains
+    busted
+    cd ../advtrains_interlocking
+    busted
+    cd ../serialize_lib
+    busted
+- activate_test_env: |
+    cd advtrains
+    git merge --no-commit origin/luaatcdebug
+- install_advtrains : |
+    mkdir .minetest/mods
+    cp -r advtrains .minetest/mods
+    cd .minetest/mods
+    git clone https://git.bananach.space/basic_trains.git/
+- run_test_world: | 
+    echo "bind_address = 127.0.0.1" > minetest.conf
+    minetestserver --port 31111 --gameid minetest_game --config ~/minetest.conf --world ~/.minetest/worlds/advtrains_testworld --logfile ~/minetest.log
+- test_po_files : |
+    cd advtrains/advtrains
+    for f in po/*.po; do
+      luajit -e 'require("poconvert").from_string("advtrains", io.input():read("*a"))' < $f
     done

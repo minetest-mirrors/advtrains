@@ -51,6 +51,9 @@ advtrains.IGNORE_WORLD = false
 local NO_SAVE = false
 -- Do not save any data to advtrains save files
 
+advtrains.TRAIN_MAX_WAGONS = 20
+-- Limit on the maximum number of wagons that may be in a train
+
 -- ==========================================================================
 
 -- Use a global slowdown factor to slow down train movements. Now a setting
@@ -181,7 +184,7 @@ function assertt(var, typ)
 	end
 end
 
-dofile(advtrains.modpath.."/helpers.lua");
+dofile(advtrains.modpath.."/helpers.lua")
 --dofile(advtrains.modpath.."/debugitems.lua");
 
 advtrains.meseconrules = 
@@ -201,14 +204,20 @@ advtrains.meseconrules =
 
 advtrains.fpath=minetest.get_worldpath().."/advtrains"
 
+advtrains.poconvert = dofile(advtrains.modpath.."/poconvert.lua")
+advtrains.poconvert.from_flat("advtrains")
+attrans = minetest.get_translator("advtrains")
+
 advtrains.speed = dofile(advtrains.modpath.."/speed.lua")
 advtrains.formspec = dofile(advtrains.modpath.."/formspec.lua")
+advtrains.texture = dofile(advtrains.modpath.."/texture.lua")
 
 dofile(advtrains.modpath.."/path.lua")
 dofile(advtrains.modpath.."/trainlogic.lua")
 dofile(advtrains.modpath.."/trainhud.lua")
 dofile(advtrains.modpath.."/trackplacer.lua")
 dofile(advtrains.modpath.."/copytool.lua")
+dofile(advtrains.modpath.."/wagonprop_tool.lua")
 dofile(advtrains.modpath.."/tracks.lua")
 dofile(advtrains.modpath.."/track_reg_helper.lua")
 dofile(advtrains.modpath.."/occupation.lua")
@@ -479,6 +488,7 @@ advtrains.avt_save = function(remove_players_from_wagons)
 				"text_outside", "text_inside", "line", "routingcode",
 				"il_sections", "speed_restriction", "speed_restrictions_t", "is_shunt",
 				"path_ori_cp", "autocouple", "atc_wait_autocouple", "ars_disable",
+				"staticdata",
 			})
 			--then save it
 			tmp_trains[id]=v
@@ -742,6 +752,21 @@ minetest.register_chatcommand("at_whereis",
 			end
 		end,
 })
+minetest.register_chatcommand("at_tp",
+	{
+		params = "<train id>",
+		description = "Teleports you to the position of the train with the given id",
+		privs = {train_operator = true, teleport = true},
+		func = function(name,param)
+			local train = advtrains.trains[param]
+			if not train or not train.last_pos then
+				return false, "Train "..param.." does not exist or is invalid"
+			else
+				minetest.get_player_by_name(name):set_pos(train.last_pos)
+				return true, "Teleporting to train "..param
+			end
+		end,
+})
 minetest.register_chatcommand("at_disable_step",
 	{
         params = "<yes/no>", 
@@ -760,6 +785,16 @@ minetest.register_chatcommand("at_disable_step",
 			else
 				return false, "Advtrains is already running normally!"
 			end
+        end,
+})
+
+minetest.register_chatcommand("at_status",
+	{
+        params = "", 
+        description = "Print advtrains status info", 
+        privs = {train_operator = true},
+        func = function(name, param)
+			return true, advtrains.print_concat_table({"Advtrains Status: no_action",no_action,"slowdown",advtrains.global_slowdown,"(log",math.log(advtrains.global_slowdown),")"})
         end,
 })
 

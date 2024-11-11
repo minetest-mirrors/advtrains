@@ -142,13 +142,8 @@ minetest.register_on_joinplayer(function(player)
 		local pname = player:get_player_name()
 		local id=advtrains.player_to_train_mapping[pname]
 		if id then
-			for _,wagon in pairs(minetest.luaentities) do
-				if wagon.is_wagon and wagon.initialized and wagon.id then
-					local wdata = advtrains.wagons[wagon.id]
-					if wdata and wdata.train_id == id then
-						wagon:reattach_all()
-					end
-				end
+			for _, wagon in advtrains.wagon_entity_pairs_in_train(id) do
+				wagon:reattach_all()
 			end
 		end
 end)
@@ -160,12 +155,10 @@ minetest.register_on_dieplayer(function(player)
 		if id then
 			local train=advtrains.trains[id]
 			if not train then advtrains.player_to_train_mapping[pname]=nil return end
-			for _,wagon in pairs(minetest.luaentities) do
-				if wagon.is_wagon and wagon.initialized and wagon.train_id==id then
-					--when player dies, detach him from the train
-					--call get_off_plr on every wagon since we don't know which one he's on.
-					wagon:get_off_plr(pname)
-				end
+			for _, wagon in advtrains.wagon_entity_pairs_in_train(id) do
+				--when player dies, detach him from the train
+				--call get_off_plr on every wagon since we don't know which one he's on.
+				wagon:get_off_plr(pname)
 			end
 			-- just in case no wagon felt responsible for this player: clear train mapping
 			advtrains.player_to_train_mapping[pname] = nil
@@ -269,6 +262,10 @@ function advtrains.train_ensure_init(id, train)
 		atwarn("train_ensure_init: Called with id =",id,"but a nil train!")
 		atwarn(debug.traceback())
 		return nil
+	end
+
+	if not train.staticdata then
+		train.staticdata = {}
 	end
 	
 	train.dirty = true
@@ -621,7 +618,7 @@ function advtrains.train_step_b(id, train, dtime)
 		local base_cn =  train.path_cn[base_idx]
 		--atdebug(id,"Begin Checking for on-track collisions new_idx=",new_index_curr_tv,"base_idx=",base_idx,"base_pos=",base_pos,"base_cn=",base_cn)
 		-- query occupation
-		local occ = advtrains.occ.get_trains_over(base_pos)
+		local occ = advtrains.occ.reverse_lookup_sel(base_pos, "close_proximity")
 		-- iterate other trains
 		for otid, ob_idx in pairs(occ) do
 			if otid ~= id then
@@ -651,7 +648,7 @@ function advtrains.train_step_b(id, train, dtime)
 
 				-- Phase 2 - project ref_index back onto our path and check again (necessary because there might be a turnout on the way and we are driving into the flank
 				if target_is_inside then
-					local our_index = advtrains.path_project(otrn, ref_index, id)
+					local our_index = advtrains.path_project(otrn, ref_index, id, "before_end")
 					--atdebug("Backprojected our_index",our_index)
 					if our_index and our_index <= new_index_curr_tv
 							and our_index >= train.index then --FIX: If train was already past the collision point in the previous step, there is no collision! Fixes bug with split_at_index
@@ -805,9 +802,12 @@ function advtrains.train_step_c(id, train, dtime)
 			if is_loaded_area then
 				local objs = minetest.get_objects_inside_radius(rcollpos, 2)
 				for _,obj in ipairs(objs) do
-					if not obj:is_player() and obj:get_armor_groups().fleshy and obj:get_armor_groups().fleshy > 0 
-							and obj:get_luaentity() and obj:get_luaentity().name~="signs_lib:text" then
-						obj:punch(obj, 1, { full_punch_interval = 1.0, damage_groups = {fleshy = 1000}, }, nil)
+					if not obj:is_player() then
+						local armor = obj:get_armor_groups()
+						local luaentity = obj:get_luaentity()
+						if armor.fleshy and armor.fleshy > 0 and luaentity and luaentity.name ~= "signs_lib:text" then
+							obj:punch(obj, 1, { full_punch_interval = 1.0, damage_groups = {fleshy = 1000}, }, nil)
+						end
 					end
 				end
 			end
@@ -1101,8 +1101,17 @@ function advtrains.spawn_wagons(train_id)
 				if advtrains.position_in_range(pos, ablkrng) then
 					--atdebug("wagon",w_id,"spawning")
 					local wt = advtrains.get_wagon_prototype(data)
-					local wagon = minetest.add_entity(pos, wt):get_luaentity()
-					wagon:set_id(w_id)
+					local wobj = minetest.add_entity(pos, wt)
+					if not wobj then
+						atwarn("Failed to spawn wagon", w_id, "of type", wt)
+					else
+						local wagon = wobj:get_luaentity()
+						if not wagon then
+							atwarn("Wagon", w_id, "of type", wt, "spawned with nil luaentity")
+						else
+							wagon:set_id(w_id)
+						end
+					end
 				end
 			end
 		else
@@ -1169,6 +1178,8 @@ function advtrains.split_train_at_index(train, index)
 	newtrain.points_split = advtrains.merge_tables(train.points_split)
 	newtrain.autocouple = train.autocouple
 
+	advtrains.te_run_callbacks_on_decouple(train, newtrain, index)
+
 	return newtrain_id -- return new train ID, so new train can be manipulated
 
 end
@@ -1218,7 +1229,6 @@ function advtrains.invert_train(train_id)
 	advtrains.update_trainpart_properties(train_id, true)
 	
 	-- recalculate path
-	advtrains.train_ensure_init(train_id, train)
 	
 	-- If interlocking present, check whether this train is in a section and then set as shunt move after reversion
 	if advtrains.interlocking and train.il_sections and #train.il_sections > 0 then
@@ -1244,7 +1254,7 @@ function advtrains.invalidate_all_paths(pos)
 	local tab
 	if pos then
 		-- if position given, check occupation system
-		tab = advtrains.occ.get_trains_over(pos)
+		tab = advtrains.occ.reverse_lookup_quick(pos)
 	else
 		tab = advtrains.trains
 	end
@@ -1257,7 +1267,7 @@ end
 -- Calls invalidate_path_ahead on all trains occupying (having paths over) this node
 -- Can be called during train step.
 function advtrains.invalidate_all_paths_ahead(pos)
-	local tab = advtrains.occ.get_trains_over(pos)
+	local tab = advtrains.occ.reverse_lookup_sel(pos, "first_ahead")
 	
 	for id,index in pairs(tab) do
 		local train = advtrains.trains[id]

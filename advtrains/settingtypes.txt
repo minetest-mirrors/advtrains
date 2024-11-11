@@ -65,3 +65,6 @@ advtrains_save_interval (Save Interval) int 60 20 3600
 #    If enabled, trains only collide with nodes with "normal" drawtype.
 advtrains_forgiving_collision (Forgiving Collision mode) bool false
 
+#    Enable universal couplers for wagons
+#    If enabled, wagons will bypass the checks that compare the coupler types when coupling.
+advtrains_universal_couplers (Universal Couplers) bool false
