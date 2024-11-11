@@ -32,6 +32,7 @@ tasks:
         ~/.luarocks/bin/mineunit -r
         sed -n '/^File/,$p' luacov.report.out
         mv luacov.report.out ~/$i.luacov.report.out
+    done
 - install_mt_game : |
     curl -L https://github.com/minetest/minetest_game/archive/master.zip -o master.zip
     mkdir -p .minetest/games/
