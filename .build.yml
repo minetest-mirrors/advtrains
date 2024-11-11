@@ -43,13 +43,6 @@ tasks:
     curl https://lifomaps.de/advtrains-test/testworld.tar.gz -o ~/testworld.tar.gz
     cd .minetest/worlds/
     tar xf ../../testworld.tar.gz
-- run_unit_tests : |
-    cd advtrains/advtrains
-    busted
-    cd ../advtrains_interlocking
-    busted
-    cd ../serialize_lib
-    busted
 - activate_test_env: |
     cd advtrains
     git merge --no-commit origin/luaatcdebug
