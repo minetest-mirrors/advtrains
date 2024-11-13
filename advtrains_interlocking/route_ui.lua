@@ -106,7 +106,7 @@ function atil.show_route_edit_form(pname, sigd, routeid)
 	end
 	
 	form = form.."button[0.5,6;1,1;prev;<<<]"
-	form = form.."button[1.5,6;1,1;back;Back]"
+	form = form.."button[1.5,6;1,1;back;"..routeid.."/"..#tcbs.routes.."]"
 	form = form.."button[2.5,6;1,1;next;>>>]"
 	
 	
@@ -114,6 +114,8 @@ function atil.show_route_edit_form(pname, sigd, routeid)
 		form = form.."button[3.5,6;2,1;noautogen;Clr Autogen]"
 	end
 	form = form.."button[5.5,6;3,1;delete;Delete Route]"
+	form = form.."button[0.5,7;3,1;back;Back to signal]"
+	form = form.."button[3.5,7;2,1;clone;Clone Route]"
 	form = form.."button[5.5,7;3,1;newfrom;New From Route]"
 	
 	--atdebug(route.ars)
@@ -184,6 +186,16 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			-- if something set the route in the meantime, make sure this doesn't break.
 			atil.route.update_route(sigd, tcbs, nil, true)
 			table.remove(tcbs.routes, routeid)
+			advtrains.interlocking.show_signalling_form(sigd, pname)
+		end
+		
+		if fields.clone then
+			-- if something set the route in the meantime, make sure this doesn't break.
+			atil.route.update_route(sigd, tcbs, nil, true)
+			local rcopy = table.copy(route)
+			rcopy.name = route.name.."_copy"
+			rcopy.smartroute_generated = nil
+			table.insert(tcbs.routes, routeid+1, rcopy)
 			advtrains.interlocking.show_signalling_form(sigd, pname)
 		end
 
