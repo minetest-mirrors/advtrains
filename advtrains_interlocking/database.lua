@@ -261,8 +261,9 @@ routes = {
 								-- it is assumed that the next main signal will have its own distant sig
 							-- true: start signal sets distant signal to the next signal on the route with route_role "main" (typically the end signal)
 								-- for short blocks where end signal doesn't have its own distant sig
-		-- Fields used by the autorouter:
-		ar_end_sigd = <sigd> -- the sigd describing the end of the route. Used for merging route options on recalculation
+		terminal = <sigd> -- the sigd describing the end of the route (e.g. the "next" entry in the final route segment).
+						  -- Might be missing or wrong. Routesetting currently does not care about this value being present.
+		default_autoworking = false -- if true, when route is set autoworking will be by default on. Used for Blocksignal mode
 	}
 }
 
@@ -771,7 +772,7 @@ function ildb.update_rs_cache(ts_id)
 		end
 		-- warn about superfluous entry
 		for sup_end_pkey, sup_entry in pairs(result_table) do
-			--atwarn("In update_rs_cache for section",ts_id,"found superfluous endpoint",sup_end_pkey,"->",sup_entry)
+			atwarn("In update_rs_cache for section",ts_id,"found superfluous endpoint",sup_end_pkey,"->",sup_entry)
 		end
 	end
 	ts.rs_cache = rscache

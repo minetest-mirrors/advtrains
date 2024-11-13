@@ -312,7 +312,7 @@ function signal.get_aspect_internal(pos, aspt)
 			-- case is fine, distant only signal
 			masp = signal.MASP_DEFAULT
 		else			
-			assert(ndefat.main_aspects, "With named aspects, node needs advtrains.main_aspects table!")
+			assert(ndefat.main_aspects, "With named aspects, node "..node.name.." needs advtrains.main_aspects table!")
 			-- resolve the main aspect from the mainaspects table
 			if not ndefat.main_aspects_lookup then
 				cache_mainaspects(ndefat)

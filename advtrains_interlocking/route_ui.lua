@@ -110,7 +110,7 @@ function atil.show_route_edit_form(pname, sigd, routeid)
 	form = form.."button[2.5,6;1,1;next;>>>]"
 	
 	
-	if route.smartroute_generated then
+	if route.smartroute_generated or route.default_autoworking then
 		form = form.."button[3.5,6;2,1;noautogen;Clr Autogen]"
 	end
 	form = form.."button[5.5,6;3,1;delete;Delete Route]"
@@ -180,6 +180,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		
 		if fields.noautogen then
 			route.smartroute_generated = nil
+			route.default_autoworking = nil
 		end
 		
 		if fields.delete then

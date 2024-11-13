@@ -618,48 +618,78 @@ function advtrains.interlocking.show_signalling_form(sigd, pname, sel_rte, calle
 		form = form.."button[0.5,6;  5,1;cancelroute;Cancel Route]"
 	else
 		if not tcbs.route_origin then
-			local strtab = {}
-			for idx, route in ipairs(tcbs.routes) do
-				local clr = ""
-				if route.smartroute_generated then
-					clr = "#FFFF55"
+			if #tcbs.routes > 0 then
+				-- at least one route is defined, show normal dialog
+				local strtab = {}
+				for idx, route in ipairs(tcbs.routes) do
+					local clr = ""
+					if route.smartroute_generated then
+						clr = "#FFFF55"
+					end
+					if route.ars then
+						clr = "#FF5555"
+						if route.ars.default then
+							clr = "#55FF55"
+						end
+					end
+					strtab[#strtab+1] = clr .. minetest.formspec_escape(route.name)
 				end
-				if route.ars then
-					clr = "#FF5555"
-					if route.ars.default then
-						clr = "#55FF55"
+				form = form.."label[0.5,2.5;Routes:]"
+				form = form.."textlist[0.5,3;5,3;rtelist;"..table.concat(strtab, ",")
+				if sel_rte then
+					form = form .. ";" .. sel_rte .."]"
+					form = form.."button[0.5,6;  5,1;setroute;Set Route]"
+					form = form.."button[0.5,7;2,1;dsproute;Show]"
+					if hasprivs then
+						form = form.."button[3.5,7;2,1;editroute;Edit]"
+						if sel_rte > 1 then
+							form = form .. "button[5.5,4;0.5,0.3;moveup;↑]"
+						end
+						if sel_rte < #strtab then
+							form = form .. "button[5.5,4.7;0.5,0.3;movedown;↓]"
+						end
+					end
+				else
+					form = form .. "]"
+					if tcbs.ars_disabled then
+						form = form.."label[0.5,6  ;NOTE: ARS is disabled.]"
+						form = form.."label[0.5,6.5;Routes are not automatically set.]"
 					end
 				end
-				strtab[#strtab+1] = clr .. minetest.formspec_escape(route.name)
-			end
-			form = form.."label[0.5,2.5;Routes:]"
-			form = form.."textlist[0.5,3;5,3;rtelist;"..table.concat(strtab, ",")
-			if sel_rte then
-				form = form .. ";" .. sel_rte .."]"
-				form = form.."button[0.5,6;  5,1;setroute;Set Route]"
-				form = form.."button[0.5,7;2,1;dsproute;Show]"
 				if hasprivs then
-					form = form.."button[3.5,7;2,1;editroute;Edit]"
-					if sel_rte > 1 then
-						form = form .. "button[5.5,4;0.5,0.3;moveup;↑]"
-					end
-					if sel_rte < #strtab then
-						form = form .. "button[5.5,4.7;0.5,0.3;movedown;↓]"
-					end
+					form = form.."button[0.5,8;2.5,1;smartroute;Smart Route]"
+					form = form.."button[  3,8;2.5,1;newroute;New (Manual)]"
+					form = form..string.format("checkbox[0.5,8.75;ars;Automatic routesetting;%s]", not tcbs.ars_disabled)
+					form = form..string.format("checkbox[0.5,9.25;dstarstrig;Distant signal triggers ARS;%s]", not tcbs.no_dst_ars_trig)
 				end
 			else
-				form = form .. "]"
-				if tcbs.ars_disabled then
-					form = form.."label[0.5,6  ;NOTE: ARS is disabled.]"
-					form = form.."label[0.5,6.5;Routes are not automatically set.]"
+				-- no route is active, and no route is so far defined
+				if not tcbs.signal then atwarn("signalling form missing signal?!", pos) return end -- safeguard, nothing else in this function checks tcbs.signal
+				local caps = advtrains.interlocking.signal.get_signal_cap_level(tcbs.signal)
+				if caps >= 3 then
+					-- offer user the "block signal mode"
+					form = form.."label[0.5,2.5;No routes are yet defined.]"
+					if hasprivs then
+						form = form.."button[0.5,4;2.5,1;smartroute;Smart Route]"
+						form = form.."button[  3,4;2.5,1;newroute;New (Manual)]"
+						
+						form = form.."label[0.5,5.5;Setup block signal route (up to following signal):]"
+						form = form.."button[0.5,6;2.5,1;setupblocklong;Long (No Dst)]"
+						form = form.."tooltip[setupblocklong;Following track section must have no turnouts and end at another signal.\n"
+								.."Sets a route into the section ahead with auto-working set on\n"
+								.."Long block: This signal does not become distant signal.]"
+						form = form.."button[  3,6;2.5,1;setupblockshort;Short (With Dst)]"
+						form = form.."tooltip[setupblockshort;Following track section must have no turnouts and end at another signal.\n"
+								.."Sets a route into the section ahead with auto-working set on\n"
+								.."Short block: This signal becomes distant signal for next signal.]"
+					end
+				else
+					-- signal caps say it cannot be route start/end
+					form = form.."label[0.5,2.5;This is a Non-Halt signal (e.g. pure distant signal)\n"
+								.."No route is currently set through.]"
 				end
 			end
-			if hasprivs then
-				form = form.."button[0.5,8;2.5,1;smartroute;Smart Route]"
-				form = form.."button[  3,8;2.5,1;newroute;New (Manual)]"
-				form = form..string.format("checkbox[0.5,8.75;ars;Automatic routesetting;%s]", not tcbs.ars_disabled)
-				form = form..string.format("checkbox[0.5,9.25;dstarstrig;Distant signal triggers ARS;%s]", not tcbs.no_dst_ars_trig)
-			end
+			
 		elseif sigd_equal(tcbs.route_origin, sigd) then
 			-- something has gone wrong: tcbs.routeset should have been set...
 			form = form.."label[0.5,2.5;Inconsistent state: route_origin is same TCBS but no route set. Try again.]"
@@ -753,6 +783,63 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				tcbs.ars_ignore_next = nil
 				return
 			end
+			if (fields.setupblocklong or fields.setupblockshort) and hasprivs then
+				-- check adjacent section
+				if not tcbs.ts_id then
+					minetest.chat_send_player(pname, "Block route not possible: No track section ahead")
+					return
+				end
+				local ts = ildb.get_ts(tcbs.ts_id)
+				if #ts.tc_breaks ~= 2 then
+					minetest.chat_send_player(pname, "Block route not possible: Section "..(ts.name or "-").." ("..tcbs.ts_id..") has "..#ts.tc_breaks.." ends, must be 2")
+					return
+				end
+				local e_sigd
+				if vector.equals(ts.tc_breaks[1].p, pos) then
+					e_sigd = { p = ts.tc_breaks[2].p,
+							   s = ts.tc_breaks[2].s==1 and 2 or 1}
+				elseif vector.equals(ts.tc_breaks[2].p, pos) then
+					e_sigd = { p = ts.tc_breaks[1].p,
+							   s = ts.tc_breaks[1].s==1 and 2 or 1}
+				else
+					minetest.chat_send_player(pname, "Block route not possible: Section "..(ts.name or "-").." ("..tcbs.ts_id..") TCBs are inconsistent, check section!")
+					return
+				end
+				local e_tcbs = ildb.get_tcbs(e_sigd)
+				if not e_tcbs then
+					minetest.chat_send_player(pname, "Block route not possible: Adjacent TCB not found, check section!")
+					return
+				end
+				-- now we have the TCB at the end of the following section. check that signal is set
+				if not e_tcbs.signal then
+					minetest.chat_send_player(pname, "Block route not possible: Adjacent TCB has no signal assigned!")
+					return
+				end
+				local caps = advtrains.interlocking.signal.get_signal_cap_level(e_tcbs.signal)
+				if caps < 3 then
+					minetest.chat_send_player(pname, "Block route not possible: Following signal is not capable of displaying a Halt aspect (caplevel "..caps..")")
+					return
+				end
+				-- all preconditions checked! go ahead and create route
+				local route = {
+					name = "BS",
+					[1] = {
+						next = e_sigd, -- of the next (note: next) TCB on the route
+						locks = {} -- route locks of this route segment
+					},
+					terminal = e_sigd,
+					use_rscache = true,
+					-- main_aspect = <use default>
+					assign_dst = fields.setupblockshort and true, -- assign dst, if short block was selected
+					default_autoworking = true,
+				}
+				local rid = #tcbs.routes + 1 -- typically 1
+				tcbs.routes[rid] = route
+				-- directly set our newly created route
+				ilrs.update_route(sigd, tcbs, rid)
+				advtrains.interlocking.show_signalling_form(sigd, pname, nil, true)
+				return
+			end
 			if sel_rte and tcbs.routes[sel_rte] then
 				if fields.setroute then
 					ilrs.update_route(sigd, tcbs, sel_rte)
@@ -764,8 +851,6 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				end
 				if fields.editroute and hasprivs then
 					advtrains.interlocking.show_route_edit_form(pname, sigd, sel_rte)
-					--local rte = tcbs.routes[sel_rte]
-					--minetest.show_formspec(pname, formname.."_renroute_"..sel_rte, "field[name;Enter new route name;"..rte.name.."]")
 					return
 				end
 			end
@@ -802,25 +887,5 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		
 		advtrains.interlocking.show_signalling_form(sigd, pname, sel_rte, true)
 		return
-	end
-	
-	
-	if not hasprivs then return end
-	-- rename route
-	local rind, rte_id
-	pts, connids, rind = string.match(formname, "^at_il_signalling_([^_]+)_(%d)_renroute_(%d+)$")
-	if pts then
-		pos = minetest.string_to_pos(pts)
-		connid = tonumber(connids)
-		rte_id = tonumber(rind)
-		if not connid or connid<1 or connid>2 then return end
-	end
-	if pos and connid and rind and fields.name then
-		local sigd = {p=pos, s=connid}
-		local tcbs = ildb.get_tcbs(sigd)
-		if tcbs.routes[rte_id] then
-			tcbs.routes[rte_id].name = fields.name
-			advtrains.interlocking.show_signalling_form(sigd, pname)
-		end
 	end
 end)

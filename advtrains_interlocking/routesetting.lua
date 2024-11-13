@@ -171,7 +171,7 @@ function ilrs.set_route(signal, route, try)
 		-- note the signals are iterated backwards. Switch depending on the role
 		local sig = signals[i]
 		-- apply mainaspect
-		sig.tcbs_ref.route_aspect = sig.masp_override or route.main_aspect or "_default"
+		sig.tcbs_ref.route_aspect = sig.masp_override or "_default" -- or route.main_aspect : TODO this does not work if a distant signal is on the path! Implement per-sig aspects!
 		if sig.role == "distant" or sig.role == "distant_repeater" or sig.role == "main_distant" then
 			if last_mainsig then
 				-- assign the remote as the last mainsig if desired
@@ -192,6 +192,8 @@ function ilrs.set_route(signal, route, try)
 		-- update the signal aspect on map
 		advtrains.interlocking.signal.update_route_aspect(sig.tcbs_ref, i ~= 1)
 	end
+	-- Only for the first signal on the route, set route aspect. TODO: remove when masp_overrides are implemented
+	signal.route_aspect = route.main_aspect or "_default"
 	
 	return true
 end
@@ -366,8 +368,9 @@ function ilrs.update_route(sigd, tcbs, newrte, cancel)
 		if newrte then tcbs.routeset = newrte end
 		--atdebug("Setting:",tcbs.routeset)
 		local succ, rsn, cbts, cblk
-		if tcbs.routes[tcbs.routeset] then
-			succ, rsn, cbts, cblk = ilrs.set_route(sigd, tcbs.routes[tcbs.routeset])
+		local route = tcbs.routes[tcbs.routeset]
+		if route then
+			succ, rsn, cbts, cblk = ilrs.set_route(sigd, route)
 		else
 			succ = false
 			rsn = attrans("Route state changed.")
@@ -390,6 +393,8 @@ function ilrs.update_route(sigd, tcbs, newrte, cancel)
 			--atdebug("Committed Route:",tcbs.routeset)
 			-- set_route now sets the signal aspects
 			--has_changed_aspect = true
+			-- route success. apply default_autoworking flag if requested
+			tcbs.route_auto = route.default_autoworking
 		end
 	end
 	if has_changed_aspect then

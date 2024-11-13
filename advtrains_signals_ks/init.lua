@@ -161,7 +161,7 @@ end
 
 -- Main aspects shunt signal
 -- Shunt signals have only two states, distant doesn't matter
-local mainaspects_shunt = {
+local mainaspects_ra = {
 	{
 		name = "shunt",
 		description = "Shunt",
@@ -335,6 +335,10 @@ for _, rtab in ipairs({
 		}) do
 		local sbox = table.copy(rtab.sbox)
 		sbox[5] = 0
+		local afunc = prts.asp
+		if type(afunc) == "table" then
+			afunc = function() return prts.asp end
+		end
 		minetest.register_node("advtrains_signals_ks:ra_"..typ.."_"..rot, {
 			description = "Ks Shunting Signal",
 			drawtype = "mesh",
@@ -366,7 +370,7 @@ for _, rtab in ipairs({
 			advtrains = {
 				main_aspects = mainaspects_ra,
 				apply_aspect = applyaspectf_ra(rot),
-				get_aspect_info = prts.asp,
+				get_aspect_info = afunc,
 				route_role = "shunt",
 				trackworker_next_rot = "advtrains_signals_ks:ra_"..typ.."_"..rtab.nextrot,
 				trackworker_rot_incr_param2 = (rot=="60")

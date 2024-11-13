@@ -111,15 +111,7 @@ end
 
 --[[
 Route definition:
-route = {
-	name = <string>
-	[n] = {
-		next = <sigd>, -- of the next (note: next) TCB on the route
-		locks = {<pts> = "state"} -- route locks of this route segment
-	}
-	terminal = <sigd>,
-	aspect = <signal aspect>,--note, might change in future
-}
+=== See database.lua L238
 The first item in the TCB path (namely i=0) is always the start signal of this route,
 so this is left out.
 All subsequent entries, starting from 1, contain:
