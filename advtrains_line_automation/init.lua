@@ -28,9 +28,8 @@ local S = advtrains.lines.translate
 
 dofile(modpath.."railwaytime.lua")
 dofile(modpath.."scheduler.lua")
-
+dofile(modpath.."station_editor.lua")
 dofile(modpath.."stoprail.lua")
-
 
 function advtrains.lines.load(data)
 	if data then
