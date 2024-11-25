@@ -348,6 +348,8 @@ function ilrs.update_route(sigd, tcbs, newrte, cancel)
 		--atdebug("Signal not in control, held by",tcbs.signal_name)
 		return
 	end
+	-- clear route_rsn, it will be set again if needed
+	tcbs.route_rsn = nil
 	if (newrte and tcbs.routeset and tcbs.routeset ~= newrte) or cancel then
 		if tcbs.route_committed then
 			--atdebug("Cancelling:",tcbs.routeset)
@@ -359,7 +361,6 @@ function ilrs.update_route(sigd, tcbs, newrte, cancel)
 		has_changed_aspect = true
 		tcbs.routeset = nil
 		tcbs.route_auto = nil
-		tcbs.route_rsn = nil
 	end
 	if newrte or tcbs.routeset then
 		if tcbs.route_committed then

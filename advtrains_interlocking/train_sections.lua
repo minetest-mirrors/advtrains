@@ -101,6 +101,7 @@ local function setsection(tid, train, ts_id, ts, sigd)
 		tcbs.route_aspect = nil
 		tcbs.route_remote = nil
 		tcbs.route_origin = nil
+		tcbs.route_rsn = nil
 		if not tcbs.route_auto then
 			tcbs.routeset = nil
 		end
