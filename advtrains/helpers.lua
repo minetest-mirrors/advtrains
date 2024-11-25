@@ -578,7 +578,7 @@ local trackiter_mt = {
 -- initial_pos: the initial track position of the track iterator
 -- initial_connid: the connection index in which to traverse. If nil, adds a "branch" for every connection of the track (traverse in all directions)
 -- limit: maximum distance from the start point after which the traverser stops
--- follow_all: if true, follows all branches at multi-connection tracks, even the ones pointing backwards or the crossing track on crossings. If false, follows only switches in driving direction.
+-- follow_all: NOT IMPLEMENTED (supposed: if true, follows all branches at multi-connection tracks, even the ones pointing backwards or the crossing track on crossings. If false, follows only switches in driving direction.)
 
 -- Functions of the returned TrackIterator can be called via the Lua : notation, such as ti:next_track()
 -- If only the main track needs to be followed, use only the ti:next_track() function and do not call ti:next_branch().

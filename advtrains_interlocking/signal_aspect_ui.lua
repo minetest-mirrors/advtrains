@@ -186,6 +186,30 @@ function advtrains.interlocking.init_distant_assign(pos, pname)
 	players_assign_distant[pname] = pos
 end
 
+local function try_auto_assign_to_tcb(signalpos, pos, connid, pname)
+	local ti = advtrains.get_track_iterator(pos, connid, 6, false) -- maximum 6 track nodes ahead
+	local apos, aconnid = ti:next_branch()
+	while apos do
+		-- check for presence of a tcb
+		local tcb = advtrains.interlocking.db.get_tcb(apos)
+		if tcb then
+			-- check on the pointing connid whether it has a signal already
+			if not tcb[aconnid].signal then
+				-- go ahead and assign
+				local sigd = { p=apos, s=aconnid }
+				advtrains.interlocking.db.assign_signal_to_tcbs(signalpos, sigd)
+				minetest.chat_send_player(pname, "Assigned signal to the TCB at "..core.pos_to_string(apos))
+				advtrains.interlocking.show_tcb_marker(apos)
+				advtrains.interlocking.show_signalling_form(sigd, pname)
+			end
+			-- in all cases return
+			return
+		end
+		apos, aconnid = ti:next_track()
+	end
+	-- if we end up here limit is up
+end
+
 minetest.register_on_punchnode(function(pos, node, player, pointed_thing)
 	local pname = player:get_player_name()
 	if not minetest.check_player_privs(pname, "interlocking") then
@@ -207,6 +231,8 @@ minetest.register_on_punchnode(function(pos, node, player, pointed_thing)
 					advtrains.interlocking.db.set_ip_signal(pts, plconnid, signalpos)
 					ipmarker(pos, plconnid)
 					minetest.chat_send_player(pname, "Configuring Signal: Successfully set influence point")
+					-- Try to find a TCB ahead and auto assign this signal there
+					try_auto_assign_to_tcb(signalpos, pos, plconnid, pname)
 				else
 					minetest.chat_send_player(pname, "Configuring Signal: Influence point of another signal is already present!")
 				end
