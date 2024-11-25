@@ -535,9 +535,12 @@ minetest.register_on_punchnode(function(pos, node, player, pointed_thing)
 			-- show formspec
 			
 			show_routing_form(pname, tcbpos)
-			
 			advtrains.interlocking.visualize_route(rp.origin, rp.route, "prog_"..pname, rp.tmp_lcks, pname)
-			
+			return
+		elseif advtrains.interlocking.database.get_tcb(pos) then
+			-- the punched node itself is a TCB
+			show_routing_form(pname, pos)
+			advtrains.interlocking.visualize_route(rp.origin, rp.route, "prog_"..pname, rp.tmp_lcks, pname)
 			return
 		end
 		if advtrains.is_passive(pos) then

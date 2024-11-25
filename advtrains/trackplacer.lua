@@ -152,12 +152,14 @@ local function check_or_bend_rail(origin, dir, pname, commit)
 	end
 end
 
-local function track_place_node(pos, node, ndef)
+local function track_place_node(pos, node, ndef, pname)
 	--atdebug("track_place_node: ",pos, node)
 	advtrains.ndb.swap_node(pos, node)
 	local ndef = minetest.registered_nodes[node.name]
 	if ndef and ndef.after_place_node then
-		ndef.after_place_node(pos)
+		-- resolve player again
+		local player = pname and core.get_player_by_name(pname) or nil
+		ndef.after_place_node(pos, player) -- note: itemstack and pointed_thing are NOT available here anymore (crap!)
 	end
 end
 
@@ -191,16 +193,16 @@ function tp.place_track(pos, tpg, pname, yaw)
 	for k1, conn1 in ipairs(cand) do
 		for k2, conn2 in ipairs(cand) do
 			if k1~=k2 then
-				-- order of conn1/conn2: prefer conn2 being in the direction of the player facing.
+				-- order of conn1/conn2: prefer conn1 being in the direction of the player facing.
 				-- the combination the other way round will be run through in a later loop iteration
-				if advtrains.yawToDirection(yaw, conn1, conn2) == conn2 then
+				if advtrains.yawToDirection(yaw, conn1, conn2) == conn1 then
 					-- does there exist a suitable double-connection rail?
 					--atdebug("Try double conn: ",conn1, conn2)
 					local node = g.double[conn1.."_"..conn2]
 					if node then
 						check_or_bend_rail(pos, conn1, pname, true)
 						check_or_bend_rail(pos, conn2, pname, true)
-						track_place_node(pos, node) -- calls after_place_node implicitly
+						track_place_node(pos, node, pname) -- calls after_place_node implicitly
 						return true
 					end
 				end
@@ -220,13 +222,13 @@ function tp.place_track(pos, tpg, pname, yaw)
 		local node = single[conn1]
 		if node then
 			check_or_bend_rail(pos, conn1, pname, true)
-			track_place_node(pos, node) -- calls after_place_node implicitly
+			track_place_node(pos, node, nil, pname) -- calls after_place_node implicitly
 			return true
 		end
 	end
 	-- 4. if nothing worked, set the default
 	local node = g.default
-	track_place_node(pos, node) -- calls after_place_node implicitly
+	track_place_node(pos, node, nil, pname) -- calls after_place_node implicitly
 	return true
 end
 

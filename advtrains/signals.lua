@@ -3,15 +3,15 @@
 
 local mrules_wallsignal = advtrains.meseconrules
 
-local function can_dig_func(pos)
+local function can_dig_func(pos, player)
 	if advtrains.interlocking then
-		return advtrains.interlocking.signal.can_dig(pos)
+		return advtrains.interlocking.signal.can_dig(pos, player)
 	end
 	return true
 end
-local function after_dig_func(pos)
+local function after_dig_func(pos, oldnode, oldmetadata, digger)
 	if advtrains.interlocking then
-		return advtrains.interlocking.signal.after_dig(pos)
+		return advtrains.interlocking.signal.after_dig(pos, oldnode, oldmetadata, digger)
 	end
 	return true
 end

@@ -802,10 +802,18 @@ function ildb.create_tcb_at(pos)
 end
 
 -- Remove TCB at the position and update/repair the now joined section
-function ildb.remove_tcb_at(pos)
+--   skip_tsrepair: should be set to true when the rail node at the TCB position is already gone.
+--                  Assumes the track sections are now separated and does not attempt the repair process.
+function ildb.remove_tcb_at(pos, pname, skip_tsrepair)
 	--atdebug("remove_tcb_at",pos)
 	local pts = advtrains.encode_pos(pos)
 	local old_tcb = track_circuit_breaks[pts]
+	-- unassign signals if defined
+	for connid=1,2 do
+		if old_tcb[connid].signal then
+			ildb.set_sigd_for_signal(old_tcb[connid].signal, nil)
+		end
+	end
 	track_circuit_breaks[pts] = nil
 	-- purge the track sections adjacent
 	if old_tcb[1].ts_id then
@@ -823,7 +831,9 @@ function ildb.remove_tcb_at(pos)
 	end
 	advtrains.interlocking.remove_tcb_marker(pos)
 	-- If needed, merge the track sections here
-	ildb.check_and_repair_ts_at_pos(pos, nil)
+	if not skip_tsrepair then
+		ildb.check_and_repair_ts_at_pos(pos, pname)
+	end
 	return true
 end
 
@@ -973,9 +983,32 @@ function ildb.get_sigd_for_signal(pos)
 	end
 	return nil
 end
-function ildb.set_sigd_for_signal(pos, sigd)
+function ildb.set_sigd_for_signal(pos, sigd) -- do not use!
 	local pts = advtrains.roundfloorpts(pos)
 	signal_assignments[pts] = sigd
+end
+
+-- Assign the signal at pos to the given TCB side.
+function ildb.assign_signal_to_tcbs(pos, sigd)
+	local tcbs = ildb.get_tcbs(sigd)
+	assert(tcbs, "assign_signal_to_tcbs invalid sigd!")
+	tcbs.signal = pos
+	if not tcbs.routes then
+		tcbs.routes = {}
+	end
+	ildb.set_sigd_for_signal(pos, sigd)
+end
+
+-- unassign the signal from the given sigd (looks in tcbs.signal for the signalpos)
+function ildb.unassign_signal_for_tcbs(sigd)
+	local tcbs = advtrains.interlocking.db.get_tcbs(sigd)
+	if not tcbs then return end
+	local pos = tcbs.signal
+	if not pos then return end
+	ildb.set_sigd_for_signal(pos, nil)
+	tcbs.signal = nil
+	tcbs.route_aspect = nil
+	tcbs.route_remote = nil
 end
 
 -- checks if there's any influence point set to this position
@@ -987,7 +1020,7 @@ function ildb.is_ip_at(pos, purge)
 		if purge then
 			-- is there still a signal assigned to it?
 			for connid, sigpos in pairs(influence_points[pts]) do
-				local asp = advtrains.interlocking.signal_get_aspect(sigpos)
+				local asp = advtrains.interlocking.signal.get_aspect(sigpos)
 				if not asp then
 					atlog("Clearing orphaned signal influence point", pts, "/", connid)
 					ildb.clear_ip_signal(pts, connid)

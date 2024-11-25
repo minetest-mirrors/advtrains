@@ -156,7 +156,7 @@ minetest.register_on_punchnode(function(pos, node, player, pointed_thing)
 	local tcbnpos = players_assign_tcb[pname]
 	if tcbnpos then
 		if vector.distance(pos, tcbnpos)<=20 then
-			local node_ok, conns, rhe = advtrains.get_rail_info_at(pos, advtrains.all_tracktypes)
+			local node_ok, conns, rhe = advtrains.get_rail_info_at(pos)
 			if node_ok and #conns == 2 then
 				-- if there is already a tcb here, reassign it
 				if ildb.get_tcb(pos) then
@@ -189,11 +189,7 @@ minetest.register_on_punchnode(function(pos, node, player, pointed_thing)
 				if ndef and ndef.advtrains and ndef.advtrains.apply_aspect then
 					local tcbs = ildb.get_tcbs(sigd)
 					if tcbs then
-						tcbs.signal = pos
-						if not tcbs.routes then
-							tcbs.routes = {}
-						end
-						ildb.set_sigd_for_signal(pos, sigd)
+						ildb.assign_signal_to_tcbs(pos, sigd)
 						minetest.chat_send_player(pname, "Configuring TCB: Successfully assigned signal.")
 						advtrains.interlocking.show_ip_form(pos, pname, true)
 					else
@@ -211,6 +207,138 @@ minetest.register_on_punchnode(function(pos, node, player, pointed_thing)
 		players_assign_signal[pname] = nil
 	end
 end)
+
+-- "Self-contained TCB"
+-- 2024-11-25: Buffers should become their own TCB (and signal) automatically to permit setting routes to them
+-- These are support functions for this kind of node.
+
+-- Create an after_place_node callback for a self-contained TCB node. The parameters control additional behavior:
+-- fail_silently_on_noprivs: (boolean) Does not give an error in case the placer does not have the interlocking privilege
+-- auto_create_self_signal: (boolean) Automatically assign this same node as signal to the A side of the newly-created TCB
+--                          (this is useful for buffers as they serve both as TCB and as an always-halt signal)
+function advtrains.interlocking.self_tcb_make_after_place_callback(fail_silently_on_noprivs, auto_create_self_signal)
+	return function(pos, player, itemstack, pointed_thing)
+		atdebug("selftcb apn ",pos, player, itemstack, pointed_thing)
+		local pname = player:get_player_name()
+		if not minetest.check_player_privs(pname, "interlocking") then
+			if not fail_silently_on_noprivs then
+				minetest.chat_send_player(pname, "Insufficient privileges to use this!")
+			end
+			return
+		end
+		if ildb.get_tcb(pos) then
+			minetest.chat_send_player(pname, "TCB already existed at this position, now linked to this node")
+		else
+			ildb.create_tcb_at(pos, pname)
+		end
+		if auto_create_self_signal then
+			local sigd = { p = pos, s = 1 }
+			local tcbs = ildb.get_tcbs(sigd)
+			-- make sure signal doesn't already exist
+			if tcbs.signal then
+				minetest.chat_send_player(pname, "Signal on B side already assigned!")
+				return
+			end
+			ildb.assign_signal_to_tcbs(pos, sigd)
+			-- assign influence point to itself
+			ildb.set_ip_signal(advtrains.roundfloorpts(pos), 1, pos)
+		end
+	end
+end
+
+-- Create an can_dig callback for a self-contained TCB node. The parameters control additional behavior:
+-- is_signal: (boolean) Whether this node is also a signal (in addition to being a TCB), e.g. when auto_create_self_signal was set.
+--            Causes also the signal API's can_dig to be called
+function advtrains.interlocking.self_tcb_make_can_dig_callback(is_signal)
+	return function(pos, player)
+		local pname = player and player:get_player_name() or ""
+		-- need to duplicate logic of the regular "can_dig_or_modify_track()" function in core/tracks.lua
+		if advtrains.get_train_at_pos(pos) then
+			minetest.chat_send_player(pname, "Can't remove track, a train is here!")
+			return false
+		end
+		-- end of standard checks
+		local tcb = ildb.get_tcb(pos)
+		if not tcb then
+			-- digging always allowed because the TCB hasn't been created (unless signal callback interjects)
+			if is_signal then
+				return advtrains.interlocking.signal.can_dig(pos, player)
+			else
+				return true
+			end
+		end
+		-- TCB exists
+		if not minetest.check_player_privs(pname, "interlocking") then
+			return false
+		end
+		-- fine to remove (unless signal callback interjects)
+		if is_signal then
+			return advtrains.interlocking.signal.can_dig(pos, player)
+		else
+			return true
+		end
+	end
+end
+
+-- Create an after_dig_node callback for a self-contained TCB node. The parameters control additional behavior:
+-- is_signal: (boolean) Whether this node is also a signal (in addition to being a TCB), e.g. when auto_create_self_signal was set.
+--            Causes also the signal API's after_dig_node to be called
+function advtrains.interlocking.self_tcb_make_after_dig_callback(is_signal)
+	return function(pos, oldnode, oldmetadata, player)
+		local pname = player:get_player_name()
+		if is_signal then
+			-- "dig" the signal first
+			advtrains.interlocking.signal.after_dig(pos, oldnode, oldmetadata, player)
+		end
+		if ildb.get_tcb(pos) then
+			-- remove the TCB
+			ildb.remove_tcb_at(pos, pname, true)
+		end
+	end
+end
+
+-- Create an on_rightclick callback for a self-contained TCB node. The rightclick callback tries to repeat the TCB assignment
+-- if necessary and otherwise shows the TCB formspec. The parameters control additional behavior:
+-- fail_silently_on_noprivs: (boolean) Does not give an error in case the placer does not have the interlocking privilege
+-- auto_create_self_signal: (boolean) Automatically assign this same node as signal to the B side of the
+--                           newly-created TCB if that has not already happened during place.
+--                           Otherwise, opens the signal dialog instead of the TCB dialog on rightclick
+function advtrains.interlocking.self_tcb_make_on_rightclick_callback(fail_silently_on_noprivs, auto_create_self_signal)
+	return function(pos, node, player, itemstack, pointed_thing)
+		local pname = player:get_player_name()
+		if not minetest.check_player_privs(pname, "interlocking") then
+			if not fail_silently_on_noprivs then
+				minetest.chat_send_player(pname, "Insufficient privileges to use this!")
+			end
+			return
+		end
+		if ildb.get_tcb(pos) then
+			-- TCB already here. go on
+		else
+			-- otherwise create tcb
+			ildb.create_tcb_at(pos, pname)
+		end
+		if auto_create_self_signal then
+			local sigd = { p = pos, s = 1 }
+			local tcbs = ildb.get_tcbs(sigd)
+			-- make sure signal doesn't already exist
+			if not tcbs.signal then
+				-- go ahead and assign signal
+				ildb.assign_signal_to_tcbs(pos, sigd)
+				-- assign influence point to itself
+				ildb.set_ip_signal(advtrains.roundfloorpts(pos), 1, pos)
+			end
+			-- in any case open the signalling form nouw
+			local control = player:get_player_control()
+			advtrains.interlocking.show_signal_form(pos, node, pname, control.aux1)
+			return
+		else
+			-- not an autosignal. Then show the TCB form
+			advtrains.interlocking.show_tcb_form(pos, pname)
+			return
+		end
+	end
+end
 
 -- TCB Form
 
@@ -666,7 +794,7 @@ function advtrains.interlocking.show_signalling_form(sigd, pname, sel_rte, calle
 				-- no route is active, and no route is so far defined
 				if not tcbs.signal then atwarn("signalling form missing signal?!", pos) return end -- safeguard, nothing else in this function checks tcbs.signal
 				local caps = advtrains.interlocking.signal.get_signal_cap_level(tcbs.signal)
-				if caps >= 3 then
+				if caps >= 4 then
 					-- offer user the "block signal mode"
 					form = form.."label[0.5,2.5;No routes are yet defined.]"
 					if hasprivs then
@@ -683,6 +811,10 @@ function advtrains.interlocking.show_signalling_form(sigd, pname, sel_rte, calle
 								.."Sets a route into the section ahead with auto-working set on\n"
 								.."Short block: This signal becomes distant signal for next signal.]"
 					end
+				elseif caps >= 3 then
+					-- it's a buffer!
+					form = form.."label[0.5,2.5;This is an always-halt signal (e.g. a buffer)\n"
+								.."No routes can be set from here.]"
 				else
 					-- signal caps say it cannot be route start/end
 					form = form.."label[0.5,2.5;This is a Non-Halt signal (e.g. pure distant signal)\n"

@@ -600,6 +600,35 @@ advtrains.register_tracks("default", {
 	--bumpers still use the old texture until the models are redone.
 	description=attrans("Bumper"),
 	formats={},
+	get_additional_definiton = function(def, preset, suffix, rotation)
+		-- 2024-11-25: Bumpers get the additional feature of being both a signal and a self-contained TCB, when interlocking is used.
+		if advtrains.interlocking then
+			return {
+				-- use the special callbacks for self_tcb (see tcb_ts_ui.lua)
+				can_dig = advtrains.interlocking.self_tcb_make_can_dig_callback(true),
+				after_dig_node = advtrains.interlocking.self_tcb_make_after_dig_callback(true),
+				after_place_node = advtrains.interlocking.self_tcb_make_after_place_callback(true, true),
+				on_rightclick = advtrains.interlocking.self_tcb_make_on_rightclick_callback(false, true),
+				advtrains = {
+					main_aspects = {
+						-- No main aspects, it always shows Stop.
+						-- But we need to define the table so that signal caplevel is 3
+					},
+					apply_aspect = function(pos, node, main_aspect, rem_aspect, rem_aspinfo)
+						-- is a no-op for bumpers, it always shows Stop
+					end,
+					get_aspect_info = function(pos, main_aspect)
+						-- it always shows Stop
+						return advtrains.interlocking.signal.ASPI_HALT
+					end,
+					distant_support = false, -- not a distant
+					route_role = "end", -- the end is nigh!
+				}
+			}
+		else
+			return {} -- no additional defs when interlocking is not used
+		end
+	end,
 }, advtrains.ap.t_30deg_straightonly)
 minetest.register_craft({
 	output = 'advtrains:dtrack_bumper_placer 2',

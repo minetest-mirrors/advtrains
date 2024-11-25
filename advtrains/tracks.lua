@@ -253,6 +253,7 @@ end
 
 -- Function called when a track is about to be dug or modified by the trackworker
 -- Returns either true (ok) or false,"translated string describing reason why it isn't allowed"
+-- Impl Note: possibly duplicate code in "self contained TCB" - see interlocking/tcb_ts_ui.lua!
 function advtrains.can_dig_or_modify_track(pos)
 	if advtrains.get_train_at_pos(pos) then
 		return false, attrans("Position is occupied by a train.")

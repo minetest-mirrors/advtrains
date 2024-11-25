@@ -400,7 +400,8 @@ end
 -- 0: not a signal at all
 -- 1: signal has get_aspect_info() but the aspect is not variable (e.g. a sign)
 -- 2: signal has apply_aspect() but does not have main aspects (e.g. a pure distant signal)
--- 3: Full capabilities, signal has main aspects and can be used as main/shunt signal (can be start/endpoint of a route)
+-- 3: signal has main signal role but can only ever display a halt aspect, such as a bumper (can be endpoint, but not startpoint, of a route)
+-- 4: Full capabilities, signal has main aspects and can be used as main/shunt signal (can be start/endpoint of a route)
 function signal.get_signal_cap_level(pos)
 	local node = advtrains.ndb.get_node_or_nil(pos)
 	local ndef = node and minetest.registered_nodes[node.name]
@@ -408,6 +409,10 @@ function signal.get_signal_cap_level(pos)
 	if ndefat and ndefat.get_aspect_info then
 		if ndefat.apply_aspect  then
 			if ndefat.main_aspects then
+				-- if the table contains anything, 4, otherwise 3
+				for _,_ in pairs(ndefat.main_aspects) do
+					return 4
+				end
 				return 3
 			end
 			return 2
@@ -419,9 +424,17 @@ end
 
 ----------------
 
-function signal.can_dig(pos)
+function signal.can_dig(pos, player)
 	local sigd = advtrains.interlocking.db.get_sigd_for_signal(pos)
 	if sigd then
+		-- check privileges
+		if not player or not minetest.check_player_privs(player:get_player_name(), "interlocking") then
+			if not player then -- intermediate debug to uncover hard-to-find bugz
+				atdebug("advtrains.interlocking.signal.can_dig(",pos,") called with player==nil!")
+			end
+			return false
+		end
+		-- check if route is set
 		local tcbs = advtrains.interlocking.db.get_tcbs(sigd)
 		if tcbs.routeset then
 			return false
@@ -434,11 +447,7 @@ function signal.after_dig(pos, oldnode, oldmetadata, player)
 	-- unassign signal if necessary
 	local sigd = advtrains.interlocking.db.get_sigd_for_signal(pos)
 	if sigd then
-		local tcbs = advtrains.interlocking.db.get_tcbs(sigd)
-		advtrains.interlocking.db.set_sigd_for_signal(pos, nil)
-		tcbs.signal = nil
-		tcbs.route_aspect = nil
-		tcbs.route_remote = nil
+		advtrains.interlocking.db.unassign_signal_for_tcbs(sigd)
 		minetest.chat_send_player(player:get_player_name(), "Signal has been unassigned. Name and routes are kept for reuse.")
 	end
 	-- TODO clear influence point
