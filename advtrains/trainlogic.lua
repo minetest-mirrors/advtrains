@@ -844,7 +844,7 @@ local callbacks_leave_node, run_callbacks_leave_node = mknodecallback("leave")
 -- Node callback for approaching
 -- Might be called multiple times, whenever path is recalculated. Also called for the first node the train is standing on, then has_entered is true.
 -- signature is function(pos, id, train, index, has_entered, lzbdata)
--- has_entered: true if the "enter" callback has already been executed for this train in this location
+-- has_entered: Provided for legacy reasons. Always false. (used to signify that the enter callback has already been called, at a time where enter was still called at .5 index)
 -- lzbdata: arbitrary data (shared between all callbacks), deleted when LZB is restarted.
 -- These callbacks are called in order of distance as train progresses along tracks, so lzbdata can be used to
 -- keep track of a train's state once it passes this point
@@ -890,7 +890,7 @@ end
 
 function advtrains.tnc_call_approach_callback(pos, train_id, train, index, lzbdata)
 	--atdebug("tnc approach",pos,train_id, lzbdata)
-	local has_entered = atround(train.index) == index
+	local has_entered = false -- 2024-11-25: has_entered is now always false, because enter point = LZB hit point!
 	
 	local node = advtrains.ndb.get_node(pos) --this spares the check if node is nil, it has a name in any case
 	local mregnode=minetest.registered_nodes[node.name]
@@ -903,18 +903,21 @@ function advtrains.tnc_call_approach_callback(pos, train_id, train, index, lzbda
 end
 
 -- === te callback definition for tnc node callbacks ===
+-- Change 2024-11-25: Enter node happens when index surpasses whole number (i.e. at center of rail)
+-- Instead of atround (prev behavior) nouw use floor and ceil (note this also fixes issues where index was exactly on .0)
+local atceil = math.ceil
 
 advtrains.te_register_on_new_path(function(id, train)
 	train.tnc = {
-		old_index = atround(train.index),
-		old_end_index = atround(train.end_index),
+		old_index = atfloor(train.index),
+		old_end_index = atceil(train.end_index),
 	}
 	--atdebug(id,"tnc init",train.index,train.end_index)
 end)
 
 advtrains.te_register_on_update(function(id, train)
-	local new_index = atround(train.index)
-	local new_end_index = atround(train.end_index)
+	local new_index = atfloor(train.index)
+	local new_end_index = atceil(train.end_index)
 	local old_index = train.tnc.old_index
 	local old_end_index = train.tnc.old_end_index
 	while old_index < new_index do
@@ -932,8 +935,8 @@ advtrains.te_register_on_update(function(id, train)
 end)
 
 advtrains.te_register_on_create(function(id, train)
-	local index = atround(train.index)
-	local end_index = atround(train.end_index)
+	local index = atfloor(train.index)
+	local end_index = atceil(train.end_index)
 	while end_index <= index do
 		local pos = advtrains.round_vector_floor_y(advtrains.path_get(train,end_index))
 		tnc_call_enter_callback(pos, id, train, end_index)
@@ -943,8 +946,8 @@ advtrains.te_register_on_create(function(id, train)
 end)
 
 advtrains.te_register_on_remove(function(id, train)
-	local index = atround(train.index)
-	local end_index = atround(train.end_index)
+	local index = atfloor(train.index)
+	local end_index = atceil(train.end_index)
 	while end_index <= index do
 		local pos = advtrains.round_vector_floor_y(advtrains.path_get(train,end_index))
 		tnc_call_leave_callback(pos, id, train, end_index)
