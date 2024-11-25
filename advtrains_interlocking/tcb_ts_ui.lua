@@ -218,7 +218,6 @@ end)
 --                          (this is useful for buffers as they serve both as TCB and as an always-halt signal)
 function advtrains.interlocking.self_tcb_make_after_place_callback(fail_silently_on_noprivs, auto_create_self_signal)
 	return function(pos, player, itemstack, pointed_thing)
-		atdebug("selftcb apn ",pos, player, itemstack, pointed_thing)
 		local pname = player:get_player_name()
 		if not minetest.check_player_privs(pname, "interlocking") then
 			if not fail_silently_on_noprivs then

@@ -179,7 +179,7 @@ function signal.set_aspect(pos, main_asp, rem_pos, skip_dst_notify)
 	
 	-- if remote has changed, unregister from old remote
 	if old_remote and old_remote~=new_remote and signal.distant_refs[old_remote] then
-		atdebug("unregister old remote: ",old_remote,"from",main_pts)
+		--atdebug("unregister old remote: ",old_remote,"from",main_pts)
 		signal.distant_refs[old_remote][main_pts] = nil
 	end
 		
@@ -231,12 +231,12 @@ end
 -- Notify distant signals of main_pts of a change in the aspect of this signal
 -- 
 function signal.notify_distants_of(main_pts, limit)
-	atdebug("notify_distants_of",advtrains.decode_pos(main_pts),"limit",limit)
+	--atdebug("notify_distants_of",advtrains.decode_pos(main_pts),"limit",limit)
 	if limit <= 0 then
 		return
 	end
 	local dstrefs = signal.distant_refs[main_pts]
-	atdebug("dstrefs",dstrefs,"")
+	--atdebug("dstrefs",dstrefs,"")
 	if dstrefs then
 		for dst,_ in pairs(dstrefs) do
 			-- ensure that the backref is still valid
@@ -336,7 +336,7 @@ function signal.get_aspect_info(pos)
 			ai = ai(pos, masp)
 		end
 		if type(ai)=="table" then
-			atdebug(pos,"aspectinfo",ai)
+			--atdebug(pos,"aspectinfo",ai)
 			return ai
 		else
 			error("For node "..node.name..": ndef.advtrains.get_aspect_info must be function or table")
@@ -355,7 +355,7 @@ end
 function signal.reapply_aspect(pts)
 	-- get aspt
 	local aspt = signal.aspects[pts]
-	atdebug("reapply_aspect",advtrains.decode_pos(pts),"aspt",aspt)
+	--atdebug("reapply_aspect",advtrains.decode_pos(pts),"aspt",aspt)
 	local pos = advtrains.decode_pos(pts)
 	-- resolve mainaspect table by name
 	local masp, remote, node, ndef = signal.get_aspect_internal(pos, aspt)
@@ -368,7 +368,7 @@ function signal.reapply_aspect(pts)
 		end
 		signal.distant_refs[remote][pts] = true
 		local rem_aspt = signal.aspects[remote]
-		atdebug("resolving remote",advtrains.decode_pos(remote),"aspt",rem_aspt)
+		--atdebug("resolving remote",advtrains.decode_pos(remote),"aspt",rem_aspt)
 		local rem_pos = advtrains.decode_pos(remote)
 		rem_masp, _, _, rem_ndef = signal.get_aspect_internal(rem_pos, rem_aspt)
 		if rem_masp then
@@ -378,7 +378,7 @@ function signal.reapply_aspect(pts)
 		end
 	end
 	-- call into ndef
-	atdebug("applying to",pos,": main_asp",masp,"rem_masp",rem_masp,"rem_aspi",rem_aspi)
+	--atdebug("applying to",pos,": main_asp",masp,"rem_masp",rem_masp,"rem_aspi",rem_aspi)
 	if ndef.advtrains and ndef.advtrains.apply_aspect then
 		ndef.advtrains.apply_aspect(pos, node, masp, rem_masp, rem_aspi)
 	end

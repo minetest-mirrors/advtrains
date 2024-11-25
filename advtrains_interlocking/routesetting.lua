@@ -83,7 +83,7 @@ function ilrs.set_route(signal, route, try)
 			end_pkey = advtrains.encode_pos(c_rseg.next.p)
 			if c_ts.rs_cache[start_pkey] and c_ts.rs_cache[start_pkey][end_pkey] then
 				for lp,lst in pairs(c_ts.rs_cache[start_pkey][end_pkey]) do
-					atdebug("Add lock from RSCache:",lp,"->",lst)
+					--atdebug("Add lock from RSCache:",lp,"->",lst)
 					c_locks[lp] = lst
 				end
 			elseif not try then
@@ -92,7 +92,7 @@ function ilrs.set_route(signal, route, try)
 		end
 		-- add all from locks, these override the rscache
 		for lpts,lst in pairs(c_rseg.locks) do
-			atdebug("Add lock from Routedef:",lpts,"->",lst,"overrides",c_locks[lpts] or "none")
+			--atdebug("Add lock from Routedef:",lpts,"->",lst,"overrides",c_locks[lpts] or "none")
 			c_locks[lpts] = lst
 		end
 		
