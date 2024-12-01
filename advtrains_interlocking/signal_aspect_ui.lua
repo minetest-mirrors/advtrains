@@ -186,8 +186,11 @@ function advtrains.interlocking.init_distant_assign(pos, pname)
 	players_assign_distant[pname] = pos
 end
 
+-- Tries to automatically find a TCB to assign to the signal, or a main signal if this is a pure distant signal and another signal is found before the TCB
 local function try_auto_assign_to_tcb(signalpos, pos, connid, pname)
-	local ti = advtrains.get_track_iterator(pos, connid, 6, false) -- maximum 6 track nodes ahead
+	local pure_distant = advtrains.interlocking.signal.get_signal_cap_level(signalpos) == 2 -- exactly 2: pure distant sig
+	local is_past_first = false
+	local ti = advtrains.get_track_iterator(pos, connid, pure_distant and 150 or 16, false) -- maximum 16 track nodes ahead
 	local apos, aconnid = ti:next_branch()
 	while apos do
 		-- check for presence of a tcb
@@ -204,8 +207,18 @@ local function try_auto_assign_to_tcb(signalpos, pos, connid, pname)
 			end
 			-- in all cases return
 			return
+		elseif pure_distant and is_past_first then
+			-- try to find another signal's influence point here which could be the remote of a distant signal
+			local pts = advtrains.roundfloorpts(apos)
+			local mainsig = advtrains.interlocking.db.get_ip_signal(pts, aconnid)
+			if mainsig and advtrains.interlocking.signal.get_signal_cap_level(mainsig) >= 3 then
+				advtrains.interlocking.signal.set_aspect(signalpos, "_default", mainsig)
+				minetest.chat_send_player(pname, "Assigned distant signal to the main signal at "..core.pos_to_string(mainsig))
+				return
+			end
 		end
 		apos, aconnid = ti:next_track()
+		is_past_first = true
 	end
 	-- if we end up here limit is up
 end

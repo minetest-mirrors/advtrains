@@ -768,6 +768,7 @@ function advtrains.interlocking.show_signalling_form(sigd, pname, sel_rte, calle
 					form = form.."button[0.5,6;  5,1;setroute;Set Route]"
 					form = form.."button[0.5,7;2,1;dsproute;Show]"
 					if hasprivs then
+						form = form.."button[2.5,7;1,1;setarsdefault;Set Def.]"
 						form = form.."button[3.5,7;2,1;editroute;Edit]"
 						if sel_rte > 1 then
 							form = form .. "button[5.5,4;0.5,0.3;moveup;↑]"
@@ -983,6 +984,16 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				if fields.editroute and hasprivs then
 					advtrains.interlocking.show_route_edit_form(pname, sigd, sel_rte)
 					return
+				end
+				if fields.setarsdefault and hasprivs then
+					for rid, route in ipairs(tcbs.routes) do
+						local isdefault = rid == sel_rte
+						if route.ars then
+							route.ars.default = isdefault
+						elseif isdefault then
+							route.ars = {default = true}
+						end
+					end
 				end
 			end
 		end

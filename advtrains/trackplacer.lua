@@ -152,10 +152,10 @@ local function check_or_bend_rail(origin, dir, pname, commit)
 	end
 end
 
-local function track_place_node(pos, node, ndef, pname)
+local function track_place_node(pos, node, ndef_p, pname)
 	--atdebug("track_place_node: ",pos, node)
 	advtrains.ndb.swap_node(pos, node)
-	local ndef = minetest.registered_nodes[node.name]
+	local ndef = ndef_p or minetest.registered_nodes[node.name]
 	if ndef and ndef.after_place_node then
 		-- resolve player again
 		local player = pname and core.get_player_by_name(pname) or nil
@@ -202,7 +202,7 @@ function tp.place_track(pos, tpg, pname, yaw)
 					if node then
 						check_or_bend_rail(pos, conn1, pname, true)
 						check_or_bend_rail(pos, conn2, pname, true)
-						track_place_node(pos, node, pname) -- calls after_place_node implicitly
+						track_place_node(pos, node, nil, pname) -- calls after_place_node implicitly
 						return true
 					end
 				end

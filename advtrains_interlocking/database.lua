@@ -701,7 +701,7 @@ local function recursively_find_routes(s_pos, s_connid, locks_found, result_tabl
 	local pos, connid, bconnid = ti:next_branch()
 	pos, connid, bconnid = ti:next_track()-- step once to get ahead of previous turnout
 	local last_pos
-	repeat
+	while pos do -- this stops the loop when either the track end is reached or the limit is hit
 		local node = advtrains.ndb.get_node_or_nil(pos)
 		--atdebug("Walk ",pos, "nodename", node.name, "entering at conn",bconnid)
 		local ndef = minetest.registered_nodes[node.name]
@@ -739,7 +739,7 @@ local function recursively_find_routes(s_pos, s_connid, locks_found, result_tabl
 		-- Go forward
 		last_pos = pos
 		pos, connid, bconnid = ti:next_track()
-	until not pos -- this stops the loop when either the track end is reached or the limit is hit
+	end 
 	--atdebug("recursively_find_routes: Reached track end or limit at", last_pos, ". This path is not saved, returning")
 end
 
@@ -832,7 +832,7 @@ function ildb.remove_tcb_at(pos, pname, skip_tsrepair)
 	advtrains.interlocking.remove_tcb_marker(pos)
 	-- If needed, merge the track sections here
 	if not skip_tsrepair then
-		ildb.check_and_repair_ts_at_pos(pos, pname)
+		ildb.check_and_repair_ts_at_pos(pos, nil, pname)
 	end
 	return true
 end
