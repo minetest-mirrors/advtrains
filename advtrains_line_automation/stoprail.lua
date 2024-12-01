@@ -104,7 +104,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				end
 			end
 			local stn = advtrains.lines.stations[stdata.stn]
-			if stn and fields.stnname and fields.stnname ~= stn.name then
+			if stn and fields.stnname and fields.stnname~="" and fields.stnname ~= stn.name then
 				if (stn.owner == pname or minetest.check_player_privs(pname, "train_admin")) then
 					stn.name = fields.stnname
 				else
