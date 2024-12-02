@@ -46,7 +46,7 @@ minetest.override_item("mesecons_switch:mesecon_switch_on", {
 				mesecon.receptor_off(pos)
 			end
 		end,
-		fallback_state = "off",
+		node_fallback_state = "off",
 		on_updated_from_nodedb = function(pos, node)
 			mesecon.receptor_on(pos)
 		end,

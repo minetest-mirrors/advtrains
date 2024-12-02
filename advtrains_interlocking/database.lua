@@ -758,6 +758,7 @@ function ildb.update_rs_cache(ts_id)
 		--atdebug("Starting for ",start_tcbi, start_tcbs)
 		local locks_found = {}
 		local result_table = {}
+		
 		recursively_find_routes(start_tcbs.p, start_tcbs.s, locks_found, result_table, TS_MAX_SCAN)
 		-- now result_table contains found route locks. Match them with the other TCBs we have in this section
 		for end_tcbi, end_tcbs in ipairs(ts.tc_breaks) do
@@ -765,7 +766,11 @@ function ildb.update_rs_cache(ts_id)
 				end_pkey = advtrains.encode_pos(end_tcbs.p)
 				if result_table[end_pkey] then
 					--atdebug("Set RSCache entry",end_pkey.."-"..end_pkey,"=",result_table[end_pkey])
-					rscache[start_pkey][end_pkey] = result_table[end_pkey]
+					local lockstab = result_table[end_pkey]
+					if ts.fixed_locks then -- include the sections fixedlocks if present
+						for pts, st in pairs(ts.fixed_locks) do lockstab[pts] = st end
+					end
+					rscache[start_pkey][end_pkey] = lockstab
 					result_table[end_pkey] = nil
 				end
 			end

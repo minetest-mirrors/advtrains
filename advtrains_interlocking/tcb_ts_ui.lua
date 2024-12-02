@@ -4,6 +4,7 @@ local players_assign_tcb = {}
 local players_assign_signal = {}
 local players_assign_xlink = {}
 local players_link_ts = {}
+local players_assign_fixedlocks = {}
 
 local ildb = advtrains.interlocking.db
 local ilrs = advtrains.interlocking.route
@@ -205,6 +206,28 @@ minetest.register_on_punchnode(function(pos, node, player, pointed_thing)
 			minetest.chat_send_player(pname, "Configuring TCB: Node is too far away. Aborted.")
 		end
 		players_assign_signal[pname] = nil
+	end
+	
+	-- FixedLocks assignment
+	local ts_id = players_assign_fixedlocks[pname]
+	if ts_id then
+		if advtrains.is_passive(pos) then
+			local pts = advtrains.encode_pos(pos)
+			local state = advtrains.getstate(pos)
+			local ts = ildb.get_ts(ts_id)
+			if ts and ts.fixed_locks then
+				minetest.chat_send_player(pname, minetest.pos_to_string(pos).." locks in state "..state)
+				ts.fixed_locks[pts] = state
+			else
+				minetest.chat_send_player(pname, "Error: TS modified, abort!")
+				players_assign_fixedlocks[pname] = nil
+			end
+		else
+			minetest.chat_send_player(pname, "Setting fixed locks finished!")
+			players_assign_fixedlocks[pname] = nil
+			ildb.update_rs_cache(ts_id)
+			advtrains.interlocking.show_ts_form(ts_id, pname)
+		end
 	end
 end)
 
@@ -492,7 +515,7 @@ function advtrains.interlocking.show_ts_form(ts_id, pname)
 	local ts = ildb.get_ts(ts_id)
 	if not ts_id then return end
 	
-	local form = "size[10,10]label[0.5,0.5;Track Section Detail - "..ts_id.."]"
+	local form = "size[10.5,10]label[0.5,0.5;Track Section Detail - "..ts_id.."]"
 	form = form.."field[0.8,2;5.2,1;name;Section name;"..minetest.formspec_escape(ts.name or "").."]"
 	form = form.."button[5.5,1.7;1,1;setname;Set]"
 	local hint
@@ -503,11 +526,27 @@ function advtrains.interlocking.show_ts_form(ts_id, pname)
 		advtrains.interlocking.show_tcb_marker(sigd.p)
 	end
 	
-	form = form.."textlist[0.5,3;5,3;tcblist;"..table.concat(strtab, ",").."]"
+	form = form.."label[0.5,2.5;Boundary TCBs:]"
+	form = form.."textlist[0.5,3;4,3;tcblist;"..table.concat(strtab, ",").."]"
+	
+	-- additional route locks (e.g. for level crossings)
+	
+	strtab = {}
+	if ts.fixed_locks then
+		for pts, state in pairs(ts.fixed_locks) do
+			strtab[#strtab+1] = minetest.formspec_escape(
+				minetest.pos_to_string(advtrains.decode_pos(pts)).." = "..state)
+		end
+	end
+	form = form.."label[5.5,2.5;Fixed route locks (e.g. level crossings):]"
+	form = form.."textlist[5.5,3;4,3;fixedlocks;"..table.concat(strtab, ",").."]"
 	
 	if ildb.may_modify_ts(ts) then
-		form = form.."button[5.5,4;4,1;remove;Remove Section]"
-		form = form.."tooltip[dissolve;This will remove the track section and set all its end points to End Of Interlocking]"
+		form = form.."button[5.5,6;2,1;flk_add;Add locks]"
+		form = form.."button[7.5,6;2,1;flk_clear;Clear locks]"
+		
+		form = form.."button[5.5,8;4,1;remove;Remove Section]"
+		form = form.."tooltip[remove;This will remove the track section and set all its end points to End Of Interlocking]"
 	else
 		hint=3
 	end
@@ -562,6 +601,18 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			if ts.name == "" then
 				ts.name = nil
 			end
+		end
+		
+		if fields.flk_add then
+			if not ts.fixed_locks then
+				ts.fixed_locks = {}
+			end
+			players_assign_fixedlocks[pname] = ts_id
+			minetest.chat_send_player(pname, "Punch components to add fixed locks. (punch anything else = end)")
+			minetest.close_formspec(pname, formname)
+			return
+		elseif fields.flk_clear then
+			ts.fixed_locks = nil
 		end
 		
 		if fields.reset then

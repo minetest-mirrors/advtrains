@@ -310,7 +310,7 @@ minetest.register_node("advtrains:across_on", {
 	advtrains = {
 		node_state = "on",
 		node_state_map = { on = "advtrains:across_on", off = "advtrains:across_off" },
-		fallback_state = "off",
+		node_fallback_state = "off",
 	},
 	on_rightclick=function(pos, node, player)
 		if advtrains.check_turnout_signal_protection(pos, player:get_player_name()) then
