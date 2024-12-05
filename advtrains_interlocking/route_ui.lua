@@ -96,7 +96,7 @@ function atil.show_route_edit_form(pname, sigd, routeid, sel_rpartidx)
 	-- What is in focus is determined by the parameter sel_rpartidx
 	
 	local sel_rpart = tabref[sel_rpartidx]
-	atdebug("sel rpart",sel_rpart)
+	--atdebug("sel rpart",sel_rpart)
 	
 	if sel_rpart and sel_rpart.signal then
 		-- get TCBS here and rseg selected
@@ -169,7 +169,6 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	local pname = player:get_player_name()
 	-- retreive sel_rpart from the cache in any case and clear it out
 	local sel_rpart = sel_rpartcache[pname]
-	sel_rpartcache[pname] = nil
 	if not minetest.check_player_privs(pname, {train_operator=true, interlocking=true}) then
 		return
 	end
@@ -230,12 +229,18 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			local rseg = route[sel_rpart.seg]
 			if rseg then
 				rseg.call_on = minetest.is_yes(fields.se_callon)
+				-- reshow form to update CO marker
+				atil.show_route_edit_form(pname, sigd, routeid, sel_rpart.idx)
+				return
 			end
 		end
 		
 		if fields.noautogen then
 			route.smartroute_generated = nil
 			route.default_autoworking = nil
+			-- reshow form for the button to disappear
+			atil.show_route_edit_form(pname, sigd, routeid, sel_rpart and sel_rpart.idx)
+			return
 		end
 		
 		if fields.delete then
@@ -243,6 +248,9 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			atil.route.update_route(sigd, tcbs, nil, true)
 			table.remove(tcbs.routes, routeid)
 			advtrains.interlocking.show_signalling_form(sigd, pname)
+			-- cleanup
+			sel_rpartcache[pname] = nil
+			return
 		end
 		
 		if fields.clone then
@@ -253,12 +261,17 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			rcopy.smartroute_generated = nil
 			table.insert(tcbs.routes, routeid+1, rcopy)
 			advtrains.interlocking.show_signalling_form(sigd, pname)
+			-- cleanup
+			sel_rpartcache[pname] = nil
+			return
 		end
 
 		if fields.newfrom then
 			advtrains.interlocking.init_route_prog(pname, sigd, route)
 			minetest.close_formspec(pname, formname)
 			tcbs.ars_ignore_next = nil
+			-- cleanup
+			sel_rpartcache[pname] = nil
 			return
 		end
 		
@@ -269,6 +282,8 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		
 		if fields.back then
 			advtrains.interlocking.show_signalling_form(sigd, pname)
+			-- cleanup
+			sel_rpartcache[pname] = nil
 			return
 		end
 		
@@ -277,11 +292,15 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			local prev_idx = sel_rpart and sel_rpart.idx or 1
 			local tev = minetest.explode_textlist_event(fields.routelog)
 			local new_idx = tev and tev.index
-			atdebug("routelog sel",prev_idx,new_idx)
 			if new_idx and new_idx ~= prev_idx then
 				atil.show_route_edit_form(pname, sigd, routeid, new_idx)
 				return
 			end
+		end
+		
+		if field.quit then
+			-- cleanup
+			sel_rpartcache[pname] = nil
 		end
 		
 	end
