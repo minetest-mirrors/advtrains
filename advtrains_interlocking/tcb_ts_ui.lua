@@ -1008,12 +1008,12 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 					name = "BS",
 					[1] = {
 						next = e_sigd, -- of the next (note: next) TCB on the route
-						locks = {} -- route locks of this route segment
+						locks = {}, -- route locks of this route segment
+						assign_dst = fields.setupblockshort and true, -- assign dst, if short block was selected
 					},
 					terminal = e_sigd,
 					use_rscache = true,
 					-- main_aspect = <use default>
-					assign_dst = fields.setupblockshort and true, -- assign dst, if short block was selected
 					default_autoworking = true,
 				}
 				local rid = #tcbs.routes + 1 -- typically 1

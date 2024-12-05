@@ -11,9 +11,10 @@ local function sigd_to_string(sigd)
 	return minetest.pos_to_string(sigd.p).." / "..lntrans[sigd.s]
 end
 
+-- indexed by pname
+local sel_rpartcache = {}
 
-
-function atil.show_route_edit_form(pname, sigd, routeid)
+function atil.show_route_edit_form(pname, sigd, routeid, sel_rpartidx)
 
 	if not minetest.check_player_privs(pname, {train_operator=true, interlocking=true}) then
 		minetest.chat_send_player(pname, "Insufficient privileges to use this!")
@@ -31,10 +32,12 @@ function atil.show_route_edit_form(pname, sigd, routeid)
 	
 	-- construct textlist for route information
 	local tab = {}
-	local function itab(t)
+	local tabref = {}
+	local function itab(rseg, t, rty, rpara)
 		tab[#tab+1] = minetest.formspec_escape(string.gsub(t, ",", " "))
+		tabref[#tab] = { [rty] = true, param = rpara, seg = rseg, idx = #tab }
 	end
-	itab("("..(tcbs.signal_name or "+")..") Route #"..routeid)
+	itab(1, "("..(tcbs.signal_name or "+")..") Route #"..routeid, "signal", sigd)
 	
 	-- this code is partially copy-pasted from routesetting.lua
 	-- we start at the tc designated by signal
@@ -44,12 +47,12 @@ function atil.show_route_edit_form(pname, sigd, routeid)
 	while c_sigd and i<=#route do
 		c_tcbs = ildb.get_tcbs(c_sigd)
 		if not c_tcbs then
-			itab("-!- No TCBS at "..sigd_to_string(c_sigd)..". Please reconfigure route!")
+			itab(i, "-!- No TCBS at "..sigd_to_string(c_sigd)..". Please reconfigure route!", "err", nil)
 			break
 		end
 		c_ts_id = c_tcbs.ts_id
 		if not c_ts_id then
-			itab("-!- No track section adjacent to "..sigd_to_string(c_sigd)..". Please reconfigure route!")
+			itab(i, "-!- No track section adjacent to "..sigd_to_string(c_sigd)..". Please reconfigure route!", "err", nil)
 			break
 		end
 		c_ts = ildb.get_ts(c_ts_id)
@@ -57,16 +60,18 @@ function atil.show_route_edit_form(pname, sigd, routeid)
 		c_rseg = route[i]
 		c_lckp = {}
 		
-		itab(""..i.." "..sigd_to_string(c_sigd))
-		itab("= "..(c_ts and c_ts.name or "-").." =")
+		local signame = "-"
+		if c_tcbs and c_tcbs.signal then signame = c_tcbs.signal_name or "o" end
+		itab(i, ""..i.." "..sigd_to_string(c_sigd).." ("..signame..")", "signal", c_sigd)
+		itab(i, "= "..(c_ts and c_ts.name or c_ts_id).." ="..(c_rseg.call_on and " [CO]" or ""), "section", c_ts_id)
 		
 		if c_rseg.locks then
 			for pts, state in pairs(c_rseg.locks) do
 				
 				local pos = minetest.string_to_pos(pts)
-				itab("L "..pts.." -> "..state)
+				itab(i, "L "..pts.." -> "..state, "lock", pos)
 				if not advtrains.is_passive(pos) then
-					itab("-!- No passive component at "..pts..". Please reconfigure route!")
+					itab(i, "-!- No passive component at "..pts..". Please reconfigure route!", "err", nil)
 					break
 				end
 			end
@@ -78,31 +83,61 @@ function atil.show_route_edit_form(pname, sigd, routeid)
 	if c_sigd then
 		local e_tcbs = ildb.get_tcbs(c_sigd)
 		local signame = "-"
-		if e_tcbs and e_tcbs.signal then signame = e_tcbs.signal_name or "+" end
-		itab("E "..sigd_to_string(c_sigd).." ("..signame..")")
+		if e_tcbs and e_tcbs.signal then signame = e_tcbs.signal_name or "o" end
+		itab(i, "E "..sigd_to_string(c_sigd).." ("..signame..")", "end", c_sigd)
 	else
-		itab("E (none)")
+		itab(i, "E (none)", "end", nil)
 	end
 	
-	form = form.."textlist[0.5,2;3.5,3.9;rtelog;"..table.concat(tab, ",").."]"
+	if not sel_rpartidx then sel_rpartidx = 1 end
+	form = form.."textlist[0.5,2;3.5,3.9;routelog;"..table.concat(tab, ",")..";"..(sel_rpartidx or 1)..";false]"
 	
-	-- to the right of rtelog a signal aspect selection for the start signal
-	form = form..F.label(4.5, 2, "Signal Aspect:")
-	-- main aspect list
-	local signalpos = tcbs.signal
-	local ndef = signalpos and advtrains.ndb.get_ndef(signalpos)
-	if ndef and ndef.advtrains and ndef.advtrains.main_aspects then
-		local entries = { "<Default Aspect>" }
-		local sel = 1
-		for i, mae in ipairs(ndef.advtrains.main_aspects) do
-			entries[i+1] = mae.description
-			if mae.name == route.main_aspect then
-				sel = i+1
+	-- to the right of rtelog, controls are displayed for the thing in focus
+	-- What is in focus is determined by the parameter sel_rpartidx
+	
+	local sel_rpart = tabref[sel_rpartidx]
+	atdebug("sel rpart",sel_rpart)
+	
+	if sel_rpart and sel_rpart.signal then
+		-- get TCBS here and rseg selected
+		local s_tcbs = ildb.get_tcbs(sel_rpart.param)
+		local rseg = route[sel_rpart.seg]
+		-- main aspect list
+		local signalpos = s_tcbs and s_tcbs.signal
+		if signalpos and rseg then
+			form = form..F.label(4.5, 2, "Signal Aspect:")
+			local ndef = signalpos and advtrains.ndb.get_ndef(signalpos)
+			if ndef and ndef.advtrains and ndef.advtrains.main_aspects then
+				local entries = { "<Default Aspect>" }
+				local sel = 1
+				for i, mae in ipairs(ndef.advtrains.main_aspects) do
+					entries[i+1] = mae.description
+					if mae.name == rseg.main_aspect then
+						sel = i+1
+					end
+				end
+				form = form..F.dropdown(4.5, 3.0, 4, "sa_main_aspect", entries, sel, true)
 			end
+			-- checkbox for assign distant signal
+			local assign_dst = rseg.assign_dst
+			if assign_dst == nil then
+				assign_dst = (sel_rpart.seg~=1) -- special behavior when assign_dst is nil (and not false):
+				-- defaults to false for the very first signal and true for all others (= minimal user configuration overhead)
+				-- Note: on save, the value will be fixed at either false or true
+			end
+			form = form..string.format("checkbox[4.5,4.0;sa_distant;Announce distant signal;%s]", assign_dst)
+		else
+			form = form..F.label(4.5, 2, "No Signal at this TCB")
 		end
-		form = form..F.dropdown(4.5, 3.0, 4, "sa_main_aspect", entries, sel, true)
-		-- checkbox for assign distant signal
-		form = form..string.format("checkbox[4.5,4.0;sa_distant;Announce distant signal;%s]", route.assign_dst)
+	elseif sel_rpart and sel_rpart.section then
+		local rseg = route[sel_rpart.seg]
+		if rseg then
+			form = form..F.label(4.5, 2, "Section Options:")
+			-- checkbox for call-on
+			form = form..string.format("checkbox[4.5,4.0;se_callon;Call-on (section may be occupied);%s]", rseg.call_on)
+		end
+	else
+		form = form..F.label(4.5, 2, "<< Select a route part to edit options")
 	end
 	
 	form = form.."button[0.5,6;1,1;prev;<<<]"
@@ -123,13 +158,18 @@ function atil.show_route_edit_form(pname, sigd, routeid)
 	form = form.."textarea[0.8,8.3;5,3;ars;ARS Rule List;"..atil.ars_to_text(route.ars).."]"
 	form = form.."button[5.5,8.23;3,1;savears;Save ARS List]"
 	
-	minetest.show_formspec(pname, "at_il_routeedit_"..minetest.pos_to_string(sigd.p).."_"..sigd.s.."_"..routeid, form)
-
+	local formname = "at_il_routeedit_"..minetest.pos_to_string(sigd.p).."_"..sigd.s.."_"..routeid
+	minetest.show_formspec(pname, formname, form)
+	-- record selected entry from routelog for receive fields callback
+	sel_rpartcache[pname] = sel_rpart
 end
 
 
 minetest.register_on_player_receive_fields(function(player, formname, fields)
 	local pname = player:get_player_name()
+	-- retreive sel_rpart from the cache in any case and clear it out
+	local sel_rpart = sel_rpartcache[pname]
+	sel_rpartcache[pname] = nil
 	if not minetest.check_player_privs(pname, {train_operator=true, interlocking=true}) then
 		return
 	end
@@ -163,19 +203,34 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			route.name = fields.name
 		end
 		
-		if fields.sa_main_aspect then
+		if fields.sa_main_aspect and sel_rpart and sel_rpart.signal then
 			local idx = tonumber(fields.sa_main_aspect)
-			route.main_aspect = nil
-			if idx > 1 then
-				local signalpos = tcbs.signal
-				local ndef = signalpos and advtrains.ndb.get_ndef(signalpos)
-				if ndef and ndef.advtrains and ndef.advtrains.main_aspects then
-					route.main_aspect = ndef.advtrains.main_aspects[idx - 1].name
+			-- get TCBS here and rseg selected
+			local s_tcbs = ildb.get_tcbs(sel_rpart.param)
+			local rseg = route[sel_rpart.seg]
+			-- main aspect list
+			local signalpos = s_tcbs and s_tcbs.signal
+			if rseg then
+				rseg.main_aspect = nil
+				if idx > 1 then
+					local ndef = signalpos and advtrains.ndb.get_ndef(signalpos)
+					if ndef and ndef.advtrains and ndef.advtrains.main_aspects then
+						rseg.main_aspect = ndef.advtrains.main_aspects[idx - 1].name
+					end
 				end
 			end
 		end
-		if fields.sa_distant then
-			route.assign_dst = minetest.is_yes(fields.sa_distant)
+		if fields.sa_distant and sel_rpart and sel_rpart.signal then
+			local rseg = route[sel_rpart.seg]
+			if rseg then
+				rseg.assign_dst = minetest.is_yes(fields.sa_distant)
+			end
+		end
+		if fields.se_callon and sel_rpart and sel_rpart.section then
+			local rseg = route[sel_rpart.seg]
+			if rseg then
+				rseg.call_on = minetest.is_yes(fields.se_callon)
+			end
 		end
 		
 		if fields.noautogen then
@@ -214,6 +269,19 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		
 		if fields.back then
 			advtrains.interlocking.show_signalling_form(sigd, pname)
+			return
+		end
+		
+		-- if an entry was selected in the textlist (and its not the current one) update the form
+		if fields.routelog then
+			local prev_idx = sel_rpart and sel_rpart.idx or 1
+			local tev = minetest.explode_textlist_event(fields.routelog)
+			local new_idx = tev and tev.index
+			atdebug("routelog sel",prev_idx,new_idx)
+			if new_idx and new_idx ~= prev_idx then
+				atil.show_route_edit_form(pname, sigd, routeid, new_idx)
+				return
+			end
 		end
 		
 	end
