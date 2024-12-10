@@ -43,7 +43,7 @@ function atil.show_route_edit_form(pname, sigd, routeid, sel_rpartidx)
 	-- we start at the tc designated by signal
 	local c_sigd = sigd
 	local i = 1
-	local c_tcbs, c_ts_id, c_ts, c_rseg, c_lckp
+	local c_tcbs, c_ts_id, c_ts, c_rseg
 	while c_sigd and i<=#route do
 		c_tcbs = ildb.get_tcbs(c_sigd)
 		if not c_tcbs then
@@ -58,7 +58,6 @@ function atil.show_route_edit_form(pname, sigd, routeid, sel_rpartidx)
 		c_ts = ildb.get_ts(c_ts_id)
 		
 		c_rseg = route[i]
-		c_lckp = {}
 		
 		local signame = "-"
 		if c_tcbs and c_tcbs.signal then signame = c_tcbs.signal_name or "o" end
@@ -145,9 +144,9 @@ function atil.show_route_edit_form(pname, sigd, routeid, sel_rpartidx)
 	form = form.."button[2.5,6;1,1;next;>>>]"
 	
 	
-	if route.smartroute_generated or route.default_autoworking then
-		form = form.."button[3.5,6;2,1;noautogen;Clr Autogen]"
-	end
+	--if route.smartroute_generated or route.default_autoworking then
+	--	form = form.."button[3.5,6;2,1;noautogen;Clr Autogen]"
+	--end
 	form = form.."button[5.5,6;3,1;delete;Delete Route]"
 	form = form.."button[0.5,7;3,1;back;Back to signal]"
 	form = form.."button[3.5,7;2,1;clone;Clone Route]"
@@ -235,13 +234,13 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			end
 		end
 		
-		if fields.noautogen then
-			route.smartroute_generated = nil
-			route.default_autoworking = nil
-			-- reshow form for the button to disappear
-			atil.show_route_edit_form(pname, sigd, routeid, sel_rpart and sel_rpart.idx)
-			return
-		end
+		--if fields.noautogen then
+		--	route.smartroute_generated = nil
+		--	route.default_autoworking = nil
+		--	-- reshow form for the button to disappear
+		--	atil.show_route_edit_form(pname, sigd, routeid, sel_rpart and sel_rpart.idx)
+		--	return
+		--end
 		
 		if fields.delete then
 			-- if something set the route in the meantime, make sure this doesn't break.
@@ -298,7 +297,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			end
 		end
 		
-		if field.quit then
+		if fields.quit then
 			-- cleanup
 			sel_rpartcache[pname] = nil
 		end

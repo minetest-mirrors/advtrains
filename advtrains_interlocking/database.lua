@@ -245,6 +245,14 @@ routes = {
 				800080008000 = st
 			}
 			next = S[(-23,9,0)/2] -- the start TCB of the next route segment (pointing forward)
+			-- Signal info: relates to the signal at the start of this section:
+			main_aspect = "_free" -- The main aspect that the route start signal is to show
+			assign_dst = false  -- Whether to assign distant signal (affects only the signal at the start of the route)
+								-- false: start signal does not set distant signal (the default), for long blocks
+								-- it is assumed that the next main signal will have its own distant sig
+								-- true: start signal sets distant signal to the next signal on the route with route_role "main" (typically the end signal)
+								-- for short blocks where end signal doesn't have its own distant sig
+			call_on = false	-- if true, when this route is set, section is allowed to be occupied by a train (but it must not have a route set in)
 		}
 		2 = {
 			locks = {}
@@ -254,15 +262,6 @@ routes = {
 		ars = { <ARS rule definition table> }
 		use_rscache = false -- if true, the track section's rs_cache will be used to set locks in addition to the locks table
 							-- this is disabled for legacy routes, but enabled for all new routes by default
-		-- Fields to specify the signal aspect of the signal
-		main_aspect = "_free" -- The main aspect that the route start signal is to show
-		assign_dst = false  -- Whether to assign distant signal (affects only the signal at the start of the route)
-							-- false: start signal does not set distant signal (the default), for long blocks
-								-- it is assumed that the next main signal will have its own distant sig
-							-- true: start signal sets distant signal to the next signal on the route with route_role "main" (typically the end signal)
-								-- for short blocks where end signal doesn't have its own distant sig
-		terminal = <sigd> -- the sigd describing the end of the route (e.g. the "next" entry in the final route segment).
-						  -- Might be missing or wrong. Routesetting currently does not care about this value being present.
 		default_autoworking = false -- if true, when route is set autoworking will be by default on. Used for Blocksignal mode
 	}
 }

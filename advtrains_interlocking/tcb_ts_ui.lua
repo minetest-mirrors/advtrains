@@ -6,6 +6,7 @@ local players_assign_xlink = {}
 local players_link_ts = {}
 local players_assign_fixedlocks = {}
 
+local atil = advtrains.interlocking
 local ildb = advtrains.interlocking.db
 local ilrs = advtrains.interlocking.route
 
@@ -746,6 +747,42 @@ function advtrains.interlocking.highlight_track_section(pos)
 	end
 end
 
+-- checks that the given route is still valid (i.e. all its TCBs, sections and locks exist)
+-- returns true (ok) or false, reason (on issue)
+function advtrains.interlocking.check_route_valid(route, sigd)
+	-- this code is partially copy-pasted from routesetting.lua
+	-- we start at the tc designated by signal
+	local c_sigd = sigd
+	local i = 1
+	local c_tcbs, c_ts_id, c_ts, c_rseg
+	while c_sigd and i<=#route do
+		c_tcbs = ildb.get_tcbs(c_sigd)
+		if not c_tcbs then
+			return false, "No TCBS at "..sigd_to_string(c_sigd)
+		end
+		c_ts_id = c_tcbs.ts_id
+		if not c_ts_id then
+			return false, "No track section adjacent to "..sigd_to_string(c_sigd)
+		end
+		c_ts = ildb.get_ts(c_ts_id)
+		
+		c_rseg = route[i]
+		
+		if c_rseg.locks then
+			for pts, state in pairs(c_rseg.locks) do
+				local pos = minetest.string_to_pos(pts)
+				if not advtrains.is_passive(pos) then
+					return false, "No passive component for lock at "..pts
+				end
+			end
+		end
+		-- advance
+		c_sigd = c_rseg.next
+		i = i + 1
+	end
+	return true, nil, c_sigd
+end
+
 -- Signalling formspec - set routes a.s.o
 
 -- textlist selection temporary storage
@@ -800,17 +837,19 @@ function advtrains.interlocking.show_signalling_form(sigd, pname, sel_rte, calle
 				-- at least one route is defined, show normal dialog
 				local strtab = {}
 				for idx, route in ipairs(tcbs.routes) do
+					local rname = route.name
+					local valid = atil.check_route_valid(route, sigd)
 					local clr = ""
-					if route.smartroute_generated then
-						clr = "#FFFF55"
-					end
-					if route.ars then
+					if not valid then
 						clr = "#FF5555"
+						rname = rname.." (invalid)"
+					elseif route.ars then
+						clr = "#FFFF55"
 						if route.ars.default then
 							clr = "#55FF55"
 						end
 					end
-					strtab[#strtab+1] = clr .. minetest.formspec_escape(route.name)
+					strtab[#strtab+1] = clr .. minetest.formspec_escape(rname)
 				end
 				form = form.."label[0.5,2.5;Routes:]"
 				form = form.."textlist[0.5,3;5,3;rtelist;"..table.concat(strtab, ",")
@@ -961,8 +1000,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				return
 			end
 			if fields.smartroute and hasprivs then
-				advtrains.interlocking.smartroute.init(pname, sigd)
-				minetest.close_formspec(pname, formname)
+				advtrains.interlocking.smartroute.start(pname, sigd)
 				tcbs.ars_ignore_next = nil
 				return
 			end
