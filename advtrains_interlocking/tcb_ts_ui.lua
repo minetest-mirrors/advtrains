@@ -780,6 +780,11 @@ function advtrains.interlocking.check_route_valid(route, sigd)
 		c_sigd = c_rseg.next
 		i = i + 1
 	end
+	-- check end TCB
+	c_tcbs = ildb.get_tcbs(c_sigd)
+	if not c_tcbs then
+		return false, "Final TCBS missing at "..sigd_to_string(c_sigd)
+	end
 	return true, nil, c_sigd
 end
 

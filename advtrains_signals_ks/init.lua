@@ -411,11 +411,12 @@ for _, rtab in ipairs({
 			advtrains = {
 				get_aspect_info = asp,
 				trackworker_next_rot = "advtrains_signals_ks:"..prefix.."_"..typ.."_"..rtab.nextrot,
-				trackworker_rot_incr_param2 = (rot=="60")
+				trackworker_rot_incr_param2 = (rot=="60"),
+				trackworker_next_var = "advtrains_signals_ks:"..prefix.."_"..nxt.."_"..rot,
 			},
-			on_rightclick = advtrains.interlocking.signal_rc_handler,
-			can_dig = advtrains.interlocking.signal_can_dig,
-			after_dig_node = advtrains.interlocking.signal_after_dig,
+			on_rightclick = advtrains.interlocking.signal.on_rightclick,
+			can_dig = advtrains.interlocking.signal.can_dig,
+			after_dig_node = advtrains.interlocking.signal.after_dig,
 		})
 		-- rotatable by trackworker
 		--TODO add rotation using trackworker
