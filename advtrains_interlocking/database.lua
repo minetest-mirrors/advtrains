@@ -351,7 +351,7 @@ end
 -- Returns:
 -- ts_id - the track section that was found
 -- nil - No track section exists
-function ildb.check_and_repair_ts_at_pos(pos, tcb_connid, notify_pname)
+function ildb.check_and_repair_ts_at_pos(pos, tcb_connid, notify_pname, force_create)
 	--atdebug("check_and_repair_ts_at_pos", pos, tcb_connid)
 	-- check prereqs
 	if ildb.get_tcb(pos) then
@@ -378,7 +378,7 @@ function ildb.check_and_repair_ts_at_pos(pos, tcb_connid, notify_pname)
 				-- inconsistency is found, repair it
 				--atdebug("check_and_repair_ts_at_pos: Inconsistency is found!")
 				tsrepair_notify(notify_pname, "Track section inconsistent here, repairing...")
-				return ildb.repair_ts_merge_all(all_tcbs, false, notify_pname)
+				return ildb.repair_ts_merge_all(all_tcbs, force_create, notify_pname)
 				-- Step2 check is no longer necessary since we just created that new section
 			end
 		end
@@ -386,9 +386,13 @@ function ildb.check_and_repair_ts_at_pos(pos, tcb_connid, notify_pname)
 	-- only one found (it is either nil or a ts id)
 	--atdebug("check_and_repair_ts_at_pos: TS consistent id=",ts_id,"")
 	if not ts_id then
-		tsrepair_notify(notify_pname, "No track section found here.")
-		return
-		-- All TCBs agreed that there is no section here.
+		if force_create and next(all_tcbs) then --ensure at least one tcb is in list
+			return ildb.repair_ts_merge_all(all_tcbs, force_create, notify_pname)
+		else
+			--tsrepair_notify(notify_pname, "No track section found here.")
+			return nil
+			-- All TCBs agreed that there is no section here
+		end
 	end
 	
 	local ts = ildb.get_ts(ts_id)
@@ -403,9 +407,9 @@ function ildb.check_and_repair_ts_at_pos(pos, tcb_connid, notify_pname)
 	if #ts.tc_breaks ~= #all_tcbs then
 		--atdebug("check_and_repair_ts_at_pos: Partition is found!")
 		tsrepair_notify(notify_pname, "Track section partition found, repairing...")
-		return ildb.repair_ts_merge_all(all_tcbs, false, notify_pname)
+		return ildb.repair_ts_merge_all(all_tcbs, force_create, notify_pname)
 	end
-	tsrepair_notify(notify_pname, "Found section", ts.name or ts_id, "here.")
+	--tsrepair_notify(notify_pname, "Found section", ts.name or ts_id, "here.")
 	return ts_id
 end
 

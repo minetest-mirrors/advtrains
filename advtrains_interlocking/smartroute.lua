@@ -30,7 +30,7 @@ end
 --route search implementation
 -- Note this is similar to recursively_find_routes in database.lua, there used for the rscache
 
-local function recursively_find_routes(s_pos, s_connid, searching_shunt, tcbseq, mark_pos, result_table, scan_limit, tscnt_limit)
+local function recursively_find_routes(s_pos, s_connid, searching_shunt, tcbseq, mark_pos, result_table, scan_limit, tscnt_limit, cur_ts_id, notify_pname)
 	atdebug("(SmartRoute) Recursively restarting at ",s_pos, s_connid, "limit left", scan_limit,"tscnt",tscnt_limit)
 	local ti = advtrains.get_track_iterator(s_pos, s_connid, scan_limit, false)
 	local pos, connid, bconnid = ti:next_branch()
@@ -52,7 +52,7 @@ local function recursively_find_routes(s_pos, s_connid, searching_shunt, tcbseq,
 				--atdebug("Going in direction",oconnid,"state",state)
 				recursively_find_routes(pos, oconnid, searching_shunt,
 					table.copy(tcbseq), table.copy(mark_pos),
-					result_table, ti.limit, tscnt_limit)
+					result_table, ti.limit, tscnt_limit, cur_ts_id, notify_pname)
 			end
 			return
 		end
@@ -62,6 +62,13 @@ local function recursively_find_routes(s_pos, s_connid, searching_shunt, tcbseq,
 			local fsigd = { p = pos, s = connid }
 			atdebug("(SmartRoute) Encounter TCB ",fsigd)
 			tcbseq[#tcbseq+1] = fsigd
+			-- TS validity check: ensure that the TS the back connid refers to is the same as the one at the start
+			local re_ts_id = tcb[bconnid].ts_id
+			if re_ts_id ~= cur_ts_id then
+				atwarn("(SmartRoute) Found TS Inconsistency: entered in section",cur_ts_id,"but TCB backref is section",re_ts_id)
+				ildb.check_and_repair_ts_at_pos(pos, bconnid, notify_pname)
+				-- nothing needs to be updated on our side
+			end
 			-- check if this is a possible route endpoint
 			local tcbs = tcb[connid]
 			if tcbs.signal then
@@ -93,6 +100,9 @@ local function recursively_find_routes(s_pos, s_connid, searching_shunt, tcbseq,
 			if tscnt_limit <= 0 then
 				break
 			end
+			-- update the cur_ts_id
+			cur_ts_id = tcb[connid].ts_id
+			atdebug("(SmartRoute) Now in section:",cur_ts_id)
 		end
 		-- Go forward
 		last_pos = pos
@@ -116,9 +126,9 @@ end
 -- Maximum scan length for track iterator
 local TS_MAX_SCAN = 1000
 
-function sr.rescan(pname, sigd, tscnt_limit, searching_shunt)
+function sr.rescan(pname, sigd, tcbs, tscnt_limit, searching_shunt, pname)
 	local result_table = {}
-	recursively_find_routes(sigd.p, sigd.s, is_startsignal_shunt, {}, {}, result_table, TS_MAX_SCAN, tscnt_limit)
+	recursively_find_routes(sigd.p, sigd.s, searching_shunt, {}, {}, result_table, TS_MAX_SCAN, tscnt_limit, tcbs.ts_id, pname)
 	return result_table
 end
 
@@ -128,9 +138,12 @@ function sr.propose_next(pname, sigd, tscnt_limit, searching_shunt)
 	if not tcbs or not tcbs.routes then
 		minetest.chat_send_player(pname, "Smartroute: TCBS or routes don't exist here!")
 		return
+	elseif not tcbs.ts_id then
+		minetest.chat_send_player(pname, "Smartroute: No track section directly ahead!")
+		return
 	end
 	-- Step 1: search for routes using the current settings
-	local found_routes = sr.rescan(pname, sigd, tscnt_limit, searching_shunt)
+	local found_routes = sr.rescan(pname, sigd, tcbs, tscnt_limit, searching_shunt, pname)
 	-- Step 2: remove routes for endpoints for which routes already exist
 	local ex_endpts = {} -- key = sigd_to_string
 	for rtid, route in ipairs(tcbs.routes) do

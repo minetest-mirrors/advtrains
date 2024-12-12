@@ -124,9 +124,17 @@ function ilrs.set_route(signal, route, try)
 				return false, "No passive component at "..minetest.pos_to_string(pos)..". Please update track section or reconfigure route!"
 			end
 		end
+		-- sanity check, is section at next the same as the current?
+		local nvar = c_rseg.next
+		if nvar then
+			local re_tcbs = ildb.get_tcbs({p = nvar.p, s = (nvar.s==1) and 2 or 1})
+			if not re_tcbs or not re_tcbs.ts_id or re_tcbs.ts_id~=c_ts_id then
+				if not try then atwarn("Encountered inconsistent ts (front~=back) while a real run of routesetting routine, at position",pts,"while setting route",rtename,"of",signal) end
+				return false, "TCB at "..minetest.pos_to_string(nvar.p).." has different section than previous TCB. Please update track section or reconfigure route!"
+			end
+		end
 		-- reserve ts and write locks
 		if not try then
-			local nvar = c_rseg.next
 			if not route[i+1] then
 				-- We shouldn't use the "next" value of the final route segment, because this can lead to accidental route-cancelling of already set routes from another signal.
 				nvar = nil

@@ -3,7 +3,7 @@
 
 local ilrs = advtrains.interlocking.route
 
-local function node_right_click(pos, pname)
+local function node_right_click(pos, pname, player)
 	if advtrains.is_passive(pos) then
 		local form = "size[7,5]label[0.5,0.5;Route lock inspector]"
 		local pts = advtrains.encode_pos(pos)
@@ -33,7 +33,7 @@ local function node_right_click(pos, pname)
 		return
 	end
 
-	local ts_id = advtrains.interlocking.db.check_and_repair_ts_at_pos(pos)
+	local ts_id = advtrains.interlocking.db.check_and_repair_ts_at_pos(pos, nil, pname)
 	if ts_id then
 		advtrains.interlocking.show_ts_form(ts_id, pname)
 	else
@@ -41,7 +41,7 @@ local function node_right_click(pos, pname)
 	end
 end
 
-local function node_left_click(pos, pname)
+local function node_left_click(pos, pname, player)
 	local node_ok, conns, rail_y=advtrains.get_rail_info_at(pos)
 	if not node_ok then
 		minetest.chat_send_player(pname, "Node is not a track!")
@@ -52,8 +52,12 @@ local function node_left_click(pos, pname)
 		advtrains.interlocking.show_tcb_marker(pos)
 		return
 	end
+	
+	-- create track section if aux1 button down
+	local pc = player:get_player_control()
+	local force_create = pc.aux1
 
-	local ts_id = advtrains.interlocking.db.check_and_repair_ts_at_pos(pos, nil, pname)
+	local ts_id = advtrains.interlocking.db.check_and_repair_ts_at_pos(pos, nil, pname, force_create)
 	if ts_id then
 		advtrains.interlocking.db.update_rs_cache(ts_id)
 		advtrains.interlocking.highlight_track_section(pos)
@@ -80,7 +84,7 @@ minetest.register_craftitem("advtrains_interlocking:tool",{
 		end
 		if pointed_thing.type=="node" then
 			local pos=pointed_thing.under
-			node_right_click(pos, pname)
+			node_right_click(pos, pname, player)
 		end
 	end,
 	on_use = function(itemstack, player, pointed_thing)
@@ -94,7 +98,7 @@ minetest.register_craftitem("advtrains_interlocking:tool",{
 		end
 		if pointed_thing.type=="node" then
 			local pos=pointed_thing.under
-			node_left_click(pos, pname)
+			node_left_click(pos, pname, player)
 		end
 	end
 })

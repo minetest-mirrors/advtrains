@@ -776,8 +776,16 @@ function advtrains.interlocking.check_route_valid(route, sigd)
 				end
 			end
 		end
+		-- sanity check, is section at next the same as the current?
+		local nvar = c_rseg.next
+		if nvar then
+			local re_tcbs = ildb.get_tcbs({p = nvar.p, s = (nvar.s==1) and 2 or 1})
+			if not re_tcbs or not re_tcbs.ts_id or re_tcbs.ts_id~=c_ts_id then
+				return false, "TCB at "..minetest.pos_to_string(nvar.p).." has different section than previous TCB."
+			end
+		end
 		-- advance
-		c_sigd = c_rseg.next
+		c_sigd = nvar
 		i = i + 1
 	end
 	-- check end TCB

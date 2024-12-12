@@ -75,8 +75,17 @@ function atil.show_route_edit_form(pname, sigd, routeid, sel_rpartidx)
 				end
 			end
 		end
+		-- sanity check, is section at next the same as the current?
+		local nvar = c_rseg.next
+		if nvar then
+			local re_tcbs = ildb.get_tcbs({p = nvar.p, s = (nvar.s==1) and 2 or 1})
+			if not re_tcbs or not re_tcbs.ts_id or re_tcbs.ts_id~=c_ts_id then
+				itab(i, "-!- At "..sigd_to_string(c_sigd)..".Section Start and End do not match!", "err", nil)
+				break
+			end
+		end
 		-- advance
-		c_sigd = c_rseg.next
+		c_sigd = nvar
 		i = i + 1
 	end
 	if c_sigd then
@@ -135,6 +144,8 @@ function atil.show_route_edit_form(pname, sigd, routeid, sel_rpartidx)
 			-- checkbox for call-on
 			form = form..string.format("checkbox[4.5,4.0;se_callon;Call-on (section may be occupied);%s]", rseg.call_on)
 		end
+	elseif sel_rpart and sel_rpart.err then
+		form = form.."textarea[4.5,2.5;4,4;errorta;Error:;"..tab[sel_rpartidx].."]"
 	else
 		form = form..F.label(4.5, 2, "<< Select a route part to edit options")
 	end
