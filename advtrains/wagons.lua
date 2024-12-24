@@ -461,26 +461,34 @@ function wagon:on_step(dtime)
 		--needs to know index and path
 		if train.velocity==0 and self.door_entry and train.door_open and train.door_open~=0 then
 			--using the mapping created by the trainlogic globalstep
+			local platform_offset = math.floor(self.wagon_width / 2)
 			for i, ino in ipairs(self.door_entry) do
 				--fct is the flipstate flag from door animation above
 				local aci = advtrains.path_get_index_by_offset(train, index, ino*fct)
 				local ix1, ix2 = advtrains.path_get_adjacent(train, aci)
 				-- the two wanted positions are ix1 and ix2 + (2nd-1st rotated by 90deg)
 				-- (x z) rotated by 90deg is (-z x)  (http://stackoverflow.com/a/4780141)
-				local add = { x = (ix2.z-ix1.z)*train.door_open, y = 0, z = (ix1.x-ix2.x)*train.door_open }
-				local pts1=vector.round(vector.add(ix1, add))
-				local pts2=vector.round(vector.add(ix2, add))
-				if minetest.get_item_group(minetest.get_node(pts1).name, "platform")>0 then
-					local ckpts={
-						pts1,
-						pts2,
-						vector.add(pts1, {x=0, y=1, z=0}),
-						vector.add(pts2, {x=0, y=1, z=0}),
-					}
-					for _,ckpos in ipairs(ckpts) do
-						local cpp=minetest.pos_to_string(ckpos)
-						if advtrains.playersbypts[cpp] then
-							self:on_rightclick(advtrains.playersbypts[cpp])
+				local add = {
+					x = atround((ix2.z-ix1.z)*train.door_open),
+					y = 0,
+					z = atround((ix1.x-ix2.x)*train.door_open)
+				}
+				for offset = (platform_offset == 0 and 0 or 1), platform_offset do
+					local scaled_add = vector.multiply(add, offset)
+					local pts1=vector.add(ix1, scaled_add)
+					local pts2=vector.add(ix2, scaled_add)
+					if minetest.get_item_group(minetest.get_node(pts1).name, "platform")>0 then
+						local ckpts={
+							pts1,
+							pts2,
+							vector.add(pts1, {x=0, y=1, z=0}),
+							vector.add(pts2, {x=0, y=1, z=0}),
+						}
+						for _,ckpos in ipairs(ckpts) do
+							local cpp=minetest.pos_to_string(ckpos)
+							if advtrains.playersbypts[cpp] then
+								self:on_rightclick(advtrains.playersbypts[cpp])
+							end
 						end
 					end
 				end
