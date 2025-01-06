@@ -871,14 +871,15 @@ function advtrains.interlocking.show_signalling_form(sigd, pname, sel_rte, calle
 					form = form.."button[0.5,6;  5,1;setroute;Set Route]"
 					form = form.."button[0.5,7;2,1;dsproute;Show]"
 					if hasprivs then
-						form = form.."button[2.5,7;1,1;setarsdefault;Set Def.]"
+						form = form.."button[5.5,3.3;1,0.3;setarsdefault;D]tooltip[setarsdefault;Set ARS default route]"
 						form = form.."button[3.5,7;2,1;editroute;Edit]"
 						if sel_rte > 1 then
-							form = form .. "button[5.5,4;0.5,0.3;moveup;↑]"
+							form = form .. "button[5.5,4;1,0.3;moveup;↑]"
 						end
 						if sel_rte < #strtab then
-							form = form .. "button[5.5,4.7;0.5,0.3;movedown;↓]"
+							form = form .. "button[5.5,4.7;1,0.3;movedown;↓]"
 						end
+						form = form.."button[5.5,5.4;1,0.3;delroute;X]tooltip[delroute;Delete this route]"
 					end
 				else
 					form = form .. "]"
@@ -1096,6 +1097,9 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 							route.ars = {default = true}
 						end
 					end
+				end
+				if fields.delroute and hasprivs then
+					table.remove(tcbs.routes,sel_rte)
 				end
 			end
 		end

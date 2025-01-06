@@ -718,6 +718,7 @@ local function recursively_find_routes(s_pos, s_connid, locks_found, result_tabl
 				return
 			end
 			local out_conns = ildb.get_possible_out_connids(node.name, bconnid)
+			-- note 2025-01-06: get_possible_out_connids contains some logic so that the correct switch state is selected even if the turnout is entered from the branch side (see "have_back_conn")
 			for oconnid, state in pairs(out_conns) do
 				--atdebug("Going in direction",oconnid,"state",state)
 				locks_found[pts] = state
