@@ -225,7 +225,6 @@ dofile(advtrains.modpath.."/atc.lua")
 dofile(advtrains.modpath.."/wagons.lua")
 dofile(advtrains.modpath.."/protection.lua")
 
-dofile(advtrains.modpath.."/trackdb_legacy.lua")
 dofile(advtrains.modpath.."/nodedb.lua")
 dofile(advtrains.modpath.."/couple.lua")
 
