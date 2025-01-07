@@ -146,6 +146,15 @@ local applyaspectf_distant = function(rot)
  end
 end
 
+-- Main aspects distant signal
+-- Only one aspect for "expect free". Whether green or yellow lamp is shown and which speed indicator is determined by remote signal
+local mainaspects_dst = {
+	{
+		name = "expectclear",
+		description = "Expect Clear",
+	},
+}
+
 --Rangiersignal
 local applyaspectf_ra = function(rot)
  -- we get here the full main_aspect table
@@ -313,10 +322,11 @@ for _, rtab in ipairs({
 			drop = "advtrains_signals_ks:vs_slow_0",
 			inventory_image = "advtrains_signals_ks_vs_inv.png",
 			advtrains = {
-				-- no mainaspect
+				main_aspects = mainaspects_dst,
 				apply_aspect = applyaspectf_distant(rot),
 				get_aspect_info = afunc,
 				route_role = "distant",
+				pure_distant = true,
 				trackworker_next_rot = "advtrains_signals_ks:vs_"..typ.."_"..rtab.nextrot,
 				trackworker_rot_incr_param2 = (rot=="60")
 			},

@@ -330,7 +330,7 @@ function signal.get_aspect_info(pos)
 	local aspt = signal.aspects[advtrains.encode_pos(pos)]
 	local masp, remote, node, ndef = signal.get_aspect_internal(pos, aspt)
 	-- call into ndef
-	if ndef.advtrains and ndef.advtrains.get_aspect_info then
+	if ndef and ndef.advtrains and ndef.advtrains.get_aspect_info then
 		local ai = ndef.advtrains.get_aspect_info
 		if type(ai)=="function" then
 			ai = ai(pos, masp)
@@ -390,6 +390,12 @@ end
 -- 
 function signal.update_route_aspect(tcbs, skip_dst_notify)
 	if tcbs.signal then
+		if not tcbs.route_aspect and signal.get_signal_cap_level(tcbs.signal) == 2 then
+			return
+			-- Special behavior for pure-distant signals assigned to TCBs: retain their last assigned main signal
+			-- and do not fall back to halt. This mirrors real-life, where the distant signal goes back to
+			-- expect halt only when the main signal falls into halt
+		end
 		local asp = tcbs.route_aspect or "_halt"
 		local rem = tcbs.route_remote
 		signal.set_aspect(tcbs.signal, asp, rem, skip_dst_notify)
@@ -399,7 +405,7 @@ end
 -- Returns how capable the signal is with regards to aspect setting
 -- 0: not a signal at all
 -- 1: signal has get_aspect_info() but the aspect is not variable (e.g. a sign)
--- 2: signal has apply_aspect() but does not have main aspects (e.g. a pure distant signal)
+-- 2: signal has apply_aspect() and main aspects but has "pure_distant" flag set (cannot be start/endpoint of a route, special behavior that its route aspect is not cleared on train pass)
 -- 3: signal has main signal role but can only ever display a halt aspect, such as a bumper (can be endpoint, but not startpoint, of a route)
 -- 4: Full capabilities, signal has main aspects and can be used as main/shunt signal (can be start/endpoint of a route)
 function signal.get_signal_cap_level(pos)
@@ -407,8 +413,8 @@ function signal.get_signal_cap_level(pos)
 	local ndef = node and minetest.registered_nodes[node.name]
 	local ndefat = ndef and ndef.advtrains
 	if ndefat and ndefat.get_aspect_info then
-		if ndefat.apply_aspect  then
-			if ndefat.main_aspects then
+		if ndefat.apply_aspect and ndefat.main_aspects then
+			if not ndefat.pure_distant then
 				-- if the table contains anything, 4, otherwise 3
 				for _,_ in pairs(ndefat.main_aspects) do
 					return 4

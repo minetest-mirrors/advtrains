@@ -1029,7 +1029,7 @@ function ildb.is_ip_at(pos, purge)
 		if purge then
 			-- is there still a signal assigned to it?
 			for connid, sigpos in pairs(influence_points[pts]) do
-				local asp = advtrains.interlocking.signal.get_aspect(sigpos)
+				local asp = advtrains.interlocking.signal.get_aspect_info(sigpos)
 				if not asp then
 					atlog("Clearing orphaned signal influence point", pts, "/", connid)
 					ildb.clear_ip_signal(pts, connid)
