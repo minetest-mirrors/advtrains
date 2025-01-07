@@ -415,7 +415,7 @@ for _, rtab in ipairs {
 					apply_aspect = function(pos, node, main_aspect, rem_aspect, rem_aspinfo)
 						local asp_name = main_aspect and main_aspect.name or "danger"
 						-- if this signal is clear and remote signal is restrictive (<= 10) then degrade to caution aspect
-						if not main_aspect or main_aspect.name == "halt" then
+						if not main_aspect or main_aspect.halt then
 							asp_name = "danger"
 						elseif main_aspect.name == "clear" and rem_aspinfo and rem_aspinfo.main and rem_aspinfo.main >= 0 and rem_aspinfo.main <= 10 then
 							asp_name = "caution"
@@ -423,6 +423,9 @@ for _, rtab in ipairs {
 						advtrains.ndb.swap_node(pos, {name="advtrains_signals_japan:"..sigtype.."_"..asp_name.."_"..rot, param2 = node.param2})
 					end,
 					get_aspect_info = function(pos, main_aspect)
+						if main_aspect.halt then
+							return { main = 0 } -- generic halt
+						end
 						return {
 							main = main_aspect.main,
 							proceed_as_main = true,

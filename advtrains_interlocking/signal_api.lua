@@ -85,12 +85,11 @@ ndef.advtrains = {
 		-- name: A unique key to identify the main aspect. Might be required by some code.
 		-- description: Text shown in UI dropdown
 		-- Node can set any other fields at its discretion. They are not touched.
-		-- Note: Pure distant signals (that cannot show halt) should NOT have a main_aspects table.
-		--       For these signals no main aspect selection UI is shown and they cannot be startpoint of a route
+		-- Note: Pure distant signals should set one main aspect, and set the "pure_distant = true" field
 	apply_aspect = function(pos, node, main_aspect, rem_aspect, rem_aspinfo)
 		-- set the node to show the desired aspect
 		-- called by advtrains when this signal's aspect group or the remote signal's aspect changes
-		-- main_aspect is never nil, but can be one of the special aspects { halt = true } or { default = true }
+		-- main_aspect is never nil, but can be the special aspect { name = "_halt", halt = true }
 		-- MAY return the aspect_info. If it returns nil then get_aspect_info will be queried at a later point.
 	get_aspect_info(pos, main_aspect)
 		-- Returns the aspect info table (main, shunt, dst etc.)
@@ -104,6 +103,12 @@ ndef.advtrains = {
 		-- distant: if more than one distant signal is before a main signal, only the last one is assigned (but any number of distant_repeater signals are allowed)
 		-- main_distant: Combination of main and distant - like "main", but additionally gets assigned to the next main like a "distant"
 		-- end: like main, but signifies that it marks an end of track and trains cannot continue further. (currently no practical implications above main)
+	pure_distant = true / false
+		-- If true, this signal is assumed to be a pure distant signal (its halt aspect is rather "expect halt" and it cannot show a true "stop here")
+		-- The following special behavior applies when this signal is assigned to a TCB: When a train passes the signal, the aspect is not reset to the
+		-- halt aspect and it continues to announce the remote signal's aspect (like in real life)
+		-- Typically such signals have one main aspect, their appearance depends almost exclusively on their remote signal and the halt aspect is the same as
+		-- the aspect shown when the main aspect is set but the remote signal is at halt.
 }
 
 == Nomenclature ==

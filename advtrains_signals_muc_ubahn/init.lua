@@ -20,6 +20,9 @@ local mainaspects = {
 	{ name = "hp2", description = "Hp2: Reduced Speed" },
 	{ name = "hp3", description = "Hp3: Shunt" },
 }
+local dstaspects = {
+	{ name = "vr1", description = "Vr1: Expect Full speed" },
+}
 
 local function applyaspect_main(loc)
 	return function(pos, node, main_aspect, rem_aspect, rem_aspinfo)
@@ -38,7 +41,7 @@ end
 local function applyaspect_distant(loc)
 	return function(pos, node, main_aspect, rem_aspect, rem_aspinfo)
 		local ma_node = "vr0" -- show expect stop by default
-		if not main_aspect.halt and rem_aspinfo and (not rem_aspinfo.main or rem_aspinfo.main>12 or rem_aspinfo.main==-1) then
+		if not main_aspect.halt and (not rem_aspinfo or not rem_aspinfo.main or rem_aspinfo.main>12 or rem_aspinfo.main==-1) then
 			ma_node = "vr1" -- show free when dst is at least 12
 		end
 		advtrains.ndb.swap_node(pos, {name = "advtrains_signals_muc_ubahn:signal_wall_"..loc.."_"..ma_node, param2 = node.param2})
@@ -74,8 +77,9 @@ for r,f in pairs(all_sigs) do
 			after_dig_node = advtrains.interlocking.signal.after_dig,
 			-- new signal API
 			advtrains = {
-				main_aspects = not f.distant and mainaspects, -- main aspects only for main
+				main_aspects = f.distant and dstaspects or mainaspects, -- main aspects only for main
 				apply_aspect = f.distant and applyaspect_distant(loc) or applyaspect_main(loc),
+				pure_distant = f.distant,
 				get_aspect_info = function() return f.asp end,
 				route_role = f.distant and "distant" or "main"
 			},
