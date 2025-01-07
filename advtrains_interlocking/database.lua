@@ -276,6 +276,8 @@ Track section
 	--       start TCB           end TCB             switch pos
 	-- Recalculated on every change via update_rs_cache
 	-- Note that the tcb side number is not saved because it is unnecessary
+	fixed_locks = { "800080008000" = "st" }
+	-- table of fixed locks to be set for all routes thru this section (e.g. level crossings
 	
 	route = {
 		origin = <signal>,  -- route origin

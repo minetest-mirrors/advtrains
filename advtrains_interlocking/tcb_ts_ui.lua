@@ -910,16 +910,6 @@ function advtrains.interlocking.show_signalling_form(sigd, pname, sel_rte, calle
 					if hasprivs then
 						form = form.."button[0.5,4;2.5,1;smartroute;Smart Route]"
 						form = form.."button[  3,4;2.5,1;newroute;New (Manual)]"
-						
-						form = form.."label[0.5,5.5;Setup block signal route (up to following signal):]"
-						form = form.."button[0.5,6;2.5,1;setupblocklong;Long (No Dst)]"
-						form = form.."tooltip[setupblocklong;Following track section must have no turnouts and end at another signal.\n"
-								.."Sets a route into the section ahead with auto-working set on\n"
-								.."Long block: This signal does not become distant signal.]"
-						form = form.."button[  3,6;2.5,1;setupblockshort;Short (With Dst)]"
-						form = form.."tooltip[setupblockshort;Following track section must have no turnouts and end at another signal.\n"
-								.."Sets a route into the section ahead with auto-working set on\n"
-								.."Short block: This signal becomes distant signal for next signal.]"
 					end
 				elseif caps >= 3 then
 					-- it's a buffer!
@@ -927,7 +917,7 @@ function advtrains.interlocking.show_signalling_form(sigd, pname, sel_rte, calle
 								.."No routes can be set from here.]"
 				else
 					-- signal caps say it cannot be route start/end
-					form = form.."label[0.5,2.5;This is a Non-Halt signal (e.g. pure distant signal)\n"
+					form = form.."label[0.5,2.5;This is a pure distant signal\n"
 								.."No route is currently set through.]"
 				end
 			end
@@ -968,10 +958,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	end
 	local hasprivs = minetest.check_player_privs(pname, "interlocking")
 	
-	-- independent of the formspec, clear this whenever some formspec event happens
 	local tpsi = sig_pselidx[pname]
-	sig_pselidx[pname] = nil
-	p_open_sig_form[pname] = nil
 	
 	local pts, connids = string.match(formname, "^at_il_signalling_([^_]+)_(%d)$")
 	local pos, connid
@@ -986,6 +973,8 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		if not tcbs then return end
 
 		if fields.quit then
+			sig_pselidx[pname] = nil
+			p_open_sig_form[pname] = nil
 			-- form quit: disable temporary ARS ignore
 			tcbs.ars_ignore_next = nil
 			return
@@ -994,7 +983,9 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		local sel_rte
 		if fields.rtelist then
 			local tev = minetest.explode_textlist_event(fields.rtelist)
-			sel_rte = tev.index
+			if tev.type ~= "INV" then
+				sel_rte = tev.index
+			end
 		elseif tpsi then
 			sel_rte = tpsi
 		end
@@ -1024,63 +1015,6 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				tcbs.ars_ignore_next = nil
 				return
 			end
-			if (fields.setupblocklong or fields.setupblockshort) and hasprivs then
-				-- check adjacent section
-				if not tcbs.ts_id then
-					minetest.chat_send_player(pname, "Block route not possible: No track section ahead")
-					return
-				end
-				local ts = ildb.get_ts(tcbs.ts_id)
-				if #ts.tc_breaks ~= 2 then
-					minetest.chat_send_player(pname, "Block route not possible: Section "..(ts.name or "-").." ("..tcbs.ts_id..") has "..#ts.tc_breaks.." ends, must be 2")
-					return
-				end
-				local e_sigd
-				if vector.equals(ts.tc_breaks[1].p, pos) then
-					e_sigd = { p = ts.tc_breaks[2].p,
-							   s = ts.tc_breaks[2].s==1 and 2 or 1}
-				elseif vector.equals(ts.tc_breaks[2].p, pos) then
-					e_sigd = { p = ts.tc_breaks[1].p,
-							   s = ts.tc_breaks[1].s==1 and 2 or 1}
-				else
-					minetest.chat_send_player(pname, "Block route not possible: Section "..(ts.name or "-").." ("..tcbs.ts_id..") TCBs are inconsistent, check section!")
-					return
-				end
-				local e_tcbs = ildb.get_tcbs(e_sigd)
-				if not e_tcbs then
-					minetest.chat_send_player(pname, "Block route not possible: Adjacent TCB not found, check section!")
-					return
-				end
-				-- now we have the TCB at the end of the following section. check that signal is set
-				if not e_tcbs.signal then
-					minetest.chat_send_player(pname, "Block route not possible: Adjacent TCB has no signal assigned!")
-					return
-				end
-				local caps = advtrains.interlocking.signal.get_signal_cap_level(e_tcbs.signal)
-				if caps < 3 then
-					minetest.chat_send_player(pname, "Block route not possible: Following signal is not capable of displaying a Halt aspect (caplevel "..caps..")")
-					return
-				end
-				-- all preconditions checked! go ahead and create route
-				local route = {
-					name = "BS",
-					[1] = {
-						next = e_sigd, -- of the next (note: next) TCB on the route
-						locks = {}, -- route locks of this route segment
-						assign_dst = fields.setupblockshort and true, -- assign dst, if short block was selected
-					},
-					terminal = e_sigd,
-					use_rscache = true,
-					-- main_aspect = <use default>
-					default_autoworking = true,
-				}
-				local rid = #tcbs.routes + 1 -- typically 1
-				tcbs.routes[rid] = route
-				-- directly set our newly created route
-				ilrs.update_route(sigd, tcbs, rid)
-				advtrains.interlocking.show_signalling_form(sigd, pname, nil, true)
-				return
-			end
 			if sel_rte and tcbs.routes[sel_rte] then
 				if fields.setroute then
 					ilrs.update_route(sigd, tcbs, sel_rte)
@@ -1098,14 +1032,29 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 					for rid, route in ipairs(tcbs.routes) do
 						local isdefault = rid == sel_rte
 						if route.ars then
-							route.ars.default = isdefault
+							if route.ars.default and isdefault then
+								-- D button pressed but route was already default - remove ars default field!
+								route.ars.default = nil
+							elseif isdefault then
+								route.ars.default = true
+							else
+								route.ars.default = nil
+							end
+							-- if the table is nouw empty delete it
+							if not next(route.ars) then
+								route.ars = nil
+							end
 						elseif isdefault then
 							route.ars = {default = true}
 						end
 					end
 				end
 				if fields.delroute and hasprivs then
-					table.remove(tcbs.routes,sel_rte)
+					if tcbs.routes[sel_rte] and tcbs.routes[sel_rte].ars then
+						minetest.chat_send_player(pname, "Cannot delete route which has ARS rules, please review and then delete through edit dialog!")
+					else
+						table.remove(tcbs.routes,sel_rte)
+					end
 				end
 			end
 		end
