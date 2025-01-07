@@ -50,6 +50,10 @@ function advtrains.on_control_change(pc, train, flip)
 			train.ctrl_user = 1
 			act=true
 		end
+		if train.ars_disable and pc.up then
+			-- up clears ars disable flag in any situation
+			train.ars_disable = nil
+		end
 		-- If atc command set, only "Jump" key can clear command. To prevent accidental control.
 		if train.tarvelocity or train.atc_command then
 			return
