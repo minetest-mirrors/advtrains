@@ -357,8 +357,8 @@ function ildb.check_and_repair_ts_at_pos(pos, tcb_connid, notify_pname, force_cr
 	if ildb.get_tcb(pos) then
 		if not tcb_connid then error("check_and_repair_ts_at_pos: Startpoint is TCB, must provide tcb_connid!") end
 	else
-		--if tcb_connid then error("check_and_repair_ts_at_pos: Startpoint is not TCB, must not provide tcb_connid!") end
-		-- do not give error here, for some applications do not require it
+		-- FIX 2025-01-07: If the checked pos is not a TCB, we always need to search in both directions, otherwise we errorneously split a ts
+		tcb_connid = nil
 	end
 	-- STEP 1: Ensure that only one section is at this place
 	-- get all TCBs adjacent to this 
