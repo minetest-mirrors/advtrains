@@ -23,6 +23,7 @@ dofile(modpath.."routesetting.lua")
 dofile(modpath.."tcb_ts_ui.lua")
 dofile(modpath.."route_ui.lua")
 dofile(modpath.."smartroute.lua")
+dofile(modpath.."autonaming.lua")
 dofile(modpath.."tool.lua")
 
 dofile(modpath.."approach.lua")

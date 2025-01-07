@@ -201,6 +201,8 @@ local function try_auto_assign_to_tcb(signalpos, pos, connid, pname)
 				-- go ahead and assign
 				local sigd = { p=apos, s=aconnid }
 				advtrains.interlocking.db.assign_signal_to_tcbs(signalpos, sigd)
+				-- use auto-naming
+				advtrains.interlocking.add_autoname_to_tcbs(tcb[aconnid], pname)
 				minetest.chat_send_player(pname, "Assigned signal to the TCB at "..core.pos_to_string(apos))
 				advtrains.interlocking.show_tcb_marker(apos)
 				advtrains.interlocking.show_signalling_form(sigd, pname)

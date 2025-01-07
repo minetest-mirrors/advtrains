@@ -192,6 +192,8 @@ minetest.register_on_punchnode(function(pos, node, player, pointed_thing)
 					local tcbs = ildb.get_tcbs(sigd)
 					if tcbs then
 						ildb.assign_signal_to_tcbs(pos, sigd)
+						-- use auto-naming
+						advtrains.interlocking.add_autoname_to_tcbs(tcbs, pname)
 						minetest.chat_send_player(pname, "Configuring TCB: Successfully assigned signal.")
 						advtrains.interlocking.show_ip_form(pos, pname, true)
 					else
@@ -265,6 +267,8 @@ function advtrains.interlocking.self_tcb_make_after_place_callback(fail_silently
 			ildb.assign_signal_to_tcbs(pos, sigd)
 			-- assign influence point to itself
 			ildb.set_ip_signal(advtrains.roundfloorpts(pos), 1, pos)
+			-- use auto-naming
+			advtrains.interlocking.add_autoname_to_tcbs(tcbs, pname)
 		end
 	end
 end
@@ -350,6 +354,8 @@ function advtrains.interlocking.self_tcb_make_on_rightclick_callback(fail_silent
 				ildb.assign_signal_to_tcbs(pos, sigd)
 				-- assign influence point to itself
 				ildb.set_ip_signal(advtrains.roundfloorpts(pos), 1, pos)
+				-- use auto-naming
+				advtrains.interlocking.add_autoname_to_tcbs(tcbs, pname)
 			end
 			-- in any case open the signalling form nouw
 			local control = player:get_player_control()
