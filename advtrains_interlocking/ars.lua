@@ -52,7 +52,7 @@ function il.ars_to_text(arstab)
 end
 
 function il.text_to_ars(t)
-	if t=="" then
+	if not string.match(t, "%S+") then
 		return nil
 	elseif t=="*" then
 		return {default=true}

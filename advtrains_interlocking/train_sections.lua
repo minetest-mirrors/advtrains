@@ -83,7 +83,7 @@ local function setsection(tid, train, ts_id, ts, sigd)
 	-- route setting - clear route state
 	if ts.route then
 		--atdebug(tid,"enters",ts_id,"examining Routestate",ts.route)
-		if not sigd_equal(ts.route.entry, sigd) then
+		if sigd and not sigd_equal(ts.route.entry, sigd) then
 			-- Train entered not from the route. Locate origin and cancel route!
 			atwarn("Train",tid,"hit route",ts.route.rsn,"!")
 			advtrains.interlocking.route.cancel_route_from(ts.route.origin)
@@ -173,7 +173,7 @@ advtrains.te_register_on_create(function(id, train)
 	if ts_id then
 		local ts = ildb.get_ts(ts_id)
 		if ts then
-			setsection(id, train, ts_id, ts, origin)
+			setsection(id, train, ts_id, ts, nil)
 		else
 			atwarn("While placing train, TS didnt exist ",ts_id)
 		end

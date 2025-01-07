@@ -66,7 +66,10 @@ function ilrs.set_route(signal, route, try)
 		c_rseg = route[i]
 		c_lckp = {}
 		
-		if c_ts.route then
+		if not c_ts then
+			if not try then atwarn("Encountered ts missing during a real run of routesetting routine, at ts=",c_ts_id,"while setting route",rtename,"of",signal) end
+			return false, "Section '"..(c_ts_id).."' not found!", c_ts_id, nil
+		elseif c_ts.route then
 			if not try then atwarn("Encountered ts lock during a real run of routesetting routine, at ts=",c_ts_id,"while setting route",rtename,"of",signal) end
 			return false, "Section '"..(c_ts.name or c_ts_id).."' already has route set from "..sigd_to_string(c_ts.route.origin)..":\n"..c_ts.route.rsn, c_ts_id, nil
 		end
