@@ -84,7 +84,7 @@ function ildb.load(data)
 				if pos then
 					-- that was a pos_to_string
 					local epos = advtrains.encode_pos(pos)
-					atdebug("ILDB converting TCB position format",pts,"->",epos)
+					--atdebug("ILDB converting TCB position format",pts,"->",epos)
 					track_circuit_breaks[epos] = tcb
 				else
 					-- keep entry, it is already new
@@ -100,7 +100,7 @@ function ildb.load(data)
 									local lpos = minetest.string_to_pos(lpts)
 									if lpos then
 										local epos = advtrains.encode_pos(lpos)
-										atdebug("ILDB converting tcb",pts,"side",t_side,"route",t_route,"lock position format",lpts,"->",epos)
+										--atdebug("ILDB converting tcb",pts,"side",t_side,"route",t_route,"lock position format",lpts,"->",epos)
 										locks_n[epos] = state
 									else
 										-- already correct format
@@ -131,7 +131,7 @@ function ildb.load(data)
 				if pos then
 					-- that was a pos_to_string
 					local epos = advtrains.encode_pos(pos)
-					atdebug("ILDB converting Route Lock position format",pts,"->",epos)
+					--atdebug("ILDB converting Route Lock position format",pts,"->",epos)
 					advtrains.interlocking.route.rte_locks[epos] = lta
 				else
 					-- keep entry, it is already new
@@ -535,7 +535,7 @@ function ildb.repair_ts_merge_all(all_tcbs, force_create, notify_pname)
 	end
 	-- Create a new fresh track section with all the TCBs we have in our collection
 	local new_ts_id, new_ts = ildb.create_ts_from_tcb_list(all_tcbs)
-	tsrepair_notify(notify_pname, "Created track section",new_ts_id,"from TCBs:", all_tcbs)
+	tsrepair_notify(notify_pname, "Created track section",new_ts_id,"from",#all_tcbs,"TCBs")
 	return new_ts_id
 end
 

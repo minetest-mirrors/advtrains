@@ -441,7 +441,7 @@ function signal.can_dig(pos, player)
 		-- check privileges
 		if not player or not minetest.check_player_privs(player:get_player_name(), "interlocking") then
 			if not player then -- intermediate debug to uncover hard-to-find bugz
-				atdebug("advtrains.interlocking.signal.can_dig(",pos,") called with player==nil!")
+				atwarn("advtrains.interlocking.signal.can_dig(",pos,") called with player==nil!")
 			end
 			return false
 		end

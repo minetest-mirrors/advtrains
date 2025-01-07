@@ -64,7 +64,7 @@ function sr.rescan(pname, sigd, tcbs, find_more_than, searching_shunt, pname)
 		end
 		if not cur_restart then
 			-- we have no candidates left. Give up and return what we have
-			atdebug("(SR) No Candidates left, end rescan")
+			--atdebug("(SR) No Candidates left, end rescan")
 			return found_routes
 		end
 		-- check if we need to stop due to having found enough routes
@@ -72,14 +72,14 @@ function sr.rescan(pname, sigd, tcbs, find_more_than, searching_shunt, pname)
 		if cur_len > last_len then
 			-- one level is finished, check if enoufh routes are found
 			if #found_routes > find_more_than then
-				atdebug("(SR) Layer finished and enough routes found, end rescan")
+				--atdebug("(SR) Layer finished and enough routes found, end rescan")
 				return found_routes
 			end
 			last_len = cur_len
 		end
 		-- our current restart point is nouw in cur_restart
 		local c_sigd = cur_restart.sigd
-		atdebug("(SR) Search continues at",c_sigd,"seqlen",#cur_restart.tcbseq)
+		--atdebug("(SR) Search continues at",c_sigd,"seqlen",#cur_restart.tcbseq)
 		-- do a TS repair, this also updates the RS cache should it be out of date
 		local c_ts_id = ildb.check_and_repair_ts_at_pos(c_sigd.p, c_sigd.s, pname, false)
 		if c_ts_id then
@@ -90,7 +90,7 @@ function sr.rescan(pname, sigd, tcbs, find_more_than, searching_shunt, pname)
 				for _, end_sigd in ipairs(c_ts.tc_breaks) do
 					end_pkey = advtrains.encode_pos(end_sigd.p)
 					if rsout[end_pkey] then
-						atdebug("(SR) Section",c_ts_id,c_ts.name,"has way",c_sigd,"->",end_sigd)
+						--atdebug("(SR) Section",c_ts_id,c_ts.name,"has way",c_sigd,"->",end_sigd)
 						local nsigd = {p=end_sigd.p, s = end_sigd.s==1 and 2 or 1} -- invert to other side
 						-- record nsigd in the tcbseq
 						local ntcbseq = table.copy(cur_restart.tcbseq)
@@ -105,7 +105,7 @@ function sr.rescan(pname, sigd, tcbs, find_more_than, searching_shunt, pname)
 											or ndef.advtrains.route_role == "end" or ndef.advtrains.route_role == "shunt" then
 									-- signal is suitable target
 									local is_mainsignal = ndef.advtrains.route_role ~= "shunt"
-									atdebug("(SR) Suitable end signal at",nsigd,", recording route!")
+									--atdebug("(SR) Suitable end signal at",nsigd,", recording route!")
 									-- record the found route in the results
 									found_routes[#found_routes+1] = {
 											tcbseq = ntcbseq,
@@ -114,7 +114,7 @@ function sr.rescan(pname, sigd, tcbs, find_more_than, searching_shunt, pname)
 									}
 									-- if this is a main signal and/or we are only searching shunt routes, stop the search here
 									if is_mainsignal or searching_shunt then
-											atdebug("(SR) Not continuing this branch!")
+											--atdebug("(SR) Not continuing this branch!")
 											shall_continue = false
 									end
 								end
@@ -127,10 +127,10 @@ function sr.rescan(pname, sigd, tcbs, find_more_than, searching_shunt, pname)
 					end
 				end
 			else
-				atdebug("(SR) Section",c_ts_id,c_ts.name,"found no rscache entry for start ",bgn_pts)
+				--atdebug("(SR) Section",c_ts_id,c_ts.name,"found no rscache entry for start ",bgn_pts)
 			end
 		else
-			atdebug("(SR) Stop at",c_sigd,"because no sec ahead")
+			--atdebug("(SR) Stop at",c_sigd,"because no sec ahead")
 		end
 	end
 end
@@ -200,10 +200,10 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			local endpoint = route[#route].next -- 'next' field of the last route segment (the segment with index==len)
 			if valid and endpoint then
 				local endstr = advtrains.interlocking.sigd_to_string(endpoint)
-				atdebug("(Smartroute) Find existing endpoint:",route.name,"ends at",endstr)
+				--atdebug("(Smartroute) Find existing endpoint:",route.name,"ends at",endstr)
 				ex_endpts[endstr] = route.name
 			else
-				atdebug("(Smartroute) Find existing endpoint:",route.name," not considered, endpoint",endpoint,"valid",valid)
+				--atdebug("(Smartroute) Find existing endpoint:",route.name," not considered, endpoint",endpoint,"valid",valid)
 			end
 		end
 		local new_frte = {}
@@ -213,7 +213,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			if not ex_endpts[endstr] then
 				new_frte[#new_frte+1] = froute
 			else
-				atdebug("(Smartroute) Throwing away",froute.name,"because endpoint",endstr,"already reached by route",ex_endpts[endstr])
+				--atdebug("(Smartroute) Throwing away",froute.name,"because endpoint",endstr,"already reached by route",ex_endpts[endstr])
 			end
 		end
 		
@@ -244,7 +244,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				end
 			end
 		end
-		atdebug("Smartroute done!")
+		--atdebug("Smartroute done!")
 		advtrains.interlocking.show_signalling_form(sigd, pname, sel_rte)
 		players_smartroute_actions[pname] = nil
 	end
