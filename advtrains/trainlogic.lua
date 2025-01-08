@@ -630,7 +630,7 @@ function advtrains.train_step_b(id, train, dtime)
 				local ocn = otrn.path_cn[ob_idx]
 				local ocp = otrn.path_cp[ob_idx]
 
-				local target_is_inside, ref_index, facing
+				local target_is_inside, ref_index, facing, same_dir
 
 				if base_cn == ocn then
 					-- same direction
@@ -1049,7 +1049,7 @@ function advtrains.update_trainpart_properties(train_id, invert_flipstate)
 			if not wagon then
 				local ent = advtrains.wagon_objects[w_id]
 				local pdesc
-				if ent then
+				if ent and ent:get_pos() then
 					pdesc = "at " .. minetest.pos_to_string(ent:get_pos())
 				elseif train.last_pos then
 					pdesc = "near " .. minetest.pos_to_string(train.last_pos)

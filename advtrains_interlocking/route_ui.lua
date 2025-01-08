@@ -67,7 +67,7 @@ function atil.show_route_edit_form(pname, sigd, routeid, sel_rpartidx)
 		if c_rseg.locks then
 			for pts, state in pairs(c_rseg.locks) do
 				
-				local pos = minetest.string_to_pos(pts)
+				local pos = advtrains.decode_pos(pts)
 				itab(i, "L "..pts.." -> "..state, "lock", pos)
 				if not advtrains.is_passive(pos) then
 					itab(i, "-!- No passive component at "..pts..". Please reconfigure route!", "err", nil)

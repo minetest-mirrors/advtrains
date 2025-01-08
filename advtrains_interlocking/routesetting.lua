@@ -104,7 +104,7 @@ function ilrs.set_route(signal, route, try)
 		end
 		
 		for lp, state in pairs(c_locks) do
-			local confl = ilrs.has_route_lock(pts, state)
+			local confl = ilrs.has_route_lock(lp, state)
 			
 			local pos = advtrains.decode_pos(lp)
 			if advtrains.is_passive(pos) then
@@ -131,7 +131,8 @@ function ilrs.set_route(signal, route, try)
 		local nvar = c_rseg.next
 		if nvar then
 			local re_tcbs = ildb.get_tcbs({p = nvar.p, s = (nvar.s==1) and 2 or 1})
-			if not re_tcbs or not re_tcbs.ts_id or re_tcbs.ts_id~=c_ts_id then
+			if (not re_tcbs or not re_tcbs.ts_id or re_tcbs.ts_id~=c_ts_id)
+					and route[i+1] then --FIX 2025-01-08: in old worlds the final TCB may be wrong (it didn't matter back then), don't error out here (route still shown invalid in UI)
 				if not try then atwarn("Encountered inconsistent ts (front~=back) while a real run of routesetting routine, at position",pts,"while setting route",rtename,"of",signal) end
 				return false, "TCB at "..minetest.pos_to_string(nvar.p).." has different section than previous TCB. Please update track section or reconfigure route!"
 			end
@@ -413,7 +414,9 @@ function ilrs.update_route(sigd, tcbs, newrte, cancel)
 			-- set_route now sets the signal aspects
 			--has_changed_aspect = true
 			-- route success. apply default_autoworking flag if requested
-			tcbs.route_auto = route.default_autoworking
+			if route.default_autoworking then
+				tcbs.route_auto = true --FIX 2025-01-08: never set it to false if it was true!
+			end
 		end
 	end
 	if has_changed_aspect then

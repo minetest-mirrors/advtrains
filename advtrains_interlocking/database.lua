@@ -84,7 +84,7 @@ function ildb.load(data)
 				if pos then
 					-- that was a pos_to_string
 					local epos = advtrains.encode_pos(pos)
-					--atdebug("ILDB converting TCB position format",pts,"->",epos)
+					atdebug("ILDB converting TCB position format",pts,"->",epos)
 					track_circuit_breaks[epos] = tcb
 				else
 					-- keep entry, it is already new
@@ -100,7 +100,7 @@ function ildb.load(data)
 									local lpos = minetest.string_to_pos(lpts)
 									if lpos then
 										local epos = advtrains.encode_pos(lpos)
-										--atdebug("ILDB converting tcb",pts,"side",t_side,"route",t_route,"lock position format",lpts,"->",epos)
+										atdebug("ILDB converting tcb",pts,"side",t_side,"route",t_route,"lock position format",lpts,"->",epos)
 										locks_n[epos] = state
 									else
 										-- already correct format
@@ -131,7 +131,7 @@ function ildb.load(data)
 				if pos then
 					-- that was a pos_to_string
 					local epos = advtrains.encode_pos(pos)
-					--atdebug("ILDB converting Route Lock position format",pts,"->",epos)
+					atdebug("ILDB converting Route Lock position format",pts,"->",epos)
 					advtrains.interlocking.route.rte_locks[epos] = lta
 				else
 					-- keep entry, it is already new
@@ -412,6 +412,7 @@ function ildb.check_and_repair_ts_at_pos(pos, tcb_connid, notify_pname, force_cr
 		return ildb.repair_ts_merge_all(all_tcbs, force_create, notify_pname)
 	end
 	--tsrepair_notify(notify_pname, "Found section", ts.name or ts_id, "here.")
+	ildb.update_rs_cache(ts_id)
 	return ts_id
 end
 
@@ -457,7 +458,7 @@ function ildb.get_all_tcbs_adjacent(inipos, inidir, per_track_callback)
 		pos, connid = ti:next_branch()
 		--atdebug("get_all_tcbs_adjacent: BRANCH: ",pos, connid)
 		bconnid = nil
-		is_branch_start = true
+		local is_branch_start = true
 		repeat
 			-- callback
 			if per_track_callback then

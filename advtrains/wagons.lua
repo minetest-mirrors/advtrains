@@ -1333,7 +1333,7 @@ function advtrains.get_wagon_prototype(data)
 	end
 	local rt, proto = advtrains.resolve_wagon_alias(wt)
 	if not rt then
-		atwarn("Unable to load wagon type",wt,", using placeholder")
+		--atwarn("Unable to load wagon type",wt,", using placeholder")
 		rt = "advtrains:wagon_placeholder"
 		proto = advtrains.wagon_prototypes[rt]
 	end

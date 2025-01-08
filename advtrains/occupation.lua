@@ -89,8 +89,8 @@ function o.set_item(train_id, pos, idx)
 	assert(idx)
 	local i = 1
 	while t[i] do
-		if t[i]==train_id and t[i+1]==index then
-			break
+		if t[i]==train_id and t[i+1]==idx then
+			return
 		end
 		i = i + 2
 	end

@@ -375,6 +375,7 @@ function signal.reapply_aspect(pts)
 		local rem_aspt = signal.aspects[remote]
 		--atdebug("resolving remote",advtrains.decode_pos(remote),"aspt",rem_aspt)
 		local rem_pos = advtrains.decode_pos(remote)
+		local _,rem_ndef
 		rem_masp, _, _, rem_ndef = signal.get_aspect_internal(rem_pos, rem_aspt)
 		if rem_masp then
 			if rem_ndef.advtrains and rem_ndef.advtrains.get_aspect_info then

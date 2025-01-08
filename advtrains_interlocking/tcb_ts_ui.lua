@@ -776,7 +776,7 @@ function advtrains.interlocking.check_route_valid(route, sigd)
 		
 		if c_rseg.locks then
 			for pts, state in pairs(c_rseg.locks) do
-				local pos = minetest.string_to_pos(pts)
+				local pos = advtrains.decode_pos(pts)
 				if not advtrains.is_passive(pos) then
 					return false, "No passive component for lock at "..pts
 				end
@@ -795,6 +795,9 @@ function advtrains.interlocking.check_route_valid(route, sigd)
 		i = i + 1
 	end
 	-- check end TCB
+	if not c_sigd then
+		return false, "Final TCBS unset (legacy-style buffer route)"
+	end
 	c_tcbs = ildb.get_tcbs(c_sigd)
 	if not c_tcbs then
 		return false, "Final TCBS missing at "..sigd_to_string(c_sigd)

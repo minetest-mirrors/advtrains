@@ -226,11 +226,15 @@ if advtrains.interlocking then
 	end
 	static_env.get_aspect = function(signal)
 		local pos = atlatc.pcnaming.resolve_pos(signal)
-		return advtrains.interlocking.signal_get_aspect(pos)
+		return advtrains.interlocking.signal.get_aspect_info(pos)
 	end
-	static_env.set_aspect = function(signal, asp)
+	static_env.set_aspect = function(signal, main_asp, rem_signal)
+		if type(main_asp) == "table" then
+			error("set_aspect: Parameters of this method have changed to (signal, main_asp, rem_signal) with introduction of distant signalling: parameter 2 is now the main aspect name (a string)")
+		end
 		local pos = atlatc.pcnaming.resolve_pos(signal)
-		return advtrains.interlocking.signal_set_aspect(pos,asp)
+		local rem_pos = rem_signal and atlatc.pcnaming.resolve_pos(rem_signal)
+		return advtrains.interlocking.signal_set_aspect(pos, main_asp, rem_pos)
 	end
 	
 	--section_occupancy()
