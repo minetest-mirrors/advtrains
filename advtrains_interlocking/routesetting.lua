@@ -265,6 +265,11 @@ function ilrs.free_route_locks(ts, lcks, nocallbacks)
 end
 
 function ilrs.free_route_locks_indiv(pts, ts, nocallbacks)
+	-- legacy: if starts with bracket then pts is still in old pos_to_string format (may happen because ts.route_post is not migrated)
+	if string.match(pts, "^%(") then
+		atdebug("free_route_locks_indiv: converting position",pts)
+		pts = advtrains.encode_pos(minetest.string_to_pos(pts))
+	end
 	local e = ilrs.rte_locks[pts]
 	if not e then return nil
 	elseif #e==0 then
