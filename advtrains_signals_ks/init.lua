@@ -476,7 +476,7 @@ for _, rtab in ipairs({
 		["16"]  = {main = 16, n = "e"},
 		["e"] = {main = -1, n = "4"},
 	} do
-		local tile2 = "advtrains_signals_ks_sign_lf7.png^(advtrains_signals_ks_sign_"..typ..".png^[makealpha:255,255,255)"..(typ == "e" and "" or "^[multiply:orange")
+		local tile2 = "advtrains_signals_ks_sign_lf7.png^(advtrains_signals_ks_sign_"..typ..".png^[makealpha:255,255,255)^[multiply:orange"
 		local inv = "advtrains_signals_ks_sign_lf7.png^(advtrains_signals_ks_sign_8.png^[makealpha:255,255,255)^[multiply:orange"
 		register_sign("sign_lf", typ, prts.n, "Temporary local speed restriction sign", "sign", tile2, "8", inv, {main = prts.main, shunt = true, type = "temp"})
 	end
@@ -486,8 +486,8 @@ for _, rtab in ipairs({
 		["6"]   = {main =  6, n = "8"},
 		["8"]   = {main =  8, n = "12"},
 		["12"]  = {main = 12, n = "16"},
-		["16"]  = {main = 16, n = "20"},
-		["20"]  = {main = 20, n = "4"},
+		["16"]  = {main = 16, n = "e"},
+		["e"]  = {main = -1, n = "4"},
 	} do
 		local tile2 = "advtrains_signals_ks_sign_lf7.png^(advtrains_signals_ks_sign_"..typ..".png^[makealpha:255,255,255)"
 		local inv = "advtrains_signals_ks_sign_lf7.png^(advtrains_signals_ks_sign_8.png^[makealpha:255,255,255)"
