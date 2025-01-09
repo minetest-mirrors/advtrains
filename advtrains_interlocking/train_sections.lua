@@ -40,37 +40,50 @@ local function itkexist(tbl, ikey, com)
 	return false
 end
 
-local function itremove(tbl, com)
+local function itremove(tbl, com, once)
 	local i=1
 	while i <= #tbl do
 		if tbl[i] == com then
 			table.remove(tbl, i)
+			if once then return end
 		else
 			i = i + 1
 		end
 	end
 end
-local function itkremove(tbl, ikey, com)
+local function itkremove(tbl, ikey, com, once)
 	local i=1
 	while i <= #tbl do
 		if tbl[i][ikey] == com then
 			table.remove(tbl, i)
+			if once then return end
 		else
 			i = i + 1
 		end
 	end
 end
 
-local function setsection(tid, train, ts_id, ts, sigd)
+local function setsection(tid, train, ts_id, ts, sigd, only_if_not_exist)
 	-- train
 	if not train.il_sections then train.il_sections = {} end
-	if not itkexist(train.il_sections, "ts_id", ts_id) then
+	if only_if_not_exist then
+		-- called for the back connid on enter, only to ensure that section is blocked if train was so far not registered
+		if not itkexist(train.il_sections, "ts_id", ts_id) then
+			table.insert(train.il_sections, {ts_id = ts_id, origin = sigd})
+		end
+	else
+		-- insert always, this leads to duplicate entries if the train enters the same section a second time
 		table.insert(train.il_sections, {ts_id = ts_id, origin = sigd})
 	end
 	
 	-- ts
 	if not ts.trains then ts.trains = {} end
-	if not itexist(ts.trains, tid) then
+	if only_if_not_exist then
+		-- called for the back connid on enter, only to ensure that section is blocked if train was so far not registered
+		if not itexist(ts.trains, tid) then
+			table.insert(ts.trains, tid)
+		end
+	else
 		table.insert(ts.trains, tid)
 	end
 	
@@ -110,15 +123,16 @@ local function setsection(tid, train, ts_id, ts, sigd)
 	end
 end
 
-local function freesection(tid, train, ts_id, ts)
+local function freesection(tid, train, ts_id, ts, clear_all)
 	-- train
 	if not train.il_sections then train.il_sections = {} end
-	itkremove(train.il_sections, "ts_id", ts_id)
+	itkremove(train.il_sections, "ts_id", ts_id, not clear_all)
 	
 	-- ts
 	if not ts.trains then ts.trains = {} end
-	itremove(ts.trains, tid)
+	itremove(ts.trains, tid, not clear_all)
 	
+	-- route locks
 	if ts.route_post then
 		advtrains.interlocking.route.free_route_locks(ts_id, ts.route_post.locks)
 		if ts.route_post.next then
@@ -140,12 +154,18 @@ end
 -- This sets the section for both directions, to be failsafe
 advtrains.tnc_register_on_enter(function(pos, id, train, index)
 	local tcb = ildb.get_tcb(pos)
-	if tcb then
-		for connid=1,2 do
-			local ts = tcb[connid].ts_id and ildb.get_ts(tcb[connid].ts_id)
-			if ts then
-				setsection(id, train, tcb[connid].ts_id, ts, {p=pos, s=connid})
-			end
+	if tcb and train.path_cp[index] and train.path_cn[index] then
+		-- forward conn
+		local connid = train.path_cn[index]
+		local ts = tcb[connid].ts_id and ildb.get_ts(tcb[connid].ts_id)
+		if ts then
+			setsection(id, train, tcb[connid].ts_id, ts, {p=pos, s=connid})
+		end
+		-- backward conn (safety only)
+		connid = train.path_cp[index]
+		ts = tcb[connid].ts_id and ildb.get_ts(tcb[connid].ts_id)
+		if ts then
+			setsection(id, train, tcb[connid].ts_id, ts, {p=pos, s=connid}, true)
 		end
 	end
 end)
@@ -155,6 +175,7 @@ end)
 advtrains.tnc_register_on_leave(function(pos, id, train, index)
 	local tcb = ildb.get_tcb(pos)
 	if tcb and train.path_cp[index] then
+		-- backward conn
 		local connid = train.path_cp[index]
 		local ts = tcb[connid].ts_id and ildb.get_ts(tcb[connid].ts_id)
 		if ts then
@@ -173,7 +194,7 @@ advtrains.te_register_on_create(function(id, train)
 	if ts_id then
 		local ts = ildb.get_ts(ts_id)
 		if ts then
-			setsection(id, train, ts_id, ts, nil)
+			setsection(id, train, ts_id, ts, nil, true)
 		else
 			atwarn("While placing train, TS didnt exist ",ts_id)
 		end
