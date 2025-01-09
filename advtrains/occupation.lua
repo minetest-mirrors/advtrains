@@ -103,7 +103,10 @@ function o.clear_all_items(train_id, pos)
 	local t = occget(pos)
 	if not t then return end
 	local i = 1
+	local grd = 0
 	while t[i] do
+		grd=grd+1
+		if grd>10000 then error("loop guard occ clearall") end
 		if t[i]==train_id then
 			table.remove(t, i)
 			table.remove(t, i)
@@ -116,7 +119,10 @@ function o.clear_specific_item(train_id, pos, index)
 	local t = occget(pos)
 	if not t then return end
 	local i = 1
+	local grd = 0
 	while t[i] do
+		grd=grd+1
+		if grd>10000 then error("loop guard occ clearall") end
 		if t[i]==train_id and t[i+1]==index then
 			table.remove(t, i)
 			table.remove(t, i)
