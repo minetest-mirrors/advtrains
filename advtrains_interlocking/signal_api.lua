@@ -462,7 +462,11 @@ function signal.after_dig(pos, oldnode, oldmetadata, player)
 		advtrains.interlocking.db.unassign_signal_for_tcbs(sigd)
 		minetest.chat_send_player(player:get_player_name(), "Signal has been unassigned. Name and routes are kept for reuse.")
 	end
-	-- TODO clear influence point
+	-- clear influence point
+	local ipts,iconnid = advtrains.interlocking.db.get_ip_by_signalpos(pos)
+	if ipts then
+		advtrains.interlocking.db.clear_ip_signal(ipts, iconnid)
+	end
 	advtrains.interlocking.signal.unregister_aspect(pos)
 end
 
