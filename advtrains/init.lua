@@ -33,7 +33,7 @@ advtrains = {trains={}, player_to_train_mapping={}}
 
 -- =======================Development/debugging settings=====================
 -- DO NOT USE FOR NORMAL OPERATION
-local DUMP_DEBUG_SAVE = true
+local DUMP_DEBUG_SAVE = false
 -- dump the save files in human-readable format into advtrains_DUMP
 
 local GENERATE_ATRICIFIAL_LAG = false
