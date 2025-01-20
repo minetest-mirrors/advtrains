@@ -233,40 +233,41 @@ function advtrains.hud_train_format(train, flip)
 	if train.tarvelocity then
 		hud:add(1+train.tarvelocity*11, 85, T"advtrains_hud_arrow.png":transform"FY":multiply"cyan")
 	end
-	local lzbdisp
 	local lzb = train.lzb
-	if lzb and lzb.checkpoints then
-		local oc = lzb.checkpoints
-		for i = 1, #oc do
-			if advtrains.interlocking then
-				local udata = oc[i].udata
-				if udata and udata.signal_pos then
-					local sigd = advtrains.interlocking.db.get_sigd_for_signal(udata.signal_pos)
-					if sigd then
-						local tcbs = advtrains.interlocking.db.get_tcbs(sigd) or {}
-						if tcbs.route_rsn then
-							table.insert(st, ("%s: %s"):format(minetest.pos_to_string(sigd.p), tcbs.route_rsn))
-						end
-					end
+	local lzbdisp = {c = "darkslategray", d = 888}
+	if lzb and lzb.checkpoints and lzb.checkpoints[1] then
+		local cp = lzb.checkpoints[1]
+		if advtrains.interlocking and cp.udata and cp.udata.signal_pos then
+			local sigd = advtrains.interlocking.db.get_sigd_for_signal(cp.udata.signal_pos)
+			if sigd then
+				local tcbs = advtrains.interlocking.db.get_tcbs(sigd) or {}
+				if tcbs.route_rsn then
+					table.insert(st, ("%s: %s"):format(minetest.pos_to_string(sigd.p), tcbs.route_rsn))
 				end
-			end
-			local spd = oc[i].speed
-			spd = advtrains.speed.min(spd, train.speed_restriction)
-			if spd == -1 then spd = nil end
-			local c = not spd and "lime" or (type(spd) == "number" and (spd == 0) and "red" or "orange") or nil
-			if c then
-				if spd and spd~=0 then
-					hud:add(1+spd*11, 50, T"advtrains_hud_arrow.png":multiply"red")
-				end
-				local dist = math.floor(((oc[i].index or train.index)-train.index))
-				dist = math.max(0, math.min(999, dist))
-				lzbdisp = {c = c, d = dist}
-				break
 			end
 		end
-	end
-	if not lzbdisp then
-		lzbdisp = {c = "darkslategray", d = 888}
+		local spd = cp.speed
+		local c, arrow
+		if not spd or spd == -1 then
+			c = "lime"
+		elseif spd == 0 then
+			c = "red"
+		elseif not res or spd <= res then
+			c = "orange"
+			arrow = true
+		elseif spd <= max then
+			c = "yellow"
+			arrow = true
+		else
+			c = "cyan"
+			arrow = true
+		end
+		if arrow then
+			hud:add(1+spd*11, 50, T"advtrains_hud_arrow.png":multiply"red")
+		end
+		local dist = math.floor(((cp.index or train.index)-train.index))
+		dist = math.max(0, math.min(999, dist))
+		lzbdisp = {c = c, d = dist}
 	end
 	hud:add_fill(130, 10, 30, 5, lzbdisp.c)
 	hud:add_fill(130, 35, 30, 5, lzbdisp.c)
