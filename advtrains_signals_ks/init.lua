@@ -532,7 +532,7 @@ for _, rtab in ipairs({
 		t.advtrains = {
 				trackworker_next_rot = "advtrains_signals_ks:zs3_"..typ.."_"..rtab.nextrot,
 				trackworker_rot_incr_param2 = (rot=="60")
-			},
+			}
 		minetest.register_node("advtrains_signals_ks:zs3_"..typ.."_"..rot, t)
 		--TODO add rotation using trackworker
 
@@ -545,7 +545,7 @@ for _, rtab in ipairs({
 		t.advtrains = {
 				trackworker_next_rot = "advtrains_signals_ks:zs3v_"..typ.."_"..rtab.nextrot,
 				trackworker_rot_incr_param2 = (rot=="60")
-			},
+			}
 		minetest.register_node("advtrains_signals_ks:zs3v_"..typ.."_"..rot, t)
 		--TODO add rotation using trackworker
 	end
