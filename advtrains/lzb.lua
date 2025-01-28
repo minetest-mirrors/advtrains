@@ -265,7 +265,8 @@ end
 advtrains.te_register_on_new_path(function(id, train)
 	advtrains.lzb_invalidate(train)
 	-- Taken care of in pre-move hook (see train_step_b)
-	--look_ahead(id, train)
+	-- 2025-01-28 - do anyway, there seems to be an issue
+	look_ahead(id, train)
 end)
 
 advtrains.te_register_on_invalidate_ahead(function(id, train, start_idx)

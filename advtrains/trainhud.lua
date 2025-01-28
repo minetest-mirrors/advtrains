@@ -277,7 +277,20 @@ function advtrains.hud_train_format(train, flip)
 	end
 	
 	if train.atc_command then
-		table.insert(st, ("ATC: %s%s"):format(train.atc_delay and advtrains.abs_ceil(train.atc_delay).."s " or "", train.atc_command or ""))
+		local delay_str = ""
+		if train.atc_delay and train.atc_delay >= 0 then
+			delay_str = advtrains.abs_ceil(train.atc_delay).."s "
+		end
+		if train.atc_wait_finish then
+			delay_str = delay_str.."[W] "
+		end
+		if train.atc_wait_autocouple then
+			delay_str = delay_str.."[Cpl] "
+		end
+		if train.atc_wait_signal then
+			delay_str = delay_str.."[G] "
+		end
+		table.insert(st, ("ATC: %s%s"):format(delay_str, train.atc_command or ""))
 	end
 	
 	return table.concat(st,"\n"), tostring(hud)

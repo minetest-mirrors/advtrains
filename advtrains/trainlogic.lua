@@ -427,7 +427,8 @@ function advtrains.train_step_b(id, train, dtime)
 		if train.atc_command then
 			if (not train.atc_delay or train.atc_delay<=0)
 					and not train.atc_wait_finish
-					and not train.atc_wait_autocouple then
+					and not train.atc_wait_autocouple
+					and not train.atc_wait_signal then
 				advtrains.atc.execute_atc_command(id, train)
 			elseif train.atc_delay and train.atc_delay > 0 then
 				train.atc_delay=train.atc_delay-dtime
@@ -454,6 +455,15 @@ function advtrains.train_step_b(id, train, dtime)
 		if train.atc_wait_finish then
 			if not train.atc_brake_target and (not train.tarvelocity or train.velocity==train.tarvelocity) then
 				train.atc_wait_finish=nil
+			end
+		end
+		-- clear atc_wait_signal immediately when the next LZB checkpoint is not a "stop"
+		-- (but make sure lzb is initialized, otherwise wait for it)
+		if train.atc_wait_signal and train.lzb then
+			local first_ckp = train.lzb.checkpoints and train.lzb.checkpoints[1]
+			-- no checkpoint exists, or it has a speed of either nil or >0
+			if not first_ckp or first_ckp.speed ~= 0 then
+				train.atc_wait_signal = nil
 			end
 		end
 		

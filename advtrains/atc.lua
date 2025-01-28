@@ -94,6 +94,7 @@ function atc.train_reset_command(train, keep_tarvel)
 	train.atc_brake_target=nil
 	train.atc_wait_finish=nil
 	train.atc_wait_autocouple=nil
+	train.atc_wait_signal=nil
 	train.atc_arrow=nil
 	if not keep_tarvel then
 		train.tarvelocity=nil
@@ -278,6 +279,10 @@ local matchptn={
 		train.atc_wait_autocouple=true
 		return 3
 	end,
+	["G"]=function(id, train)
+		train.atc_wait_signal=true
+		return 1
+	end,
 }
 
 eval_conditional = function(command, arrow, speed)
@@ -375,7 +380,8 @@ function atc.execute_atc_command(id, train)
 			train.atc_command=string.sub(command, patlen+1)
 			if train.atc_delay<=0
 				and not train.atc_wait_finish
-				and not train.atc_wait_autocouple then
+				and not train.atc_wait_autocouple
+				and not train.atc_wait_signal then
 				--continue (recursive, cmds shouldn't get too long, and it's a end-recursion.)
 				atc.execute_atc_command(id, train)
 			end
