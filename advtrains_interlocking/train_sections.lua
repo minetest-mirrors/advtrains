@@ -157,13 +157,13 @@ advtrains.tnc_register_on_enter(function(pos, id, train, index)
 	if tcb and train.path_cp[index] and train.path_cn[index] then
 		-- forward conn
 		local connid = train.path_cn[index]
-		local ts = tcb[connid].ts_id and ildb.get_ts(tcb[connid].ts_id)
+		local ts = tcb[connid] and tcb[connid].ts_id and ildb.get_ts(tcb[connid].ts_id)
 		if ts then
 			setsection(id, train, tcb[connid].ts_id, ts, {p=pos, s=connid})
 		end
 		-- backward conn (safety only)
 		connid = train.path_cp[index]
-		ts = tcb[connid].ts_id and ildb.get_ts(tcb[connid].ts_id)
+		ts = tcb[connid] and tcb[connid].ts_id and ildb.get_ts(tcb[connid].ts_id)
 		if ts then
 			setsection(id, train, tcb[connid].ts_id, ts, {p=pos, s=connid}, true)
 		end
@@ -177,7 +177,7 @@ advtrains.tnc_register_on_leave(function(pos, id, train, index)
 	if tcb and train.path_cp[index] then
 		-- backward conn
 		local connid = train.path_cp[index]
-		local ts = tcb[connid].ts_id and ildb.get_ts(tcb[connid].ts_id)
+		local ts = tcb[connid] and tcb[connid].ts_id and ildb.get_ts(tcb[connid].ts_id)
 		if ts then
 			freesection(id, train, tcb[connid].ts_id, ts)
 		end

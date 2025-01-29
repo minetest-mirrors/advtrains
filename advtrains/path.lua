@@ -112,14 +112,17 @@ end
 -- before returning from the calling function.
 function advtrains.path_invalidate(train, ignore_lock)
 	if advtrains.lock_path_inval and not ignore_lock then
-		atwarn("Train ",train.train_id,": Illegal path invalidation has occured during train step:")
+		atwarn("Train ",train.id,": Illegal path invalidation has occured during train step:")
 		atwarn(debug.traceback())
 	end
-
 	if train.path then
+		--atdebug("path_invalidate for",train.id)
+		local _cnt = 0
 		for i,p in pairs(train.path) do
+			_cnt = _cnt + 1; if _cnt > 10000 then error("Loop trap in advtrains.path_invalidate was triggered!") end
 			advtrains.occ.clear_all_items(train.id, advtrains.round_vector_floor_y(p))
 		end
+		--atdebug("occ cleared")
 	end
 	train.path = nil
 	train.path_dist = nil
