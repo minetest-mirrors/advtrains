@@ -1565,3 +1565,32 @@ function advtrains.wagon_entity_pairs_in_train(train_id)
 	if not train then return function() end end
 	return advtrains.next_wagon_entity_in_train, train, 0
 end
+
+minetest.register_chatcommand("at_chown", {
+	params = "<wagon_id> <player_name>",
+	description = "Change the owner of an advtrains wagon",
+	privs = {train_admin=true},
+	func = function(name, param)
+		local params = string.split(param," ")
+		local wid = params[1]
+		local new_owner = params[2]
+		if not wid then return false end --no params added
+		--player name checks
+		if not new_owner then return false, attrans("Please specify a player name to transfer ownership to.") end --no player name argument
+		if not core.player_exists(new_owner) then return false, attrans("That player does not exist!") end --is a valid player
+		--wagon id checks
+		if not wid:match("%d%d%d%d%d%d") then return false, attrans("Not a valid wagon id.") end -- invalid wagon id
+		local w_data = advtrains.wagons[wid]
+		if not w_data then return false, attrans("That wagon does not exist!") end
+		-- actually chown the wagon
+		local curr_owner = w_data.owner
+		w_data.owner = new_owner
+		advtrains.wagons[wid] = w_data
+		advtrains.log("Chown", name, core.get_player_by_name(name):get_pos(), "wid="..wid..", from="..curr_owner..", to="..new_owner)
+
+		if name ~= new_owner then
+			core.chat_send_player(new_owner, attrans("You have been given ownership of wagon @1", wid))
+		end
+		return true, attrans("Wagon @1 ownership changed from @2 to @3", wid, curr_owner, new_owner)
+	end
+})
