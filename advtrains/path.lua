@@ -119,7 +119,11 @@ function advtrains.path_invalidate(train, ignore_lock)
 		--atdebug("path_invalidate for",train.id)
 		local _cnt = 0
 		for i,p in pairs(train.path) do
-			_cnt = _cnt + 1; if _cnt > 10000 then error("Loop trap in advtrains.path_invalidate was triggered!") end
+			_cnt = _cnt + 1
+			if _cnt > 10000 then
+				atdebug(train)
+				error("Loop trap in advtrains.path_invalidate was triggered!")
+			end
 			advtrains.occ.clear_all_items(train.id, advtrains.round_vector_floor_y(p))
 		end
 		--atdebug("occ cleared")

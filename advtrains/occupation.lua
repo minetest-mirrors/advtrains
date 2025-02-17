@@ -103,9 +103,7 @@ function o.clear_all_items(train_id, pos)
 	local t = occget(pos)
 	if not t then return end
 	local i = 1
-	local _cnt = 0
 	while t[i] do
-		_cnt = _cnt + 1; if _cnt > 10000 then error("Loop trap in advtrains.occ,clear_all_items was triggered!") end
 		if t[i]==train_id then
 			table.remove(t, i)
 			table.remove(t, i)
