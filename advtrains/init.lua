@@ -427,6 +427,16 @@ function advtrains.load_version_4()
 		if il_save then
 			advtrains.interlocking.db.load(il_save)
 		end
+		
+		-- TODO 2.5.0 backwards compatibility fallback: Store the pre-v2.5.0 save file so that it can be reverted to if needed
+		local fallback_file = advtrains.fpath.."_interlocking.ls.pre250"
+		local file = io.open(fallback_file, "rb")
+		if file then
+			io.close(file)
+		else
+			atwarn("Backing up pre-2.5.0 version of Interlocking save file to",fallback_file," for potential downgrade to older versions")
+			os.rename(advtrains.fpath.."_interlocking.ls", fallback_file)
+		end
 	end
 	
 	--== load lines ==

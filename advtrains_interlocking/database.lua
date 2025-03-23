@@ -100,7 +100,7 @@ function ildb.load(data)
 									local lpos = minetest.string_to_pos(lpts)
 									if lpos then
 										local epos = advtrains.encode_pos(lpos)
-										atdebug("ILDB converting tcb",pts,"side",t_side,"route",t_route,"lock position format",lpts,"->",epos)
+										atdebug("ILDB converting tcb",pts,"side",t_side,"route",t_rnum,"lock position format",lpts,"->",epos)
 										locks_n[epos] = state
 									else
 										-- already correct format
