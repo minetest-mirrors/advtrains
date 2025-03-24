@@ -474,7 +474,13 @@ end
 local active_node_range = tonumber(minetest.settings:get("active_block_range"))*16 + 16
 -- Function to check whether node at position(pos) is "loaded"/"active"
 -- That is, whether it is within the active_block_range to a player
-if minetest.is_block_active then -- define function differently whether minetest.is_block_active is available or not
+if core.compare_block_status then
+	-- latest API
+	function advtrains.is_node_loaded(pos)
+		return core.compare_block_status(pos, "active")
+	end
+elseif minetest.is_block_active then -- define function differently whether minetest.is_block_active is available or not
+	-- API added by my PR but later superseded by the above and now removed
 	advtrains.is_node_loaded = minetest.is_block_active
 else
 	function advtrains.is_node_loaded(pos)
