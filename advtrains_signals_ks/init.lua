@@ -362,7 +362,7 @@ for _, rtab in ipairs({
 			paramtype2 = "facedir",
 			selection_box = {
 				type = "fixed",
-				fixed = {sbox, rotation_sbox}
+				fixed = {sbox, {-1/4, -1/2, -1/4, 1/4, -7/16, 1/4}}
 			},
 			collision_box = {
 				type = "fixed",

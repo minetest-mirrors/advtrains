@@ -175,6 +175,9 @@ function advtrains.interlocking.visualize_route(origin, route, context, tmp_lcks
 		-- display locks
 		for pts, state in pairs(v.locks) do
 			local pos = minetest.string_to_pos(pts)
+			if not pos then
+				pos = advtrains.decode_pos(pts)
+			end
 			routesprite(context, pos, "fix"..k..pts, "at_il_route_lock.png", "Fixed in state '"..state.."' by route "..route.name.." until segment #"..k.." is freed.")
 		end
 	end
