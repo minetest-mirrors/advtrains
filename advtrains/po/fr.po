@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: advtrains\n"
 "Report-Msgid-Bugs-To: advtrains-discuss@lists.sr.ht\n"
-"POT-Creation-Date: 2024-12-06 21:17+0100\n"
-"PO-Revision-Date: 2024-11-02 21:31+0100\n"
+"POT-Creation-Date: 2024-12-08 15:21+0100\n"
+"PO-Revision-Date: 2024-12-04 15:55+0100\n"
 "Last-Translator: Tanavit <tanavit@posto.ovh>\n"
 "Language-Team: French\n"
 "Language: fr\n"
@@ -327,18 +327,19 @@ msgstr ""
 
 #: advtrains/wagonprop_tool.lua
 msgid "Insufficient privileges to use this!"
-msgstr ""
+msgstr "Privilèges insuffisants pour utiliser ceci !"
 
 #: advtrains/wagonprop_tool.lua
-#, fuzzy
 msgid "Wagon Properties Tool"
-msgstr "Propriétés du wagon"
+msgstr "Outil de propriété du wagon"
 
 #: advtrains/wagonprop_tool.lua
 msgid ""
 "Wagon Properties Tool\n"
 "Punch a wagon to view and edit the Wagon Properties"
 msgstr ""
+"Outil de propriété du wagon\n"
+"Frappez un wagon pour voir et modifier ses propriétés"
 
 #: advtrains/wagons.lua
 msgid "(Doors closed)"
@@ -401,9 +402,8 @@ msgid "The wagon's inventory is not empty."
 msgstr "Le stock de ce wagon n'est pas vide."
 
 #: advtrains/wagons.lua
-#, fuzzy
 msgid "This Wagon ID"
-msgstr "Ce wagon est plein."
+msgstr "Identificateur du wagon"
 
 #: advtrains/wagons.lua
 msgid "This wagon has no seats."
@@ -419,7 +419,7 @@ msgstr "Ce wagon est la propriété de @1, vous ne pouvez pas le détruire."
 
 #: advtrains/wagons.lua
 msgid "Train ID"
-msgstr ""
+msgstr "Identificateur du train"
 
 #: advtrains/wagons.lua
 msgid "Wagon needs to be decoupled from other wagons in order to destroy it."
@@ -595,6 +595,11 @@ msgstr "Vous ne pouvez nommer un composant LuaATC passif sans le privilege @1."
 msgid "Big Industrial Train Engine"
 msgstr "Grosse locomotive industrielle"
 
+#: advtrains_train_industrial/init.lua advtrains_train_japan/init.lua
+#: advtrains_train_steam/init.lua advtrains_train_subway/init.lua
+msgid "Driver Stand"
+msgstr "Poste de pilotage"
+
 #: advtrains_train_industrial/init.lua advtrains_train_steam/init.lua
 msgid "Driver Stand (left)"
 msgstr "Poste de pilotage (gauche)"
@@ -615,7 +620,7 @@ msgstr "Wagon-citerne industriel"
 msgid "Industrial wood wagon"
 msgstr "Wagon grumier industriel"
 
-#: advtrains_train_japan/init.lua
+#: advtrains_train_japan/init.lua advtrains_train_subway/init.lua
 msgid "Driver stand"
 msgstr "Poste de pilotage"
 
@@ -630,6 +635,11 @@ msgstr "Passage inter-voiture de train Japonais"
 #: advtrains_train_japan/init.lua
 msgid "Japanese Train Wagon"
 msgstr "Voiture Japonaise"
+
+#: advtrains_train_japan/init.lua advtrains_train_steam/init.lua
+#: advtrains_train_subway/init.lua
+msgid "Passenger area"
+msgstr "Voiture Passager"
 
 #: advtrains_train_steam/init.lua
 msgid "Box Wagon"

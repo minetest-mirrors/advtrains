@@ -7,6 +7,7 @@ BTDIR="$ATDIR/../basic_trains"
 POTFILE="$PODIR/advtrains.pot"
 
 xgettext \
+	-v -v -v \
 	-D "$ATDIR" \
 	-D "$BTDIR" \
 	-d advtrains \

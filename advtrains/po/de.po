@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: advtrains\n"
 "Report-Msgid-Bugs-To: advtrains-discuss@lists.sr.ht\n"
-"POT-Creation-Date: 2024-12-06 21:17+0100\n"
+"POT-Creation-Date: 2024-12-08 15:21+0100\n"
 "PO-Revision-Date: 2023-10-09 11:18+0200\n"
 "Last-Translator: Y. Wang <yw05@forksworld.de>\n"
 "Language-Team: German\n"
@@ -595,6 +595,12 @@ msgstr "Sie dürfen ohne das „@1“ keinen passiven LuaATC-Bauteil benennen."
 msgid "Big Industrial Train Engine"
 msgstr "Große Industrielle Lokomotive"
 
+#: advtrains_train_industrial/init.lua advtrains_train_japan/init.lua
+#: advtrains_train_steam/init.lua advtrains_train_subway/init.lua
+#, fuzzy
+msgid "Driver Stand"
+msgstr "Führerstand"
+
 #: advtrains_train_industrial/init.lua advtrains_train_steam/init.lua
 msgid "Driver Stand (left)"
 msgstr "Führerstand Links"
@@ -615,7 +621,7 @@ msgstr "Tankwaggon"
 msgid "Industrial wood wagon"
 msgstr "Holztransportwaggon"
 
-#: advtrains_train_japan/init.lua
+#: advtrains_train_japan/init.lua advtrains_train_subway/init.lua
 msgid "Driver stand"
 msgstr "Führerstand"
 
@@ -630,6 +636,12 @@ msgstr "Waggonzwischenverbindung Japanischer Personenzüge"
 #: advtrains_train_japan/init.lua
 msgid "Japanese Train Wagon"
 msgstr "Japanischer Personenzug-Passagierwaggon"
+
+#: advtrains_train_japan/init.lua advtrains_train_steam/init.lua
+#: advtrains_train_subway/init.lua
+#, fuzzy
+msgid "Passenger area"
+msgstr "Passagierwaggon"
 
 #: advtrains_train_steam/init.lua
 msgid "Box Wagon"
