@@ -73,7 +73,7 @@ end
 local no_action=false
 
 local function reload_saves()
-	atwarn("Restoring saved state in 1 second...")
+	atwarn(S("Restoring saved state in 1 second..."))
 	no_action=true
 	advtrains.lock_path_inval = false
 	--read last save state and continue, as if server was restarted
@@ -84,7 +84,7 @@ local function reload_saves()
 	end
 	minetest.after(1, function()
 		advtrains.load()
-		atwarn("Reload successful!")
+		atwarn(S("Reload successful!"))
 		advtrains.ndb.restore_all()
 	end)
 end
@@ -349,7 +349,7 @@ function advtrains.avt_load()
 				end
 			end
 			for wid, _ in pairs(todel) do
-				atwarn("Removing unused wagon", wid, "from wagon_save table.")
+				atwarn(S("Removing unused wagon"), wid, S("from wagon_save table."))
 				advtrains.wagon_save[wid]=nil
 			end
 		else
@@ -414,7 +414,7 @@ function advtrains.load_version_4()
 			end
 		end
 		for wid, _ in pairs(todel) do
-			atwarn("Removing unused wagon", wid, "from wagon_save table.")
+			atwarn(S("Removing unused wagon"), wid, S("from wagon_save table."))
 			advtrains.wagon_save[wid]=nil
 		end
 	end
@@ -502,7 +502,7 @@ advtrains.avt_save = function(remove_players_from_wagons)
 			--then save it
 			tmp_trains[id]=v
 		else
-			atwarn("Train",id,"had no wagons left because of some bug. It is being deleted. Wave it goodbye!")
+			atwarn(S("Train"),id,S("had no wagons left because of some bug. It is being deleted. Wave it goodbye!"))
 			advtrains.remove_train(id)
 		end
 	end
@@ -583,7 +583,7 @@ advtrains.avt_save = function(remove_players_from_wagons)
 	local succ, err = serialize_lib.save_atomic_multiple(parts_table, advtrains.fpath.."_", callbacks_table)
 	
 	if not succ then
-		atwarn("Saving failed: "..err)
+		atwarn(S("Saving failed: ")..err)
 	else
 		-- store version
 		advtrains.save_component(4, "version")
@@ -686,7 +686,7 @@ end
 function advtrains.save(remove_players_from_wagons)
 	if not init_load then
 		--wait... we haven't loaded yet?!
-		atwarn("Instructed to save() but load() was never called!")
+		atwarn(S("Instructed to save() but load() was never called!"))
 		return
 	end
 	
@@ -715,7 +715,7 @@ function advtrains.save(remove_players_from_wagons)
 end
 minetest.register_on_shutdown(function()
 	if within_mainstep then
-		atwarn("Crash during advtrains main step - skipping the shutdown save operation to not save inconsistent data!")
+		atwarn(S("Crash during advtrains main step - skipping the shutdown save operation to not save inconsistent data!"))
 	else
 		advtrains.save()
 	end
@@ -727,10 +727,10 @@ end)
 minetest.register_chatcommand("at_empty_seats",
 	{
         params = "", -- Short parameter description
-        description = "Detach all players, especially the offline ones, from all trains. Use only when no one serious is on a train.", -- Full description
+        description = S("Detach all players, especially the offline ones, from all trains. Use only when no one serious is on a train."), -- Full description
         privs = {train_operator=true, server=true}, -- Require the "privs" privilege to run
         func = function(name, param)
-				atwarn("Data is being saved. While saving, advtrains will remove the players from trains. Save files will be reloaded afterwards!")
+				atwarn(S("Data is being saved. While saving, advtrains will remove the players from trains. Save files will be reloaded afterwards!"))
 				advtrains.save(true)
 				reload_saves()
         end,
@@ -739,60 +739,60 @@ minetest.register_chatcommand("at_empty_seats",
 minetest.register_chatcommand("at_reroute",
 	{
         params = "", 
-        description = "Delete all train routes, force them to recalculate", 
+        description = S("Delete all train routes, force them to recalculate"), 
         privs = {train_operator=true}, -- Only train operator is required, since this is relatively safe.
         func = function(name, param)
 				advtrains.invalidate_all_paths()
-				return true, "Successfully invalidated train routes"
+				return true, S("Successfully invalidated train routes")
         end,
 })
 
 minetest.register_chatcommand("at_whereis",
 	{
 		params = "<train id>",
-		description = "Returns the position of the train with the given id",
+		description = S("Returns the position of the train with the given id"),
 		privs = {train_operator = true},
 		func = function(name,param)
 			local train = advtrains.trains[param] 
 			if not train or not train.last_pos then
-				return false, "Train "..param.." does not exist or is invalid"
+				return false, S("Train ")..param..S(" does not exist or is invalid")
 			else
-				return true, "Train "..param.." is at "..minetest.pos_to_string(train.last_pos)
+				return true, S("Train ")..param..S(" is at ")..minetest.pos_to_string(train.last_pos)
 			end
 		end,
 })
 minetest.register_chatcommand("at_tp",
 	{
 		params = "<train id>",
-		description = "Teleports you to the position of the train with the given id",
+		description = S("Teleports you to the position of the train with the given id"),
 		privs = {train_operator = true, teleport = true},
 		func = function(name,param)
 			local train = advtrains.trains[param]
 			if not train or not train.last_pos then
-				return false, "Train "..param.." does not exist or is invalid"
+				return false, S("Train ")..param..S(" does not exist or is invalid")
 			else
 				minetest.get_player_by_name(name):set_pos(train.last_pos)
-				return true, "Teleporting to train "..param
+				return true, S("Teleporting to train ")..param
 			end
 		end,
 })
 minetest.register_chatcommand("at_disable_step",
 	{
         params = "<yes/no>", 
-        description = "Disable the advtrains globalstep temporarily", 
+        description = S("Disable the advtrains globalstep temporarily"), 
         privs = {server=true},
         func = function(name, param)
 			if minetest.is_yes(param) then
 				-- disable everything, and turn off saving
 				no_action = true;
-				atwarn("The advtrains globalstep has been disabled. Trains are not moving, and no data is saved! Run '/at_disable_step no' to enable again!")
-				return true, "Disabled advtrains successfully"
+				atwarn(S("The advtrains globalstep has been disabled. Trains are not moving, and no data is saved! Run '/at_disable_step no' to enable again!"))
+				return true, S("Disabled advtrains successfully")
 			elseif no_action then
-				atwarn("Re-enabling advtrains globalstep...")
+				atwarn(S("Re-enabling advtrains globalstep..."))
 				reload_saves()
 				return true
 			else
-				return false, "Advtrains is already running normally!"
+				return false, S("Advtrains is already running normally!")
 			end
         end,
 })
@@ -800,10 +800,10 @@ minetest.register_chatcommand("at_disable_step",
 minetest.register_chatcommand("at_status",
 	{
         params = "", 
-        description = "Print advtrains status info", 
+        description = S("Print advtrains status info"), 
         privs = {train_operator = true},
         func = function(name, param)
-			return true, advtrains.print_concat_table({"Advtrains Status: no_action",no_action,"slowdown",advtrains.global_slowdown,"(log",math.log(advtrains.global_slowdown),")"})
+			return true, advtrains.print_concat_table({S("Advtrains Status: no_action"),no_action,S("slowdown"),advtrains.global_slowdown,S("(log"),math.log(advtrains.global_slowdown),")"})
         end,
 })
 

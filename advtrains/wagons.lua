@@ -7,6 +7,9 @@
 -- An entity is ONLY spawned by update_trainpart_properties when it finds it useful.
 -- Only data that are only important to the entity itself are stored in the luaentity
 
+-- Translation
+S = attrans
+
 -- TP delay when getting off wagon
 local GETOFF_TP_DELAY = 0.5
 
@@ -154,12 +157,12 @@ function wagon:ensure_init()
 		end
 	end
 	if not self.noninitticks then
-		atwarn("wagon",self.id,"uninitialized init=",self.initialized)
+		atwarn("Wagon",self.id,S("Uninitialized init="),self.initialized)
 		self.noninitticks=0
 	end
 	self.noninitticks=self.noninitticks+1
 	if self.noninitticks>20 then
-		atwarn("wagon",self.id,"uninitialized, removing")
+		atwarn("Wagon",self.id,S("Uninitialized, removing"))
 		self:destroy()
 	else
 		self.object:set_velocity({x=0,y=0,z=0})
@@ -182,7 +185,7 @@ function wagon:on_punch(puncher, time_from_last_punch, tool_capabilities, direct
 			return
 		end
 		if data.owner and puncher:get_player_name()~=data.owner and (not minetest.check_player_privs(puncher, {train_admin = true })) then
-		   minetest.chat_send_player(puncher:get_player_name(), attrans("This wagon is owned by @1, you can't destroy it.", data.owner));
+		   minetest.chat_send_player(puncher:get_player_name(), S("This wagon is owned by @1, you can't destroy it.", data.owner));
 		   return
 		end
 		
@@ -201,25 +204,25 @@ function wagon:on_punch(puncher, time_from_last_punch, tool_capabilities, direct
 		if self.has_inventory then
 			local inv=minetest.get_inventory({type="detached", name="advtrains_wgn_"..self.id})
 			if not inv then -- inventory is not initialized when wagon was never loaded - should never happen
-				atwarn("Destroying wagon with inventory, but inventory is not found? Shouldn't happen!")
+				atwarn(S("Destroying wagon with inventory, but inventory is not found? Shouldn't happen!"))
 				return
 			end
 			for listname, _ in pairs(inv:get_lists()) do
 				if not inv:is_empty(listname) then
-					minetest.chat_send_player(puncher:get_player_name(), attrans("The wagon's inventory is not empty."));
+					minetest.chat_send_player(puncher:get_player_name(), S("The wagon's inventory is not empty."));
 					return
 				end
 			end
 		end
 		
 		if #(self:train().trainparts)>1 then
-		   minetest.chat_send_player(puncher:get_player_name(), attrans("Wagon needs to be decoupled from other wagons in order to destroy it."));
+		   minetest.chat_send_player(puncher:get_player_name(), S("Wagon needs to be decoupled from other wagons in order to destroy it."));
 		   return
 		end
 
 		local pc=puncher:get_player_control()
 		if not pc.sneak then
-			minetest.chat_send_player(puncher:get_player_name(), attrans("Warning: If you destroy this wagon, you only get some steel back! If you are sure, hold Sneak and left-click the wagon."))
+			minetest.chat_send_player(puncher:get_player_name(), S("Warning: If you destroy this wagon, you only get some steel back! If you are sure, hold Sneak and left-click the wagon."))
 			return
 		end
 		
@@ -240,7 +243,7 @@ function wagon:destroy()
 	if self.id then
 		local data = advtrains.wagons[self.id]
 		if not data then
-			atwarn("wagon:destroy(): data is not set!")
+			atwarn(S(" wagon:destroy(): data is not set!"))
 			return
 		end
 		
@@ -367,15 +370,15 @@ function wagon:on_step(dtime)
 		
 		--show off-track information in outside text instead of notifying the whole server about this
 		if train.off_track then
-			outside = outside .."\n!!! Train off track !!!"
+			outside = outside .."\n"..S("!!! Train off track !!!")
 		end
 		
 		-- liquid container: display liquid contents in infotext
 		if self.techage_liquid_capacity then
 			if data.techage_liquid and data.techage_liquid.name then
-				outside = outside .."\nLiquid: "..data.techage_liquid.name..", "..data.techage_liquid.amount.." units"
+				outside = outside .."\n"..S("Liquid: ")..data.techage_liquid.name..", "..data.techage_liquid.amount..S(" units")
 			else
-				outside = outside .."\nLiquid: empty"
+				outside = outside .."\n"..S("Liquid: empty")
 			end
 		end
 		
@@ -669,21 +672,21 @@ function wagon:on_rightclick(clicker)
 					end
 				end
 				if self.has_inventory and self.get_inventory_formspec and advtrains.check_driving_couple_protection(pname, data.owner, data.whitelist) then
-					poss[#poss+1]={name=attrans("Show Inventory"), key="inv"}
+					poss[#poss+1]={name=S("Show Inventory"), key="inv"}
 				end
 				if self.seat_groups[sgr].driving_ctrl_access and advtrains.check_driving_couple_protection(pname, data.owner, data.whitelist) then
-					poss[#poss+1]={name=attrans("Onboard Computer"), key="bordcom"}
+					poss[#poss+1]={name=S("Onboard Computer"), key="bordcom"}
 				end
 				if data.owner==pname then
-					poss[#poss+1]={name=attrans("Wagon properties"), key="prop"}
+					poss[#poss+1]={name=S("Wagon properties"), key="prop"}
 				end
 				if not self.seat_groups[sgr].require_doors_open or self:train().door_open~=0 then
-					poss[#poss+1]={name=attrans("Get off"), key="off"}
+					poss[#poss+1]={name=S("Get off"), key="off"}
 				else
 					if clicker:get_player_control().sneak then
-						poss[#poss+1]={name=attrans("Get off (forced)"), key="off"}
+						poss[#poss+1]={name=S("Get off (forced)"), key="off"}
 					else
-						poss[#poss+1]={name=attrans("(Doors closed)"), key="dcwarn"}
+						poss[#poss+1]={name=S("(Doors closed)"), key="dcwarn"}
 					end
 				end
 				if #poss==0 then
@@ -693,7 +696,7 @@ function wagon:on_rightclick(clicker)
 				else
 					local form = "size[5,"..1+(#poss).."]"
 					for pos,ent in ipairs(poss) do
-						form = form .. "button_exit[0.5,"..(pos-0.5)..";4,1;"..ent.key..";"..ent.name.."]"
+						form = form.. "button_exit[0.5,"..(pos-0.5)..";4,1;"..ent.key..";"..ent.name.."]"
 					end
 					minetest.show_formspec(pname, "advtrains_seating_"..self.id, form)
 				end
@@ -712,7 +715,7 @@ function wagon:on_rightclick(clicker)
 				end
 				
 				local doors_open = self:train().door_open~=0 or clicker:get_player_control().sneak
-				local allow, rsn=false, attrans("This wagon has no seats.")
+				local allow, rsn=false, S("This wagon has no seats.")
 				for _,sgr in ipairs(self.assign_to_seat_group) do
 					allow, rsn = self:check_seat_group_access(pname, sgr)
 					if allow then
@@ -723,16 +726,16 @@ function wagon:on_rightclick(clicker)
 										self:get_on(clicker, seatid)
 										return
 									else
-										rsn=attrans("This wagon is full.")
+										rsn=S("This wagon is full.")
 									end
 								else
-									rsn=attrans("Doors are closed! (Try holding sneak key!)")
+									rsn=S("Doors are closed! (Try holding sneak key!)")
 								end
 							end
 						end
 					end
 				end
-				minetest.chat_send_player(pname, rsn or attrans("You can't get on this wagon."))
+				minetest.chat_send_player(pname, rsn or S("You can't get on this wagon."))
 			else
 				self:show_get_on_form(pname)
 			end
@@ -858,7 +861,7 @@ function wagon:show_get_on_form(pname)
 		end
 		return
 	end
-	local form, comma="size[5,8]label[0.5,0.5;"..attrans("Select seat:").."]textlist[0.5,1;4,6;seat;", ""
+	local form, comma="size[5,8]label[0.5,0.5;"..S("Select seat:").."]textlist[0.5,1;4,6;seat;", ""
 	for seatno, seattbl in ipairs(self.seats) do
 		local addtext, colorcode="", ""
 		if data.seatp and data.seatp[seatno] then
@@ -870,7 +873,7 @@ function wagon:show_get_on_form(pname)
 	end
 	form=form..";0,false]"
 	if self.has_inventory and self.get_inventory_formspec then
-		form=form.."button_exit[1,7;3,1;inv;"..attrans("Show Inventory").."]"
+		form=form.."button_exit[1,7;3,1;inv;"..S("Show Inventory").."]"
 	end
 	minetest.show_formspec(pname, "advtrains_geton_"..self.id, form)
 end
@@ -881,27 +884,27 @@ function wagon:show_wagon_properties(pname)
 	button: save
 	]]
 	local data = advtrains.wagons[self.id]
-	local form = "size[5,5]"
-	form = form.."label[0.2,0;"..attrans("This Wagon ID")..": "..self.id.." ("..data.owner..")]"
-	form = form .. "field[0.5,1;4.5,1;whitelist;Allow these players to access your wagon:;"..minetest.formspec_escape(data.whitelist or "").."]"
-	form = form .. "field[0.5,2;4.5,1;roadnumber;Wagon road number:;"..minetest.formspec_escape(data.roadnumber or "").."]"
+	local form="size[5,5]"
+	form=form.."label[0.2,0;"..S("This Wagon ID")..": "..self.id.." ("..data.owner..")]"
+	form = form.."field[0.5,1;4.5,1;whitelist;"..S("Allow these players to access your wagon:")..";"..minetest.formspec_escape(data.whitelist or "").."]"
+	form = form.."field[0.5,2;4.5,1;roadnumber;"..S("Wagon road number:")..";"..minetest.formspec_escape(data.roadnumber or "").."]"
 	local fc = ""
 	if data.fc then
 		fc = table.concat(data.fc, "!")
 	end
-	form = form .. "field[0.5,3;4.5,1;fc;Freight Code:;"..fc.."]"
+	form = form.. "field[0.5,3;4.5,1;fc;"..S("Freight Code:")..";"..fc.."]"
 	if data.fc then
 		if not data.fcind then data.fcind = 1 end
 		if data.fcind > 1 then
-			form=form.."button[0.5,3.5;1,1;fcp;prev FC]"
+			form=form.."button[0.5,3.5;1,1;fcp;"..S("Prev FC").."]"
 		end
-		form=form.."label[1.5,3.5;Current FC:]"
+		form=form.."label[1.5,3.5;"..S("Current FC: ").."]"
 
 		local cur = data.fc[data.fcind] or ""
 		form=form.."label[1.5,3.75;"..minetest.formspec_escape(cur).."]"
-		form=form.."button[3.5,3.5;1,1;fcn;next FC]"
+		form=form.."button[3.5,3.5;1,1;fcn;"..S("Next FC:").."]"
 	end
-	form=form.."button_exit[0.5,4.5;4,1;save;"..attrans("Save wagon properties").."]"
+	form=form.."button_exit[0.5,4.5;4,1;save;"..S("Save wagon properties").."]"
 	minetest.show_formspec(pname, "advtrains_prop_"..self.id, form)
 end
 
@@ -986,30 +989,30 @@ function wagon:show_bordcom(pname)
 	local linhei
 	
 	local form = "size[11,9]label[0.5,0;AdvTrains Boardcom v0.1]"
-	form=form.."textarea[7.5,0.05;10,1;;"..attrans("Train ID")..": "..(minetest.formspec_escape(train.id or ""))..";]"
-	form=form.."textarea[0.5,1.5;7,1;text_outside;"..attrans("Text displayed outside on train")..";"..(minetest.formspec_escape(train.text_outside or "")).."]"
-	form=form.."textarea[0.5,3;7,1;text_inside;"..attrans("Text displayed inside train")..";"..(minetest.formspec_escape(train.text_inside or "")).."]"
-	form=form.."field[7.5,1.75;3,1;line;"..attrans("Line")..";"..(minetest.formspec_escape(train.line or "")).."]"
-	form=form.."field[7.5,3.25;3,1;routingcode;"..attrans("Routingcode")..";"..(minetest.formspec_escape(train.routingcode or "")).."]"
+	form=form.."textarea[7.5,0.05;10,1;;"..S("Train ID")..": "..(minetest.formspec_escape(train.id or ""))..";]"
+	form=form.."textarea[0.5,1.5;7,1;text_outside;"..S("Text displayed outside on train")..";"..(minetest.formspec_escape(train.text_outside or "")).."]"
+	form=form.."textarea[0.5,3;7,1;text_inside;"..S("Text displayed inside train")..";"..(minetest.formspec_escape(train.text_inside or "")).."]"
+	form=form.."field[7.5,1.75;3,1;line;"..S("Line")..";"..(minetest.formspec_escape(train.line or "")).."]"
+	form=form.."field[7.5,3.25;3,1;routingcode;"..S("Routingcode")..";"..(minetest.formspec_escape(train.routingcode or "")).."]"
 	--row 5 : train overview and autocoupling
 	if train.velocity==0 then
-		form=form.."label[0.5,4;Train overview /coupling control:]"
+		form=form.."label[0.5,4;"..S("Train overview /coupling control:").."])"
 		linhei=5
 		local pre_own, pre_wl, owns_any = nil, nil, minetest.check_player_privs(pname, "train_admin")
 		for i, tpid in ipairs(train.trainparts) do
 			local ent = advtrains.wagons[tpid]
 			if ent then
 				local roadnumber = ent.roadnumber or ""
-				form = form .. string.format("button[%d,%d;%d,%d;%s;%s]", i, linhei, 1, 0.2, "wgprp"..i, roadnumber)
+				form = form.. string.format("button[%d,%d;%d,%d;%s;%s]", i, linhei, 1, 0.2, "wgprp"..i, roadnumber)
 				local ename = ent.type
-				form = form .. "item_image["..i..","..(linhei+0.5)..";1,1;"..ename.."]"
+				form = form.. "item_image["..i..","..(linhei+0.5)..";1,1;"..ename.."]"
 				if i~=1 then
 					if checklock(pname, ent.owner, pre_own, ent.whitelist, pre_wl) then
-						form = form .. "image_button["..(i-0.5)..","..(linhei+1.5)..";1,1;advtrains_discouple.png;dcpl_"..i..";]"
+						form = form.. "image_button["..(i-0.5)..","..(linhei+1.5)..";1,1;advtrains_discouple.png;dcpl_"..i..";]"
 					end
 				end
 				if i == data.pos_in_trainparts then
-					form = form .. "box["..(i-0.1)..","..(linhei+0.4)..";1,1;green]"
+					form = form.. "box["..(i-0.1)..","..(linhei+0.4)..";1,1;green]"
 				end
 				pre_own = ent.owner
 				pre_wl = ent.whitelist
@@ -1018,24 +1021,24 @@ function wagon:show_bordcom(pname)
 		end
 		
 		if train.movedir==1 then
-			form = form .. "label["..(#train.trainparts+1)..","..(linhei)..";-->]"
+			form = form.. "label["..(#train.trainparts+1)..","..(linhei)..";-->]"
 		else
-			form = form .. "label[0.5,"..(linhei)..";<--]"
+			form = form.. "label[0.5,"..(linhei)..";<--]"
 		end
 		--check cpl_eid_front and _back of train
 		local couple_front = checkcouple(train.cpl_front)
 		local couple_back = checkcouple(train.cpl_back)
 		if couple_front then
-			form = form .. "image_button[0.5,"..(linhei+1)..";1,1;advtrains_couple.png;cpl_f;]"
+			form = form.. "image_button[0.5,"..(linhei+1)..";1,1;advtrains_couple.png;cpl_f;]"
 		end
 		if couple_back then
-			form = form .. "image_button["..(#train.trainparts+0.5)..","..(linhei+1)..";1,1;advtrains_couple.png;cpl_b;]"
+			form = form.. "image_button["..(#train.trainparts+0.5)..","..(linhei+1)..";1,1;advtrains_couple.png;cpl_b;]"
 		end
 		
 	else
-		form=form.."label[0.5,4.5;Train overview / coupling control is only shown when the train stands.]"
+		form=form.."label[0.5,4.5;"..S("Train overview / coupling control is only shown when the train stands.").."]"
 	end
-	form = form .. "button[0.5,8;3,1;save;Save]"
+	form = form.. "button[0.5,8;3,1;save;"..S("Save").."]"
 	
 	-- Interlocking functionality: If the interlocking module is loaded, you can set the signal aspect
 	-- from inside the train
@@ -1045,14 +1048,14 @@ function wagon:show_bordcom(pname)
 			local oci = train.lzb.checkpoints[i]
 			if oci.udata and oci.udata.signal_pos then
 				if advtrains.interlocking.db.get_sigd_for_signal(oci.udata.signal_pos) then
-					form = form .. "button[4.5,8;5,1;ilrs;Remote Routesetting]"
+					form = form.. "button[4.5,8;5,1;ilrs;"..S("Remote Routesetting").."]"
 					break
 				end
 			end
 			i=i+1
 		end
 		if train.ars_disable then
-			form = form .. "button[4.5,7;5,1;ilarsenable;Clear 'Disable ARS' flag]"
+			form = form.. "button[4.5,7;5,1;ilarsenable;"..S("Clear 'Disable ARS' flag").."]"
 		end
 	end
 	
@@ -1269,7 +1272,7 @@ function wagon:seating_from_key_helper(pname, fields, no)
 		self:show_bordcom(pname)
 	end
 	if fields.dcwarn then
-		minetest.chat_send_player(pname, attrans("Doors are closed. Use Sneak+rightclick to ignore the closed doors and get off."))
+		minetest.chat_send_player(pname, S("Doors are closed. Use Sneak+rightclick to ignore the closed doors and get off."))
 	end
 	if fields.off then
 		self:get_off(no)
@@ -1278,7 +1281,7 @@ end
 function wagon:check_seat_group_access(pname, sgr)
 	local data = advtrains.wagons[self.id]
 	if self.seat_groups[sgr].driving_ctrl_access and not (advtrains.check_driving_couple_protection(pname, data.owner, data.whitelist)) then
-		return false, attrans("You are not allowed to access the driver stand.")
+		return false, S("You are not allowed to access the driver stand.")
 	end
 	if self.seat_groups[sgr].driving_ctrl_access then
 		advtrains.log("Drive", pname, self.object:get_pos(), self:train().text_outside)
@@ -1298,7 +1301,7 @@ end
 
 function advtrains.safe_decouple_wagon(w_id, pname, try_run)
 	if not minetest.check_player_privs(pname, "train_operator") then
-		minetest.chat_send_player(pname, "Missing train_operator privilege")
+		minetest.chat_send_player(pname, S("Missing train_operator privilege"))
 		return false
 	end
 	local data = advtrains.wagons[w_id]
@@ -1316,7 +1319,7 @@ function advtrains.safe_decouple_wagon(w_id, pname, try_run)
 	end
 	
 	if not checklock(pname, data.owner, owdata.owner, data.whitelist, owdata.whitelist) then
-		minetest.chat_send_player(pname, "Not allowed to do this.")
+		minetest.chat_send_player(pname, S("Not allowed to do this."))
 		return false
 	end
 	
@@ -1341,7 +1344,7 @@ function advtrains.get_wagon_prototype(data)
 	end
 	local rt, proto = advtrains.resolve_wagon_alias(wt)
 	if not rt then
-		--atwarn("Unable to load wagon type",wt,", using placeholder")
+		--atwarn(S("Unable to load wagon type"),wt,S(", using placeholder"))
 		rt = "advtrains:wagon_placeholder"
 		proto = advtrains.wagon_prototypes[rt]
 	end
@@ -1378,7 +1381,7 @@ function advtrains.standard_inventory_formspec(self, pname, invname)
 	local r = "size[8,11]"..
 			"list["..invname..";box;0,0;8,3;]"
 	if data.owner==pname then
-		r = r .. "button_exit[0,9;4,1;prop;"..attrans("Wagon properties").."]"
+		r = r .. "button_exit[0,9;4,1;prop;"..S("Wagon properties").."]"
 	end
 	r = r .. "list[current_player;main;0,5;8,4;]"..
 			"listring[]"
@@ -1435,7 +1438,7 @@ function advtrains.register_wagon(sysname_p, prototype, desc, inv_img, nincreati
 					return itemstack
 				end
 				if not minetest.check_player_privs(placer, {train_operator = true }) then
-					minetest.chat_send_player(pname, "You don't have the train_operator privilege.")
+					minetest.chat_send_player(pname, S("You don't have the train_operator privilege."))
 					return itemstack
 				end
 				if not minetest.check_player_privs(placer, {train_admin = true }) and minetest.is_protected(pos, placer:get_player_name()) then
@@ -1447,7 +1450,7 @@ function advtrains.register_wagon(sysname_p, prototype, desc, inv_img, nincreati
 				
 				local prevpos = advtrains.get_adjacent_rail(pos, tconns, plconnid)
 				if not prevpos then
-					minetest.chat_send_player(pname, "The track you are trying to place the wagon on is not long enough!")
+					minetest.chat_send_player(pname, S("The track you are trying to place the wagon on is not long enough!"))
 					return
 				end
 				

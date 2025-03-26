@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: advtrains\n"
 "Report-Msgid-Bugs-To: advtrains-discuss@lists.sr.ht\n"
-"POT-Creation-Date: 2024-12-08 15:21+0100\n"
+"POT-Creation-Date: 2025-03-25 15:40+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -39,7 +39,8 @@ msgstr ""
 msgid "Digiline channel"
 msgstr ""
 
-#: advtrains/atc.lua advtrains_line_automation/stoprail.lua
+#: advtrains/atc.lua advtrains/wagons.lua
+#: advtrains_line_automation/stoprail.lua
 #: advtrains_luaautomation/active_common.lua
 msgid "Save"
 msgstr ""
@@ -149,6 +150,127 @@ msgstr ""
 msgid "Chimney"
 msgstr ""
 
+#: advtrains/init.lua
+msgid "Restoring saved state in 1 second..."
+msgstr ""
+
+#: advtrains/init.lua
+msgid "Reload successful!"
+msgstr ""
+
+#: advtrains/init.lua
+msgid "Removing unused wagon"
+msgstr ""
+
+#: advtrains/init.lua
+msgid "from wagon_save table."
+msgstr ""
+
+#: advtrains/init.lua
+msgid "Train"
+msgstr ""
+
+#: advtrains/init.lua
+msgid ""
+"had no wagons left because of some bug. It is being deleted. Wave it goodbye!"
+msgstr ""
+
+#: advtrains/init.lua
+msgid "Saving failed: "
+msgstr ""
+
+#: advtrains/init.lua
+msgid "Instructed to save() but load() was never called!"
+msgstr ""
+
+#: advtrains/init.lua
+msgid ""
+"Crash during advtrains main step - skipping the shutdown save operation to "
+"not save inconsistent data!"
+msgstr ""
+
+#: advtrains/init.lua
+msgid ""
+"Detach all players, especially the offline ones, from all trains. Use only "
+"when no one serious is on a train."
+msgstr ""
+
+#: advtrains/init.lua
+msgid ""
+"Data is being saved. While saving, advtrains will remove the players from "
+"trains. Save files will be reloaded afterwards!"
+msgstr ""
+
+#: advtrains/init.lua
+msgid "Delete all train routes, force them to recalculate"
+msgstr ""
+
+#: advtrains/init.lua
+msgid "Successfully invalidated train routes"
+msgstr ""
+
+#: advtrains/init.lua
+msgid "Returns the position of the train with the given id"
+msgstr ""
+
+#: advtrains/init.lua
+msgid " does not exist or is invalid"
+msgstr ""
+
+#: advtrains/init.lua
+msgid "Train "
+msgstr ""
+
+#: advtrains/init.lua
+msgid " is at "
+msgstr ""
+
+#: advtrains/init.lua
+msgid "Teleports you to the position of the train with the given id"
+msgstr ""
+
+#: advtrains/init.lua
+msgid "Teleporting to train "
+msgstr ""
+
+#: advtrains/init.lua
+msgid "Disable the advtrains globalstep temporarily"
+msgstr ""
+
+#: advtrains/init.lua
+msgid ""
+"The advtrains globalstep has been disabled. Trains are not moving, and no "
+"data is saved! Run '/at_disable_step no' to enable again!"
+msgstr ""
+
+#: advtrains/init.lua
+msgid "Disabled advtrains successfully"
+msgstr ""
+
+#: advtrains/init.lua
+msgid "Re-enabling advtrains globalstep..."
+msgstr ""
+
+#: advtrains/init.lua
+msgid "Advtrains is already running normally!"
+msgstr ""
+
+#: advtrains/init.lua
+msgid "Print advtrains status info"
+msgstr ""
+
+#: advtrains/init.lua
+msgid "(log"
+msgstr ""
+
+#: advtrains/init.lua
+msgid "Advtrains Status: no_action"
+msgstr ""
+
+#: advtrains/init.lua
+msgid "slowdown"
+msgstr ""
+
 #: advtrains/misc_nodes.lua
 msgid "@1 Platform (low)"
 msgstr ""
@@ -231,6 +353,34 @@ msgstr ""
 msgid "Andrew's Cross"
 msgstr ""
 
+#: advtrains/track_reg_helper.lua advtrains/tracks.lua
+msgid "This track can not be removed!"
+msgstr ""
+
+#: advtrains/track_reg_helper.lua
+msgid "@1 Slope"
+msgstr ""
+
+#: advtrains/track_reg_helper.lua
+msgid "Can't place: not pointing at node"
+msgstr ""
+
+#: advtrains/track_reg_helper.lua
+msgid "Can't place: space occupied!"
+msgstr ""
+
+#: advtrains/track_reg_helper.lua
+msgid "Can't place: Not enough slope items left (@1 required)"
+msgstr ""
+
+#: advtrains/track_reg_helper.lua
+msgid "Can't place: There's no slope of length @1"
+msgstr ""
+
+#: advtrains/track_reg_helper.lua
+msgid "Can't place: no supporting node at upper end."
+msgstr ""
+
 #: advtrains/trackplacer.lua
 msgid ""
 "Track Worker Tool\n"
@@ -240,23 +390,15 @@ msgid ""
 msgstr ""
 
 #: advtrains/trackplacer.lua
-msgid "This node can't be rotated using the trackworker."
+msgid "This node can't be rotated using the trackworker!"
 msgstr ""
 
 #: advtrains/trackplacer.lua
-msgid "This track can not be rotated."
+msgid "This track can not be rotated!"
 msgstr ""
 
 #: advtrains/trackplacer.lua
-msgid "This node can't be changed using the trackworker."
-msgstr ""
-
-#: advtrains/trackplacer.lua
-msgid "This track can not be changed."
-msgstr ""
-
-#: advtrains/tracks.lua
-msgid "This track can not be removed."
+msgid "This node can't be changed using the trackworker!"
 msgstr ""
 
 #: advtrains/tracks.lua
@@ -269,30 +411,6 @@ msgstr ""
 
 #: advtrains/tracks.lua
 msgid "There's a Signal Influence Point here."
-msgstr ""
-
-#: advtrains/tracks.lua
-msgid "@1 Slope"
-msgstr ""
-
-#: advtrains/tracks.lua
-msgid "Can't place slope: not pointing at node."
-msgstr ""
-
-#: advtrains/tracks.lua
-msgid "Can't place slope: space occupied."
-msgstr ""
-
-#: advtrains/tracks.lua
-msgid "Can't place slope: Not enough slope items left (@1 required)."
-msgstr ""
-
-#: advtrains/tracks.lua
-msgid "Can't place slope: There's no slope of length @1."
-msgstr ""
-
-#: advtrains/tracks.lua
-msgid "Can't place slope: no supporting node at upper end."
 msgstr ""
 
 #: advtrains/trainhud.lua
@@ -314,7 +432,21 @@ msgid "Insufficient privileges to use this!"
 msgstr ""
 
 #: advtrains/wagons.lua
+msgid "Uninitialized init="
+msgstr ""
+
+#: advtrains/wagons.lua
+msgid "Uninitialized, removing"
+msgstr ""
+
+#: advtrains/wagons.lua
 msgid "This wagon is owned by @1, you can't destroy it."
+msgstr ""
+
+#: advtrains/wagons.lua
+msgid ""
+"Destroying wagon with inventory, but inventory is not found? Shouldn't "
+"happen!"
 msgstr ""
 
 #: advtrains/wagons.lua
@@ -329,6 +461,26 @@ msgstr ""
 msgid ""
 "Warning: If you destroy this wagon, you only get some steel back! If you are "
 "sure, hold Sneak and left-click the wagon."
+msgstr ""
+
+#: advtrains/wagons.lua
+msgid " wagon:destroy(): data is not set!"
+msgstr ""
+
+#: advtrains/wagons.lua
+msgid "!!! Train off track !!!"
+msgstr ""
+
+#: advtrains/wagons.lua
+msgid " units"
+msgstr ""
+
+#: advtrains/wagons.lua
+msgid "Liquid: "
+msgstr ""
+
+#: advtrains/wagons.lua
+msgid "Liquid: empty"
 msgstr ""
 
 #: advtrains/wagons.lua
@@ -380,6 +532,30 @@ msgid "This Wagon ID"
 msgstr ""
 
 #: advtrains/wagons.lua
+msgid "Allow these players to access your wagon:"
+msgstr ""
+
+#: advtrains/wagons.lua
+msgid "Wagon road number:"
+msgstr ""
+
+#: advtrains/wagons.lua
+msgid "Freight Code:"
+msgstr ""
+
+#: advtrains/wagons.lua
+msgid "Prev FC"
+msgstr ""
+
+#: advtrains/wagons.lua
+msgid "Current FC: "
+msgstr ""
+
+#: advtrains/wagons.lua
+msgid "Next FC:"
+msgstr ""
+
+#: advtrains/wagons.lua
 msgid "Save wagon properties"
 msgstr ""
 
@@ -404,6 +580,22 @@ msgid "Routingcode"
 msgstr ""
 
 #: advtrains/wagons.lua
+msgid "Train overview /coupling control:"
+msgstr ""
+
+#: advtrains/wagons.lua
+msgid "Train overview / coupling control is only shown when the train stands."
+msgstr ""
+
+#: advtrains/wagons.lua
+msgid "Remote Routesetting"
+msgstr ""
+
+#: advtrains/wagons.lua
+msgid "Clear 'Disable ARS' flag"
+msgstr ""
+
+#: advtrains/wagons.lua
 msgid ""
 "Doors are closed. Use Sneak+rightclick to ignore the closed doors and get "
 "off."
@@ -411,6 +603,46 @@ msgstr ""
 
 #: advtrains/wagons.lua
 msgid "You are not allowed to access the driver stand."
+msgstr ""
+
+#: advtrains/wagons.lua
+msgid "Missing train_operator privilege"
+msgstr ""
+
+#: advtrains/wagons.lua
+msgid "Not allowed to do this."
+msgstr ""
+
+#: advtrains/wagons.lua
+msgid "You don't have the train_operator privilege."
+msgstr ""
+
+#: advtrains/wagons.lua
+msgid "The track you are trying to place the wagon on is not long enough!"
+msgstr ""
+
+#: advtrains/wagons.lua
+msgid "Please specify a player name to transfer ownership to."
+msgstr ""
+
+#: advtrains/wagons.lua
+msgid "That player does not exist!"
+msgstr ""
+
+#: advtrains/wagons.lua
+msgid "Not a valid wagon id."
+msgstr ""
+
+#: advtrains/wagons.lua
+msgid "That wagon does not exist!"
+msgstr ""
+
+#: advtrains/wagons.lua
+msgid "You have been given ownership of wagon @1"
+msgstr ""
+
+#: advtrains/wagons.lua
+msgid "Wagon @1 ownership changed from @2 to @3"
 msgstr ""
 
 #: advtrains_interlocking/routesetting.lua
@@ -435,6 +667,10 @@ msgstr ""
 
 #: advtrains_interlocking/tsr_rail.lua
 msgid "Point Speed Restriction Track"
+msgstr ""
+
+#: advtrains_line_automation/scheduler.lua
+msgid "No callback to handle schedule"
 msgstr ""
 
 #: advtrains_line_automation/stoprail.lua
@@ -466,6 +702,18 @@ msgid "Door Side"
 msgstr ""
 
 #: advtrains_line_automation/stoprail.lua
+msgid "Closed"
+msgstr ""
+
+#: advtrains_line_automation/stoprail.lua
+msgid "Left"
+msgstr ""
+
+#: advtrains_line_automation/stoprail.lua
+msgid "Right"
+msgstr ""
+
+#: advtrains_line_automation/stoprail.lua
 msgid "Reverse train"
 msgstr ""
 
@@ -474,11 +722,27 @@ msgid "Kick out passengers"
 msgstr ""
 
 #: advtrains_line_automation/stoprail.lua
+msgid "Wait for signal to clear"
+msgstr ""
+
+#: advtrains_line_automation/stoprail.lua
+msgid "Trains stopping here (ARS rules)"
+msgstr ""
+
+#: advtrains_line_automation/stoprail.lua
 msgid "Station code \"@1\" already exists and is owned by @2."
 msgstr ""
 
 #: advtrains_line_automation/stoprail.lua
 msgid "This station is owned by @1. You are not allowed to edit its name."
+msgstr ""
+
+#: advtrains_line_automation/stoprail.lua
+msgid "Unknown Station"
+msgstr ""
+
+#: advtrains_line_automation/stoprail.lua
+msgid "Next Stop:\n"
 msgstr ""
 
 #: advtrains_line_automation/stoprail.lua
@@ -548,6 +812,38 @@ msgstr ""
 
 #: advtrains_luaautomation/pcnaming.lua
 msgid "Set name of component (empty to clear)"
+msgstr ""
+
+#: advtrains_signals_japan/init.lua
+msgid "Japanese signal pole"
+msgstr ""
+
+#: advtrains_signals_japan/init.lua
+msgid "Clear (proceed)"
+msgstr ""
+
+#: advtrains_signals_japan/init.lua
+msgid "Reduced speed"
+msgstr ""
+
+#: advtrains_signals_japan/init.lua
+msgid "Caution"
+msgstr ""
+
+#: advtrains_signals_japan/init.lua
+msgid "Restricted speed"
+msgstr ""
+
+#: advtrains_signals_japan/init.lua
+msgid "Danger (halt)"
+msgstr ""
+
+#: advtrains_signals_muc_ubahn/init.lua
+msgid "Munich U-Bahn Distant Signal ("
+msgstr ""
+
+#: advtrains_signals_muc_ubahn/init.lua
+msgid "Munich U-Bahn Main Signal ("
 msgstr ""
 
 #: advtrains_train_industrial/init.lua advtrains_train_steam/init.lua

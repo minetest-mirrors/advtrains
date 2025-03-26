@@ -1,6 +1,8 @@
 -- stoprail.lua
 -- adds "stop rail". Recognized by lzb. (part of behavior is implemented there)
 
+-- Translation
+S = attrans
 
 local function to_int(n)
 	--- Disallow floating-point numbers
@@ -28,7 +30,7 @@ local function show_stoprailform(pos, player)
 	local pe = advtrains.encode_pos(pos)
 	local pname = player:get_player_name()
 	if minetest.is_protected(pos, pname) then
-		minetest.chat_send_player(pname, attrans("You are not allowed to configure this track."))
+		minetest.chat_send_player(pname, S("You are not allowed to configure this track."))
 		return
 	end
 	
@@ -51,19 +53,19 @@ local function show_stoprailform(pos, player)
 	
 	local form = "size[8,7]"
 	form = form.."style[stn,ars;font=mono]"
-	form = form.."field[0.8,0.8;2,1;stn;"..attrans("Station Code")..";"..minetest.formspec_escape(stdata.stn).."]"
-	form = form.."field[2.8,0.8;5,1;stnname;"..attrans("Station Name")..";"..minetest.formspec_escape(stnname).."]"
-	form = form.."field[0.80,2.0;1.75,1;ddelay;"..attrans("Door Delay")..";"..minetest.formspec_escape(stdata.ddelay).."]"
-	form = form.."field[2.55,2.0;1.75,1;speed;"..attrans("Dep. Speed")..";"..minetest.formspec_escape(stdata.speed).."]"
-	form = form.."field[4.30,2.0;1.75,1;track;"..attrans("Track")..";"..minetest.formspec_escape(stdata.track).."]"
-	form = form.."field[6.05,2.0;1.75,1;wait;"..attrans("Stop Time")..";"..stdata.wait.."]"
-	form = form.."label[0.5,2.6;"..attrans("Door Side").."]"
-	form = form.."dropdown[0.51,3.0;2;doors;Left,Right,Closed;"..door_dropdown[stdata.doors].."]"
-	form = form.."checkbox[3.00,2.4;reverse;"..attrans("Reverse train")..";"..(stdata.reverse and "true" or "false").."]"
-	form = form.."checkbox[3.00,2.8;kick;"..attrans("Kick out passengers")..";"..(stdata.kick and "true" or "false").."]"
-	form = form.."checkbox[3.00,3.2;waitsig;"..attrans("Wait for signal to clear")..";"..(stdata.waitsig and "true" or "false").."]"
-	form = form.."textarea[0.8,4.2;7,2;ars;Trains stopping here (ARS rules);"..advtrains.interlocking.ars_to_text(stdata.ars).."]"
-	form = form.."button[0.5,6;7,1;save;"..attrans("Save").."]"
+	form = form.."field[0.8,0.8;2,1;stn;"..S("Station Code")..";"..minetest.formspec_escape(stdata.stn).."]"
+	form = form.."field[2.8,0.8;5,1;stnname;"..S("Station Name")..";"..minetest.formspec_escape(stnname).."]"
+	form = form.."field[0.80,2.0;1.75,1;ddelay;"..S("Door Delay")..";"..minetest.formspec_escape(stdata.ddelay).."]"
+	form = form.."field[2.55,2.0;1.75,1;speed;"..S("Dep. Speed")..";"..minetest.formspec_escape(stdata.speed).."]"
+	form = form.."field[4.30,2.0;1.75,1;track;"..S("Track")..";"..minetest.formspec_escape(stdata.track).."]"
+	form = form.."field[6.05,2.0;1.75,1;wait;"..S("Stop Time")..";"..stdata.wait.."]"
+	form = form.."label[0.5,2.6;"..S("Door Side").."]"
+	form = form.."dropdown[0.51,3.0;2;doors;"..S("Left")..","..S("Right")..","..S("Closed")..";"..door_dropdown[stdata.doors].."]"
+	form = form.."checkbox[3.00,2.4;reverse;"..S("Reverse train")..";"..(stdata.reverse and "true" or "false").."]"
+	form = form.."checkbox[3.00,2.8;kick;"..S("Kick out passengers")..";"..(stdata.kick and "true" or "false").."]"
+	form = form.."checkbox[3.00,3.2;waitsig;"..S("Wait for signal to clear")..";"..(stdata.waitsig and "true" or "false").."]"
+	form = form.."textarea[0.8,4.2;7,2;ars;"..S("Trains stopping here (ARS rules)")..";"..advtrains.interlocking.ars_to_text(stdata.ars).."]"
+	form = form.."button[0.5,6;7,1;save;"..S("Save").."]"
 	
 	minetest.show_formspec(pname, "at_lines_stop_"..pe, form)
 end
@@ -74,7 +76,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	local pos = advtrains.decode_pos(pe)
 	if pos then
 		if minetest.is_protected(pos, pname) then
-			minetest.chat_send_player(pname, attrans("You are not allowed to configure this track."))
+			minetest.chat_send_player(pname, S("You are not allowed to configure this track."))
 			return
 		end
 		
@@ -98,7 +100,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 					if (stn.owner == pname or minetest.check_player_privs(pname, "train_admin")) then
 						stdata.stn = fields.stn
 					else
-						minetest.chat_send_player(pname, attrans("Station code \"@1\" already exists and is owned by @2.", fields.stn, stn.owner))
+						minetest.chat_send_player(pname, S("Station code \"@1\" already exists and is owned by @2.", fields.stn, stn.owner))
 						show_stoprailform(pos,player)
 						return
 					end
@@ -112,7 +114,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				if (stn.owner == pname or minetest.check_player_privs(pname, "train_admin")) then
 					stn.name = fields.stnname
 				else
-					minetest.chat_send_player(pname, attrans("This station is owned by @1. You are not allowed to edit its name.", stn.owner))
+					minetest.chat_send_player(pname, S("This station is owned by @1. You are not allowed to edit its name.", stn.owner))
 				end
 			end
 			
@@ -183,8 +185,8 @@ local adefunc = function(def, preset, suffix, rotation)
 							if stdata.ars and (stdata.ars.default or advtrains.interlocking.ars_check_rule_match(stdata.ars, train) ) then
 								advtrains.lzb_add_checkpoint(train, index, 2, nil)
 								local stn = advtrains.lines.stations[stdata.stn]
-								local stnname = stn and stn.name or "Unknown Station"
-								train.text_inside = "Next Stop:\n"..stnname
+								local stnname = stn and stn.name or S("Unknown Station")
+								train.text_inside = S("Next Stop:\n")..stnname
 								advtrains.interlocking.ars_set_disable(train, true)
 							end
 						end
@@ -200,7 +202,7 @@ local adefunc = function(def, preset, suffix, rotation)
 						
 						if stdata.ars and (stdata.ars.default or advtrains.interlocking.ars_check_rule_match(stdata.ars, train) ) then
 							local stn = advtrains.lines.stations[stdata.stn]
-							local stnname = stn and stn.name or "Unknown Station"
+							local stnname = stn and stn.name or S("Unknown Station")
 							
 							-- Send ATC command and set text
 							advtrains.atc.train_set_command(train, "B0 W O"..stdata.doors..(stdata.kick and "K" or "")
@@ -225,7 +227,7 @@ if minetest.get_modpath("advtrains_train_track") ~= nil then
 		models_prefix="advtrains_dtrack",
 		models_suffix=".b3d",
 		shared_texture="advtrains_dtrack_shared_stop.png",
-		description=attrans("Station/Stop Track"),
+		description=S("Station/Stop Track"),
 		formats={},
 		get_additional_definiton = adefunc,
 	}, advtrains.trackpresets.t_30deg_straightonly)
