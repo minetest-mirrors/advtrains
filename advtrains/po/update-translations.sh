@@ -13,6 +13,7 @@ xgettext \
 	-o "$POTFILE" \
 	-p . \
 	-L lua \
+	--add-location=file \
 	--from-code=UTF-8 \
 	--sort-by-file \
 	--keyword='attrans' \

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: advtrains\n"
 "Report-Msgid-Bugs-To: advtrains-discuss@lists.sr.ht\n"
-"POT-Creation-Date: 2023-10-09 11:02+0200\n"
+"POT-Creation-Date: 2024-12-06 21:17+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,54 +17,54 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: advtrains/atc.lua:109
+#: advtrains/atc.lua
 msgid "Unconfigured ATC controller"
 msgstr ""
 
-#: advtrains/atc.lua:150
+#: advtrains/atc.lua
 msgid ""
 "ATC controller, mode @1\n"
 "Command: @2"
 msgstr ""
 
-#: advtrains/atc.lua:180
+#: advtrains/atc.lua
 msgid "Command"
 msgstr ""
 
-#: advtrains/atc.lua:184
+#: advtrains/atc.lua
 msgid "Command (on)"
 msgstr ""
 
-#: advtrains/atc.lua:187
+#: advtrains/atc.lua
 msgid "Digiline channel"
 msgstr ""
 
-#: advtrains/atc.lua:189 advtrains_line_automation/stoprail.lua:65
-#: advtrains_luaautomation/active_common.lua:48
+#: advtrains/atc.lua advtrains_line_automation/stoprail.lua
+#: advtrains_luaautomation/active_common.lua
 msgid "Save"
 msgstr ""
 
-#: advtrains/atc.lua:236
+#: advtrains/atc.lua
 msgid "ATC Reverse command warning: didn't reverse train, train moving."
 msgstr ""
 
-#: advtrains/atc.lua:248
+#: advtrains/atc.lua
 msgid "ATC Kick command warning: doors are closed."
 msgstr ""
 
-#: advtrains/atc.lua:252
+#: advtrains/atc.lua
 msgid "ATC Kick command warning: train moving."
 msgstr ""
 
-#: advtrains/atc.lua:322
+#: advtrains/atc.lua
 msgid "ATC command syntax error: I statement not closed: @1"
 msgstr ""
 
-#: advtrains/atc.lua:385
+#: advtrains/atc.lua
 msgid "ATC command parse error: Unknown command: @1"
 msgstr ""
 
-#: advtrains/copytool.lua:8
+#: advtrains/copytool.lua
 msgid ""
 "Train copy/paste tool\n"
 "\n"
@@ -72,166 +72,166 @@ msgid ""
 "Right-click: paste train"
 msgstr ""
 
-#: advtrains/copytool.lua:29
+#: advtrains/copytool.lua
 msgid "You do not have the @1 privilege."
 msgstr ""
 
-#: advtrains/copytool.lua:41
+#: advtrains/copytool.lua
 msgid "The track you are trying to place the wagon on is not long enough."
 msgstr ""
 
-#: advtrains/copytool.lua:47
+#: advtrains/copytool.lua
 msgid "The clipboard couldn't access the metadata. Paste failed."
 msgstr ""
 
-#: advtrains/copytool.lua:52 advtrains/copytool.lua:57
+#: advtrains/copytool.lua
 msgid "The clipboard is empty."
 msgstr ""
 
-#: advtrains/copytool.lua:74
+#: advtrains/copytool.lua
 msgid "Back of train would end up off track, cancelling."
 msgstr ""
 
-#: advtrains/copytool.lua:92
+#: advtrains/copytool.lua
 msgid "No such lua entity."
 msgstr ""
 
-#: advtrains/copytool.lua:98
+#: advtrains/copytool.lua
 msgid "No such wagon: @1."
 msgstr ""
 
-#: advtrains/copytool.lua:104
+#: advtrains/copytool.lua
 msgid "No such train: @1."
 msgstr ""
 
-#: advtrains/copytool.lua:176
+#: advtrains/copytool.lua
 msgid "The clipboard couldn't access the metadata. Copy failed."
 msgstr ""
 
-#: advtrains/copytool.lua:180
+#: advtrains/copytool.lua
 msgid "Train copied."
 msgstr ""
 
-#: advtrains/couple.lua:28
+#: advtrains/couple.lua
 msgid "Buffer and Chain Coupler"
 msgstr ""
 
-#: advtrains/couple.lua:29
+#: advtrains/couple.lua
 msgid "Scharfenberg Coupler"
 msgstr ""
 
-#: advtrains/couple.lua:185
+#: advtrains/couple.lua
 msgid ""
 "You are not allowed to couple trains without the train_operator privilege."
 msgstr ""
 
-#: advtrains/couple.lua:329 advtrains/couple.lua:333
+#: advtrains/couple.lua
 msgid "<No coupler>"
 msgstr ""
 
-#: advtrains/couple.lua:334
+#: advtrains/couple.lua
 msgid "Can not couple: The couplers of the trains do not match (@1 and @2)."
 msgstr ""
 
-#: advtrains/craft_items.lua:3
+#: advtrains/craft_items.lua
 msgid "Boiler"
 msgstr ""
 
-#: advtrains/craft_items.lua:9
+#: advtrains/craft_items.lua
 msgid "Driver's cab"
 msgstr ""
 
-#: advtrains/craft_items.lua:15
+#: advtrains/craft_items.lua
 msgid "Wheel"
 msgstr ""
 
-#: advtrains/craft_items.lua:21
+#: advtrains/craft_items.lua
 msgid "Chimney"
 msgstr ""
 
-#: advtrains/misc_nodes.lua:16
+#: advtrains/misc_nodes.lua
 msgid "@1 Platform (low)"
 msgstr ""
 
-#: advtrains/misc_nodes.lua:33
+#: advtrains/misc_nodes.lua
 msgid "@1 Platform (high)"
 msgstr ""
 
-#: advtrains/misc_nodes.lua:59
+#: advtrains/misc_nodes.lua
 msgid "@1 Platform (45 degree)"
 msgstr ""
 
-#: advtrains/misc_nodes.lua:81
+#: advtrains/misc_nodes.lua
 msgid "@1 Platform (low, 45 degree)"
 msgstr ""
 
-#: advtrains/protection.lua:7
+#: advtrains/protection.lua
 msgid "Can place, remove and operate trains"
 msgstr ""
 
-#: advtrains/protection.lua:12
+#: advtrains/protection.lua
 msgid ""
 "Can place, remove and operate any train, regardless of owner, whitelist, or "
 "protection"
 msgstr ""
 
-#: advtrains/protection.lua:18
+#: advtrains/protection.lua
 msgid "Can place and dig tracks in unprotected areas"
 msgstr ""
 
-#: advtrains/protection.lua:24
+#: advtrains/protection.lua
 msgid "Can operate turnouts and signals in unprotected areas"
 msgstr ""
 
-#: advtrains/protection.lua:148
+#: advtrains/protection.lua
 msgid ""
 "You are not allowed to build near tracks without the track_builder privilege."
 msgstr ""
 
-#: advtrains/protection.lua:148
+#: advtrains/protection.lua
 msgid ""
 "You are not allowed to build tracks without the track_builder privilege."
 msgstr ""
 
-#: advtrains/protection.lua:153
+#: advtrains/protection.lua
 msgid "You are not allowed to build near tracks at this protected position."
 msgstr ""
 
-#: advtrains/protection.lua:153
+#: advtrains/protection.lua
 msgid "You are not allowed to build tracks at this protected position."
 msgstr ""
 
-#: advtrains/protection.lua:184
+#: advtrains/protection.lua
 msgid ""
 "You are not allowed to operate turnouts and signals without the "
 "railway_operator privilege."
 msgstr ""
 
-#: advtrains/signals.lua:63
+#: advtrains/signals.lua
 msgid "Lampless Signal"
 msgstr ""
 
-#: advtrains/signals.lua:127
+#: advtrains/signals.lua
 msgid "Signal"
 msgstr ""
 
-#: advtrains/signals.lua:191
+#: advtrains/signals.lua
 msgid "Wallmounted Signal (left)"
 msgstr ""
 
-#: advtrains/signals.lua:192
+#: advtrains/signals.lua
 msgid "Wallmounted Signal (right)"
 msgstr ""
 
-#: advtrains/signals.lua:193
+#: advtrains/signals.lua
 msgid "Wallmounted Signal (top)"
 msgstr ""
 
-#: advtrains/signals.lua:281 advtrains/signals.lua:322
+#: advtrains/signals.lua
 msgid "Andrew's Cross"
 msgstr ""
 
-#: advtrains/trackplacer.lua:313
+#: advtrains/trackplacer.lua
 msgid ""
 "Track Worker Tool\n"
 "\n"
@@ -239,394 +239,413 @@ msgid ""
 "Right-click: rotate object"
 msgstr ""
 
-#: advtrains/trackplacer.lua:340 advtrains/trackplacer.lua:377
+#: advtrains/trackplacer.lua
 msgid "This node can't be rotated using the trackworker."
 msgstr ""
 
-#: advtrains/trackplacer.lua:350
+#: advtrains/trackplacer.lua
 msgid "This track can not be rotated."
 msgstr ""
 
-#: advtrains/trackplacer.lua:404
+#: advtrains/trackplacer.lua
 msgid "This node can't be changed using the trackworker."
 msgstr ""
 
-#: advtrains/trackplacer.lua:414
+#: advtrains/trackplacer.lua
 msgid "This track can not be changed."
 msgstr ""
 
-#: advtrains/tracks.lua:449
+#: advtrains/tracks.lua
 msgid "This track can not be removed."
 msgstr ""
 
-#: advtrains/tracks.lua:616
+#: advtrains/tracks.lua
 msgid "Position is occupied by a train."
 msgstr ""
 
-#: advtrains/tracks.lua:622
+#: advtrains/tracks.lua
 msgid "There's a Track Circuit Break here."
 msgstr ""
 
-#: advtrains/tracks.lua:626
+#: advtrains/tracks.lua
 msgid "There's a Signal Influence Point here."
 msgstr ""
 
-#: advtrains/tracks.lua:637
+#: advtrains/tracks.lua
 msgid "@1 Slope"
 msgstr ""
 
-#: advtrains/tracks.lua:648 advtrains/tracks.lua:653
+#: advtrains/tracks.lua
 msgid "Can't place slope: not pointing at node."
 msgstr ""
 
-#: advtrains/tracks.lua:658
+#: advtrains/tracks.lua
 msgid "Can't place slope: space occupied."
 msgstr ""
 
-#: advtrains/tracks.lua:711
+#: advtrains/tracks.lua
 msgid "Can't place slope: Not enough slope items left (@1 required)."
 msgstr ""
 
-#: advtrains/tracks.lua:714
+#: advtrains/tracks.lua
 msgid "Can't place slope: There's no slope of length @1."
 msgstr ""
 
-#: advtrains/tracks.lua:721
+#: advtrains/tracks.lua
 msgid "Can't place slope: no supporting node at upper end."
 msgstr ""
 
-#: advtrains/trainhud.lua:305
+#: advtrains/trainhud.lua
 msgid "OVERRUN RED SIGNAL! Examine situation and reverse train to move again."
 msgstr ""
 
-#: advtrains/wagons.lua:179
+#: advtrains/wagonprop_tool.lua
+msgid ""
+"Wagon Properties Tool\n"
+"Punch a wagon to view and edit the Wagon Properties"
+msgstr ""
+
+#: advtrains/wagonprop_tool.lua
+msgid "Wagon Properties Tool"
+msgstr ""
+
+#: advtrains/wagonprop_tool.lua
+msgid "Insufficient privileges to use this!"
+msgstr ""
+
+#: advtrains/wagons.lua
 msgid "This wagon is owned by @1, you can't destroy it."
 msgstr ""
 
-#: advtrains/wagons.lua:203
+#: advtrains/wagons.lua
 msgid "The wagon's inventory is not empty."
 msgstr ""
 
-#: advtrains/wagons.lua:210
+#: advtrains/wagons.lua
 msgid "Wagon needs to be decoupled from other wagons in order to destroy it."
 msgstr ""
 
-#: advtrains/wagons.lua:216
+#: advtrains/wagons.lua
 msgid ""
 "Warning: If you destroy this wagon, you only get some steel back! If you are "
 "sure, hold Sneak and left-click the wagon."
 msgstr ""
 
-#: advtrains/wagons.lua:649 advtrains/wagons.lua:850
+#: advtrains/wagons.lua
 msgid "Show Inventory"
 msgstr ""
 
-#: advtrains/wagons.lua:652
+#: advtrains/wagons.lua
 msgid "Onboard Computer"
 msgstr ""
 
-#: advtrains/wagons.lua:655 advtrains/wagons.lua:1328
+#: advtrains/wagons.lua
 msgid "Wagon properties"
 msgstr ""
 
-#: advtrains/wagons.lua:658
+#: advtrains/wagons.lua
 msgid "Get off"
 msgstr ""
 
-#: advtrains/wagons.lua:661
+#: advtrains/wagons.lua
 msgid "Get off (forced)"
 msgstr ""
 
-#: advtrains/wagons.lua:663
+#: advtrains/wagons.lua
 msgid "(Doors closed)"
 msgstr ""
 
-#: advtrains/wagons.lua:692
+#: advtrains/wagons.lua
 msgid "This wagon has no seats."
 msgstr ""
 
-#: advtrains/wagons.lua:703
+#: advtrains/wagons.lua
 msgid "This wagon is full."
 msgstr ""
 
-#: advtrains/wagons.lua:706
+#: advtrains/wagons.lua
 msgid "Doors are closed! (Try holding sneak key!)"
 msgstr ""
 
-#: advtrains/wagons.lua:712
+#: advtrains/wagons.lua
 msgid "You can't get on this wagon."
 msgstr ""
 
-#: advtrains/wagons.lua:838
+#: advtrains/wagons.lua
 msgid "Select seat:"
 msgstr ""
 
-#: advtrains/wagons.lua:880
+#: advtrains/wagons.lua
+msgid "This Wagon ID"
+msgstr ""
+
+#: advtrains/wagons.lua
 msgid "Save wagon properties"
 msgstr ""
 
-#: advtrains/wagons.lua:965
+#: advtrains/wagons.lua
+msgid "Train ID"
+msgstr ""
+
+#: advtrains/wagons.lua
 msgid "Text displayed outside on train"
 msgstr ""
 
-#: advtrains/wagons.lua:966
+#: advtrains/wagons.lua
 msgid "Text displayed inside train"
 msgstr ""
 
-#: advtrains/wagons.lua:967
+#: advtrains/wagons.lua
 msgid "Line"
 msgstr ""
 
-#: advtrains/wagons.lua:968
+#: advtrains/wagons.lua
 msgid "Routingcode"
 msgstr ""
 
-#: advtrains/wagons.lua:1241
+#: advtrains/wagons.lua
 msgid ""
 "Doors are closed. Use Sneak+rightclick to ignore the closed doors and get "
 "off."
 msgstr ""
 
-#: advtrains/wagons.lua:1250
+#: advtrains/wagons.lua
 msgid "You are not allowed to access the driver stand."
 msgstr ""
 
-#: advtrains_interlocking/tsr_rail.lua:13
+#: advtrains_interlocking/routesetting.lua
+msgid "Route state changed."
+msgstr ""
+
+#: advtrains_interlocking/tsr_rail.lua
 msgid "Point speed restriction: @1"
 msgstr ""
 
-#: advtrains_interlocking/tsr_rail.lua:14
+#: advtrains_interlocking/tsr_rail.lua
 msgid "Set point speed restriction:"
 msgstr ""
 
-#: advtrains_interlocking/tsr_rail.lua:30
+#: advtrains_interlocking/tsr_rail.lua
 msgid "You are not allowed to configure this track without the @1 privilege."
 msgstr ""
 
-#: advtrains_interlocking/tsr_rail.lua:34
-#: advtrains_line_automation/stoprail.lua:31
-#: advtrains_line_automation/stoprail.lua:76
+#: advtrains_interlocking/tsr_rail.lua advtrains_line_automation/stoprail.lua
 msgid "You are not allowed to configure this track."
 msgstr ""
 
-#: advtrains_interlocking/tsr_rail.lua:64
+#: advtrains_interlocking/tsr_rail.lua
 msgid "Point Speed Restriction Track"
 msgstr ""
 
-#: advtrains_line_automation/stoprail.lua:54
+#: advtrains_line_automation/stoprail.lua
 msgid "Station Code"
 msgstr ""
 
-#: advtrains_line_automation/stoprail.lua:55
+#: advtrains_line_automation/stoprail.lua
 msgid "Station Name"
 msgstr ""
 
-#: advtrains_line_automation/stoprail.lua:56
+#: advtrains_line_automation/stoprail.lua
 msgid "Door Delay"
 msgstr ""
 
-#: advtrains_line_automation/stoprail.lua:57
+#: advtrains_line_automation/stoprail.lua
 msgid "Dep. Speed"
 msgstr ""
 
-#: advtrains_line_automation/stoprail.lua:58 advtrains_train_track/init.lua:11
-#: advtrains_train_track/init.lua:156
+#: advtrains_line_automation/stoprail.lua advtrains_train_track/init.lua
 msgid "Track"
 msgstr ""
 
-#: advtrains_line_automation/stoprail.lua:59
+#: advtrains_line_automation/stoprail.lua
 msgid "Stop Time"
 msgstr ""
 
-#: advtrains_line_automation/stoprail.lua:60
+#: advtrains_line_automation/stoprail.lua
 msgid "Door Side"
 msgstr ""
 
-#: advtrains_line_automation/stoprail.lua:62
+#: advtrains_line_automation/stoprail.lua
 msgid "Reverse train"
 msgstr ""
 
-#: advtrains_line_automation/stoprail.lua:63
+#: advtrains_line_automation/stoprail.lua
 msgid "Kick out passengers"
 msgstr ""
 
-#: advtrains_line_automation/stoprail.lua:97
+#: advtrains_line_automation/stoprail.lua
 msgid "Station code \"@1\" already exists and is owned by @2."
 msgstr ""
 
-#: advtrains_line_automation/stoprail.lua:111
+#: advtrains_line_automation/stoprail.lua
 msgid "This station is owned by @1. You are not allowed to edit its name."
 msgstr ""
 
-#: advtrains_line_automation/stoprail.lua:221
+#: advtrains_line_automation/stoprail.lua
 msgid "Station/Stop Track"
 msgstr ""
 
-#: advtrains_luaautomation/active_common.lua:17
+#: advtrains_luaautomation/active_common.lua
 msgid "Unconfigured LuaATC component"
 msgstr ""
 
-#: advtrains_luaautomation/active_common.lua:46
+#: advtrains_luaautomation/active_common.lua
 msgid "LuaATC Environment"
 msgstr ""
 
-#: advtrains_luaautomation/active_common.lua:49
+#: advtrains_luaautomation/active_common.lua
 msgid "Clear Local Environment"
 msgstr ""
 
-#: advtrains_luaautomation/active_common.lua:50
+#: advtrains_luaautomation/active_common.lua
 msgid "Code"
 msgstr ""
 
-#: advtrains_luaautomation/active_common.lua:64
+#: advtrains_luaautomation/active_common.lua
 msgid ""
 "You are not allowed to configure this LuaATC component without the @1 "
 "privilege."
 msgstr ""
 
-#: advtrains_luaautomation/active_common.lua:94
+#: advtrains_luaautomation/active_common.lua
 msgid "LuaATC component assigned to environment '@1'"
 msgstr ""
 
-#: advtrains_luaautomation/active_common.lua:96
+#: advtrains_luaautomation/active_common.lua
 msgid "LuaATC component assigned to an invalid environment"
 msgstr ""
 
-#: advtrains_luaautomation/active_common.lua:171
+#: advtrains_luaautomation/active_common.lua
 msgid "LuaATC component with error: @1"
 msgstr ""
 
-#: advtrains_luaautomation/init.lua:13
+#: advtrains_luaautomation/init.lua
 msgid ""
 "Can place and configure LuaATC components, including execute potentially "
 "harmful Lua code"
 msgstr ""
 
-#: advtrains_luaautomation/mesecon_controller.lua:211
+#: advtrains_luaautomation/mesecon_controller.lua
 msgid "LuaATC Mesecon Controller"
 msgstr ""
 
-#: advtrains_luaautomation/operation_panel.lua:11
+#: advtrains_luaautomation/operation_panel.lua
 msgid "LuaATC Operation Panel"
 msgstr ""
 
-#: advtrains_luaautomation/pcnaming.lua:28
+#: advtrains_luaautomation/pcnaming.lua
 msgid ""
 "Passive Component Naming Tool\n"
 "\n"
 "Right-click to name a passive component."
 msgstr ""
 
-#: advtrains_luaautomation/pcnaming.lua:39
+#: advtrains_luaautomation/pcnaming.lua
 msgid ""
 "You are not allowed to name LuaATC passive components without the @1 "
 "privilege."
 msgstr ""
 
-#: advtrains_luaautomation/pcnaming.lua:62
+#: advtrains_luaautomation/pcnaming.lua
 msgid "Set name of component (empty to clear)"
 msgstr ""
 
-#: advtrains_train_industrial/init.lua:10
-#: advtrains_train_industrial/init.lua:49 advtrains_train_steam/init.lua:20
-#: advtrains_train_steam/init.lua:91
+#: advtrains_train_industrial/init.lua advtrains_train_steam/init.lua
 msgid "Driver Stand (right)"
 msgstr ""
 
-#: advtrains_train_industrial/init.lua:17
-#: advtrains_train_industrial/init.lua:56 advtrains_train_steam/init.lua:14
-#: advtrains_train_steam/init.lua:85
+#: advtrains_train_industrial/init.lua advtrains_train_steam/init.lua
 msgid "Driver Stand (left)"
 msgstr ""
 
-#: advtrains_train_industrial/init.lua:40
+#: advtrains_train_industrial/init.lua
 msgid "Industrial Train Engine"
 msgstr ""
 
-#: advtrains_train_industrial/init.lua:79
+#: advtrains_train_industrial/init.lua
 msgid "Big Industrial Train Engine"
 msgstr ""
 
-#: advtrains_train_industrial/init.lua:98
+#: advtrains_train_industrial/init.lua
 msgid "Industrial tank wagon"
 msgstr ""
 
-#: advtrains_train_industrial/init.lua:116
+#: advtrains_train_industrial/init.lua
 msgid "Industrial wood wagon"
 msgstr ""
 
-#: advtrains_train_japan/init.lua:4
+#: advtrains_train_japan/init.lua
 msgid "Japanese Train Inter-Wagon Connection"
 msgstr ""
 
-#: advtrains_train_japan/init.lua:37
+#: advtrains_train_japan/init.lua
 msgid "Driver stand"
 msgstr ""
 
-#: advtrains_train_japan/init.lua:101
+#: advtrains_train_japan/init.lua
 msgid "Japanese Train Engine"
 msgstr ""
 
-#: advtrains_train_japan/init.lua:176
+#: advtrains_train_japan/init.lua
 msgid "Japanese Train Wagon"
 msgstr ""
 
-#: advtrains_train_steam/init.lua:75
+#: advtrains_train_steam/init.lua
 msgid "Steam Engine"
 msgstr ""
 
-#: advtrains_train_steam/init.lua:159
+#: advtrains_train_steam/init.lua
 msgid "Detailed Steam Engine"
 msgstr ""
 
-#: advtrains_train_steam/init.lua:206
+#: advtrains_train_steam/init.lua
 msgid "Passenger Wagon"
 msgstr ""
 
-#: advtrains_train_steam/init.lua:226
+#: advtrains_train_steam/init.lua
 msgid "Box Wagon"
 msgstr ""
 
-#: advtrains_train_subway/init.lua:144
+#: advtrains_train_subway/init.lua
 msgid "Subway Passenger Wagon"
 msgstr ""
 
-#: advtrains_train_track/init.lua:31
+#: advtrains_train_track/init.lua
 msgid "Y-turnout"
 msgstr ""
 
-#: advtrains_train_track/init.lua:49
+#: advtrains_train_track/init.lua
 msgid "3-way turnout"
 msgstr ""
 
-#: advtrains_train_track/init.lua:69
+#: advtrains_train_track/init.lua
 msgid "Perpendicular Diamond Crossing Track"
 msgstr ""
 
-#: advtrains_train_track/init.lua:91
+#: advtrains_train_track/init.lua
 msgid "90+Angle Diamond Crossing Track"
 msgstr ""
 
-#: advtrains_train_track/init.lua:132
+#: advtrains_train_track/init.lua
 msgid "Diagonal Diamond Crossing Track"
 msgstr ""
 
-#: advtrains_train_track/init.lua:179
+#: advtrains_train_track/init.lua
 msgid "Bumper"
 msgstr ""
 
-#: advtrains_train_track/init.lua:201
+#: advtrains_train_track/init.lua
 msgid "ATC controller"
 msgstr ""
 
-#: advtrains_train_track/init.lua:317
+#: advtrains_train_track/init.lua
 msgid "Unloading Track"
 msgstr ""
 
-#: advtrains_train_track/init.lua:342
+#: advtrains_train_track/init.lua
 msgid "Loading Track"
 msgstr ""
 
-#: advtrains_train_track/init.lua:406
+#: advtrains_train_track/init.lua
 msgid "Detector Rail"
 msgstr ""
