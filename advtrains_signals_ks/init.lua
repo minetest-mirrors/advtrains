@@ -581,16 +581,8 @@ end
 
 -- Crafting
 
-minetest.register_craft({
-	output = "advtrains_signals_ks:hs_danger_0 2",
-	recipe = {
-		{'default:steel_ingot', 'dye:red', 'default:steel_ingot'},
-		{'dye:yellow', 'default:steel_ingot', 'dye:dark_green'},
-		{'default:steel_ingot', 'advtrains_signals_ks:mast_mast_0', 'default:steel_ingot'},
-	},
-})
-
-minetest.register_craft({
+-- Ks Signals
+minetest.register_craft({ -- Ks Mast
 	output = "advtrains_signals_ks:mast_mast_0 10",
 	recipe = {
 		{'default:steel_ingot'},
@@ -598,8 +590,39 @@ minetest.register_craft({
 		{'default:steel_ingot'},
 	},
 })
-
-minetest.register_craft({
+minetest.register_craft({ -- Ks Main Signal
+	output = "advtrains_signals_ks:hs_danger_0 2",
+	recipe = {
+		{'default:steel_ingot', 'dye:red', 'default:steel_ingot'},
+		{'dye:yellow', 'default:steel_ingot', 'dye:dark_green'},
+		{'default:steel_ingot', 'advtrains_signals_ks:mast_mast_0', 'default:steel_ingot'},
+	},
+})
+minetest.register_craft({ -- Ks Distant Signal
+	output = "advtrains_signals_ks:vs_slow_0 2",
+	recipe = {
+		{'default:steel_ingot', 'default:steel_ingot', 'default:steel_ingot'},
+		{'dye:dark_green', 'default:steel_ingot', 'dye:yellow'},
+		{'default:steel_ingot', 'advtrains_signals_ks:mast_mast_0', 'default:steel_ingot'},
+	}
+})
+minetest.register_craft({ -- Ks Speed Limit Indicator
+	output = "advtrains_signals_ks:zs3_off_0 2",
+	recipe = {
+		{"","default:steel_ingot",""},
+		{"default:steel_ingot","dye:white","default:steel_ingot"},
+		{"","advtrains_signals_ks:mast_mast_0",""}
+	},
+})
+minetest.register_craft({ -- Ks Distant Speed Limit Indicator
+	output = "advtrains_signals_ks:zs3v_off_0 2",
+	recipe = {
+		{"","default:steel_ingot",""},
+		{"default:steel_ingot","dye:yellow","default:steel_ingot"},
+		{"","advtrains_signals_ks:mast_mast_0",""}
+	},
+})
+minetest.register_craft({ -- Ks Shunting Signal
 	output = "advtrains_signals_ks:ra_danger_0 2",
 	recipe = {
 		{'dye:red', 'dye:white', 'dye:red'},
@@ -608,30 +631,13 @@ minetest.register_craft({
 	},
 })
 
-minetest.register_craft({
-	output = "advtrains_signals_ks:zs3_off_0 2",
-	recipe = {
-		{"","default:steel_ingot",""},
-		{"default:steel_ingot","dye:white","default:steel_ingot"},
-		{"","advtrains_signals_ks:mast_mast_0",""}
-	},
-})
-minetest.register_craft({
-	output = "advtrains_signals_ks:zs3v_off_0 2",
-	recipe = {
-		{"","default:steel_ingot",""},
-		{"default:steel_ingot","dye:yellow","default:steel_ingot"},
-		{"","advtrains_signals_ks:mast_mast_0",""}
-	},
-})
-
+-- Speed Restriction signs
+-- Crafting entry recipe for signs
 local sign_material = "default:sign_wall_steel" --fallback
 if minetest.get_modpath("basic_materials") then
 	sign_material = "basic_materials:plastic_sheet"
 end
---print("Sign Material: "..sign_material)
-
-minetest.register_craft({
+minetest.register_craft({ -- Permanent Local Speed Restriction Sign
 	output = "advtrains_signals_ks:sign_8_0 2",
 	recipe = {
 		{sign_material, 'dye:black'},
@@ -641,22 +647,20 @@ minetest.register_craft({
 })
 sign_material = nil
 
-minetest.register_craft{
-	output = "advtrains_signals_ks:sign_8_0 1",
-	recipe = {{"advtrains_signals_ks:sign_lf7_8_0"}}
-}
-
-minetest.register_craft{
-	output = "advtrains_signals_ks:sign_hfs_0 1",
+-- Circular crafting between sign types
+minetest.register_craft{ -- Signal Sign
+	output = "advtrains_signals_ks:sign_hfs_0",
 	recipe = {{"advtrains_signals_ks:sign_8_0"}}
 }
-
-minetest.register_craft{
-	output = "advtrains_signals_ks:sign_lf_8_0 1",
+minetest.register_craft{ -- Temporary Local Speed Restriction Sign
+	output = "advtrains_signals_ks:sign_lf_8_0",
 	recipe = {{"advtrains_signals_ks:sign_hfs_0"}}
 }
-
-minetest.register_craft{
-	output = "advtrains_signals_ks:sign_lf7_8_0 1",
+minetest.register_craft{ -- Line Speed Restriction Sign
+	output = "advtrains_signals_ks:sign_lf7_8_0",
 	recipe = {{"advtrains_signals_ks:sign_lf_8_0"}}
+}
+minetest.register_craft{ -- Permanent Local Speed Restriction Sign
+	output = "advtrains_signals_ks:sign_8_0",
+	recipe = {{"advtrains_signals_ks:sign_lf7_8_0"}}
 }

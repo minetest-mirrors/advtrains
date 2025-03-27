@@ -86,3 +86,31 @@ for r,f in pairs(all_sigs) do
 		})
 	end
 end
+
+-- Crafting
+minetest.register_craft({ -- Main Signal Left as entry recipe
+	output = "advtrains_signals_muc_ubahn:signal_wall_l_hp0",
+	type = "shapeless",
+	recipe = {"advtrains:signal_wall_l_off", "advtrains_interlocking:tcb_node"},
+})
+minetest.register_craft({ -- Distant Signal Left as entry recipe
+	output = "advtrains_signals_muc_ubahn:signal_wall_l_vr0",
+	recipe = {
+		{"dye:orange","",""},
+		{"dye:orange","advtrains_signals_muc_ubahn:signal_wall_l_hp0","dye:dark_green"},
+		{"","","dye:dark_green"}
+	}
+})
+
+for this,nxt in pairs({l = "t", t = "r",r = "l"}) do --Circular crafting for wall-mount signals
+	minetest.register_craft({ -- Main Signal
+		output = "advtrains_signals_muc_ubahn:signal_wall_"..nxt.."_hp0",
+		type = "shapeless",
+		recipe = {"advtrains_signals_muc_ubahn:signal_wall_"..this.."_hp0"},
+	})
+	minetest.register_craft({ -- Distant Signal
+		output = "advtrains_signals_muc_ubahn:signal_wall_"..nxt.."_vr0",
+		type = "shapeless",
+		recipe = {"advtrains_signals_muc_ubahn:signal_wall_"..this.."_vr0"},
+	})
+end
