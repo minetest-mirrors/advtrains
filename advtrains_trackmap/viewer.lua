@@ -41,3 +41,8 @@ minetest.register_craftitem("advtrains_trackmap:tool",{
 		end
 	end
 })
+minetest.register_craft({
+	output = "advtrains_trackmap:tool",
+	type = "shapeless",
+	recipe = {"dye:green","advtrains:trackworker", "default:paper"}
+})

@@ -124,3 +124,9 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		end
 	end
 end)
+
+minetest.register_craft({
+	output = "advtrains_interlocking:tool",
+	type = "shapeless",
+	recipe = {"dye:green","advtrains:trackworker", "advtrains_interlocking:tcb_node"}
+})
