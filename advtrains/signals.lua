@@ -83,7 +83,7 @@ for r,f in pairs({on={as="off", ls="green", als="red"}, off={as="on", ls="red", 
 			on_rightclick=function(pos, node, player)
 				local pname = player:get_player_name()
 				local sigd = advtrains.interlocking and advtrains.interlocking.db.get_sigd_for_signal(pos)
-				if sigd then
+				if sigd and not player:get_player_control().aux1 then
 					advtrains.interlocking.show_signalling_form(sigd, pname)
 				elseif advtrains.interlocking and player:get_player_control().aux1 then
 					advtrains.interlocking.show_ip_form(pos, pname)
@@ -141,7 +141,7 @@ for r,f in pairs({on={as="off", ls="green", als="red"}, off={as="on", ls="red", 
 			on_rightclick=function(pos, node, player)
 				local pname = player:get_player_name()
 				local sigd = advtrains.interlocking and advtrains.interlocking.db.get_sigd_for_signal(pos)
-				if sigd then
+				if sigd and not player:get_player_control().aux1 then
 					advtrains.interlocking.show_signalling_form(sigd, pname)
 				elseif advtrains.interlocking and player:get_player_control().aux1 then
 					advtrains.interlocking.show_ip_form(pos, pname)
@@ -213,7 +213,7 @@ for r,f in pairs({on={as="off", ls="green", als="red"}, off={as="on", ls="red", 
 			on_rightclick=function(pos, node, player)
 				local pname = player:get_player_name()
 				local sigd = advtrains.interlocking and advtrains.interlocking.db.get_sigd_for_signal(pos)
-				if sigd then
+				if sigd and not player:get_player_control().aux1 then
 					advtrains.interlocking.show_signalling_form(sigd, pname)
 				elseif advtrains.interlocking and player:get_player_control().aux1 then
 					advtrains.interlocking.show_ip_form(pos, pname)
