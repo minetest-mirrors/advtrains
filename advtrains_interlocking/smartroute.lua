@@ -52,7 +52,7 @@ local RTE_MAX_SECS = 16
 -- find_more_than: search is aborted only if more than the specified number of routes are found
 function sr.rescan(pname, sigd, tcbs, find_more_than, searching_shunt, pname)
 	local found_routes = {}
-	local restart_tcbs = { {sigd = sigd, tcbseq = {} } }
+	local restart_tcbs = { {sigd = sigd, tcbseq = {}, secseq = {} } }
 	local last_len = 0
 	while true do
 		-- take first entry out of restart_tcbs (due to the way it is inserted the first entry will always be the one with the lowest length
@@ -94,7 +94,9 @@ function sr.rescan(pname, sigd, tcbs, find_more_than, searching_shunt, pname)
 						local nsigd = {p=end_sigd.p, s = end_sigd.s==1 and 2 or 1} -- invert to other side
 						-- record nsigd in the tcbseq
 						local ntcbseq = table.copy(cur_restart.tcbseq)
+						local nsecseq = table.copy(cur_restart.secseq)
 						ntcbseq[#ntcbseq+1] = nsigd
+						nsecseq[#nsecseq+1] = c_ts.name or c_ts_id
 						local shall_continue = true
 						-- check if that sigd is a route target
 						local tcbs = ildb.get_tcbs(nsigd)
@@ -109,6 +111,7 @@ function sr.rescan(pname, sigd, tcbs, find_more_than, searching_shunt, pname)
 									-- record the found route in the results
 									found_routes[#found_routes+1] = {
 											tcbseq = ntcbseq,
+											secseq = nsecseq,
 											shunt_route = not is_mainsignal,
 											name = tcbs.signal_name or atil.sigd_to_string(nsigd)
 									}
@@ -122,7 +125,7 @@ function sr.rescan(pname, sigd, tcbs, find_more_than, searching_shunt, pname)
                         end
 						-- unless overridden, insert the next restart point
 						if shall_continue then
-							restart_tcbs[#restart_tcbs+1] =  {sigd = nsigd, tcbseq = ntcbseq } 
+							restart_tcbs[#restart_tcbs+1] =  {sigd = nsigd, tcbseq = ntcbseq, secseq = nsecseq } 
 						end
 					end
 				end
@@ -155,12 +158,20 @@ function sr.propose_next(pname, sigd, find_more_than, searching_shunt)
 		found_routes = found_routes
 	}
 	-- step 3: build form
-	local form = "size[5,5]label[0,0;Route search: "..#found_routes.." found]"
+	local form = "size[8,5]label[0,0;Route search: "..#found_routes.." found]"
 	local tab = {}
 	for idx, froute in ipairs(found_routes) do
-		tab[idx] = minetest.formspec_escape(froute.name.." (Len="..#froute.tcbseq..")")
+		local secfl = table.copy(froute.secseq)
+		table.remove(secfl, 1) -- remove first and last, because it will always be the same
+		secfl[#secfl]=nil
+		local viatext = ""
+		if next(secfl) then
+			froute.via = table.concat(secfl, ", ")
+			viatext = " (via "..froute.via..")"
+		end
+		tab[idx] = minetest.formspec_escape(froute.name..viatext)
 	end
-	form=form.."textlist[0.5,1;4,3;rtelist;"..table.concat(tab, ",").."]"
+	form=form.."textlist[0.5,1;7,3;rtelist;"..table.concat(tab, ",").."]"
 	form=form.."button[0.5,4;2,1;continue;Search further]"
 	form=form.."button[2.5,4;2,1;apply;Apply]"
 	
@@ -207,11 +218,19 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			end
 		end
 		local new_frte = {}
+		local endOnce = {}
+		local endTwice = {}
 		for _,froute in ipairs(found_routes) do
 			local endpoint = froute.tcbseq[#froute.tcbseq]
 			local endstr = advtrains.interlocking.sigd_to_string(endpoint)
 			if not ex_endpts[endstr] then
 				new_frte[#new_frte+1] = froute
+				-- record duplicate targets in froute
+				if endOnce[froute.name] then
+					endTwice[froute.name] = true
+				else
+					endOnce[froute.name] = true
+				end
 			else
 				--atdebug("(Smartroute) Throwing away",froute.name,"because endpoint",endstr,"already reached by route",ex_endpts[endstr])
 			end
@@ -220,6 +239,10 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		-- All remaining routes will be applied to the signal
 		local sel_rte = #tcbs.routes+1
 		for idx, froute in ipairs(new_frte) do
+			if endTwice[froute.name] then
+				-- append via text to deduplicate name
+				froute.name = froute.name .. " (via "..(froute.via or "direct")..")"
+			end
 			tcbs.routes[#tcbs.routes+1] = build_route_from_foundroute(froute)
 		end
 		-- if only one route present and it is newly created (there was no route before, thus sel_rte==1), make default
