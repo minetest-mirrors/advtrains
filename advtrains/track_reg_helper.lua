@@ -484,6 +484,11 @@ local function append_statemap_suffix(state_map, nnpref, rot)
 	return t
 end
 
+function advtrains.default_suitable_substrate(upos)
+	return core.registered_nodes[core.get_node(upos).name]
+		and core.registered_nodes[core.get_node(upos).name].walkable
+end
+
 function advtrains.register_tracks(tracktype, def, preset)
 	if not preset.v25_format then
 		error("advtrains.register_tracks(): A track preset for pre-v2.5 is used with advtrains 2.5+. Mod probably defines own track preset instead of using it from the advtrains.ap table! Please check track mod compatibility!")
@@ -509,8 +514,7 @@ function advtrains.register_tracks(tracktype, def, preset)
 						return itemstack, false
 					end
 					if minetest.registered_nodes[minetest.get_node(pos).name] and minetest.registered_nodes[minetest.get_node(pos).name].buildable_to then
-						local s = minetest.registered_nodes[minetest.get_node(upos).name] and minetest.registered_nodes[minetest.get_node(upos).name].walkable
-						if s then
+						if (def.suitable_substrate and def.suitable_substrate or advtrains.default_suitable_substrate)(upos) then
 	--						minetest.chat_send_all(nnprefix)
 							local yaw = placer:get_look_horizontal()
 							advtrains.trackplacer.place_track(pos, nnprefix, name, yaw)
