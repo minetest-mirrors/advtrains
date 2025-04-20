@@ -24,7 +24,8 @@ local function updatemeta(pos)
 end
 
 local door_dropdown = {L=1, R=2, C=3}
-local door_dropdown_rev = {Right="R", Left="L", Closed="C"}
+--local door_dropdown_rev = {Right="R", Left="L", Closed="C"} -- Code review : why are the value in an order different than the one in the dropdown box ?
+local door_dropdown_code = {"L", "R", "C"} -- switch to numerical index of selection : for conversion of the numerical index in the opening side selection dropdown box to the internal codification
 
 local function show_stoprailform(pos, player)
 	local pe = advtrains.encode_pos(pos)
@@ -60,7 +61,7 @@ local function show_stoprailform(pos, player)
 	form = form.."field[4.30,2.0;1.75,1;track;"..S("Track")..";"..minetest.formspec_escape(stdata.track).."]"
 	form = form.."field[6.05,2.0;1.75,1;wait;"..S("Stop Time")..";"..stdata.wait.."]"
 	form = form.."label[0.5,2.6;"..S("Door Side").."]"
-	form = form.."dropdown[0.51,3.0;2;doors;"..S("Left")..","..S("Right")..","..S("Closed")..";"..door_dropdown[stdata.doors].."]"
+	form = form.."dropdown[0.51,3.0;2;doors;"..S("Left")..","..S("Right")..","..S("Closed")..";"..door_dropdown[stdata.doors]..";true]" -- switch to numerical index of the selection
 	form = form.."checkbox[3.00,2.4;reverse;"..S("Reverse train")..";"..(stdata.reverse and "true" or "false").."]"
 	form = form.."checkbox[3.00,2.8;kick;"..S("Kick out passengers")..";"..(stdata.kick and "true" or "false").."]"
 	form = form.."checkbox[3.00,3.2;waitsig;"..S("Wait for signal to clear")..";"..(stdata.waitsig and "true" or "false").."]"
@@ -120,7 +121,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			
 			-- dropdowns
 			if fields.doors then
-				stdata.doors = door_dropdown_rev[fields.doors] or "C"
+				stdata.doors = door_dropdown_code[tonumber(fields.doors)] or "C" -- switch to numerical index of selection; attention : fields.doors is string typed, needed to be converted to an integer typed index in door_dropdown_code table
 			end
 			
 			if fields.track then
