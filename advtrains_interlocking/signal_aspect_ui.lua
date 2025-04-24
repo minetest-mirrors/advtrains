@@ -247,7 +247,9 @@ minetest.register_on_punchnode(function(pos, node, player, pointed_thing)
 					ipmarker(pos, plconnid)
 					minetest.chat_send_player(pname, "Configuring Signal: Successfully set influence point")
 					-- Try to find a TCB ahead and auto assign this signal there
-					if advtrains.interlocking.signal.get_signal_cap_level(signalpos) >= 2 then
+					local pc = player:get_player_control()
+					local no_auto_assign = pc.aux1
+					if not no_auto_assign and advtrains.interlocking.signal.get_signal_cap_level(signalpos) >= 2 then
 						try_auto_assign_to_tcb(signalpos, pos, plconnid, pname)
 					end
 				else
