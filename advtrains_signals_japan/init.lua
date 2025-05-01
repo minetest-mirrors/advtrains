@@ -15,6 +15,19 @@ local light_distant = light_purple
 local light_off = signal_face_texture
 
 do
+	local model_dir = core.get_modpath("advtrains_signals_japan") .. DIR_DELIM .. "models"
+	local function add_model(name, content)
+		local fn = "advtrains_signals_japan_" .. name
+		if core.features.dynamic_add_media_startup then
+			core.dynamic_add_media {
+				filename = fn,
+				filedata = content,
+			}
+		else
+			core.mkdir(model_dir)
+			core.safe_file_write(model_dir .. DIR_DELIM .. fn, content)
+		end
+	end
 	local model_path_prefix = table.concat({minetest.get_modpath("advtrains_signals_japan"), "models", "advtrains_signals_japan_"}, DIR_DELIM)
 
 	local function vertex(x, y, z)
@@ -122,7 +135,7 @@ do
 	pole_vertices = table.concat(pole_vertices, "\n")
 	pole_objdef = table.concat(pole_objdef, "\n")
 	pole_uv = table.concat(pole_uv, "\n")
-	minetest.safe_file_write(model_path_prefix .. "pole.obj", table.concat({pole_vertices, pole_uv, pole_objdef}, "\n"))
+	add_model("pole.obj", table.concat({pole_vertices, pole_uv, pole_objdef}, "\n"))
 
 	-- generate signals
 	for lightcount = 5, 6 do
@@ -231,7 +244,7 @@ do
 			face_vertices = table.concat(face_vertices, "\n")
 			face_uv = table.concat(face_uv, "\n")
 			face_objdef = table.concat(face_objdef, "\n")
-			minetest.safe_file_write(model_path_prefix .. lightcount .. "_" .. rotname .. ".obj", table.concat({
+			add_model(lightcount .. "_" .. rotname .. ".obj", table.concat({
 				pole_vertices,
 				face_vertices,
 				table.concat(light_vertices, "\n"),
