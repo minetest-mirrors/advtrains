@@ -214,10 +214,11 @@ TCB data structure
 	-- aspect will be set accordingly.
 	routeset = <index in routes> -- Route set from this signal. This is the entry that is cleared once
 	-- train has passed the signal. (which will set the aspect to "danger" again)
-	route_committed = <boolean> -- When setting/requesting a route, routetar will be set accordingly,
+	-- routeset may be a table (e.g. {1,2}) while the route is not committed yet, indicating a wait for multiple routes at once (Multi-ARS)
+	route_committed = <boolean> -- When setting/requesting a route, routeset will be set accordingly,
 	-- while the signal still displays danger and nothing is written to the TCs
 	-- As soon as the route can actually be set, all relevant TCs and turnouts are set and this field
-	-- is set true, clearing the signal
+	-- is set true, clearing the signal (when this is true, routeset is never a table)
 	aspect = <asp> -- The aspect the signal should show. If this is nil, should show the most restrictive aspect (red)
 	signal_name = <string> -- The human-readable name of the signal, only for documenting purposes
 	routes = { <route definition> } -- a collection of routes from this signal

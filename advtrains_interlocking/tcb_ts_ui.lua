@@ -828,14 +828,29 @@ function advtrains.interlocking.show_signalling_form(sigd, pname, sel_rte, calle
 	form = form.."button[5.5,1.2;1,1;setname;Set]"
 	
 	if tcbs.routeset then
-		local rte = tcbs.routes[tcbs.routeset]
-		if not rte then
-			atwarn("Unknown route set from signal!")
-			tcbs.routeset = nil
-			return
+		if type(tcbs.routeset)=="table" then
+			local rtenames = {}
+			for midx,rteid in ipairs(tcbs.routeset) do
+				local rte = tcbs.routes[rteid]
+				if not rte then
+					atwarn("Unknown route set from signal!")
+					tcbs.routeset = nil
+					return
+				end
+				rtenames[midx] = rte.name
+			end
+			form = form.."label[0.5,2.5;Multiple routes are requested (first available is set):]"
+			form = form.."label[0.5,3.0;"..minetest.formspec_escape(table.concat(rtenames,", ")).."]"
+		else
+			local rte = tcbs.routes[tcbs.routeset]
+			if not rte then
+				atwarn("Unknown route set from signal!")
+				tcbs.routeset = nil
+				return
+			end
+			form = form.."label[0.5,2.5;A route is requested from this signal:]"
+			form = form.."label[0.5,3.0;"..minetest.formspec_escape(rte.name).."]"
 		end
-		form = form.."label[0.5,2.5;A route is requested from this signal:]"
-		form = form.."label[0.5,3.0;"..minetest.formspec_escape(rte.name).."]"
 		if tcbs.route_committed then
 			form = form.."label[0.5,3.5;Route has been set.]"
 		else
@@ -1000,9 +1015,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			end
 		end
 		if tcbs.routeset and fields.cancelroute then
-			if tcbs.routes[tcbs.routeset] and tcbs.routes[tcbs.routeset].ars then
-				tcbs.ars_ignore_next = true
-			end
+			tcbs.ars_ignore_next = true
 			-- if route committed, cancel route ts info
 			ilrs.update_route(sigd, tcbs, nil, true)
 		end

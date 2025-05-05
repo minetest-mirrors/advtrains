@@ -245,16 +245,29 @@ function il.ars_check_rule_match(ars, train)
 end
 
 local function sort_priority(sprio)
-	-- TODO implement and return the correct sorted table
-	-- for now just minimum
-	local maxk,maxv = nil,10000
-	for k,v in pairs(sprio) do
-		if v<maxv then
-			maxv = v
-			maxk = k
+	-- insertion sort
+	local order = {}
+	local oprio = {}
+	for rteid, prio in pairs(sprio) do
+		local inspos = 1
+		while order[inspos] do
+			if oprio[inspos] > prio then
+				-- next item has higher priority number (= less urgent), insert before it
+				break
+			elseif oprio[inspos] == prio and order[inspos] > rteid then
+				-- next item has same priority as current and a higher routeid, insert before it
+				break
+			end
+			inspos = inspos + 1
 		end
+		table.insert(order, inspos, rteid)
+		table.insert(oprio, inspos, prio)
 	end
-	return maxk
+	--atdebug("sort_priority",sprio,"result",order,oprio)
+	if #order == 1 then
+		return order[1] -- only one route, table doesnt make sense
+	end
+	return order
 end
 
 local function find_rtematch(routes, train)
@@ -278,12 +291,10 @@ local function find_rtematch(routes, train)
 		end
 	end
 	if next(sprio) then
-		atdebug("Ars: SMultiArs", sprio, "is not implemented yet!")
 		return sort_priority(sprio)
 	elseif default then
 		return default
 	elseif next(dprio) then
-		atdebug("Ars: DMultiArs", dprio, "is not implemented yet!")
 		return sort_priority(dprio)
 	else
 		return nil

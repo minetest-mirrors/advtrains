@@ -363,7 +363,7 @@ end
 -- route setting
 -- Call this function to set and cancel routes!
 -- sigd, tcbs: self-explanatory
--- newrte: If a new route should be set, the route index of it (in tcbs.routes). nil otherwise
+-- newrte: If a new route should be set, the route index of it (in tcbs.routes). Can also be a table (multi-ars). nil otherwise
 -- cancel: true in combination with newrte=nil causes cancellation of the current route.
 function ilrs.update_route(sigd, tcbs, newrte, cancel)
 	--atdebug("Update_Route for",sigd,tcbs.signal_name)
@@ -390,37 +390,66 @@ function ilrs.update_route(sigd, tcbs, newrte, cancel)
 		if tcbs.route_committed then
 			return
 		end
-		if newrte then tcbs.routeset = newrte end
-		--atdebug("Setting:",tcbs.routeset)
-		local succ, rsn, cbts, cblk
-		local route = tcbs.routes[tcbs.routeset]
-		if route then
-			succ, rsn, cbts, cblk = ilrs.set_route(sigd, route)
+		if newrte then
+			if type(newrte)=="table" and not next(newrte) then
+				error("update_route got multi-ARS with empty table, this is not allowed")
+			end
+			tcbs.routeset = newrte
 		else
-			succ = false
-			rsn = attrans("Route state changed.")
+			if type(tcbs.routeset)=="table" and not next(tcbs.routeset) then
+				-- just unset, don't error
+				atwarn(sigd, "had multi-ARS route set with empty list! Cancelled!")
+				tcbs.routeset = nil
+				return
+			end
 		end
-		if not succ then
-			tcbs.route_rsn = rsn
-			--atdebug("Routesetting failed:",rsn)
-			-- add cbts or cblk to callback table
-			if cbts then
-				--atdebug("cbts =",cbts)
-				if not ilrs.rte_callbacks.ts[cbts] then ilrs.rte_callbacks.ts[cbts]={} end
-				advtrains.insert_once(ilrs.rte_callbacks.ts[cbts], sigd, sigd_equal)
-			end
-			if cblk then
-				--atdebug("cblk =",cblk)
-				if not ilrs.rte_callbacks.lck[cblk] then ilrs.rte_callbacks.lck[cblk]={} end
-				advtrains.insert_once(ilrs.rte_callbacks.lck[cblk], sigd, sigd_equal)
-			end
+		--atdebug("Setting:",tcbs.routeset)
+		-- check: single-ars or multi-ars?
+		local multi_rte
+		if type(tcbs.routeset) == "table" then
+			multi_rte = tcbs.routeset
 		else
-			--atdebug("Committed Route:",tcbs.routeset)
-			-- set_route now sets the signal aspects
-			--has_changed_aspect = true
-			-- route success. apply default_autoworking flag if requested
-			if route.default_autoworking then
-				tcbs.route_auto = true --FIX 2025-01-08: never set it to false if it was true!
+			multi_rte = {tcbs.routeset}
+		end
+		for multi_idx, rteid in ipairs(multi_rte) do
+			local succ, rsn, cbts, cblk
+			local route = tcbs.routes[rteid]
+			if route then
+				succ, rsn, cbts, cblk = ilrs.set_route(sigd, route)
+			else
+				succ = false
+				rsn = attrans("Route with index @1 not found", rteid)
+			end
+			if not succ then
+				if multi_idx==1 then
+					tcbs.route_rsn = rsn
+				else
+					tcbs.route_rsn = (tcbs.route_rsn or "").."\n"..rsn
+				end
+				--atdebug("Routesetting",rteid,"failed:",rsn,"(multi-idx",multi_idx,")")
+				-- add cbts or cblk to callback table
+				if cbts then
+					--atdebug("cbts =",cbts)
+					if not ilrs.rte_callbacks.ts[cbts] then ilrs.rte_callbacks.ts[cbts]={} end
+					advtrains.insert_once(ilrs.rte_callbacks.ts[cbts], sigd, sigd_equal)
+				end
+				if cblk then
+					--atdebug("cblk =",cblk)
+					if not ilrs.rte_callbacks.lck[cblk] then ilrs.rte_callbacks.lck[cblk]={} end
+					advtrains.insert_once(ilrs.rte_callbacks.lck[cblk], sigd, sigd_equal)
+				end
+			else
+				--atdebug("Committed Route:",rteid,"(multi-idx",multi_idx,")")
+				-- replace multi_route by single actually committed route
+				tcbs.routeset = rteid
+				-- set_route now sets the signal aspects
+				--has_changed_aspect = true
+				-- route success. apply default_autoworking flag if requested
+				if route.default_autoworking then
+					tcbs.route_auto = true --FIX 2025-01-08: never set it to false if it was true!
+				end
+				-- break out of the for loop, dont try any more routes
+				break
 			end
 		end
 	end
