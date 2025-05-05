@@ -62,7 +62,7 @@ function r.fire_event(pos, evtdata, appr_internal)
 			local new_id = advtrains.split_train_at_index(train, index)
 			if new_id then
 				minetest.after(1,advtrains.atc.train_set_command,advtrains.trains[new_id], cmd, atc_arrow)
-				return true
+				return new_id
 			end
 			return false
 		end,
@@ -73,7 +73,7 @@ function r.fire_event(pos, evtdata, appr_internal)
 			if new_id then
 				minetest.after(1,advtrains.atc.train_set_command,advtrains.trains[new_id], cmd, atc_arrow)
 			end
-			return fc or ""
+			return (fc or ""), new_id
 		end,
 		split_off_locomotive = function(cmd, len)
 			assertt(cmd, "string")
@@ -81,7 +81,8 @@ function r.fire_event(pos, evtdata, appr_internal)
 			local new_id, fc = advtrains.split_train_at_fc(train, true, len)
 			if new_id then
 				minetest.after(1,advtrains.atc.train_set_command,advtrains.trains[new_id], cmd, atc_arrow)
-			end						
+			end
+			return (fc or ""), new_id					
 		end,
 		train_length = function ()
 			if not train_id then return false end
