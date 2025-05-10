@@ -46,7 +46,7 @@ dofile(mp.."/pcnaming.lua")
 
 dofile(mp.."/chatcmds.lua")
 
-if minetest.settings:get_bool("advtrains_luaautomation_enable_atlac_recipes",false) == true then
+if minetest.settings:get_bool("advtrains_luaautomation_enable_luaatc_recipes",false) == true then
 	dofile(mp.."/recipes.lua")
 end
 

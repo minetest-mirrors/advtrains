@@ -106,7 +106,7 @@ function r.fire_event(pos, evtdata, appr_internal)
 		get_fc_index = function()
 			if not train_id then return end
 			local fc_index_list = {}
-			for widx, wagon_id in ipars(train.trainparts) do
+			for widx, wagon_id in ipairs(train.trainparts) do
 				fc_index_list[widx] = advtrains.wagons[wagon_id].fcind or 1
 			end
 			return fc_index_list
