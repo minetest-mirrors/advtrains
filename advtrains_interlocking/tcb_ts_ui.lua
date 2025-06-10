@@ -786,8 +786,12 @@ function advtrains.interlocking.check_route_valid(route, sigd)
 		local nvar = c_rseg.next
 		if nvar then
 			local re_tcbs = ildb.get_tcbs({p = nvar.p, s = (nvar.s==1) and 2 or 1})
-			if not re_tcbs or not re_tcbs.ts_id or re_tcbs.ts_id~=c_ts_id then
-				return false, "TCB at "..minetest.pos_to_string(nvar.p).." has different section than previous TCB."
+			if not re_tcbs then
+				return false, "TCB at "..minetest.pos_to_string(nvar.p).." is missing"
+			elseif not re_tcbs.ts_id then
+				return false, "TCB at "..minetest.pos_to_string(nvar.p).." is not assigned to previous track section"
+			elseif re_tcbs.ts_id~=c_ts_id then
+				return false, "TCB at "..minetest.pos_to_string(nvar.p).." has different section than previous TCB"
 			end
 		end
 		-- advance
@@ -1024,11 +1028,13 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				advtrains.interlocking.init_route_prog(pname, sigd)
 				minetest.close_formspec(pname, formname)
 				tcbs.ars_ignore_next = nil
+				p_open_sig_form[pname] = nil -- form is closed/left, do not reopen
 				return
 			end
 			if fields.smartroute and hasprivs then
 				advtrains.interlocking.smartroute.start(pname, sigd)
 				tcbs.ars_ignore_next = nil
+				p_open_sig_form[pname] = nil -- form is closed/left, do not reopen
 				return
 			end
 			if sel_rte and tcbs.routes[sel_rte] then
@@ -1042,6 +1048,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				end
 				if fields.editroute and hasprivs then
 					advtrains.interlocking.show_route_edit_form(pname, sigd, sel_rte)
+					p_open_sig_form[pname] = nil -- form is closed/left, do not reopen
 					return
 				end
 				if fields.setarsdefault and hasprivs then
