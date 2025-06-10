@@ -1,6 +1,9 @@
 local sformat = string.format
 local fsescape = minetest.formspec_escape
 
+-- Get current translator
+local S = advtrains.translate
+
 local function make_list(entries)
 	local t = {}
 	for k, v in ipairs(entries) do
@@ -12,7 +15,7 @@ end
 local function S_wrapper(f, i0)
 	return function(...)
 		local args = {...}
-		args[i0] = attrans(unpack(args,i0))
+		args[i0] = S(unpack(args,i0))
 		return f(unpack(args,1,i0))
 	end
 end

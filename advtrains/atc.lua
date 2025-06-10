@@ -1,6 +1,9 @@
 --atc.lua
 --registers and controls the ATC system
 
+-- Get current translator
+local S = advtrains.translate
+
 local atc={}
 
 local eval_conditional
@@ -107,7 +110,7 @@ local apn_func=function(pos)
 	-- FIX for long-persisting ndb bug: there's no node in parameter 2 of this function!
 	local meta=minetest.get_meta(pos)
 	if meta then
-		meta:set_string("infotext", attrans("Unconfigured ATC controller"))
+		meta:set_string("infotext", S("Unconfigured ATC controller"))
 		meta:set_string("formspec", atc.get_atc_controller_formspec(pos, meta))
 	end
 end
@@ -129,27 +132,15 @@ advtrains.atc_function = function(def, preset, suffix, rotation)
 				local meta=minetest.get_meta(pos)
 				if meta then
 					if not fields.save then 
-						--[[--maybe only the dropdown changed
-						if fields.mode then
-							meta:set_string("mode", idxtrans[fields.mode])
-							if fields.mode=="digiline" then
-								meta:set_string("infotext", attrans("ATC controller, mode @1\nChannel: @2", fields.mode, meta:get_string("command")) )
-							else
-								meta:set_string("infotext", attrans("ATC controller, mode @1\nCommand: @2", fields.mode, meta:get_string("command")) )
-							end
-							meta:set_string("formspec", atc.get_atc_controller_formspec(pos, meta))
-						end]]--
 						return
 					end
 					--meta:set_string("mode", idxtrans[fields.mode])
 					meta:set_string("command", fields.command)
 					--meta:set_string("command_on", fields.command_on)
 					meta:set_string("channel", fields.channel)
-					--if fields.mode=="digiline" then
-					--	meta:set_string("infotext", attrans("ATC controller, mode @1\nChannel: @2", fields.mode, meta:get_string("command")) )
-					--else
-					meta:set_string("infotext", attrans("ATC controller, mode @1\nCommand: @2", "-", meta:get_string("command")) )
-					--end
+					
+					meta:set_string("infotext", S("ATC controller, Command: @1", meta:get_string("command")) )
+
 					meta:set_string("formspec", atc.get_atc_controller_formspec(pos, meta))
 					
 					local pts=minetest.pos_to_string(pos)
@@ -178,16 +169,11 @@ function atc.get_atc_controller_formspec(pos, meta)
 	if mode<3 then
 		formspec=formspec
 			.."style[command;font=mono]"
-			.."field[0.8,1.5;7,1;command;"..attrans("Command")..";"..minetest.formspec_escape(command).."]"
-		if tonumber(mode)==2 then
-			formspec=formspec
-				.."style[command_on;font=mono]"
-				.."field[0.8,3;7,1;command_on;"..attrans("Command (on)")..";"..minetest.formspec_escape(command_on).."]"
-		end
+			.."field[0.8,1.5;7,1;command;"..S("Command")..";"..minetest.formspec_escape(command).."]"
 	else
-		formspec=formspec.."field[0.8,1.5;7,1;channel;"..attrans("Digiline channel")..";"..minetest.formspec_escape(channel).."]"
+		formspec=formspec.."field[0.8,1.5;7,1;channel;"..S("Digiline channel")..";"..minetest.formspec_escape(channel).."]"
 	end
-	return formspec.."button_exit[0.5,4.5;7,1;save;"..attrans("Save").."]"
+	return formspec.."button_exit[0.5,4.5;7,1;save;"..S("Save").."]"
 end
 
 --from trainlogic.lua train step
@@ -234,7 +220,7 @@ local matchptn={
 			advtrains.train_ensure_init(id, train)
 			-- no one minds if this failed... this shouldn't even be called without train being initialized...
 		else
-			atwarn(sid(id), attrans("ATC Reverse command warning: didn't reverse train, train moving."))
+			atwarn(sid(id), S("ATC Reverse command warning: didn't reverse train, train moving."))
 		end
 		return 1
 	end,
@@ -246,11 +232,11 @@ local matchptn={
 	end,
 	["K"] = function(id, train)
 		if train.door_open == 0 then
-			atwarn(sid(id), attrans("ATC Kick command warning: doors are closed."))
+			atwarn(sid(id), S("ATC Kick command warning: doors are closed."))
 			return 1
 		end
 		if train.velocity > 0 then
-			atwarn(sid(id), attrans("ATC Kick command warning: train moving."))
+			atwarn(sid(id), S("ATC Kick command warning: train moving."))
 			return 1
 		end
 		local tp = train.trainparts
@@ -324,7 +310,7 @@ eval_conditional = function(command, arrow, speed)
 		local nest, pos, elsepos=0, 1
 		while nest>=0 do
 			if pos>#rest then
-				atwarn(sid(id), attrans("ATC command syntax error: I statement not closed: @1",command))
+				atwarn(sid(id), S("ATC command syntax error: I statement not closed: @1",command))
 				return ""
 			end
 			local char=string.sub(rest, pos, pos)
@@ -388,7 +374,7 @@ function atc.execute_atc_command(id, train)
 			return
 		end
 	end
-	atwarn(sid(id), attrans("ATC command parse error: Unknown command: @1", command))
+	atwarn(sid(id), S("ATC command parse error: Unknown command: @1", command))
 	atc.train_reset_command(train, true)
 end
 

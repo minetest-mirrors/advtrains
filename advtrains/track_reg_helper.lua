@@ -4,6 +4,9 @@
 -- Note to future: This is actually just a work-saver, avoiding me to port over all the crossing nodes as well as the linetrack tracks.
 -- Future track mods should please directly use the appropriate advtrains.register_node_4rot() API and not rely on this!
 
+-- Get current translator
+local S = advtrains.translate
+
 --definition preparation
 local function conns(c1, c2, r1, r2) return {{c=c1, y=r1}, {c=c2, y=r2}} end
 local function conns3(c1, c2, c3, r1, r2, r3) return {{c=c1, y=r1}, {c=c2, y=r2}, {c=c3, y=r3}} end
@@ -471,7 +474,7 @@ Depending on the number of connections:
 local function can_dig_callback(pos, player)
 	local ok, reason = advtrains.can_dig_or_modify_track(pos)
 	if not ok and player then
-		minetest.chat_send_player(player:get_player_name(), attrans("This track can not be removed!") .. " " .. reason)
+		minetest.chat_send_player(player:get_player_name(), S("This track can not be removed!") .. " " .. reason)
 	end
 	return ok
 end
@@ -656,7 +659,7 @@ end
 local sl={}
 function sl.register_placer(def, preset)
 	minetest.register_craftitem(":"..def.nodename_prefix.."_slopeplacer",{
-		description = attrans("@1 Slope", def.description),
+		description = S("@1 Slope", def.description),
 		inventory_image = def.texture_prefix.."_slopeplacer.png",
 		wield_image = def.texture_prefix.."_slopeplacer.png",
 		groups={},
@@ -667,17 +670,17 @@ end
 function sl.create_slopeplacer_on_place(def, preset)
 	return function(istack, player, pt)
 		if not pt.type=="node" then 
-			minetest.chat_send_player(player:get_player_name(), attrans("Can't place: not pointing at node"))
+			minetest.chat_send_player(player:get_player_name(), S("Can't place: not pointing at node"))
 			return istack 
 		end
 		local pos=pt.above
 		if not pos then 
-			minetest.chat_send_player(player:get_player_name(), attrans("Can't place: not pointing at node"))
+			minetest.chat_send_player(player:get_player_name(), S("Can't place: not pointing at node"))
 			return istack
 		end
 		local node=minetest.get_node(pos)
 		if not minetest.registered_nodes[node.name] or not minetest.registered_nodes[node.name].buildable_to then
-			minetest.chat_send_player(player:get_player_name(), attrans("Can't place: space occupied!"))
+			minetest.chat_send_player(player:get_player_name(), S("Can't place: space occupied!"))
 			return istack
 		end
 		if not advtrains.check_track_protection(pos, player:get_player_name()) then 
@@ -730,17 +733,17 @@ function sl.create_slopeplacer_on_place(def, preset)
 							pos=vector.subtract(pos, dirvec)
 						end
 					else
-						minetest.chat_send_player(player:get_player_name(), attrans("Can't place: Not enough slope items left (@1 required)", step))
+						minetest.chat_send_player(player:get_player_name(), S("Can't place: Not enough slope items left (@1 required)", step))
 					end
 				else
-					minetest.chat_send_player(player:get_player_name(), attrans("Can't place: There's no slope of length @1",step))
+					minetest.chat_send_player(player:get_player_name(), S("Can't place: There's no slope of length @1",step))
 				end
 				return istack
 			end
 			step=step+1
 			pos=vector.add(pos, dirvec)
 		end
-		minetest.chat_send_player(player:get_player_name(), attrans("Can't place: no supporting node at upper end."))
+		minetest.chat_send_player(player:get_player_name(), S("Can't place: no supporting node at upper end."))
 		return itemstack
 	end
 end

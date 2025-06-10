@@ -1,6 +1,8 @@
 -- tracks.lua
 -- rewritten with advtrains 2.5 according to new track registration system
 
+-- Get current translator
+local S = advtrains.translate
 
 --[[
 
@@ -125,7 +127,7 @@ Switchable nodes (turnouts, single/double-slip switches) are implemented by havi
 function advtrains.track_can_dig_callback(pos, player)
 	local ok, reason = advtrains.can_dig_or_modify_track(pos)
 	if not ok and player then
-		minetest.chat_send_player(player:get_player_name(), attrans("This track can not be removed!") .. " " .. reason)
+		minetest.chat_send_player(player:get_player_name(), S("This track can not be removed!") .. " " .. reason)
 	end
 	return ok
 end
@@ -256,17 +258,17 @@ end
 -- Impl Note: possibly duplicate code in "self contained TCB" - see interlocking/tcb_ts_ui.lua!
 function advtrains.can_dig_or_modify_track(pos)
 	if advtrains.get_train_at_pos(pos) then
-		return false, attrans("Position is occupied by a train.")
+		return false, S("Position is occupied by a train.")
 	end
 	-- interlocking: tcb, signal IP a.s.o.
 	if advtrains.interlocking then
 		-- TCB?
 		if advtrains.interlocking.db.get_tcb(pos) then
-			return false, attrans("There's a Track Circuit Break here.")
+			return false, S("There's a Track Circuit Break here.")
 		end
 		-- signal ip?
 		if advtrains.interlocking.db.is_ip_at(pos, true) then -- is_ip_at with purge parameter
-			return false, attrans("There's a Signal Influence Point here.")
+			return false, S("There's a Signal Influence Point here.")
 		end
 	end
 	return true

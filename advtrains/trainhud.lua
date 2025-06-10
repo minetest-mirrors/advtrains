@@ -1,5 +1,8 @@
 --trainhud.lua: holds all the code for train controlling
 
+-- Get current translator
+local S = advtrains.translate
+
 local T = advtrains.texture
 
 advtrains.hud = {}
@@ -274,7 +277,7 @@ function advtrains.hud_train_format(train, flip)
 	hud:add_n7seg(131, 18, 28, 14, lzbdisp.d, 3, lzbdisp.c)
 	
 	if res and res == 0 then
-		table.insert(st, attrans("OVERRUN RED SIGNAL! Examine situation and reverse train to move again."))
+		table.insert(st, S("OVERRUN RED SIGNAL! Examine situation and reverse train to move again."))
 	end
 	
 	if train.atc_command then

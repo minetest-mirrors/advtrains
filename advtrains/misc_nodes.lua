@@ -1,5 +1,8 @@
 --all nodes that do not fit in any other category
 
+-- Get current translator
+local S = advtrains.translate
+
 function advtrains.register_platform(modprefix, preset)
 	local ndef=minetest.registered_nodes[preset]
 	if not ndef then 
@@ -13,7 +16,7 @@ function advtrains.register_platform(modprefix, preset)
 	local desc=ndef.description or ""
 	local nodename=string.match(preset, ":(.+)$")
 	minetest.register_node(modprefix .. ":platform_low_"..nodename, {
-		description = attrans("@1 Platform (low)", desc),
+		description = S("@1 Platform (low)", desc),
 		tiles = {btex.."^advtrains_platform.png", btex, btex, btex, btex, btex},
 		groups = {cracky = 1, not_blocking_trains = 1, platform=1},
 		sounds = ndef.sounds,
@@ -30,7 +33,7 @@ function advtrains.register_platform(modprefix, preset)
 		sunlight_propagates = true,
 	})
 	minetest.register_node(modprefix .. ":platform_high_"..nodename, {
-		description = attrans("@1 Platform (high)", desc),
+		description = S("@1 Platform (high)", desc),
 		tiles = {btex.."^advtrains_platform.png", btex, btex, btex, btex, btex},
 		groups = {cracky = 1, not_blocking_trains = 1, platform=2},
 		sounds = ndef.sounds,
@@ -56,7 +59,7 @@ function advtrains.register_platform(modprefix, preset)
 			}
 	}
 	minetest.register_node(modprefix..":platform_45_"..nodename, {
-		description = attrans("@1 Platform (45 degree)", desc),
+		description = S("@1 Platform (45 degree)", desc),
 		groups = {cracky = 1, not_blocking_trains = 1, platform=2},
 		sounds = ndef.sounds,
 		drawtype = "mesh",
@@ -78,7 +81,7 @@ function advtrains.register_platform(modprefix, preset)
 			}
 	}
 	minetest.register_node(modprefix..":platform_45_low_"..nodename, {
-		description = attrans("@1 Platform (low, 45 degree)", desc),
+		description = S("@1 Platform (low, 45 degree)", desc),
 		groups = {cracky = 1, not_blocking_trains = 1, platform=2},
 		sounds = ndef.sounds,
 		drawtype = "mesh",

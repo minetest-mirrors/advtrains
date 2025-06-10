@@ -4,8 +4,11 @@
 -- 4.712389 = 1.5pi; sin(1.5pi) = -1
 -- 7.853981 = 2.5pi; sin(2.5pi) = 1
 
+-- Get current translator
+local S = advtrains.translate
+
 minetest.register_tool("advtrains:copytool", {
-	description = attrans("Train copy/paste tool\n\nLeft-click: copy train\nRight-click: paste train"),
+	description = S("Train copy/paste tool\n\nLeft-click: copy train\nRight-click: paste train"),
 	inventory_image = "advtrains_copytool.png",
 	wield_image = "advtrains_copytool.png",
 	stack_max = 1,
@@ -38,23 +41,23 @@ minetest.register_tool("advtrains:copytool", {
 
 			local prevpos = advtrains.get_adjacent_rail(pointed_thing.under, tconns, plconnid, {default=true})
 			if not prevpos then
-				minetest.chat_send_player(pname, attrans("The track you are trying to place the wagon on is not long enough."))
+				minetest.chat_send_player(pname, S("The track you are trying to place the wagon on is not long enough."))
 				return
 			end
 
 			local meta = itemstack:get_meta()
 			if not meta then
-				minetest.chat_send_player(pname, attrans("The clipboard couldn't access the metadata. Paste failed."))
+				minetest.chat_send_player(pname, S("The clipboard couldn't access the metadata. Paste failed."))
 			return
 			end
 			local clipboard = meta:get_string("clipboard")
 			if (clipboard == "") then
-				minetest.chat_send_player(pname, attrans("The clipboard is empty."));
+				minetest.chat_send_player(pname, S("The clipboard is empty."));
 				return
 			end
 			clipboard = minetest.deserialize(clipboard)
 			if (clipboard.wagons == nil) then
-				minetest.chat_send_player(pname, attrans("The clipboard is empty."));
+				minetest.chat_send_player(pname, S("The clipboard is empty."));
 				return
 			end
 
@@ -71,7 +74,7 @@ minetest.register_tool("advtrains:copytool", {
 			local train = advtrains.trains[id]
 			train.off_track = train.end_index<train.path_trk_b
 			if (train.off_track) then
-				minetest.chat_send_player(pname, attrans("Back of train would end up off track, cancelling."))
+				minetest.chat_send_player(pname, S("Back of train would end up off track, cancelling."))
 				advtrains.remove_train(id)
 				return
 			end
@@ -89,19 +92,19 @@ minetest.register_tool("advtrains:copytool", {
 
 		local le = pointed_thing.ref:get_luaentity()
 		if (le == nil) then
-			minetest.chat_send_player(user:get_player_name(), attrans("No such lua entity."))
+			minetest.chat_send_player(user:get_player_name(), S("No such lua entity."))
 			return
 		end
 
 		local wagon = advtrains.wagons[le.id]
 		if (not (le.id and advtrains.wagons[le.id])) then
-			minetest.chat_send_player(user:get_player_name(), attrans("No such wagon: @1.", le.id))
+			minetest.chat_send_player(user:get_player_name(), S("No such wagon: @1.", le.id))
 			return
 		end
 
 		local train = advtrains.trains[wagon.train_id]
 		if (not train) then
-			minetest.chat_send_player(user:get_player_name(), attrans("No such train: @1.", wagon.train_id))
+			minetest.chat_send_player(user:get_player_name(), S("No such train: @1.", wagon.train_id))
 			return
 		end
 
@@ -173,11 +176,11 @@ minetest.register_tool("advtrains:copytool", {
 		
 		local meta = itemstack:get_meta()
 		if not meta then
-			minetest.chat_send_player(pname, attrans("The clipboard couldn't access the metadata. Copy failed."))
+			minetest.chat_send_player(pname, S("The clipboard couldn't access the metadata. Copy failed."))
 			return
 		end
 		meta:set_string("clipboard", minetest.serialize(clipboard))
-		minetest.chat_send_player(user:get_player_name(), attrans("Train copied."))
+		minetest.chat_send_player(user:get_player_name(), S("Train copied."))
 		return itemstack
 	end
 })

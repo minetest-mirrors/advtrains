@@ -1,6 +1,9 @@
 --trainlogic.lua
 --controls train entities stuff about connecting/disconnecting/colliding trains and other things
 
+-- Get current translator
+local S = advtrains.translate
+
 local setting_overrun_mode = minetest.settings:get("advtrains_overrun_mode")
 
 local benchmark=false

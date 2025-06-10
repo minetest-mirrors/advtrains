@@ -1,6 +1,9 @@
 --advtrains by orwell96
 --signals.lua
 
+-- Get current translator
+local S = advtrains.translate
+
 local mrules_wallsignal = advtrains.meseconrules
 
 local function can_dig_func(pos, player)
@@ -59,7 +62,7 @@ for r,f in pairs({on={as="off", ls="green", als="red"}, off={as="on", ls="red", 
 			tiles = {"advtrains_retrosignal.png"},
 			inventory_image="advtrains_retrosignal_inv.png",
 			drop="advtrains:retrosignal_off",
-			description=attrans("Lampless Signal"),
+			description=S("Lampless Signal (deprecated!)"),
 			sunlight_propagates=true,
 			groups = {
 				cracky=3,
@@ -122,7 +125,7 @@ for r,f in pairs({on={as="off", ls="green", als="red"}, off={as="on", ls="red", 
 			tiles = {"advtrains_signal_"..r..".png"},
 			inventory_image="advtrains_signal_inv.png",
 			drop="advtrains:signal_off",
-			description=attrans("Signal"),
+			description=S("Signal (deprecated!)"),
 			groups = {
 				cracky=3,
 				not_blocking_trains=1,
@@ -177,9 +180,9 @@ for r,f in pairs({on={as="off", ls="green", als="red"}, off={as="on", ls="red", 
 	
 	--tunnel signals. no rotations.
 	local swdesc = { -- needed for xgettext
-		l = attrans("Wallmounted Signal (left)"),
-		r = attrans("Wallmounted Signal (right)"),
-		t = attrans("Wallmounted Signal (top)"),
+		l = S("Wallmounted Signal (left) (deprecated!)"),
+		r = S("Wallmounted Signal (right) (deprecated!)"),
+		t = S("Wallmounted Signal (top) (deprecated!)"),
 	}
 	for loc, sbox in pairs({l={-1/2, -1/2, -1/4, 0, 1/2, 1/4}, r={0, -1/2, -1/4, 1/2, 1/2, 1/4}, t={-1/2, 0, -1/4, 1/2, 1/2, 1/4}}) do
 		minetest.register_node("advtrains:signal_wall_"..loc.."_"..r, {
@@ -258,7 +261,7 @@ minetest.register_node("advtrains:across_off", {
 	mesh = "advtrains_across.obj",
 	tiles = {"advtrains_across.png"},
 	drop="advtrains:across_off",
-	description=attrans("Andrew's Cross"),
+	description=S("Andrew's Cross"),
 	groups = {
 		cracky=3,
 		not_blocking_trains=1,
@@ -295,7 +298,7 @@ minetest.register_node("advtrains:across_on", {
 	mesh = "advtrains_across.obj",
 	tiles = {{name="advtrains_across_anim.png", animation={type="vertical_frames", aspect_w=64, aspect_h=64, length=1.0}}},
 	drop="advtrains:across_off",
-	description=attrans("Andrew's Cross"),
+	description=S("Andrew's Cross"),
 	groups = {
 		cracky=3,
 		not_blocking_trains=1,

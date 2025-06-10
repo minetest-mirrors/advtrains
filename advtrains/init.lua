@@ -22,12 +22,6 @@ Copyright (C) 2016-2020  Moritz Blei (orwell96) and contributors
 local lot = os.clock()
 minetest.log("action", "[advtrains] Loading...")
 
--- There is no need to support 0.4.x anymore given that the compatitability with it is already broken by 1bb1d825f46af3562554c12fba35a31b9f7973ff
-attrans = minetest.get_translator ("advtrains")
-function attrans_formspec(...)
-	return minetest.formspec_escape(attrans(...))
-end
-
 --advtrains
 advtrains = {trains={}, player_to_train_mapping={}}
 
@@ -55,6 +49,17 @@ advtrains.TRAIN_MAX_WAGONS = 20
 -- Limit on the maximum number of wagons that may be in a train
 
 -- ==========================================================================
+
+advtrains.modpath = minetest.get_modpath("advtrains")
+
+-- Initialize internationalization (using ywang's poconvert)
+advtrains.poconvert = dofile(advtrains.modpath.."/poconvert.lua")
+advtrains.poconvert.from_flat("advtrains")
+-- ask engine for translator instance, this will load the translation files
+advtrains.translate = core.get_translator("advtrains")
+
+-- Get current translator
+local S = advtrains.translate
 
 -- Use a global slowdown factor to slow down train movements. Now a setting
 advtrains.DTIME_LIMIT = tonumber(minetest.settings:get("advtrains_dtime_limit")) or 0.2
@@ -88,8 +93,6 @@ local function reload_saves()
 		advtrains.ndb.restore_all()
 	end)
 end
-
-advtrains.modpath = minetest.get_modpath("advtrains")
 
 --Advtrains dump (special treatment of pos and sigd)
 function atdump(t, intend)
@@ -203,10 +206,6 @@ advtrains.meseconrules =
  {x=0, y=-2, z=0}}
 
 advtrains.fpath=minetest.get_worldpath().."/advtrains"
-
-advtrains.poconvert = dofile(advtrains.modpath.."/poconvert.lua")
-advtrains.poconvert.from_flat("advtrains")
-attrans = minetest.get_translator("advtrains")
 
 advtrains.speed = dofile(advtrains.modpath.."/speed.lua")
 advtrains.formspec = dofile(advtrains.modpath.."/formspec.lua")
@@ -502,7 +501,7 @@ advtrains.avt_save = function(remove_players_from_wagons)
 			--then save it
 			tmp_trains[id]=v
 		else
-			atwarn(S("Train"),id,S("had no wagons left because of some bug. It is being deleted. Wave it goodbye!"))
+			atwarn(S("Train @1 had no wagons left because of some bug. It is being deleted. Wave it goodbye!", id))
 			advtrains.remove_train(id)
 		end
 	end
@@ -583,7 +582,7 @@ advtrains.avt_save = function(remove_players_from_wagons)
 	local succ, err = serialize_lib.save_atomic_multiple(parts_table, advtrains.fpath.."_", callbacks_table)
 	
 	if not succ then
-		atwarn(S("Saving failed: ")..err)
+		atwarn(S("Saving failed: @1", err))
 	else
 		-- store version
 		advtrains.save_component(4, "version")
@@ -755,9 +754,9 @@ minetest.register_chatcommand("at_whereis",
 		func = function(name,param)
 			local train = advtrains.trains[param] 
 			if not train or not train.last_pos then
-				return false, S("Train ")..param..S(" does not exist or is invalid")
+				return false, S("Train @1 does not exist or is invalid", param)
 			else
-				return true, S("Train ")..param..S(" is at ")..minetest.pos_to_string(train.last_pos)
+				return true, S("Train @1 is at @2", param, minetest.pos_to_string(train.last_pos))
 			end
 		end,
 })
@@ -769,10 +768,10 @@ minetest.register_chatcommand("at_tp",
 		func = function(name,param)
 			local train = advtrains.trains[param]
 			if not train or not train.last_pos then
-				return false, S("Train ")..param..S(" does not exist or is invalid")
+				return false, S("Train @1 does not exist or is invalid", param)
 			else
 				minetest.get_player_by_name(name):set_pos(train.last_pos)
-				return true, S("Teleporting to train ")..param
+				return true, S("Teleporting to train @1", param)
 			end
 		end,
 })
@@ -803,7 +802,7 @@ minetest.register_chatcommand("at_status",
         description = S("Print advtrains status info"), 
         privs = {train_operator = true},
         func = function(name, param)
-			return true, advtrains.print_concat_table({S("Advtrains Status: no_action"),no_action,S("slowdown"),advtrains.global_slowdown,S("(log"),math.log(advtrains.global_slowdown),")"})
+			return true, S("Advtrains Status: no_action @1 slowdown @2 (log @3)", no_action, advtrains.global_slowdown, math.log(advtrains.global_slowdown))
         end,
 })
 

@@ -1,6 +1,10 @@
+
+-- Get current translator
+local S = advtrains.translate
+
 minetest.register_craftitem("advtrains:wagon_prop_tool",{ --craftitem because it does nothing on its own
-	description = attrans("Wagon Properties Tool\nPunch a wagon to view and edit the Wagon Properties"),
-	short_description = attrans("Wagon Properties Tool"),
+	description = S("Wagon Properties Tool\nPunch a wagon to view and edit the Wagon Properties"),
+	short_description = S("Wagon Properties Tool"),
 	groups = {},
 	inventory_image = "advtrains_wagon_prop_tool.png",
 	wield_image = "advtrains_wagon_prop_tool.png",
@@ -23,7 +27,7 @@ minetest.register_craftitem("advtrains:wagon_prop_tool",{ --craftitem because it
 
 		--whitelist protection check
 		if not advtrains.check_driving_couple_protection(pname,wagon.owner,wagon.whitelist) then
-			minetest.chat_send_player(pname, attrans("Insufficient privileges to use this!"))
+			minetest.chat_send_player(pname, S("Insufficient privileges to use this!"))
 			return
 		end
 		object:show_wagon_properties(pname)

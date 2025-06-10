@@ -1,6 +1,9 @@
 --trackplacer.lua
 --holds code for the track-placing system. the default 'track' item will be a craftitem that places rails as needed. this will neither place or change switches nor place vertical rails.
 
+-- Get current translator
+local S = advtrains.translate
+
 --all new trackplacer code
 local tp={
 	groups={}
@@ -237,7 +240,7 @@ end
 
 
 minetest.register_craftitem("advtrains:trackworker",{
-	description = attrans("Track Worker Tool\n\nLeft-click: change rail type (straight/curve/switch)\nRight-click: rotate object"),
+	description = S("Track Worker Tool\n\nLeft-click: change rail type (straight/curve/switch)\nRight-click: rotate object"),
 	groups = {cracky=1}, -- key=name, value=rating; rating=1..3.
 	inventory_image = "advtrains_trackworker.png",
 	wield_image = "advtrains_trackworker.png",
@@ -260,7 +263,7 @@ minetest.register_craftitem("advtrains:trackworker",{
 			local ndef = minetest.registered_nodes[node.name]
 			
 			if not ndef.advtrains or not ndef.advtrains.trackworker_next_rot then
-				minetest.chat_send_player(placer:get_player_name(), attrans("This node can't be rotated using the trackworker!"))
+				minetest.chat_send_player(placer:get_player_name(), S("This node can't be rotated using the trackworker!"))
 				return
 			end
 			
@@ -269,7 +272,7 @@ minetest.register_craftitem("advtrains:trackworker",{
 				-- is a track, we can query
 				local can_modify, reason = advtrains.can_dig_or_modify_track(pos)
 				if not can_modify then
-					local str = attrans("This track can not be rotated!")
+					local str = S("This track can not be rotated!")
 					if reason then
 						str = str .. " " .. reason
 					end
@@ -309,7 +312,7 @@ minetest.register_craftitem("advtrains:trackworker",{
 			local ndef = minetest.registered_nodes[node.name]
 			
 			if not ndef.advtrains or not ndef.advtrains.trackworker_next_var then
-				minetest.chat_send_player(name, attrans("This node can't be changed using the trackworker!"))
+				minetest.chat_send_player(name, S("This node can't be changed using the trackworker!"))
 				return
 			end
 			
@@ -318,7 +321,7 @@ minetest.register_craftitem("advtrains:trackworker",{
 				-- is a track, we can query
 				local can_modify, reason = advtrains.can_dig_or_modify_track(pos)
 				if not can_modify then
-					local str = attrans("This track can not be rotated!")
+					local str = S("This track can not be rotated!")
 					if reason then
 						str = str .. " " .. reason
 					end

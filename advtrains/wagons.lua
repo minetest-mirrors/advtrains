@@ -7,8 +7,8 @@
 -- An entity is ONLY spawned by update_trainpart_properties when it finds it useful.
 -- Only data that are only important to the entity itself are stored in the luaentity
 
--- Translation
-S = attrans
+-- Get current translator
+local S = advtrains.translate
 
 -- TP delay when getting off wagon
 local GETOFF_TP_DELAY = 0.5
@@ -157,7 +157,7 @@ function wagon:ensure_init()
 		end
 	end
 	if not self.noninitticks then
-		atwarn("Wagon",self.id,S("Uninitialized init="),self.initialized)
+		atwarn("Wagon",self.id,"Uninitialized init=",self.initialized)
 		self.noninitticks=0
 	end
 	self.noninitticks=self.noninitticks+1
@@ -243,7 +243,7 @@ function wagon:destroy()
 	if self.id then
 		local data = advtrains.wagons[self.id]
 		if not data then
-			atwarn(S(" wagon:destroy(): data is not set!"))
+			atwarn(" wagon:destroy(): data is not set!")
 			return
 		end
 		
@@ -1481,7 +1481,7 @@ advtrains.register_wagon("advtrains:wagon_placeholder", {
 	assign_to_seat_group = {},
 	wagon_span=1,
 	drops={},
-}, "Wagon placeholder", "advtrains_wagon_placeholder.png", true)
+}, S("Wagon placeholder"), "advtrains_wagon_placeholder.png", true)
 
 
 
@@ -1579,12 +1579,12 @@ minetest.register_chatcommand("at_chown", {
 		local new_owner = params[2]
 		if not wid then return false end --no params added
 		--player name checks
-		if not new_owner then return false, attrans("Please specify a player name to transfer ownership to.") end --no player name argument
-		if not core.player_exists(new_owner) then return false, attrans("That player does not exist!") end --is a valid player
+		if not new_owner then return false, S("Please specify a player name to transfer ownership to.") end --no player name argument
+		if not core.player_exists(new_owner) then return false, S("That player does not exist!") end --is a valid player
 		--wagon id checks
-		if not wid:match("%d%d%d%d%d%d") then return false, attrans("Not a valid wagon id.") end -- invalid wagon id
+		if not wid:match("%d%d%d%d%d%d") then return false, S("Not a valid wagon id.") end -- invalid wagon id
 		local w_data = advtrains.wagons[wid]
-		if not w_data then return false, attrans("That wagon does not exist!") end
+		if not w_data then return false, S("That wagon does not exist!") end
 		-- actually chown the wagon
 		local curr_owner = w_data.owner
 		w_data.owner = new_owner
@@ -1592,8 +1592,8 @@ minetest.register_chatcommand("at_chown", {
 		advtrains.log("Chown", name, core.get_player_by_name(name):get_pos(), "wid="..wid..", from="..curr_owner..", to="..new_owner)
 
 		if name ~= new_owner then
-			core.chat_send_player(new_owner, attrans("You have been given ownership of wagon @1", wid))
+			core.chat_send_player(new_owner, S("You have been given ownership of wagon @1", wid))
 		end
-		return true, attrans("Wagon @1 ownership changed from @2 to @3", wid, curr_owner, new_owner)
+		return true, S("Wagon @1 ownership changed from @2 to @3", wid, curr_owner, new_owner)
 	end
 })
