@@ -1,25 +1,24 @@
 #!/bin/sh
-# NOTE: Please make sure you also have basic_trains installed, as it uses attrans for historical reasons
+
+MODNAME="advtrains"
+MSGID_BUGS_ADDR='advtrains-discuss@lists.sr.ht'
 
 PODIR=`dirname "$0"`
-ATDIR="$PODIR/../.."
-BTDIR="$ATDIR/../basic_trains"
-POTFILE="$PODIR/advtrains.pot"
+ATDIR="$PODIR/.."
+POTFILE="$PODIR/$MODNAME.pot"
 
 xgettext \
 	-D "$ATDIR" \
-	-D "$BTDIR" \
-	-d advtrains \
+	-d "$MODNAME" \
 	-o "$POTFILE" \
 	-p . \
 	-L lua \
 	--add-location=file \
 	--from-code=UTF-8 \
 	--sort-by-file \
-	--keyword='attrans' \
 	--keyword='S' \
-	--package-name='advtrains' \
-	--msgid-bugs-address='advtrains-discuss@lists.sr.ht' \
+	--package-name="$MODNAME" \
+	--msgid-bugs-address="$MSGID_BUGS_ADDR" \
 	`find $ATDIR $BTDIR -name '*.lua' -printf '%P\n'` \
 	&&
 for i in "$PODIR"/*.po; do
