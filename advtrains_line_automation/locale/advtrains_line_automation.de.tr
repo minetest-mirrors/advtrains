@@ -1,0 +1,22 @@
+# textdomain: advtrains_line_automation
+Closed=Geschlossen
+Dep. Speed=Zielgeschwindigkeit bei Abfahrt
+Door Delay=Zeit für die Türschließung
+Door Side=Türseite
+Kick out passengers=Fahrgäste zum Ausstieg zwingen
+Left=Links
+Next Stop:@n=Nächste Haltestelle:@n
+Reverse train=Zug Umkehren
+Right=Rechts
+Save=Speichern
+Station Code=Kennzeichen der Haltestelle
+Station Name=Name der Haltestelle
+Station code "@1" already exists and is owned by @2.=Die Haltestelle mit dem Kennzeichen „@1“ ist bereits vorhanden und wird von @2 verwaltet.
+Station/Stop Track=Gleis zur Kennzeichnung einer Haltestelle
+Stop Time=Wartezeit
+This station is owned by @1. You are not allowed to edit its name.=Diese Haltestelle wird von @1 verwaltet. Sie dürfen sie nicht umbenennen.
+Track=Gleis
+Trains stopping here (ARS rules)=Züge, die hier halten (ARS-Regeln)
+Unknown Station=Unbekannte Station
+Wait for signal to clear=Warte bis Signal Fahrt zeigt
+You are not allowed to configure this track.=Sie dürfen dieses Gleis nicht konfigurieren.

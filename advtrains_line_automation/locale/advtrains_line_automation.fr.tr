@@ -1,0 +1,22 @@
+# textdomain: advtrains_line_automation
+Closed=Fermé
+Dep. Speed=Vit. de départ
+Door Delay=Durée d'ouverture des portes
+Door Side=Ouv. des portes coté
+Kick out passengers=Éjecter les passagers
+Left=Gauche
+Next Stop:@n=Prochain arrêt :@n
+Reverse train=Inversion du sens de marche
+Right=Droit
+Save=Sauvegarder
+Station Code=Code de Station
+Station Name=Nom de Station
+Station code "@1" already exists and is owned by @2.=Le code de station "@1" existe et est possédé par @2.
+Station/Stop Track=Voie d'arrêt en station
+Stop Time=Durée d'arrêt
+This station is owned by @1. You are not allowed to edit its name.=Cette station est la propriété de @1. Vous n'êtes pas autorisé à modifier son nom.
+Track=Voie
+Trains stopping here (ARS rules)=Trains marquant l'arrêt (règles ARS)
+Unknown Station=Gare inconnue
+Wait for signal to clear=En attente de signal d'autorisation
+You are not allowed to configure this track.=Vous n'êtes pas autorisé à configurer cette voie.

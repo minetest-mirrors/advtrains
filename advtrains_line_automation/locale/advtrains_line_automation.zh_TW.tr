@@ -1,0 +1,22 @@
+# textdomain: advtrains_line_automation
+Closed=
+Dep. Speed=出發速度
+Door Delay=車門關閉時間
+Door Side=
+Kick out passengers=踢出乘客
+Left=
+Next Stop:@n=
+Reverse train=改變行車方向
+Right=
+Save=儲存
+Station Code=車站碼
+Station Name=車站名稱
+Station code "@1" already exists and is owned by @2.=
+Station/Stop Track=車站軌道
+Stop Time=停站時間
+This station is owned by @1. You are not allowed to edit its name.=
+Track=軌道
+Trains stopping here (ARS rules)=
+Unknown Station=
+Wait for signal to clear=
+You are not allowed to configure this track.=您不能調整這段軌道。
