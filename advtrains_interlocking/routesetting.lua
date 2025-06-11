@@ -1,5 +1,8 @@
 -- Setting and clearing routes
 
+-- Get current translator
+local S = advtrains.interlocking.translate
+
 -- TODO duplicate
 local lntrans = { "A", "B" }
 local function sigd_to_string(sigd)
@@ -52,7 +55,7 @@ function ilrs.set_route(signal, route, try)
 		c_tcbs = ildb.get_tcbs(c_sigd)
 		if not c_tcbs then
 			if not try then atwarn("Did not find TCBS",c_sigd,"while setting route",rtename,"of",signal) end
-			return false, "No TCB found at "..sigd_to_string(c_sigd)..". Please update or reconfigure route!"
+			return false, S("No TCB found at @1. Please update or reconfigure route!", sigd_to_string(c_sigd))
 		end
 		if i == 1 then
 			nodst = c_tcbs.nodst
@@ -60,7 +63,7 @@ function ilrs.set_route(signal, route, try)
 		c_ts_id = c_tcbs.ts_id
 		if not c_ts_id then
 			if not try then atwarn("Encountered End-Of-Interlocking while setting route",rtename,"of",signal) end
-			return false, "No track section adjacent to "..sigd_to_string(c_sigd)..". Please reconfigure route!"
+			return false, S("No track section adjacent to @1. Please reconfigure route!", sigd_to_string(c_sigd))
 		end
 		c_ts = ildb.get_ts(c_ts_id)
 		c_rseg = route[i]
@@ -68,17 +71,18 @@ function ilrs.set_route(signal, route, try)
 		
 		if not c_ts then
 			if not try then atwarn("Encountered ts missing during a real run of routesetting routine, at ts=",c_ts_id,"while setting route",rtename,"of",signal) end
-			return false, "Section '"..(c_ts_id).."' not found!", c_ts_id, nil
+			return false, S("Section '@1' not found!", c_ts_id), c_ts_id, nil
 		elseif c_ts.route then
 			if not try then atwarn("Encountered ts lock during a real run of routesetting routine, at ts=",c_ts_id,"while setting route",rtename,"of",signal) end
-			return false, "Section '"..(c_ts.name or c_ts_id).."' already has route set from "..sigd_to_string(c_ts.route.origin)..":\n"..c_ts.route.rsn, c_ts_id, nil
+			return false, S("Section '@1' already has route set from @2:", (c_ts.name or c_ts_id), sigd_to_string(c_ts.route.origin))
+				.."\n"..c_ts.route.rsn, c_ts_id, nil
 		end
 		if c_ts.trains and #c_ts.trains>0 then
 			if c_rseg.call_on then
 				--atdebug("Routesetting: Call-on situation in", c_ts_id)
 			else
 				if not try then atwarn("Encountered ts occupied during a real run of routesetting routine, at ts=",c_ts_id,"while setting route",rtename,"of",signal) end
-				return false, "Section '"..(c_ts.name or c_ts_id).."' is occupied!", c_ts_id, nil
+				return false, S("Section '@1' is occupied!", (c_ts.name or c_ts_id)), c_ts_id, nil
 			end
 		end
 		
@@ -113,18 +117,18 @@ function ilrs.set_route(signal, route, try)
 					local confl = ilrs.has_route_lock(lp)
 					if confl then
 						if not try then atwarn("Encountered route lock while a real run of routesetting routine, at position",pos,"while setting route",rtename,"of",signal) end
-						return false, "Lock conflict at "..minetest.pos_to_string(pos)..", Held locked by:\n"..confl, nil, lp
+						return false, S("Lock conflict at @1, Held locked by:", minetest.pos_to_string(pos)).."\n"..confl, nil, lp
 					elseif not try then
 						advtrains.setstate(pos, state)
 					end
 				end
 				if not try then
-					ilrs.add_route_lock(lp, c_ts_id, "Route '"..rtename.."' from signal '"..signalname.."'", signal)
+					ilrs.add_route_lock(lp, c_ts_id, S("Route @1 from signal @2", rtename, signalname), signal)
 					c_lckp[#c_lckp+1] = lp
 				end
 			else
 				if not try then atwarn("Encountered route lock misconfiguration (no passive component) while a real run of routesetting routine, at position",pts,"while setting route",rtename,"of",signal) end
-				return false, "No passive component at "..minetest.pos_to_string(pos)..". Please update track section or reconfigure route!"
+				return false, S("Turnout/component missing at @1. Please update track section or reconfigure route!", minetest.pos_to_string(pos))
 			end
 		end
 		-- sanity check, is section at next the same as the current?
@@ -134,7 +138,7 @@ function ilrs.set_route(signal, route, try)
 			if (not re_tcbs or not re_tcbs.ts_id or re_tcbs.ts_id~=c_ts_id)
 					and route[i+1] then --FIX 2025-01-08: in old worlds the final TCB may be wrong (it didn't matter back then), don't error out here (route still shown invalid in UI)
 				if not try then atwarn("Encountered inconsistent ts (front~=back) while a real run of routesetting routine, at position",pts,"while setting route",rtename,"of",signal) end
-				return false, "TCB at "..minetest.pos_to_string(nvar.p).." has different section than previous TCB. Please update track section or reconfigure route!"
+				return false, S("TCB at @1 has different section than previous TCB. Please update track section or reconfigure route!", minetest.pos_to_string(nvar.p))
 			end
 		end
 		-- reserve ts and write locks
@@ -146,7 +150,7 @@ function ilrs.set_route(signal, route, try)
 			c_ts.route = {
 				origin = signal,
 				entry = c_sigd,
-				rsn = "Route '"..rtename.."' from signal '"..signalname.."', segment #"..i,
+				rsn = S("Route @1 from signal @2, segment #@3", rtename, signalname, i),
 				first = first,
 			}
 			c_ts.route_post = {

@@ -55,6 +55,9 @@ Every time a repair operation takes place, and on every track edit operation, th
 
 ]]--
 
+-- Get current translator
+local S = advtrains.interlocking.translate
+
 local TRAVERSER_LIMIT = 1000
 
 
@@ -380,7 +383,7 @@ function ildb.check_and_repair_ts_at_pos(pos, tcb_connid, notify_pname, force_cr
 			if ts_id ~= tcbs_ts_id then
 				-- inconsistency is found, repair it
 				--atdebug("check_and_repair_ts_at_pos: Inconsistency is found!")
-				tsrepair_notify(notify_pname, "Track section inconsistent here, repairing...")
+				tsrepair_notify(notify_pname, S("Track section inconsistent here, repairing..."))
 				return ildb.repair_ts_merge_all(all_tcbs, force_create, notify_pname)
 				-- Step2 check is no longer necessary since we just created that new section
 			end
@@ -409,7 +412,7 @@ function ildb.check_and_repair_ts_at_pos(pos, tcb_connid, notify_pname, force_cr
 	-- That means it is sufficient to compare the LENGTHS of both lists, if one is longer then it is inconsistent
 	if #ts.tc_breaks ~= #all_tcbs then
 		--atdebug("check_and_repair_ts_at_pos: Partition is found!")
-		tsrepair_notify(notify_pname, "Track section partition found, repairing...")
+		tsrepair_notify(notify_pname, S("Track section partition found, repairing..."))
 		return ildb.repair_ts_merge_all(all_tcbs, force_create, notify_pname)
 	end
 	--tsrepair_notify(notify_pname, "Found section", ts.name or ts_id, "here.")
@@ -537,7 +540,7 @@ function ildb.repair_ts_merge_all(all_tcbs, force_create, notify_pname)
 	end
 	-- Create a new fresh track section with all the TCBs we have in our collection
 	local new_ts_id, new_ts = ildb.create_ts_from_tcb_list(all_tcbs)
-	tsrepair_notify(notify_pname, "Created track section",new_ts_id,"from",#all_tcbs,"TCBs")
+	tsrepair_notify(notify_pname, S("Created track section @1 from @2 TCBs", new_ts_id, #all_tcbs))
 	return new_ts_id
 end
 
@@ -738,7 +741,8 @@ local function recursively_find_routes(s_pos, s_connid, locks_found, result_tabl
 			local end_pkey = advtrains.encode_pos(pos)
 			--atdebug("Found end TCB", pos, end_pkey,", returning")
 			if result_table[end_pkey] then
-				atwarn("While caching track section routing, found multiple route paths within same track section. Only first one found will be used")
+				--atwarn("While caching track section routing, found multiple route paths within same track section. Only first one found will be used")
+				-- this warning appears too often and is typically harmless
 			else
 				result_table[end_pkey] = table.copy(locks_found)
 			end
@@ -784,9 +788,9 @@ function ildb.update_rs_cache(ts_id)
 			end
 		end
 		-- warn about superfluous entry
-		for sup_end_pkey, sup_entry in pairs(result_table) do
-			atwarn("In update_rs_cache for section",ts_id,"found superfluous endpoint",sup_end_pkey,"->",sup_entry)
-		end
+		--for sup_end_pkey, sup_entry in pairs(result_table) do
+		--	atwarn("In update_rs_cache for section",ts_id,"found superfluous endpoint",sup_end_pkey,"->",sup_entry)
+		--end -- this warning appears too often and is typically harmless
 	end
 	ts.rs_cache = rscache
 	--atdebug("== Done update_rs_cache for ",ts_id, "result:",rscache) 

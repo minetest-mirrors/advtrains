@@ -1,6 +1,8 @@
 -- autonaming.lua
 -- Automatically set names of signals (and maybe track sections) based on numbering
 
+-- Get current translator
+local S = advtrains.interlocking.translate
 
 local function find_highest_count(prefix)
 	local cnt = 0
@@ -34,10 +36,10 @@ function advtrains.interlocking.set_autoname_prefix(pname, prefix)
 		-- scan database for this prefix to find out the highest count
 		local count = find_highest_count(prefix)
 		player_prefix_info[pname] = { prefix = prefix, count = count}
-		return true, "Prefix set, next signal name will be: ".. advtrains.interlocking.get_next_autoname(pname, true)
+		return true, S("Prefix set, next signal name will be: @1", advtrains.interlocking.get_next_autoname(pname, true))
 	else
 		player_prefix_info[pname] = nil
-		return true, "Prefix unset, signals are not auto-named for you!"
+		return true, S("Prefix unset, signals are not auto-named for you!")
 	end
 end
 
@@ -62,7 +64,7 @@ end
 minetest.register_chatcommand("at_nameprefix",
 	{
 		params = "<prefix>",
-		description = "Sets the current prefix for automatically naming interlocking components. Example: '/at_nameprefix TEST' - signals will be named TEST1, TEST2 and so on",
+		description = S("Sets the current prefix for automatically naming interlocking components. Example: '/at_nameprefix TEST' - signals will be named TEST1, TEST2 and so on"),
 		privs = {interlocking = true},
 		func = advtrains.interlocking.set_autoname_prefix,
 })

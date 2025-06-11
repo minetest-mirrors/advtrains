@@ -1,6 +1,9 @@
 -- route_ui.lua
 -- User interface for showing and editing routes
 
+-- Get current translator
+local S = advtrains.interlocking.translate
+
 local atil = advtrains.interlocking
 local ildb = atil.db
 local F = advtrains.formspec
@@ -17,7 +20,7 @@ local sel_rpartcache = {}
 function atil.show_route_edit_form(pname, sigd, routeid, sel_rpartidx)
 
 	if not minetest.check_player_privs(pname, {train_operator=true, interlocking=true}) then
-		minetest.chat_send_player(pname, "Insufficient privileges to use this!")
+		minetest.chat_send_player(pname, S("Insufficient privileges to use this!"))
 		return
 	end
 	
@@ -26,9 +29,9 @@ function atil.show_route_edit_form(pname, sigd, routeid, sel_rpartidx)
 	local route = tcbs.routes[routeid]
 	if not route then return end
 	
-	local form = "size[9,11]label[0.5,0.2;Route overview]"
-	form = form.."field[0.8,1.2;6.5,1;name;Route name;"..minetest.formspec_escape(route.name).."]"
-	form = form.."button[7.0,0.9;1.5,1;setname;Set]"
+	local form = "size[9,11]label[0.5,0.2;"..S("Route overview").."]"
+	form = form.."field[0.8,1.2;6.5,1;name;"..S("Route name")..";"..minetest.formspec_escape(route.name).."]"
+	form = form.."button[7.0,0.9;1.5,1;setname;"..S("Set").."]"
 	
 	-- construct textlist for route information
 	local tab = {}
@@ -47,12 +50,12 @@ function atil.show_route_edit_form(pname, sigd, routeid, sel_rpartidx)
 	while c_sigd and i<=#route do
 		c_tcbs = ildb.get_tcbs(c_sigd)
 		if not c_tcbs then
-			itab(i, "-!- No TCBS at "..sigd_to_string(c_sigd)..". Please reconfigure route!", "err", nil)
+			itab(i, "-!- "..S("TCB at @1 is missing", sigd_to_string(c_sigd)), "err", nil)
 			break
 		end
 		c_ts_id = c_tcbs.ts_id
 		if not c_ts_id then
-			itab(i, "-!- No track section adjacent to "..sigd_to_string(c_sigd)..". Please reconfigure route!", "err", nil)
+			itab(i, "-!- "..S("Track section after @1 missing", sigd_to_string(c_sigd)), "err", nil)
 			break
 		end
 		c_ts = ildb.get_ts(c_ts_id)
@@ -70,7 +73,7 @@ function atil.show_route_edit_form(pname, sigd, routeid, sel_rpartidx)
 				local pos = advtrains.decode_pos(pts)
 				itab(i, "L "..pts.." -> "..state, "lock", pos)
 				if not advtrains.is_passive(pos) then
-					itab(i, "-!- No passive component at "..pts..". Please reconfigure route!", "err", nil)
+					itab(i, "-!- "..S("Turnout/component missing at @1", minetest.pos_to_string(pos)), "err", nil)
 					break
 				end
 			end
@@ -79,8 +82,14 @@ function atil.show_route_edit_form(pname, sigd, routeid, sel_rpartidx)
 		local nvar = c_rseg.next
 		if nvar then
 			local re_tcbs = ildb.get_tcbs({p = nvar.p, s = (nvar.s==1) and 2 or 1})
-			if not re_tcbs or not re_tcbs.ts_id or re_tcbs.ts_id~=c_ts_id then
-				itab(i, "-!- At "..sigd_to_string(c_sigd)..".Section Start and End do not match!", "err", nil)
+			if not re_tcbs then
+				itab(i, "-!- "..S("TCB at @1 is missing", minetest.pos_to_string(nvar.p)), "err", nil)
+				break
+			elseif not re_tcbs.ts_id then
+				itab(i, "-!- "..S("TCB at @1 is not assigned to previous track section", minetest.pos_to_string(nvar.p)), "err", nil)
+				break
+			elseif re_tcbs.ts_id~=c_ts_id then
+				itab(i, "-!- "..S("TCB at @1 has different section than previous TCB", minetest.pos_to_string(nvar.p)), "err", nil)
 				break
 			end
 		end
@@ -113,10 +122,10 @@ function atil.show_route_edit_form(pname, sigd, routeid, sel_rpartidx)
 		-- main aspect list
 		local signalpos = s_tcbs and s_tcbs.signal
 		if signalpos and rseg then
-			form = form..F.label(4.5, 2, "Signal Aspect:")
+			form = form..F.label(4.5, 2, S("Signal Aspect:"))
 			local ndef = signalpos and advtrains.ndb.get_ndef(signalpos)
 			if ndef and ndef.advtrains and ndef.advtrains.main_aspects then
-				local entries = { "<Default Aspect>" }
+				local entries = { S("<Default Aspect>") }
 				local sel = 1
 				for i, mae in ipairs(ndef.advtrains.main_aspects) do
 					entries[i+1] = mae.description
@@ -133,21 +142,21 @@ function atil.show_route_edit_form(pname, sigd, routeid, sel_rpartidx)
 				-- defaults to false for the very first signal and true for all others (= minimal user configuration overhead)
 				-- Note: on save, the value will be fixed at either false or true
 			end
-			form = form..string.format("checkbox[4.5,4.0;sa_distant;Announce distant signal;%s]", assign_dst)
+			form = form..string.format("checkbox[4.5,4.0;sa_distant;"..S("Announce distant signal")..";%s]", assign_dst)
 		else
-			form = form..F.label(4.5, 2, "No Signal at this TCB")
+			form = form..F.label(4.5, 2, S("No Signal at this TCB"))
 		end
 	elseif sel_rpart and sel_rpart.section then
 		local rseg = route[sel_rpart.seg]
 		if rseg then
-			form = form..F.label(4.5, 2, "Section Options:")
+			form = form..F.label(4.5, 2, S("Section Options:"))
 			-- checkbox for call-on
-			form = form..string.format("checkbox[4.5,4.0;se_callon;Call-on (section may be occupied);%s]", rseg.call_on)
+			form = form..string.format("checkbox[4.5,4.0;se_callon;"..S("Call-on (section may be occupied)")..";%s]", rseg.call_on)
 		end
 	elseif sel_rpart and sel_rpart.err then
-		form = form.."textarea[4.5,2.5;4,4;errorta;Error:;"..tab[sel_rpartidx].."]"
+		form = form.."textarea[4.5,2.5;4,4;errorta;"..S("Error:")..";"..tab[sel_rpartidx].."]"
 	else
-		form = form..F.label(4.5, 2, "<< Select a route part to edit options")
+		form = form..F.label(4.5, 2, S("<< Select a route part to edit options"))
 	end
 	
 	form = form.."button[0.5,6;1,1;prev;<<<]"
@@ -158,15 +167,15 @@ function atil.show_route_edit_form(pname, sigd, routeid, sel_rpartidx)
 	--if route.smartroute_generated or route.default_autoworking then
 	--	form = form.."button[3.5,6;2,1;noautogen;Clr Autogen]"
 	--end
-	form = form.."button[5.5,6;3,1;delete;Delete Route]"
-	form = form.."button[0.5,7;3,1;back;Back to signal]"
-	form = form.."button[3.5,7;2,1;clone;Clone Route]"
-	form = form.."button[5.5,7;3,1;newfrom;New From Route]"
+	form = form.."button[5.5,6;3,1;delete;"..S("Delete Route").."]"
+	form = form.."button[0.5,7;3,1;back;"..S("Back to signal").."]"
+	form = form.."button[3.5,7;2,1;clone;"..S("Clone Route").."]"
+	form = form.."button[5.5,7;3,1;newfrom;"..S("New From Route").."]"
 	
 	--atdebug(route.ars)
 	form = form.."style[ars;font=mono]"
-	form = form.."textarea[0.8,8.3;5,3;ars;ARS Rule List;"..atil.ars_to_text(route.ars).."]"
-	form = form.."button[5.5,8.23;3,1;savears;Save ARS List]"
+	form = form.."textarea[0.8,8.3;5,3;ars;"..S("ARS Rule List")..";"..atil.ars_to_text(route.ars).."]"
+	form = form.."button[5.5,8.23;3,1;savears;"..S("Save ARS List").."]"
 	
 	local formname = "at_il_routeedit_"..minetest.pos_to_string(sigd.p).."_"..sigd.s.."_"..routeid
 	minetest.show_formspec(pname, formname, form)
