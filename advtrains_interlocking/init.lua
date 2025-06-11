@@ -6,7 +6,7 @@ advtrains.interlocking = {}
 -- Initialize internationalization (using ywang's poconvert)
 advtrains.poconvert.from_flat("advtrains_interlocking")
 -- ask engine for translator instance, this will load the translation files
-advtrains.interlocking.translate = core.get_translator("advtrains")
+advtrains.interlocking.translate = core.get_translator("advtrains_interlocking")
 
 -- Get current translator
 local S = advtrains.interlocking.translate

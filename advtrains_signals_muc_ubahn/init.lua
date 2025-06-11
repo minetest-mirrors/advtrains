@@ -6,6 +6,9 @@
 -- Hp4 and Hp5 are not implemented because they do not make sense.
 -- Also the speed signals are not yet added (they will be added later)
 
+-- ask engine for translator instance, this will load the translation files
+local S = core.get_translator("advtrains_signals_muc_ubahn")
+
 local all_sigs = {
 	hp0 = { asp = { main = 0 }, crea = true }, -- halt
 	hp1 = { asp = { main = -1, proceed_as_main = true } }, -- free full speed
@@ -16,9 +19,9 @@ local all_sigs = {
 }
 
 local mainaspects = {
-	{ name = "hp1", description = "Hp1: Full speed" },
-	{ name = "hp2", description = "Hp2: Reduced Speed" },
-	{ name = "hp3", description = "Hp3: Shunt" },
+	{ name = "hp1", description = S("Hp1: Full speed") },
+	{ name = "hp2", description = S("Hp2: Reduced Speed") },
+	{ name = "hp3", description = S("Hp3: Shunt") },
 }
 local dstaspects = {
 	{ name = "vr1", description = "Vr1: Expect Full speed" },
@@ -62,7 +65,7 @@ for r,f in pairs(all_sigs) do
 			mesh = "advtrains_signals_muc_ubahn_wsig_"..loc..".obj",
 			tiles = {"advtrains_signals_muc_ubahn_"..r..".png"},
 			drop = f.distant and "advtrains_signals_muc_ubahn:signal_wall_"..loc.."_vr0" or "advtrains_signals_muc_ubahn:signal_wall_"..loc.."_hp0",
-			description = f.distant and attrans("Munich U-Bahn Distant Signal ("..loc..")") or attrans("Munich U-Bahn Main Signal ("..loc..")"),
+			description = f.distant and S("Munich U-Bahn Distant Signal ("..loc..")") or S("Munich U-Bahn Main Signal ("..loc..")"),
 			groups = {
 				cracky=3,
 				not_blocking_trains=1,

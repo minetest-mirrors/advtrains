@@ -260,7 +260,8 @@ do
 	end
 end
 
-local S = attrans
+-- ask engine for translator instance, this will load the translation files
+local S = core.get_translator("advtrains_signals_japan")
 
 minetest.register_node("advtrains_signals_japan:pole_0", {
 	description = S("Japanese signal pole"),
@@ -398,7 +399,7 @@ for _, rtab in ipairs {
 		local lightcount = siginfo.lightcount
 		for asp, texture in pairs(siginfo.textures) do
 			minetest.register_node("advtrains_signals_japan:"..sigtype.."_"..asp.."_"..rot, {
-				description = attrans(string.format("Japanese%s signal (type %s)", siginfo.isdst and " repeating" or "", siginfo.desc)),
+				description = S(string.format("Japanese%s signal (type %s)", siginfo.isdst and " repeating" or "", siginfo.desc)),
 				drawtype = "mesh",
 				mesh = string.format("advtrains_signals_japan_%d_%s.obj", lightcount, rot),
 				tiles = {pole_texture, signal_face_texture, texture},
