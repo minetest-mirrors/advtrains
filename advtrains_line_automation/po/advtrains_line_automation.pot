@@ -1,0 +1,102 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the advtrains_line_automation package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: advtrains_line_automation\n"
+"Report-Msgid-Bugs-To: advtrains-discuss@lists.sr.ht\n"
+"POT-Creation-Date: 2025-06-11 23:01+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: stoprail.lua
+msgid "You are not allowed to configure this track."
+msgstr ""
+
+#: stoprail.lua
+msgid "Station Code"
+msgstr ""
+
+#: stoprail.lua
+msgid "Station Name"
+msgstr ""
+
+#: stoprail.lua
+msgid "Door Delay"
+msgstr ""
+
+#: stoprail.lua
+msgid "Dep. Speed"
+msgstr ""
+
+#: stoprail.lua
+msgid "Track"
+msgstr ""
+
+#: stoprail.lua
+msgid "Stop Time"
+msgstr ""
+
+#: stoprail.lua
+msgid "Door Side"
+msgstr ""
+
+#: stoprail.lua
+msgid "Closed"
+msgstr ""
+
+#: stoprail.lua
+msgid "Left"
+msgstr ""
+
+#: stoprail.lua
+msgid "Right"
+msgstr ""
+
+#: stoprail.lua
+msgid "Reverse train"
+msgstr ""
+
+#: stoprail.lua
+msgid "Kick out passengers"
+msgstr ""
+
+#: stoprail.lua
+msgid "Wait for signal to clear"
+msgstr ""
+
+#: stoprail.lua
+msgid "Trains stopping here (ARS rules)"
+msgstr ""
+
+#: stoprail.lua
+msgid "Save"
+msgstr ""
+
+#: stoprail.lua
+msgid "Station code \"@1\" already exists and is owned by @2."
+msgstr ""
+
+#: stoprail.lua
+msgid "This station is owned by @1. You are not allowed to edit its name."
+msgstr ""
+
+#: stoprail.lua
+msgid "Unknown Station"
+msgstr ""
+
+#: stoprail.lua
+msgid "Next Stop:\n"
+msgstr ""
+
+#: stoprail.lua
+msgid "Station/Stop Track"
+msgstr ""
