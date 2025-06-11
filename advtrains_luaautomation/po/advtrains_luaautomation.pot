@@ -1,0 +1,185 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the advtrains_luaautomation package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: advtrains_luaautomation\n"
+"Report-Msgid-Bugs-To: advtrains-discuss@lists.sr.ht\n"
+"POT-Creation-Date: 2025-06-11 23:03+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: active_common.lua
+msgid "Unconfigured LuaATC component"
+msgstr ""
+
+#: active_common.lua
+msgid "LuaATC Environment"
+msgstr ""
+
+#: active_common.lua chatcmds.lua
+msgid "Save"
+msgstr ""
+
+#: active_common.lua
+msgid "Clear Local Environment"
+msgstr ""
+
+#: active_common.lua
+msgid "Code"
+msgstr ""
+
+#: active_common.lua
+msgid ""
+"You are not allowed to configure this LuaATC component without the @1 "
+"privilege."
+msgstr ""
+
+#: active_common.lua
+msgid "LuaATC component assigned to environment '@1'"
+msgstr ""
+
+#: active_common.lua
+msgid "LuaATC component assigned to an invalid environment"
+msgstr ""
+
+#: active_common.lua
+msgid "LuaATC component with error: @1"
+msgstr ""
+
+#: atc_rail.lua
+msgid "LuaATC Track"
+msgstr ""
+
+#: chatcmds.lua
+msgid "Run Init Code"
+msgstr ""
+
+#: chatcmds.lua
+msgid "Clear S"
+msgstr ""
+
+#: chatcmds.lua
+msgid "Delete Env."
+msgstr ""
+
+#: chatcmds.lua
+msgid "Environment initialization code"
+msgstr ""
+
+#: chatcmds.lua
+msgid "Set up and modify AdvTrains LuaAutomation environment"
+msgstr ""
+
+#: chatcmds.lua
+msgid "Invalid environment name!"
+msgstr ""
+
+#: chatcmds.lua
+msgid "Create an AdvTrains LuaAutomation environment"
+msgstr ""
+
+#: chatcmds.lua
+msgid "Name required!"
+msgstr ""
+
+#: chatcmds.lua
+msgid "Invalid name (only common characters)"
+msgstr ""
+
+#: chatcmds.lua
+msgid "Environment already exists!"
+msgstr ""
+
+#: chatcmds.lua
+msgid ""
+"Created environment '@1'. Use '/env_setup @2' to define global "
+"initialization code, or start building LuaATC components!"
+msgstr ""
+
+#: chatcmds.lua
+msgid "Subscribe to the log of an Advtrains LuaATC environment"
+msgstr ""
+
+#: chatcmds.lua
+msgid "Already subscribed!"
+msgstr ""
+
+#: chatcmds.lua
+msgid "Subscribed to environment '@1'."
+msgstr ""
+
+#: chatcmds.lua
+msgid "Unubscribe to the log of an Advtrains LuaATC environment"
+msgstr ""
+
+#: chatcmds.lua
+msgid "Successfully unsubscribed!"
+msgstr ""
+
+#: chatcmds.lua
+msgid "Not subscribed!"
+msgstr ""
+
+#: chatcmds.lua
+msgid ""
+"List Advtrains LuaATC environments you are subscribed to (no parameters) or "
+"subscribers of an environment (giving an env name)."
+msgstr ""
+
+#: chatcmds.lua
+msgid "Not subscribed to any!"
+msgstr ""
+
+#: chatcmds.lua
+msgid "No subscribers!"
+msgstr ""
+
+#: chatcmds.lua
+msgid "Environment deleted!"
+msgstr ""
+
+#: chatcmds.lua
+msgid ""
+"SURE TO DELETE ENVIRONMENT @1? Type YES (all uppercase) to continue or just "
+"quit form to cancel."
+msgstr ""
+
+#: init.lua
+msgid ""
+"Can place and configure LuaATC components, including execute potentially "
+"harmful Lua code"
+msgstr ""
+
+#: mesecon_controller.lua
+msgid "LuaATC Mesecon Controller"
+msgstr ""
+
+#: operation_panel.lua
+msgid "LuaATC Operation Panel"
+msgstr ""
+
+#: pcnaming.lua
+msgid ""
+"Passive Component Naming Tool\n"
+"\n"
+"Right-click to name a passive component."
+msgstr ""
+
+#: pcnaming.lua
+msgid ""
+"You are not allowed to name LuaATC passive components without the @1 "
+"privilege."
+msgstr ""
+
+#: pcnaming.lua
+msgid "Set name of component (empty to clear)"
+msgstr ""
