@@ -59,7 +59,7 @@ function sched.run()
 				-- run it
 				callbacks[elem.e](elem.d)
 			else
-				atwarn("[lines][scheduler] "..S("No callback to handle schedule"),elem)
+				atwarn("[lines][scheduler] No callback to handle schedule",elem)
 			end
 			cnt=cnt+1
 			ucn = units_cnt[elem.u]

@@ -1,8 +1,8 @@
 -- stoprail.lua
 -- adds "stop rail". Recognized by lzb. (part of behavior is implemented there)
 
--- Translation
-S = attrans
+-- Get current translator
+local S = advtrains.lines.translate
 
 local function to_int(n)
 	--- Disallow floating-point numbers
