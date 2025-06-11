@@ -1,6 +1,11 @@
 -- Default tracks for advtrains
 -- (c) orwell96 and contributors
 
+-- Initialize internationalization (using ywang's poconvert)
+advtrains.poconvert.from_flat("advtrains_train_track")
+-- ask engine for translator instance, this will load the translation files
+local S = core.get_translator("advtrains_train_track")
+
 local default_boxen = {
     ["st"] = {
         [""] = {
@@ -184,7 +189,7 @@ advtrains.register_tracks("default", {
 	models_prefix="advtrains_dtrack",
 	models_suffix=".b3d",
 	shared_texture="advtrains_dtrack_shared.png",
-	description=attrans("Track"),
+	description=S("Track"),
 	formats={},
 
     get_additional_definiton = function(def, preset, suffix, rotation)
@@ -265,7 +270,7 @@ advtrains.register_tracks("default", {
 	models_prefix="advtrains_dtrack_sy",
 	models_suffix=".obj",
 	shared_texture="advtrains_dtrack_shared.png",
-	description=attrans("Y-turnout"),
+	description=S("Y-turnout"),
 	formats = {},
     get_additional_definiton = y3_turnouts_addef,
 }, advtrains.ap.t_yturnout)
@@ -284,7 +289,7 @@ advtrains.register_tracks("default", {
 	models_prefix="advtrains_dtrack_s3",
 	models_suffix=".obj",
 	shared_texture="advtrains_dtrack_shared.png",
-	description=attrans("3-way turnout"),
+	description=S("3-way turnout"),
 	formats = {},
     get_additional_definiton = y3_turnouts_addef,
 }, advtrains.ap.t_s3way)
@@ -334,7 +339,7 @@ advtrains.register_tracks("default", {
 	models_prefix="advtrains_dtrack_xing",
 	models_suffix=".obj",
 	shared_texture="advtrains_dtrack_shared.png",
-	description=attrans("Perpendicular Diamond Crossing Track"),
+	description=S("Perpendicular Diamond Crossing Track"),
 	formats = {},
     get_additional_definiton = function(def, preset, suffix, rotation)
         return perp_boxen[rotation] or {}
@@ -426,7 +431,7 @@ advtrains.register_tracks("default", {
 	models_prefix="advtrains_dtrack_xing90plusx",
 	models_suffix=".obj",
 	shared_texture="advtrains_dtrack_shared.png",
-	description=attrans("90+Angle Diamond Crossing Track"),
+	description=S("90+Angle Diamond Crossing Track"),
 	formats = {},
     get_additional_definiton = function(def, preset, suffix, rotation)
         return ninety_plus_boxen[suffix] or {}
@@ -548,7 +553,7 @@ advtrains.register_tracks("default", {
 	models_prefix="advtrains_dtrack_xingdiag",
 	models_suffix=".obj",
 	shared_texture="advtrains_dtrack_shared.png",
-	description=attrans("Diagonal Diamond Crossing Track"),
+	description=S("Diagonal Diamond Crossing Track"),
 	formats = {},
     get_additional_definiton = function(def, preset, suffix, rotation)
         return diagonal_boxen[suffix] or {}
@@ -575,7 +580,7 @@ advtrains.register_tracks("default", {
 	models_suffix=".obj",
 	shared_texture="advtrains_dtrack_shared.png",
 	second_texture="default_gravel.png",
-	description=attrans("Track"),
+	description=S("Track"),
 	formats={vst1={true, false, true}, vst2={true, false, true}, vst31={true}, vst32={true}, vst33={true}},
 }, advtrains.ap.t_30deg_slope)
 
@@ -598,7 +603,7 @@ advtrains.register_tracks("default", {
 	models_suffix=".b3d",
 	shared_texture="advtrains_dtrack_rail.png",
 	--bumpers still use the old texture until the models are redone.
-	description=attrans("Bumper"),
+	description=S("Bumper"),
 	formats={},
 	get_additional_definiton = function(def, preset, suffix, rotation)
 		-- 2024-11-25: Bumpers get the additional feature of being both a signal and a self-contained TCB, when interlocking is used.
@@ -649,7 +654,7 @@ advtrains.register_tracks("default", {
 	models_prefix="advtrains_dtrack",
 	models_suffix=".b3d",
 	shared_texture="advtrains_dtrack_shared_atc.png",
-	description=attrans("ATC controller"),
+	description=S("ATC controller"),
 	formats={},
 	get_additional_definiton = advtrains.atc_function
 }, advtrains.trackpresets.t_30deg_straightonly)
@@ -827,7 +832,7 @@ advtrains.register_tracks("default", {
 	models_prefix="advtrains_dtrack",
 	models_suffix=".b3d",
 	shared_texture="advtrains_dtrack_shared_unload.png",
-	description=attrans("Unloading Track"),
+	description=S("Unloading Track"),
 	formats={},
 	get_additional_definiton = function(def, preset, suffix, rotation)
 		return {
@@ -859,7 +864,7 @@ advtrains.register_tracks("default", {
 	models_prefix="advtrains_dtrack",
 	models_suffix=".b3d",
 	shared_texture="advtrains_dtrack_shared_load.png",
-	description=attrans("Loading Track"),
+	description=S("Loading Track"),
 	formats={},
 	get_additional_definiton = function(def, preset, suffix, rotation)
 		return {
@@ -929,7 +934,7 @@ if mesecon then
 		models_prefix="advtrains_dtrack",
 		models_suffix=".b3d",
 		shared_texture="advtrains_dtrack_shared_detector_off.png",
-		description=attrans("Detector Rail"),
+		description=S("Detector Rail"),
 		formats={},
 		get_additional_definiton = function(def, preset, suffix, rotation)
 			return {
