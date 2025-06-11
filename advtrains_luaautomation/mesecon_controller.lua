@@ -6,7 +6,8 @@
 -- From Mesecons mod https://mesecons.net/
 -- (c) Jeija and Contributors
 
-local S = atltrans
+-- Get current translator
+local S = atlatc.translate
 local BASENAME = "advtrains_luaautomation:mesecon_controller"
 
 local rules = {

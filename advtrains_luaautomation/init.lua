@@ -2,14 +2,20 @@
 -- Lua automation features for advtrains
 -- Uses global table 'atlatc' (AdvTrains_LuaATC)
 
-atltrans = attrans
-local S = atltrans
 
---Privilege
---Only trusted players should be enabled to build stuff which can break the server.
 
 atlatc = { envs = {}}
 
+-- Initialize internationalization (using ywang's poconvert)
+advtrains.poconvert.from_flat("advtrains_luaautomation")
+-- ask engine for translator instance, this will load the translation files
+atlatc.translate = core.get_translator("advtrains_luaautomation")
+
+-- Get current translator
+local S = atlatc.translate
+
+--Privilege
+--Only trusted players should be enabled to build stuff which can break the server.
 minetest.register_privilege("atlatc", { description = S("Can place and configure LuaATC components, including execute potentially harmful Lua code"), give_to_singleplayer = false, default= false })
 
 --Size of code input forms in X,Y notation. Must be at least 10x10

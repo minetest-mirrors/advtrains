@@ -2,6 +2,9 @@
 -- registers and handles the ATC rail. Active component.
 -- This is the only component that can interface with trains, so train interface goes here too.
 
+-- Get current translator
+local S = atlatc.translate
+
 --Using subtable
 local r={}
 
@@ -229,7 +232,7 @@ advtrains.register_tracks("default", {
 	models_prefix="advtrains_dtrack",
 	models_suffix=".b3d",
 	shared_texture="advtrains_dtrack_shared_atc.png",
-	description=atltrans("LuaATC Track"),
+	description=S("LuaATC Track"),
 	formats={},
 	get_additional_definiton = function(def, preset, suffix, rotation)
 		return {

@@ -1,4 +1,5 @@
-local S = atltrans
+-- Get current translator
+local S = atlatc.translate
 
 local ac = {nodes={}}
 

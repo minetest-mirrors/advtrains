@@ -2,7 +2,8 @@
 --a.k.a Passive component naming
 --Allows to assign names to passive components, so they can be called like:
 --setstate("iamasignal", "green")
-local S = atltrans
+-- Get current translator
+local S = atlatc.translate
 
 atlatc.pcnaming={name_map={}}
 function atlatc.pcnaming.load(stuff)
