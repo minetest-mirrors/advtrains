@@ -1,0 +1,807 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the advtrains_interlocking package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: advtrains_interlocking\n"
+"Report-Msgid-Bugs-To: advtrains-discuss@lists.sr.ht\n"
+"POT-Creation-Date: 2025-06-11 23:21+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: autonaming.lua
+msgid "Prefix set, next signal name will be: @1"
+msgstr ""
+
+#: autonaming.lua
+msgid "Prefix unset, signals are not auto-named for you!"
+msgstr ""
+
+#: autonaming.lua
+msgid ""
+"Sets the current prefix for automatically naming interlocking components. "
+"Example: '/at_nameprefix TEST' - signals will be named TEST1, TEST2 and so on"
+msgstr ""
+
+#: database.lua
+msgid "Track section inconsistent here, repairing..."
+msgstr ""
+
+#: database.lua
+msgid "Track section partition found, repairing..."
+msgstr ""
+
+#: database.lua
+msgid "Created track section @1 from @2 TCBs"
+msgstr ""
+
+#: init.lua
+msgid "Can set up track sections, routes and signals"
+msgstr ""
+
+#: route_prog.lua
+msgid "[Route programming] "
+msgstr ""
+
+#: route_prog.lua
+msgid "@1 is no longer affected when this route is set."
+msgstr ""
+
+#: route_prog.lua
+msgid "Fixed in state @1 by route @2 until segment #@3 is freed."
+msgstr ""
+
+#: route_prog.lua
+msgid "@1 Terminal @2"
+msgstr ""
+
+#: route_prog.lua
+msgid "Fixed in state @1 by route @2 (punch to unfix)"
+msgstr ""
+
+#: route_prog.lua route_ui.lua signal_aspect_ui.lua tcb_ts_ui.lua tool.lua
+msgid "Insufficient privileges to use this!"
+msgstr ""
+
+#: route_prog.lua
+msgid ""
+"Route programming mode active. Punch TCBs to add route segments, punch "
+"turnouts to lock them."
+msgstr ""
+
+#: route_prog.lua
+msgid "Added track section @1 to the route."
+msgstr ""
+
+#: route_prog.lua
+msgid "Finish programming route"
+msgstr ""
+
+#: route_prog.lua
+msgid "Route ends at signal:"
+msgstr ""
+
+#: route_prog.lua
+msgid "WARNING: Route does not end at a signal."
+msgstr ""
+
+#: route_prog.lua
+msgid "Routes should in most cases end at signals."
+msgstr ""
+
+#: route_prog.lua
+msgid "Cancel if you are unsure!"
+msgstr ""
+
+#: route_prog.lua
+msgid "Route leads into"
+msgstr ""
+
+#: route_prog.lua
+msgid "non-interlocked area"
+msgstr ""
+
+#: route_prog.lua
+msgid "Enter Route Name"
+msgstr ""
+
+#: route_prog.lua
+msgid "Save Route"
+msgstr ""
+
+#: route_prog.lua
+msgid "Next section is diverging (>2 TCBs)"
+msgstr ""
+
+#: route_prog.lua tcb_ts_ui.lua
+msgid "End of interlocking"
+msgstr ""
+
+#: route_prog.lua
+msgid "Advance/Complete Route"
+msgstr ""
+
+#: route_prog.lua
+msgid "Advance to next route section"
+msgstr ""
+
+#: route_prog.lua
+msgid "This TCB is not suitable as"
+msgstr ""
+
+#: route_prog.lua
+msgid "route continuation."
+msgstr ""
+
+#: route_prog.lua
+msgid "Finish route HERE"
+msgstr ""
+
+#: route_prog.lua
+msgid "Finish route at end of NEXT section"
+msgstr ""
+
+#: route_prog.lua
+msgid "Advancing over next section is"
+msgstr ""
+
+#: route_prog.lua
+msgid "impossible at this place."
+msgstr ""
+
+#: route_prog.lua
+msgid "Step back one section"
+msgstr ""
+
+#: route_prog.lua
+msgid "Cancel route programming"
+msgstr ""
+
+#: route_prog.lua
+msgid "Route section @1 removed."
+msgstr ""
+
+#: route_prog.lua
+msgid "Route discarded."
+msgstr ""
+
+#: route_prog.lua
+msgid "Cannot program route without a target"
+msgstr ""
+
+#: route_prog.lua
+msgid "The origin TCB has become unknown during programming. Try again."
+msgstr ""
+
+#: route_prog.lua
+msgid "Successfully programmed route."
+msgstr ""
+
+#: route_prog.lua
+msgid "This TCB is unconfigured, you first need to assign it to a rail"
+msgstr ""
+
+#: route_prog.lua
+msgid "@1 is held in @2 position when this route is set and freed "
+msgstr ""
+
+#: route_ui.lua
+msgid "Route overview"
+msgstr ""
+
+#: route_ui.lua
+msgid "Route name"
+msgstr ""
+
+#: route_ui.lua tcb_ts_ui.lua
+msgid "Set"
+msgstr ""
+
+#: route_ui.lua tcb_ts_ui.lua
+msgid "TCB at @1 is missing"
+msgstr ""
+
+#: route_ui.lua tcb_ts_ui.lua
+msgid "Track section after @1 missing"
+msgstr ""
+
+#: route_ui.lua tcb_ts_ui.lua
+msgid "Turnout/component missing at @1"
+msgstr ""
+
+#: route_ui.lua tcb_ts_ui.lua
+msgid "TCB at @1 is not assigned to previous track section"
+msgstr ""
+
+#: route_ui.lua tcb_ts_ui.lua
+msgid "TCB at @1 has different section than previous TCB"
+msgstr ""
+
+#: route_ui.lua signal_aspect_ui.lua
+msgid "Signal Aspect:"
+msgstr ""
+
+#: route_ui.lua
+msgid "<Default Aspect>"
+msgstr ""
+
+#: route_ui.lua
+msgid "Announce distant signal"
+msgstr ""
+
+#: route_ui.lua
+msgid "No Signal at this TCB"
+msgstr ""
+
+#: route_ui.lua
+msgid "Section Options:"
+msgstr ""
+
+#: route_ui.lua
+msgid "Call-on (section may be occupied)"
+msgstr ""
+
+#: route_ui.lua
+msgid "Error:"
+msgstr ""
+
+#: route_ui.lua
+msgid "<< Select a route part to edit options"
+msgstr ""
+
+#: route_ui.lua
+msgid "Delete Route"
+msgstr ""
+
+#: route_ui.lua
+msgid "Back to signal"
+msgstr ""
+
+#: route_ui.lua
+msgid "Clone Route"
+msgstr ""
+
+#: route_ui.lua
+msgid "New From Route"
+msgstr ""
+
+#: route_ui.lua
+msgid "ARS Rule List"
+msgstr ""
+
+#: route_ui.lua
+msgid "Save ARS List"
+msgstr ""
+
+#: routesetting.lua
+msgid "No TCB found at @1. Please update or reconfigure route!"
+msgstr ""
+
+#: routesetting.lua
+msgid "No track section adjacent to @1. Please reconfigure route!"
+msgstr ""
+
+#: routesetting.lua
+msgid "Section '@1' not found!"
+msgstr ""
+
+#: routesetting.lua
+msgid "Section '@1' already has route set from @2:"
+msgstr ""
+
+#: routesetting.lua
+msgid "Section '@1' is occupied!"
+msgstr ""
+
+#: routesetting.lua
+msgid "Lock conflict at @1, Held locked by:"
+msgstr ""
+
+#: routesetting.lua
+msgid "Route @1 from signal @2"
+msgstr ""
+
+#: routesetting.lua
+msgid ""
+"Turnout/component missing at @1. Please update track section or reconfigure "
+"route!"
+msgstr ""
+
+#: routesetting.lua
+msgid ""
+"TCB at @1 has different section than previous TCB. Please update track "
+"section or reconfigure route!"
+msgstr ""
+
+#: routesetting.lua
+msgid "Route @1 from signal @2, segment #@3"
+msgstr ""
+
+#: signal_aspect_ui.lua
+msgid "Influence point is set at @1."
+msgstr ""
+
+#: signal_aspect_ui.lua
+msgid "Modify"
+msgstr ""
+
+#: signal_aspect_ui.lua tool.lua
+msgid "Clear"
+msgstr ""
+
+#: signal_aspect_ui.lua
+msgid "Influence point is not set."
+msgstr ""
+
+#: signal_aspect_ui.lua
+msgid "Set influence point"
+msgstr ""
+
+#: signal_aspect_ui.lua
+msgid "<none>"
+msgstr ""
+
+#: signal_aspect_ui.lua
+msgid "Dst: @1"
+msgstr ""
+
+#: signal_aspect_ui.lua
+msgid "<assign distant>"
+msgstr ""
+
+#: signal_aspect_ui.lua
+msgid ""
+"Configuring Signal: Please look in train's driving direction and punch rail "
+"to set influence point."
+msgstr ""
+
+#: signal_aspect_ui.lua
+msgid "Set distant signal: Punch the main signal to assign!"
+msgstr ""
+
+#: signal_aspect_ui.lua
+msgid "Assigned signal to the TCB at @1"
+msgstr ""
+
+#: signal_aspect_ui.lua
+msgid "Assigned distant signal to the main signal at @1"
+msgstr ""
+
+#: signal_aspect_ui.lua
+msgid "Configuring Signal: Successfully set influence point"
+msgstr ""
+
+#: signal_aspect_ui.lua
+msgid ""
+"Configuring Signal: Influence point of another signal is already present!"
+msgstr ""
+
+#: signal_aspect_ui.lua
+msgid "Configuring Signal: This is not a normal two-connection rail! Aborted."
+msgstr ""
+
+#: signal_aspect_ui.lua
+msgid "Configuring Signal: Node is too far away. Aborted."
+msgstr ""
+
+#: smartroute.lua
+msgid "Smartroute: TCBS or routes don't exist here!"
+msgstr ""
+
+#: smartroute.lua
+msgid "Smartroute: No track section directly ahead!"
+msgstr ""
+
+#: smartroute.lua
+msgid "Route search: @1 found"
+msgstr ""
+
+#: smartroute.lua
+msgid "Search further"
+msgstr ""
+
+#: smartroute.lua
+msgid "Apply"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Track Circuit Break"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Unconfigured Track Circuit Break, right-click to assign."
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "This TCB has been removed. Please dig marker."
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Configuring TCB: Please punch the rail you want to assign this TCB to."
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Can't remove TCB: Both sides must have no signal assigned!"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid ""
+"Configuring TCB: Already existed at this position, it is now linked to this "
+"TCB marker"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "TCB assigned to @1"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Configuring TCB: Successfully configured TCB"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Configuring TCB: This is not a normal two-connection rail! Aborted."
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Configuring TCB: Node is too far away. Aborted."
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Configuring TCB: Successfully assigned signal."
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Configuring TCB: Internal error, TCBS doesn't exist. Aborted."
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Configuring TCB: Cannot use static signals for routesetting. Aborted."
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Configuring TCB: Not a compatible signal. Aborted."
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "@1 locks in state @2"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Error: TS modified, abort!"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Setting fixed locks finished!"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "TCB already existed at this position, now linked to this node"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Signal on B side already assigned!"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Can't remove track, a train is here!"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Side @1"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Show track section"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Create Interlocked Track Section"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Link: @1"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Link @1"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "No Link"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Signalling"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Assign a signal"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Track Circuit Break Configuration"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "TCB Link: Select linked TCB now!"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Configuring TCB: Please punch the signal to assign."
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Track Section Detail - @1"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Section name"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Boundary TCBs:"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Fixed route locks (e.g. level crossings):"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Add locks"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Clear locks"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Remove Section"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid ""
+"This will remove the track section and set all its end points to End Of "
+"Interlocking"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Route is set: "
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Section holds @1 route locks."
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Trains on this section:"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "No trains on this section."
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Reset section state"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid ""
+"You cannot modify track sections when a route is set or a train is on the "
+"section."
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Punch components to add fixed locks. (punch anything else = end)"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Reset track section"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid ""
+"This will clear the list of trains\n"
+"and the routesetting status of this section.\n"
+"Are you sure?"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Yes"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Cancel"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Reset track section @1!"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Final TCBS unset (legacy-style buffer route)"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Signal at @1"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Signal name"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Multiple routes are requested (first available is set):"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "A route is requested from this signal:"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Route has been set."
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Waiting for route to be set..."
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Enable Automatic Working"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Automatic Working is active."
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Route is re-set when a train passed."
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Disable Automatic Working"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Cancel Route"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid " (invalid)"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Routes:"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Set Route"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Show"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Set ARS default route"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Edit"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Delete this route"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "NOTE: ARS is disabled."
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Routes are not automatically set."
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Smart Route"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "New (Manual)"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Automatic routesetting"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Distant signal triggers ARS"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "No routes are yet defined."
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid ""
+"This is an always-halt signal (e.g. a buffer)\n"
+"No routes can be set from here."
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid ""
+"This is a pure distant signal\n"
+"No route is currently set through."
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Route is set over this signal by:"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Wait for this route to be cancelled in order to do anything here."
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid ""
+"Cannot delete route which has ARS rules, please review and then delete "
+"through edit dialog!"
+msgstr ""
+
+#: tool.lua
+msgid "Route lock inspector"
+msgstr ""
+
+#: tool.lua
+msgid "Route locks currently put:"
+msgstr ""
+
+#: tool.lua
+msgid "No route locks set"
+msgstr ""
+
+#: tool.lua
+msgid "Emplace manual lock"
+msgstr ""
+
+#: tool.lua
+msgid "Node is not a track!"
+msgstr ""
+
+#: tool.lua
+msgid "No track section at this location!"
+msgstr ""
+
+#: tool.lua
+msgid ""
+"Interlocking tool\n"
+"Punch: Highlight track section\n"
+"Place: check route locks/show track section info"
+msgstr ""
+
+#: tsr_rail.lua
+msgid "Point speed restriction: @1"
+msgstr ""
+
+#: tsr_rail.lua
+msgid "Set point speed restriction:"
+msgstr ""
+
+#: tsr_rail.lua
+msgid "You are not allowed to configure this track without the @1 privilege."
+msgstr ""
+
+#: tsr_rail.lua
+msgid "You are not allowed to configure this track."
+msgstr ""
+
+#: tsr_rail.lua
+msgid "Point Speed Restriction Track"
+msgstr ""
