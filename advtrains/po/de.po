@@ -3,14 +3,14 @@ msgstr ""
 "Project-Id-Version: advtrains\n"
 "Report-Msgid-Bugs-To: advtrains-discuss@lists.sr.ht\n"
 "POT-Creation-Date: 2025-06-10 21:40+0200\n"
-"PO-Revision-Date: 2023-10-09 11:18+0200\n"
+"PO-Revision-Date: 2025-06-11 22:55+0200\n"
 "Last-Translator: Y. Wang <yw05@forksworld.de>\n"
 "Language-Team: German\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.3.2\n"
+"X-Generator: Poedit 3.2.2\n"
 
 #: atc.lua
 msgid "ATC Kick command warning: doors are closed."
@@ -39,11 +39,8 @@ msgid "ATC command syntax error: I statement not closed: @1"
 msgstr "Zugbeeinflussung: Unvollständiger I-Befehl: @1"
 
 #: atc.lua
-#, fuzzy
 msgid "ATC controller, Command: @1"
-msgstr ""
-"Zugbeeinflussungsgleis in Betriebsart „@1“\n"
-"Befehl: @2"
+msgstr "Zugbeeinflussungsgleis, Befehl: @1"
 
 #: atc.lua
 msgid "Command"
@@ -101,7 +98,7 @@ msgstr "Das Gleis, auf dem der Waggon platziert werden woll, ist zu kurz."
 
 #: copytool.lua
 msgid "Train copied."
-msgstr "Der Zug wurde Kopiert."
+msgstr "Der Zug wurde kopiert."
 
 #: copytool.lua
 msgid ""
@@ -136,6 +133,8 @@ msgid ""
 "Cannot couple @1 and @2 - train would have length @3 which is above the "
 "limit of @4"
 msgstr ""
+"Züge @1 und @2 können nicht gekuppelt werden - die resultierende Zuglänge @3 "
+"wäre länger als das Maximum von @4"
 
 #: couple.lua
 msgid "Scharfenberg Coupler"
@@ -148,11 +147,11 @@ msgstr "Sie dürfen ohne das „train_operator“-Privileg keine Züge ankuppeln
 
 #: craft_items.lua
 msgid "Boiler"
-msgstr ""
+msgstr "Kessel"
 
 #: craft_items.lua
 msgid "Chimney"
-msgstr ""
+msgstr "Schornstein"
 
 #: craft_items.lua
 msgid "Driver's cab"
@@ -160,113 +159,126 @@ msgstr "Führerstand"
 
 #: craft_items.lua
 msgid "Wheel"
-msgstr ""
+msgstr "Rad"
 
 #: init.lua
 msgid "Advtrains Status: no_action @1 slowdown @2 (log @3)"
 msgstr ""
+"Advtrains Status: keine Aktion: @1 Verlangsamungsfaktor: @2 (logarithmisch "
+"@3)"
 
 #: init.lua
 msgid "Advtrains is already running normally!"
-msgstr ""
+msgstr "Advtrains läuft bereits normal!"
 
 #: init.lua
 msgid ""
 "Crash during advtrains main step - skipping the shutdown save operation to "
 "not save inconsistent data!"
 msgstr ""
+"Advtrains ist während der Ausführung des Main Step abgestürzt - Daten werden "
+"nicht gespeichert um Inkonsistenzen zu verhindern!"
 
 #: init.lua
 msgid ""
 "Data is being saved. While saving, advtrains will remove the players from "
 "trains. Save files will be reloaded afterwards!"
 msgstr ""
+"Daten werden gespeichert. Beim Speichern werden alle Spieler aus Waggons "
+"entfernt. Anschließend werden die Speicherdateien neu geladen!"
 
 #: init.lua
 msgid "Delete all train routes, force them to recalculate"
-msgstr ""
+msgstr "Erzwingt die Neuberechnung der Bewegungspfade aller Züge"
 
 #: init.lua
 msgid ""
 "Detach all players, especially the offline ones, from all trains. Use only "
 "when no one serious is on a train."
 msgstr ""
+"Bewirkt, dass alle Spieler (insbesondere Offline-Spieler) aus Waggons "
+"entfernt werden. Nur benutzen, wenn niemand ernsthaft in einem Zug sitzt."
 
 #: init.lua
 msgid "Disable the advtrains globalstep temporarily"
-msgstr ""
+msgstr "Advtrains-Schrittverarbeitung temporär deaktivieren"
 
 #: init.lua
 msgid "Disabled advtrains successfully"
-msgstr ""
+msgstr "Advtrains erfolgreich deaktiviert"
 
 #: init.lua
 msgid "Instructed to save() but load() was never called!"
-msgstr ""
+msgstr "Speichern angefordert, aber Speicherdateien wurden nie geladen!"
 
 #: init.lua
 msgid "Print advtrains status info"
-msgstr ""
+msgstr "Advtrains-Statusinformationen ausgeben"
 
 #: init.lua
 msgid "Re-enabling advtrains globalstep..."
-msgstr ""
+msgstr "Advtrains-Schrittverarbeitung wird wieder aktiviert..."
 
 #: init.lua
 msgid "Reload successful!"
-msgstr ""
+msgstr "Neu Laden Erfolgreich!"
 
 #: init.lua
 msgid "Removing unused wagon"
-msgstr ""
+msgstr "Ungenutzer Waggon wird entfernt"
 
 #: init.lua
 msgid "Restoring saved state in 1 second..."
-msgstr ""
+msgstr "Speicherstand wird in 1 Sekunde wiederhergestellt..."
 
 #: init.lua
 msgid "Returns the position of the train with the given id"
-msgstr ""
+msgstr "Gibt die Position des Zugs mit der gegebenen ID aus"
 
 #: init.lua
 msgid "Saving failed: @1"
-msgstr ""
+msgstr "Speichern ist fehlgeschlagen: @1"
 
 #: init.lua
 msgid "Successfully invalidated train routes"
-msgstr ""
+msgstr "Bewegungspfade der Züge erfolgreich invalidiert"
 
 #: init.lua
 msgid "Teleporting to train @1"
-msgstr ""
+msgstr "Teleportiere zu Zug @1"
 
 #: init.lua
 msgid "Teleports you to the position of the train with the given id"
-msgstr ""
+msgstr "Teleportiere dich zu dem Zug mit der gegebenen ID"
 
 #: init.lua
 msgid ""
 "The advtrains globalstep has been disabled. Trains are not moving, and no "
 "data is saved! Run '/at_disable_step no' to enable again!"
 msgstr ""
+"Advtrains-Schrittverarbeitung ist deaktiviert. Züge bewegen sich nicht und "
+"Änderungen werden nicht gespeichert. Führe '/at_disable_step no' aus um sie "
+"wieder zu aktivieren!"
 
 #: init.lua
 msgid "Train @1 does not exist or is invalid"
-msgstr ""
+msgstr "Zug @1 existiert nicht oder ist ungültig"
 
 #: init.lua
 msgid ""
 "Train @1 had no wagons left because of some bug. It is being deleted. Wave "
 "it goodbye!"
 msgstr ""
+"Zug @1 hat keine Wagen mehr und sollte nicht mehr existieren. Er wird "
+"gelöscht. Auf Wiedersehen!"
 
 #: init.lua
 msgid "Train @1 is at @2"
-msgstr ""
+msgstr "Zug @1 ist bei @2"
 
 #: init.lua
 msgid "from wagon_save table."
-msgstr ""
+msgstr "aus der wagon_save table"
 
 #: misc_nodes.lua
 msgid "@1 Platform (45 degree)"
@@ -286,21 +298,21 @@ msgstr "Niedriger @1-Bahnsteig (45°)"
 
 #: protection.lua
 msgid "Can operate turnouts and signals in unprotected areas"
-msgstr ""
+msgstr "Darf Weichen und Signale in ungeschütztem Gebiet stellen"
 
 #: protection.lua
 msgid "Can place and dig tracks in unprotected areas"
-msgstr ""
+msgstr "Darf Gleise in ungeschütztem Gebiet verlegen und entfernen"
 
 #: protection.lua
 msgid ""
 "Can place, remove and operate any train, regardless of owner, whitelist, or "
 "protection"
-msgstr ""
+msgstr "Darf, unabhängig von Besitzer oder Schutz, sämtliche Züge steuern"
 
 #: protection.lua
 msgid "Can place, remove and operate trains"
-msgstr ""
+msgstr "Darf Züge platzieren, entfernen und steuern"
 
 #: protection.lua
 msgid "You are not allowed to build near tracks at this protected position."
@@ -334,28 +346,24 @@ msgid "Andrew's Cross"
 msgstr "Andreaskreuz"
 
 #: signals.lua
-#, fuzzy
 msgid "Lampless Signal (deprecated!)"
-msgstr "Mechanisches Signal"
+msgstr "Mechanisches Signal (veraltet!)"
 
 #: signals.lua
 msgid "Signal (deprecated!)"
-msgstr ""
+msgstr "Signal (veraltet!)"
 
 #: signals.lua
-#, fuzzy
 msgid "Wallmounted Signal (left) (deprecated!)"
-msgstr "An der linken Seite montiertes Signal"
+msgstr "An der linken Seite montiertes Signal (veraltet!)"
 
 #: signals.lua
-#, fuzzy
 msgid "Wallmounted Signal (right) (deprecated!)"
-msgstr "An der rechten Seite montiertes Signal"
+msgstr "An der rechten Seite montiertes Signal (veraltet!)"
 
 #: signals.lua
-#, fuzzy
 msgid "Wallmounted Signal (top) (deprecated!)"
-msgstr "An der Decke montiertes Signal"
+msgstr "An der Decke montiertes Signal (veraltet!)"
 
 #: track_reg_helper.lua
 msgid "@1 Slope"
@@ -439,10 +447,12 @@ msgstr "Hier ist eine Gleisabschnittsgrenze (TCB)."
 #: trainhud.lua
 msgid "OVERRUN RED SIGNAL! Examine situation and reverse train to move again."
 msgstr ""
+"ROTES SIGNAL ÜBERFAHREN! Situation überprüfen und Fahrtrichtung wechseln, um "
+"Bewegungssperre aufzuheben."
 
 #: wagonprop_tool.lua
 msgid "Insufficient privileges to use this!"
-msgstr ""
+msgstr "Unzureichende Privilegien, um dies zu benutzen!"
 
 #: wagonprop_tool.lua
 #, fuzzy
@@ -454,14 +464,16 @@ msgid ""
 "Wagon Properties Tool\n"
 "Punch a wagon to view and edit the Wagon Properties"
 msgstr ""
+"Waggon-Einstellungstool\n"
+"Auf Waggon anwenden um Waggon-Einstellungen aufzurufen"
 
 #: wagons.lua
 msgid " units"
-msgstr ""
+msgstr " Einheiten"
 
 #: wagons.lua
 msgid "!!! Train off track !!!"
-msgstr ""
+msgstr "!!! Abseits vom Gleis !!!"
 
 #: wagons.lua
 msgid "(Doors closed)"
@@ -469,25 +481,27 @@ msgstr "(Türen geschlossen)"
 
 #: wagons.lua
 msgid "Allow these players to access your wagon:"
-msgstr ""
+msgstr "Diese Spieler dürfen auf den Waggon zugreifen:"
 
 #: wagons.lua
 msgid "Clear 'Disable ARS' flag"
-msgstr ""
+msgstr "ARS-Sperre aufheben"
 
 #: wagons.lua
 msgid "Current FC: "
-msgstr ""
+msgstr "Aktueller FC:"
 
 #: wagons.lua
 msgid ""
 "Destroying wagon with inventory, but inventory is not found? Shouldn't "
 "happen!"
 msgstr ""
+"Waggon mit Inventar zerstört, aber Inventar nicht gefunden? Sollte nicht "
+"passieren!"
 
 #: wagons.lua
 msgid "Doors are closed! (Try holding sneak key!)"
-msgstr "Die Türen sind geschlossen."
+msgstr "Die Türen sind geschlossen! (Probiere Schleichen-Taste!)"
 
 #: wagons.lua
 msgid ""
@@ -499,7 +513,7 @@ msgstr ""
 
 #: wagons.lua
 msgid "Freight Code:"
-msgstr ""
+msgstr "Frachtcode:"
 
 #: wagons.lua
 msgid "Get off"
@@ -515,48 +529,48 @@ msgstr "Linie"
 
 #: wagons.lua
 msgid "Liquid: "
-msgstr ""
+msgstr "Flüssigkeit:"
 
 #: wagons.lua
 msgid "Liquid: empty"
-msgstr ""
+msgstr "Flüssigkeit: leer"
 
 #: wagons.lua
 msgid "Missing train_operator privilege"
-msgstr ""
+msgstr "Fehlendes train_operator Privileg"
 
 #: wagons.lua
 msgid "Next FC:"
-msgstr ""
+msgstr "Nächster FC:"
 
 #: wagons.lua
 msgid "Not a valid wagon id."
-msgstr ""
+msgstr "Keine gültige Waggon-ID"
 
 #: wagons.lua
-#, fuzzy
 msgid "Not allowed to do this."
-msgstr "Sie dürfen dieses Gleis nicht konfigurieren."
+msgstr "Sie dürfen dies nicht tun."
 
 #: wagons.lua
 msgid "Onboard Computer"
-msgstr ""
+msgstr "Bordcomputer"
 
 #: wagons.lua
 msgid "Please specify a player name to transfer ownership to."
 msgstr ""
+"Geben Sie einen Spielernamen an, an den der Besitz übertragen werden soll."
 
 #: wagons.lua
 msgid "Prev FC"
-msgstr ""
+msgstr "Vorheriger FC"
 
 #: wagons.lua
 msgid "Remote Routesetting"
-msgstr ""
+msgstr "Fahrstraße entfernt stellen"
 
 #: wagons.lua
 msgid "Routingcode"
-msgstr ""
+msgstr "Routingcode"
 
 #: wagons.lua
 msgid "Save wagon properties"
@@ -580,26 +594,23 @@ msgstr "Äußere Anzeige"
 
 #: wagons.lua
 msgid "That player does not exist!"
-msgstr ""
+msgstr "Dieser Spieler existiert nicht!"
 
 #: wagons.lua
-#, fuzzy
 msgid "That wagon does not exist!"
-msgstr "In diesem Waggon ist kein Sitzplatz vorhanden."
+msgstr "Dieser Wagen existiert nicht!"
 
 #: wagons.lua
-#, fuzzy
 msgid "The track you are trying to place the wagon on is not long enough!"
-msgstr "Das Gleis, auf dem der Waggon platziert werden woll, ist zu kurz."
+msgstr "Das Gleis, auf dem der Waggon platziert werden woll, ist zu kurz!"
 
 #: wagons.lua
 msgid "The wagon's inventory is not empty."
 msgstr "Das Inventar dieses Waggons ist nicht leer."
 
 #: wagons.lua
-#, fuzzy
 msgid "This Wagon ID"
-msgstr "Der Waggon ist voll."
+msgstr "Dieser Wagen ID"
 
 #: wagons.lua
 msgid "This wagon has no seats."
@@ -615,32 +626,31 @@ msgstr "Dieser Waggon gehört @1, Sie dürfen ihn nicht abbauen."
 
 #: wagons.lua
 msgid "Train ID"
-msgstr ""
+msgstr "Zug-ID"
 
 #: wagons.lua
 msgid "Train overview / coupling control is only shown when the train stands."
-msgstr ""
+msgstr "Zugübersicht / Kupplungssteuerung nur im Stillstand verfügbar."
 
 #: wagons.lua
 msgid "Train overview /coupling control:"
-msgstr ""
+msgstr "Zugübersicht / Kupplungssteuerung:"
 
 #: wagons.lua
 msgid "Uninitialized, removing"
-msgstr ""
+msgstr "Nicht initialisiert, entferne"
 
 #: wagons.lua
 msgid "Wagon @1 ownership changed from @2 to @3"
-msgstr ""
+msgstr "Besitzer von Waggon @1 geändert von @2 auf @3"
 
 #: wagons.lua
 msgid "Wagon needs to be decoupled from other wagons in order to destroy it."
 msgstr "Der Waggon muss abgekoppelt sein, damit Sie ihn abbauen können."
 
 #: wagons.lua
-#, fuzzy
 msgid "Wagon placeholder"
-msgstr "Waggon-Einstellungen"
+msgstr "Waggon-Platzhalter"
 
 #: wagons.lua
 msgid "Wagon properties"
@@ -648,7 +658,7 @@ msgstr "Waggon-Einstellungen"
 
 #: wagons.lua
 msgid "Wagon road number:"
-msgstr ""
+msgstr "Wagennummer:"
 
 #: wagons.lua
 msgid ""
@@ -673,7 +683,7 @@ msgstr "Ihnen fehlt das „@1“-Privileg."
 
 #: wagons.lua
 msgid "You have been given ownership of wagon @1"
-msgstr ""
+msgstr "Sie sind nun der Besitzer von Waggon @1"
 
 #~ msgid "3-way turnout"
 #~ msgstr "Dreiwegweiche"
