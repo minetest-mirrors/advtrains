@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: advtrains\n"
 "Report-Msgid-Bugs-To: advtrains-discuss@lists.sr.ht\n"
 "POT-Creation-Date: 2025-06-11 23:21+0200\n"
-"PO-Revision-Date: 2025-06-11 23:40+0200\n"
+"PO-Revision-Date: 2025-06-12 22:55+0200\n"
 "Last-Translator: Y. Wang <yw05@forksworld.de>\n"
 "Language-Team: German\n"
 "Language: de\n"
@@ -14,183 +14,192 @@ msgstr ""
 
 #: autonaming.lua
 msgid "Prefix set, next signal name will be: @1"
-msgstr ""
+msgstr "Präfix gesetzt, nächster Signalname: @1"
 
 #: autonaming.lua
 msgid "Prefix unset, signals are not auto-named for you!"
-msgstr ""
+msgstr "Präfix gelöscht, automatische Signalbenennung deaktiviert!"
 
 #: autonaming.lua
 msgid ""
 "Sets the current prefix for automatically naming interlocking components. "
 "Example: '/at_nameprefix TEST' - signals will be named TEST1, TEST2 and so on"
 msgstr ""
+"Setze einen Präfix für die automatische Benennung von neu hinzugefügten "
+"Signalen. Beispiel: '/at_nameprefix TEST' - Signale werden mit TEST1, TEST2 "
+"usw. benannt"
 
 #: database.lua
 msgid "Created track section @1 from @2 TCBs"
-msgstr ""
+msgstr "Gleisabschnitt @1 aus @2 TCBs erstellt"
 
 #: database.lua
 msgid "Track section inconsistent here, repairing..."
-msgstr ""
+msgstr "Gleisabschnitt ist inkonsistent, repariere..."
 
 #: database.lua
 msgid "Track section partition found, repairing..."
-msgstr ""
+msgstr "Gleisabschnitt partitioniert, repariere..."
 
 #: init.lua
 msgid "Can set up track sections, routes and signals"
-msgstr ""
+msgstr "Darf Gleisabschnitte, Fahrstraßen und Signale bearbeiten"
 
 #: route_prog.lua
 msgid "@1 Terminal @2"
-msgstr ""
+msgstr "@1 Ziel @2"
 
 #: route_prog.lua
 msgid "@1 is held in @2 position when this route is set and freed "
-msgstr ""
+msgstr "@1 wird durch die Fahrstraße in Position @2 festgelegt"
 
 #: route_prog.lua
 msgid "@1 is no longer affected when this route is set."
-msgstr ""
+msgstr "@1 wird nicht mehr durch die Fahrstraße festgelegt"
 
 #: route_prog.lua
 msgid "Added track section @1 to the route."
-msgstr ""
+msgstr "Gleisabschnitt @1 zur Fahrstraße hinzugefügt."
 
 #: route_prog.lua
 msgid "Advance to next route section"
-msgstr ""
+msgstr "Nächsten Gleisabschnitt hinzufügen"
 
 #: route_prog.lua
 msgid "Advance/Complete Route"
-msgstr ""
+msgstr "Fahrstraße fortsetzen/beenden"
 
 #: route_prog.lua
 msgid "Advancing over next section is"
-msgstr ""
+msgstr "Fortsetzen über nächsten Gleisabschnitt hinaus"
 
 #: route_prog.lua
 msgid "Cancel if you are unsure!"
-msgstr ""
+msgstr "Abbrechen, wenn Sie unsicher sind!"
 
 #: route_prog.lua
 msgid "Cancel route programming"
-msgstr ""
+msgstr "Fahrstraßenprogrammierung abbrechen"
 
 #: route_prog.lua
 msgid "Cannot program route without a target"
-msgstr ""
+msgstr "Kann keine Fahrstraße ohne Ziel programmieren"
 
 #: route_prog.lua tcb_ts_ui.lua
 msgid "End of interlocking"
-msgstr ""
+msgstr "Ende der Zugsicherung"
 
 #: route_prog.lua
 msgid "Enter Route Name"
-msgstr ""
+msgstr "Fahrstraßennamen eingeben"
 
 #: route_prog.lua
 msgid "Finish programming route"
-msgstr ""
+msgstr "Fahrstraße abschließen"
 
 #: route_prog.lua
 msgid "Finish route HERE"
-msgstr ""
+msgstr "Fahrstraße HIER abschließen"
 
 #: route_prog.lua
 msgid "Finish route at end of NEXT section"
-msgstr ""
+msgstr "Fahrstraße am Ende des NÄCHSTEN Abschnitts abschließen"
 
 #: route_prog.lua
 msgid "Fixed in state @1 by route @2 (punch to unfix)"
-msgstr ""
+msgstr "Festgelegt in Zustand @1 durch Fahrstraße @2 (Schlagen um freizugeben)"
 
 #: route_prog.lua
 msgid "Fixed in state @1 by route @2 until segment #@3 is freed."
 msgstr ""
+"Festgelegt in Zustand @1 durch Fahrstraße @2, bis Segment @3 freigegeben "
+"wird."
 
 #: route_prog.lua route_ui.lua signal_aspect_ui.lua tcb_ts_ui.lua tool.lua
 msgid "Insufficient privileges to use this!"
-msgstr ""
+msgstr "Unzureichende Privilegien, um dies zu benutzen!"
 
 #: route_prog.lua
 msgid "Next section is diverging (>2 TCBs)"
-msgstr ""
+msgstr "Nächster Abschnitt enthält eine Weiche (>2 TCBs)"
 
 #: route_prog.lua
 msgid "Route discarded."
-msgstr ""
+msgstr "Fahrstraße verworfen."
 
 #: route_prog.lua
 msgid "Route ends at signal:"
-msgstr ""
+msgstr "Fahrstraße endet bei Signal:"
 
 #: route_prog.lua
 msgid "Route leads into"
-msgstr ""
+msgstr "Fahrstraße führt in"
 
 #: route_prog.lua
 msgid ""
 "Route programming mode active. Punch TCBs to add route segments, punch "
 "turnouts to lock them."
 msgstr ""
+"Fahrstraßenprogrammierung aktiv. Schlage Gleisabschnittsgrenzen (TCB) um "
+"Segmente hinzuzufügen, schlage Weichen um sie festzulegen."
 
 #: route_prog.lua
 msgid "Route section @1 removed."
-msgstr ""
+msgstr "Fahrstraßenabschnitt @1 entfernt."
 
 #: route_prog.lua
 msgid "Routes should in most cases end at signals."
-msgstr ""
+msgstr "Fahrstraßen sollten normalerweise an einem Signal enden."
 
 #: route_prog.lua
 msgid "Save Route"
-msgstr ""
+msgstr "Fahrstraße speichern"
 
 #: route_prog.lua
 msgid "Step back one section"
-msgstr ""
+msgstr "Einen Abschnitt zurück"
 
 #: route_prog.lua
 msgid "Successfully programmed route."
-msgstr ""
+msgstr "Fahrstraße erfolgreich programmiert."
 
 #: route_prog.lua
 msgid "The origin TCB has become unknown during programming. Try again."
-msgstr ""
+msgstr "Der Start-TCB ist unbekannt geworden. Versuche nochmal."
 
 #: route_prog.lua
 msgid "This TCB is not suitable as"
-msgstr ""
+msgstr "Diese Gleisabschnittsgrenze ist"
 
 #: route_prog.lua
 msgid "This TCB is unconfigured, you first need to assign it to a rail"
 msgstr ""
+"Diese Gleisabschnittsgrenze ist noch nicht konfiguiert, sie muss erst "
+"zugewiesen werden"
 
 #: route_prog.lua
 msgid "WARNING: Route does not end at a signal."
-msgstr ""
+msgstr "ACHTUNG: Fahrstraße endet nicht an einem Signal."
 
 #: route_prog.lua
 msgid "[Route programming] "
-msgstr ""
+msgstr "[Fahrstraßenprogrammierung] "
 
 #: route_prog.lua
 msgid "impossible at this place."
-msgstr ""
+msgstr "ist hier nicht möglich."
 
 #: route_prog.lua
 msgid "non-interlocked area"
-msgstr ""
+msgstr "nicht-überwachtes Gebiet"
 
 #: route_prog.lua
 msgid "route continuation."
-msgstr ""
+msgstr "nicht als Fortsetzung geeignet."
 
 #: route_ui.lua
 msgid "<< Select a route part to edit options"
-msgstr ""
+msgstr "<< Wähle einen Abschnitt, um Optionen zu bearbeiten"
 
 #: route_ui.lua
 msgid "<Default Aspect>"
@@ -198,59 +207,59 @@ msgstr "<Standardbegriff>"
 
 #: route_ui.lua
 msgid "ARS Rule List"
-msgstr ""
+msgstr "ARS-Regelliste"
 
 #: route_ui.lua
 msgid "Announce distant signal"
-msgstr ""
+msgstr "Entferntes Hauptsignal ankündigen"
 
 #: route_ui.lua
 msgid "Back to signal"
-msgstr ""
+msgstr "Zurück zum Signal"
 
 #: route_ui.lua
 msgid "Call-on (section may be occupied)"
-msgstr ""
+msgstr "Abschnitt darf belegt sein"
 
 #: route_ui.lua
 msgid "Clone Route"
-msgstr ""
+msgstr "Duplizieren"
 
 #: route_ui.lua
 msgid "Delete Route"
-msgstr ""
+msgstr "Fahrstraße löschen"
 
 #: route_ui.lua
 msgid "Error:"
-msgstr ""
+msgstr "Fehler:"
 
 #: route_ui.lua
 msgid "New From Route"
-msgstr ""
+msgstr "Neu aus dieser FS"
 
 #: route_ui.lua
 msgid "No Signal at this TCB"
-msgstr ""
+msgstr "Kein Signal hier"
 
 #: route_ui.lua
 msgid "Route name"
-msgstr ""
+msgstr "Fahrstraßenname"
 
 #: route_ui.lua
 msgid "Route overview"
-msgstr ""
+msgstr "Fahrstraßenübersicht"
 
 #: route_ui.lua
 msgid "Save ARS List"
-msgstr ""
+msgstr "ARS-Liste speichern"
 
 #: route_ui.lua
 msgid "Section Options:"
-msgstr ""
+msgstr "Abschnittsoptionen:"
 
 #: route_ui.lua tcb_ts_ui.lua
 msgid "Set"
-msgstr ""
+msgstr "Setzen"
 
 #: route_ui.lua signal_aspect_ui.lua
 msgid "Signal Aspect:"
@@ -258,158 +267,166 @@ msgstr "Signalbegriff:"
 
 #: route_ui.lua tcb_ts_ui.lua
 msgid "TCB at @1 has different section than previous TCB"
-msgstr ""
+msgstr "TCB bei @1 hat einen anderen Gleisabschnitt als der vorherige TCB"
 
 #: route_ui.lua tcb_ts_ui.lua
 msgid "TCB at @1 is missing"
-msgstr ""
+msgstr "TCB bei @1 fehlt"
 
 #: route_ui.lua tcb_ts_ui.lua
 msgid "TCB at @1 is not assigned to previous track section"
-msgstr ""
+msgstr "TCB bei @1 ist dem vorherigen Gleisabschnitt nicht zugewiesen"
 
 #: route_ui.lua tcb_ts_ui.lua
 msgid "Track section after @1 missing"
-msgstr ""
+msgstr "Gleisabschnitt nach @1 fehlt"
 
 #: route_ui.lua tcb_ts_ui.lua
 msgid "Turnout/component missing at @1"
-msgstr ""
+msgstr "Weiche oder Komponente bei @1 fehlt"
 
 #: routesetting.lua
 msgid "Lock conflict at @1, Held locked by:"
-msgstr ""
+msgstr "Sperrenkonflikt bei @1, bereits gesperrt durch:"
 
 #: routesetting.lua
 msgid "No TCB found at @1. Please update or reconfigure route!"
-msgstr ""
+msgstr "TCB bei @1 nicht gefunden. Bitte Fahrstraße korrigieren!"
 
 #: routesetting.lua
 msgid "No track section adjacent to @1. Please reconfigure route!"
-msgstr ""
+msgstr "Gleisabschnitt nach @1 nicht gefunden. Bitte Fahrstraße korrigieren!"
 
 #: routesetting.lua
 msgid "Route @1 from signal @2"
-msgstr ""
+msgstr "Fahrstraße @1 von Signal @2"
 
 #: routesetting.lua
 msgid "Route @1 from signal @2, segment #@3"
-msgstr ""
+msgstr "Fahrstraße @1 von Signal @2, Segment @3"
 
 #: routesetting.lua
 msgid "Section '@1' already has route set from @2:"
-msgstr ""
+msgstr "Abschnitt '@1' bereits durch Fahrstraße von @2 belegt:"
 
 #: routesetting.lua
 msgid "Section '@1' is occupied!"
-msgstr ""
+msgstr "Abschnitt '@1' ist durch einen Zug belegt!"
 
 #: routesetting.lua
 msgid "Section '@1' not found!"
-msgstr ""
+msgstr "Abschnitt '@1' nicht gefunden!"
 
 #: routesetting.lua
 msgid ""
 "TCB at @1 has different section than previous TCB. Please update track "
 "section or reconfigure route!"
 msgstr ""
+"TCB bei @1 hat anderen Abschnitt als vorhergehender TCB. Bitte Fahrstraße "
+"korrigieren!"
 
 #: routesetting.lua
 msgid ""
 "Turnout/component missing at @1. Please update track section or reconfigure "
 "route!"
-msgstr ""
+msgstr "Weiche/Komponente bei @1 nicht gefunden. Bitte Fahrstraße korrigieren!"
 
 #: signal_aspect_ui.lua
 msgid "<assign distant>"
-msgstr ""
+msgstr "<entf. Hauptsignal festl.>"
 
 #: signal_aspect_ui.lua
 msgid "<none>"
-msgstr ""
+msgstr "<kein>"
 
 #: signal_aspect_ui.lua
 msgid "Assigned distant signal to the main signal at @1"
-msgstr ""
+msgstr "Vorsignal dem Hauptsignal bei @1 zugewiesen"
 
 #: signal_aspect_ui.lua
 msgid "Assigned signal to the TCB at @1"
-msgstr ""
+msgstr "Signal der Gleisabschnittsgrenze bei @1 zugewiesen"
 
 #: signal_aspect_ui.lua tool.lua
 msgid "Clear"
-msgstr ""
+msgstr "Leeren"
 
 #: signal_aspect_ui.lua
 msgid ""
 "Configuring Signal: Influence point of another signal is already present!"
 msgstr ""
+"Signal einstellen: Beeinflussungspunkt eines anderen Signals bereits "
+"vorhanden!"
 
 #: signal_aspect_ui.lua
 msgid "Configuring Signal: Node is too far away. Aborted."
-msgstr ""
+msgstr "Signal einstellen: Block ist zu weit entfernt. Abbruch."
 
 #: signal_aspect_ui.lua
 msgid ""
 "Configuring Signal: Please look in train's driving direction and punch rail "
 "to set influence point."
 msgstr ""
+"Signal einstellen: In Fahrtrichtung schauen und Gleis schlagen, um "
+"Beeinflussungspunkt zu setzen."
 
 #: signal_aspect_ui.lua
 msgid "Configuring Signal: Successfully set influence point"
-msgstr ""
+msgstr "Signal einstellen: Beeinflussungspunkt erfolgreich gesetzt"
 
 #: signal_aspect_ui.lua
 msgid "Configuring Signal: This is not a normal two-connection rail! Aborted."
-msgstr ""
+msgstr "Signal einstellen: Dies ist kein geeignetes Gleis! Abbruch."
 
 #: signal_aspect_ui.lua
 msgid "Dst: @1"
-msgstr ""
+msgstr "Haupts.: @1"
 
 #: signal_aspect_ui.lua
 msgid "Influence point is not set."
-msgstr ""
+msgstr "Beeinflussungspunkt ist nicht gesetzt."
 
 #: signal_aspect_ui.lua
 msgid "Influence point is set at @1."
-msgstr ""
+msgstr "Beeinflussungspunkt ist gesetzt bei @1."
 
 #: signal_aspect_ui.lua
 msgid "Modify"
-msgstr ""
+msgstr "Bearbeiten"
 
 #: signal_aspect_ui.lua
 msgid "Set distant signal: Punch the main signal to assign!"
-msgstr ""
+msgstr "Hauptsignal zuweisen: Bitte schlage das Hauptsignal!"
 
 #: signal_aspect_ui.lua
 msgid "Set influence point"
-msgstr ""
+msgstr "Beeinflussungspunkt setzen"
 
 #: smartroute.lua
 msgid "Apply"
-msgstr ""
+msgstr "Anwenden"
 
 #: smartroute.lua
 msgid "Route search: @1 found"
-msgstr ""
+msgstr "Fahrstraßensuche: @1 gefunden"
 
 #: smartroute.lua
 msgid "Search further"
-msgstr ""
+msgstr "Weitersuchen"
 
 #: smartroute.lua
 msgid "Smartroute: No track section directly ahead!"
-msgstr ""
+msgstr "Fahrstraßensuche: Kein Gleisabschnitt voraus!"
 
 #: smartroute.lua
 msgid "Smartroute: TCBS or routes don't exist here!"
 msgstr ""
+"Fahrstraßensuche: Gleisabschnittsgrenze oder Fahrstraßen existieren hier "
+"nicht!"
 
 #: tcb_ts_ui.lua
 msgid " (invalid)"
-msgstr ""
+msgstr "(ungültig)"
 
 #: tcb_ts_ui.lua
 msgid "@1 locks in state @2"
@@ -442,10 +459,12 @@ msgstr "Gleisabschnittsgrenzen:"
 #: tcb_ts_ui.lua
 msgid "Can't remove TCB: Both sides must have no signal assigned!"
 msgstr ""
+"Kann Gleisabschnittsgrenze nicht entfernen: mindestens eine Seite hat noch "
+"ein Signal zugewiesen!"
 
 #: tcb_ts_ui.lua
 msgid "Can't remove track, a train is here!"
-msgstr ""
+msgstr "Kann Gleisabschnittsgrenze nicht entfernen: hier ist noch ein Zug!"
 
 #: tcb_ts_ui.lua
 msgid "Cancel"
@@ -465,49 +484,59 @@ msgstr ""
 
 #: tcb_ts_ui.lua
 msgid "Clear locks"
-msgstr "Sperren freigeben"
+msgstr "Sperren löschen"
 
 #: tcb_ts_ui.lua
 msgid ""
 "Configuring TCB: Already existed at this position, it is now linked to this "
 "TCB marker"
 msgstr ""
+"Gleisabschnittsgrenze einstellen: Existierte hier bereits, der Marker ist "
+"nun verbunden"
 
 #: tcb_ts_ui.lua
 msgid "Configuring TCB: Cannot use static signals for routesetting. Aborted."
 msgstr ""
+"Gleisabschnittsgrenze einstellen: statische Signale können nicht für "
+"Fahrstraßen benutzt werden. Abbruch."
 
 #: tcb_ts_ui.lua
 msgid "Configuring TCB: Internal error, TCBS doesn't exist. Aborted."
 msgstr ""
+"Gleisabschnittsgrenze einstellen: Interner Fehler, TCB existiert nicht. "
+"Abbruch."
 
 #: tcb_ts_ui.lua
 msgid "Configuring TCB: Node is too far away. Aborted."
-msgstr ""
+msgstr "Gleisabschnittsgrenze einstellen: Block ist zu weit entfernt. Abbruch."
 
 #: tcb_ts_ui.lua
 msgid "Configuring TCB: Not a compatible signal. Aborted."
-msgstr ""
+msgstr "Gleisabschnittsgrenze einstellen: Kein kompatibles Signal. Abbruch."
 
 #: tcb_ts_ui.lua
 msgid "Configuring TCB: Please punch the rail you want to assign this TCB to."
 msgstr ""
+"Gleisabschnittsgrenze einstellen: Bitte das Gleis schlagen, wo die Grenze "
+"erstellt werden soll."
 
 #: tcb_ts_ui.lua
 msgid "Configuring TCB: Please punch the signal to assign."
 msgstr ""
+"Gleisabschnittsgrenze einstellen: Bitte das zuzuweisende Signal schlagen."
 
 #: tcb_ts_ui.lua
 msgid "Configuring TCB: Successfully assigned signal."
-msgstr ""
+msgstr "Gleisabschnittsgrenze einstellen: Signal erfolgreich zugewiesen."
 
 #: tcb_ts_ui.lua
 msgid "Configuring TCB: Successfully configured TCB"
-msgstr ""
+msgstr "Gleisabschnittsgrenze einstellen: Grenze erfolgreich erstellt"
 
 #: tcb_ts_ui.lua
 msgid "Configuring TCB: This is not a normal two-connection rail! Aborted."
 msgstr ""
+"Gleisabschnittsgrenze einstellen: Dies ist kein geeignetes Gleis! Abbruch."
 
 #: tcb_ts_ui.lua
 msgid "Create Interlocked Track Section"
@@ -575,7 +604,7 @@ msgstr "Bisher keine Fahrstraßen definiert."
 
 #: tcb_ts_ui.lua
 msgid "No trains on this section."
-msgstr "Keine Züge auf diesem Abschnitt"
+msgstr "Keine Züge auf diesem Abschnitt."
 
 #: tcb_ts_ui.lua
 msgid "Punch components to add fixed locks. (punch anything else = end)"
@@ -678,18 +707,21 @@ msgstr "Fahrstraßensuche"
 #: tcb_ts_ui.lua
 msgid "TCB Link: Select linked TCB now!"
 msgstr ""
+"Gleisabschnitte verknüpfen: Zu verknüpfende Gleisabschnittsgrenze jetzt "
+"auswählen!"
 
 #: tcb_ts_ui.lua
 msgid "TCB already existed at this position, now linked to this node"
 msgstr ""
+"Gleisabschnittsgrenze existierte hier bereits, der Block ist nun verbunden"
 
 #: tcb_ts_ui.lua
 msgid "TCB assigned to @1"
-msgstr ""
+msgstr "Gleisabschnittsgrenze an @1 zugewiesen"
 
 #: tcb_ts_ui.lua
 msgid "This TCB has been removed. Please dig marker."
-msgstr ""
+msgstr "Gleisabschnittsgrenze wurde gelöscht. Bitte Marker entfernen."
 
 #: tcb_ts_ui.lua
 msgid ""
@@ -713,12 +745,15 @@ msgid ""
 "and the routesetting status of this section.\n"
 "Are you sure?"
 msgstr ""
+"Dies löscht die Liste der Züge im Abschnitt\n"
+"sowie den Fahrstraßenstatus.\n"
+"Sind Sie sicher?"
 
 #: tcb_ts_ui.lua
 msgid ""
 "This will remove the track section and set all its end points to End Of "
 "Interlocking"
-msgstr ""
+msgstr "Dies wird den Gleisabschnitt löschen"
 
 #: tcb_ts_ui.lua
 msgid "Track Circuit Break"
@@ -730,15 +765,16 @@ msgstr "Einstellungen der Gleisabschnittsgrenze"
 
 #: tcb_ts_ui.lua
 msgid "Track Section Detail - @1"
-msgstr ""
+msgstr "Gleisabschnitts-Details - @1"
 
 #: tcb_ts_ui.lua
 msgid "Trains on this section:"
-msgstr ""
+msgstr "Züge in diesem Abschnitt"
 
 #: tcb_ts_ui.lua
 msgid "Unconfigured Track Circuit Break, right-click to assign."
 msgstr ""
+"Nicht konfiguierte Gleisabschnittsgrenze (TCB). Rechtsklick zum Zuweisen."
 
 #: tcb_ts_ui.lua
 msgid "Wait for this route to be cancelled in order to do anything here."
@@ -757,6 +793,8 @@ msgid ""
 "You cannot modify track sections when a route is set or a train is on the "
 "section."
 msgstr ""
+"Abschnitt kann nicht bearbeitet werden, wenn eine Fahrstraße gesetzt ist "
+"oder der Abschnitt belegt ist."
 
 #: tool.lua
 msgid "Emplace manual lock"
@@ -768,6 +806,9 @@ msgid ""
 "Punch: Highlight track section\n"
 "Place: check route locks/show track section info"
 msgstr ""
+"Zugsicherungswerkzeug\n"
+"Schlagen: Gleisabschnitte hervorheben\n"
+"Platzieren: Gleisabschnittsinformation/Fahrstraßensperren anzeigen"
 
 #: tool.lua
 msgid "No route locks set"
