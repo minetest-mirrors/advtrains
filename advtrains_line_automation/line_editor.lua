@@ -1,6 +1,21 @@
 local def
 local F = minetest.formspec_escape
-local ifthenelse = ch_core.ifthenelse
+local ch_core = advtrains.lines.ch_core
+--[[
+Jednoduchá funkce, která vyhodnotí condition jako podmínku
+a podle výsledku vrátí buď true_result, nebo false_result.
+]]
+local function ifthenelse(condition, true_result, false_result)
+	if condition then
+		return true_result
+	else
+		return false_result
+	end
+end
+-- Singularis-Merge: Emulate certain ch functionality
+local function prihlasovaci_na_zobrazovaci(prihlasovaci)
+	return prihlasovaci -- no-op. On CH used to colorize the name to reflect the rank of the player
+end
 
 local max_stations = 60
 
@@ -148,7 +163,7 @@ local function get_formspec(custom_state)
         table.insert(formspec,
             ","..color..","..F(lv_line)..","..F(get_line_description(linevar_def, {first_stop = true, last_stop = true}))..
             ","..F(lv_rc)..","..ifthenelse(linevar_def.owner == pinfo.player_name, "#00ff00", color)..",")
-        table.insert(formspec, F(ch_core.prihlasovaci_na_zobrazovaci(linevar_def.owner)))
+        table.insert(formspec, F(prihlasovaci_na_zobrazovaci(linevar_def.owner)))
         table.insert(formspec, ","..color..",")
         if linevar_def.disabled then
             table.insert(formspec, "vypnutá")
@@ -360,7 +375,7 @@ local function custom_state_set_selection_index(custom_state, new_selection_inde
         custom_state.disable_linevar = "false"
         custom_state.continues = ""
     end
-    custom_state.owner = ch_core.prihlasovaci_na_zobrazovaci(custom_state.owner)
+    custom_state.owner = prihlasovaci_na_zobrazovaci(custom_state.owner)
     custom_state.compiled_linevar = nil
     custom_state.evl_scroll = 0
     custom_state.message = ""
@@ -517,7 +532,7 @@ local function custom_state_compile_linevar(custom_state)
 
     custom_state.compiled_linevar = {
         name = line.."/"..stops[1].stn.."/"..rc,
-        owner = ch_core.jmeno_na_prihlasovaci(owner),
+        owner = owner, -- ch_core.jmeno_na_prihlasovaci(owner),
         stops = stops,
         continue_line = "",
         continue_rc = "",

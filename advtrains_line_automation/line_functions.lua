@@ -1,6 +1,9 @@
 local al = advtrains.lines
 local rwt = assert(advtrains.lines.rwt)
 
+-- Get current translator
+local S = advtrains.lines.translate
+
 local MODE_NORMAL = 0 -- normální zastávka (výchozí nebo mezilehlá)
 local MODE_REQUEST_STOP = 1 -- zastávka na znamení (mezilehlá)
 local MODE_HIDDEN = 2 -- skrytá zastávka (výchozí nebo mezilehlá)
@@ -617,8 +620,8 @@ function al.on_train_approach(pos, train_id, train, index, has_entered)
         if train.line_status.linevar == nil then
             -- nelinkový vlak:
             local stn = advtrains.lines.stations[stdata.stn]
-            local stnname = stn and stn.name or attrans("Unknown Station")
-            train.text_inside = attrans("Next Stop:") .. "\n"..stnname
+            local stnname = stn and stn.name or S("Unknown Station")
+            train.text_inside = S("Next Stop:") .. "\n"..stnname
         end
         advtrains.interlocking.ars_set_disable(train, true)
     end

@@ -15,10 +15,10 @@ local def = {
 	selection_box = sbox,
 	collision_box = sbox,
 	tiles = {
-		{name = "ch_core_white_pixel.png^[multiply:#aaaaaa"},
-		{name = "ch_core_white_pixel.png^[multiply:#aaaaaa"},
-		{name = "ch_core_white_pixel.png^[multiply:#aaaaaa"},
-		{name = "ch_core_white_pixel.png^[multiply:#aaaaaa"},
+		{name = "advtrains_line_automation_white_pixel.png^[multiply:#aaaaaa"},
+		{name = "advtrains_line_automation_white_pixel.png^[multiply:#aaaaaa"},
+		{name = "advtrains_line_automation_white_pixel.png^[multiply:#aaaaaa"},
+		{name = "advtrains_line_automation_white_pixel.png^[multiply:#aaaaaa"},
 		{name = "advtrains_line_automation_jrad.png"},
 		{name = "advtrains_line_automation_jrad.png"},
 	},
@@ -34,7 +34,7 @@ local def = {
 		local player_name = placer and placer:get_player_name()
 		if player_name ~= nil then
 			local meta = core.get_meta(pos)
-			meta:set_string("infotext", "jízdní řád (spravuje: "..ch_core.prihlasovaci_na_zobrazovaci(player_name)..")")
+			meta:set_string("infotext", "jízdní řád (spravuje: "..player_name..")")
 			meta:set_string("owner", player_name)
 		end
 	end,
@@ -43,7 +43,7 @@ local def = {
 			return false
 		end
 		local player_name = player:get_player_name()
-		if ch_core.get_player_role(player_name) == "admin" then
+		if core.check_player_privs(name, {protection_bypass=true}) then
 			return true
 		end
 		if core.is_protected(pos, player_name) then

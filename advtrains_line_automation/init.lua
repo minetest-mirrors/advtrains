@@ -26,6 +26,7 @@ advtrains.lines.translate = core.get_translator("advtrains_line_automation")
 -- Get current translator
 local S = advtrains.lines.translate
 
+dofile(modpath.."ch_functions.lua")
 dofile(modpath.."railwaytime.lua")
 dofile(modpath.."line_functions.lua")
 dofile(modpath.."line_editor.lua")

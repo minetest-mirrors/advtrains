@@ -1,12 +1,22 @@
 local al = advtrains.lines
 local F = core.formspec_escape
-local ifthenelse = assert(ch_core.ifthenelse)
+local ch_core = al.ch_core
+--[[
+Jednoduchá funkce, která vyhodnotí condition jako podmínku
+a podle výsledku vrátí buď true_result, nebo false_result.
+]]
+local function ifthenelse(condition, true_result, false_result)
+	if condition then
+		return true_result
+	else
+		return false_result
+	end
+end
 local rwt = assert(advtrains.lines.rwt)
 local def
 local function CF(s)
     if s ~= nil then return F(s) else return "" end
 end
-local has_ch_time = core.get_modpath("ch_time")
 local has_signs_api = core.get_modpath("signs_api")
 local has_unifieddyes = core.get_modpath("unifieddyes")
 local rozhlas_node_name = "advtrains_line_automation:stanicni_rozhlas"
@@ -1010,12 +1020,6 @@ local function update_ann(stn, epos, signs, records, rwtime)
                 tracks = {[tracks] = true}
             end
         end
-    end
-    if has_ch_time then
-        local cas = ch_time.aktualni_cas()
-        any_line.HH = string.format("%02d", cas.hodina)
-        any_line.MM = string.format("%02d", cas.minuta)
-        any_line.SS = string.format("%02d", cas.sekunda)
     end
     local lines = {}
     for _, record in ipairs(records) do

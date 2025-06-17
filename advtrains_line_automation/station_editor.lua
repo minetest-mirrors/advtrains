@@ -1,7 +1,29 @@
 local def
 local F = minetest.formspec_escape
-local ifthenelse = ch_core.ifthenelse
+local ch_core = advtrains.lines.ch_core
+--[[
+Jednoduchá funkce, která vyhodnotí condition jako podmínku
+a podle výsledku vrátí buď true_result, nebo false_result.
+]]
+local function ifthenelse(condition, true_result, false_result)
+	if condition then
+		return true_result
+	else
+		return false_result
+	end
+end
 local rwt = assert(advtrains.lines.rwt)
+
+-- Get current translator
+local S = advtrains.lines.translate
+
+-- Singularis-Merge: Emulate certain ch functionality
+local function systemovy_kanal(pname, message)
+	core.chat_send_player(pname, S("[Station Editor]")..message)
+end
+local function prihlasovaci_na_zobrazovaci(prihlasovaci)
+	return prihlasovaci -- no-op. On CH used to colorize the name to reflect the rank of the player
+end
 
 local function load_stations()
 	local result = {}
@@ -187,7 +209,7 @@ local function get_formspec(custom_state)
 		"table[0.5,1.25;19,5;dopravna;0,KÓD,NÁZEV,#ffffff,SPRAVUJE,VZDÁLENOST,INFO")
 	for _, st in ipairs(stations) do
 		local n_tracks = #st.tracks
-		table.insert(formspec, ",0,"..F(st.stn)..","..F(st.name)..",#ffffff,"..F(ch_core.prihlasovaci_na_zobrazovaci(st.owner))..","..
+		table.insert(formspec, ",0,"..F(st.stn)..","..F(st.name)..",#ffffff,"..F(prihlasovaci_na_zobrazovaci(st.owner))..","..
 			F(station_distance_s(custom_state.player_pos, st))..","..n_tracks.." kolej")
 		if n_tracks < 1 or n_tracks > 4 then
 			table.insert(formspec, "í")
@@ -214,7 +236,7 @@ local function get_formspec(custom_state)
 	if st then
 		stn = F(st.stn)
 		nazev = F(st.name)
-		spravuje = F(ch_core.prihlasovaci_na_zobrazovaci(st.owner))
+		spravuje = F(prihlasovaci_na_zobrazovaci(st.owner))
 	else
 		stn, nazev, spravuje = "", "", F(pinfo.viewname)
 	end
@@ -268,55 +290,55 @@ local function formspec_callback(custom_state, player, formname, fields)
 		if pinfo.role ~= "admin" or new_owner == nil or new_owner == "" then
 			new_owner = pinfo.player_name
 		else
-			new_owner = ch_core.jmeno_na_prihlasovaci(new_owner)
+			--new_owner = ch_core.jmeno_na_prihlasovaci(new_owner)
 		end
 		if new_stn == nil or new_stn == "" then
-			ch_core.systemovy_kanal(custom_state.player_name, "CHYBA: kód nesmí být prázdný!")
+			systemovy_kanal(custom_state.player_name, "CHYBA: kód nesmí být prázdný!")
 			return
 		end
 		local als = advtrains.lines.stations
 		if als[new_stn] ~= nil then
-			ch_core.systemovy_kanal(custom_state.player_name, "CHYBA: zastávka s kódem "..new_stn.." již existuje!")
+			systemovy_kanal(custom_state.player_name, "CHYBA: zastávka s kódem "..new_stn.." již existuje!")
 			return
 		end
 		als[new_stn] = {name = assert(new_name), owner = assert(new_owner)}
 		custom_state.stations = nil
 		update_formspec = true
-		ch_core.systemovy_kanal(custom_state.player_name, "Dopravna úspěšně vytvořena.")
+		systemovy_kanal(custom_state.player_name, "Dopravna úspěšně vytvořena.")
 	elseif fields.ulozit then
 		local new_stn, new_name, new_owner = fields.stn, fields.name or "", fields.owner
 		local pinfo = ch_core.normalize_player(player)
 		local st = custom_state.stations[(custom_state.selection_index or 0) - 1]
 		if st == nil then
-			ch_core.systemovy_kanal(custom_state.player_name, "CHYBA: není vybrána žádná zastávka!")
+			systemovy_kanal(custom_state.player_name, "CHYBA: není vybrána žádná zastávka!")
 			return
 		end
 		local change_stn, change_name = st.stn ~= new_stn, st.name ~= new_name
 		local change_owner = pinfo.role == "admin" and fields.owner ~= nil and fields.owner ~= "" and
-			ch_core.jmeno_na_prihlasovaci(fields.owner) ~= st.owner
+			fields.owner ~= st.owner -- ch_core.jmeno_na_prihlasovaci(fields.owner) ~= st.owner
 		if not change_stn and not change_name and not change_owner then
-			ch_core.systemovy_kanal(custom_state.player_name, "Nic nezměněno.")
+			systemovy_kanal(custom_state.player_name, "Nic nezměněno.")
 			return
 		end
 		local t = advtrains.lines.stations[st.stn]
 		if t == nil then
-			ch_core.systemovy_kanal(custom_state.player_name, "CHYBA: zastávka k úpravě nebyla nalezena! Toto je pravděpodobně vnitřní chyba editoru.")
+			systemovy_kanal(custom_state.player_name, "CHYBA: zastávka k úpravě nebyla nalezena! Toto je pravděpodobně vnitřní chyba editoru.")
 			return
 		end
 		if change_stn then
 			-- zkontrolovat, že cílový kód je volný
 			if advtrains.lines.stations[new_stn] ~= nil then
-				ch_core.systemovy_kanal(custom_state.player_name, "CHYBA: zastávka s kódem "..new_stn.." již existuje!")
+				systemovy_kanal(custom_state.player_name, "CHYBA: zastávka s kódem "..new_stn.." již existuje!")
 				return
 			end
 		end
 		if change_owner then
-			t.owner = ch_core.jmeno_na_prihlasovaci(fields.owner)
-			ch_core.systemovy_kanal(custom_state.player_name, "Správa zastávky změněna.")
+			t.owner = fields.owner -- ch_core.jmeno_na_prihlasovaci(fields.owner)
+			systemovy_kanal(custom_state.player_name, "Správa zastávky změněna.")
 		end
 		if change_name then
 			t.name = new_name
-			ch_core.systemovy_kanal(custom_state.player_name, "Jmeno zastávky změněno.")
+			systemovy_kanal(custom_state.player_name, "Jmeno zastávky změněno.")
 		end
 		if change_stn then
 			advtrains.lines.stations[new_stn] = t
@@ -334,7 +356,7 @@ local function formspec_callback(custom_state, player, formname, fields)
 				end
 			end
 			advtrains.lines.stations[st.stn] = nil
-			ch_core.systemovy_kanal(custom_state.player_name, "Kód zastávky změněn, "..count.." bloků kolejí aktualizováno.")
+			systemovy_kanal(custom_state.player_name, "Kód zastávky změněn, "..count.." bloků kolejí aktualizováno.")
 		end
 		custom_state.stations = nil
 		update_formspec = true
@@ -342,26 +364,26 @@ local function formspec_callback(custom_state, player, formname, fields)
 		local pinfo = ch_core.normalize_player(player)
 		local st = custom_state.stations[(custom_state.selection_index or 0) - 1]
 		if st == nil then
-			ch_core.systemovy_kanal(custom_state.player_name, "CHYBA: není vybrána žádná zastávka!")
+			systemovy_kanal(custom_state.player_name, "CHYBA: není vybrána žádná zastávka!")
 			return
 		end
 		if st.tracks[1] ~= nil then
-			ch_core.systemovy_kanal(custom_state.player_name, "Nelze smazat zastávku, k níž jsou přiřazeny koleje!")
+			systemovy_kanal(custom_state.player_name, "Nelze smazat zastávku, k níž jsou přiřazeny koleje!")
 			return
 		end
 		local t = advtrains.lines.stations[st.stn]
 		if t == nil then
-			ch_core.systemovy_kanal(custom_state.player_name, "CHYBA: zastávka k úpravě nebyla nalezena! Toto je pravděpodobně vnitřní chyba editoru.")
+			systemovy_kanal(custom_state.player_name, "CHYBA: zastávka k úpravě nebyla nalezena! Toto je pravděpodobně vnitřní chyba editoru.")
 			return
 		end
 		advtrains.lines.stations[st.stn] = nil
-		ch_core.systemovy_kanal(custom_state.player_name, "Zastávka úspěšně smazána.")
+		systemovy_kanal(custom_state.player_name, "Zastávka úspěšně smazána.")
 		custom_state.stations = nil
 		update_formspec = true
 	elseif fields.jrad then
 		local st = custom_state.stations[(custom_state.selection_index or 0) - 1]
 		if st == nil then
-			ch_core.systemovy_kanal(custom_state.player_name, "CHYBA: není vybrána žádná zastávka!")
+			systemovy_kanal(custom_state.player_name, "CHYBA: není vybrána žádná zastávka!")
 			return
 		end
 		advtrains.lines.show_jr_formspec(player, nil, assert(st.stn))
@@ -369,31 +391,31 @@ local function formspec_callback(custom_state, player, formname, fields)
 	elseif fields.priradit_kolej then
 		local st = custom_state.stations[(custom_state.selection_index or 0) - 1]
 		if st == nil then
-			ch_core.systemovy_kanal(custom_state.player_name, "CHYBA: není vybrána žádná zastávka!")
+			systemovy_kanal(custom_state.player_name, "CHYBA: není vybrána žádná zastávka!")
 			return
 		end
 		local linevar_to_change = custom_state.linevars[custom_state.current_linevar]
 		if linevar_to_change == nil then
-			ch_core.systemovy_kanal(custom_state.player_name, "CHYBA: vnitřní chyba 1!")
+			systemovy_kanal(custom_state.player_name, "CHYBA: vnitřní chyba 1!")
 			return
 		end
 		local linevar_def = advtrains.lines.try_get_linevar_def(linevar_to_change.linevar, linevar_to_change.stn)
 		if linevar_def == nil then
-			ch_core.systemovy_kanal(custom_state.player_name, "CHYBA: vnitřní chyba 2!")
+			systemovy_kanal(custom_state.player_name, "CHYBA: vnitřní chyba 2!")
 			return
 		end
 		local stop = linevar_def.stops[linevar_to_change.linevar_index]
 		if stop == nil then
-			ch_core.systemovy_kanal(custom_state.player_name, "CHYBA: vnitřní chyba 3!")
+			systemovy_kanal(custom_state.player_name, "CHYBA: vnitřní chyba 3!")
 			return
 		end
 		if stop.stn ~= st.stn then
-			ch_core.systemovy_kanal(custom_state.player_name, "CHYBA: vnitřní chyba 4!")
+			systemovy_kanal(custom_state.player_name, "CHYBA: vnitřní chyba 4!")
 			return
 		end
 		stop.track = tostring(fields.kolej)
 		linevar_to_change.track = stop.track
-		ch_core.systemovy_kanal(custom_state.player_name, "Přiřazená kolej úspěšně nastavena.")
+		systemovy_kanal(custom_state.player_name, "Přiřazená kolej úspěšně nastavena.")
 		update_formspec = true
 	elseif fields.quit then
 		return
@@ -835,7 +857,7 @@ local function get_jr_formspec(custom_state)
 	end
 
 	if not custom_state.force_unprivileged then
-		if ch_core.get_player_role(custom_state.player_name) == "admin" then
+		if core.check_player_privs(name, {protection_bypass=true}) then -- TODO make a lines admin privilege
 			access_level = "admin"
 		elseif custom_state.player_name == node_owner or custom_state.player_name == stn_owner then
 			access_level = "owner"
@@ -876,20 +898,20 @@ local function get_jr_formspec(custom_state)
 		if access_level ~= "admin" then
 			-- player/owner
 			table.insert(formspec, "label[0.5,1.65;vlastník/ice j. řádu: ")
-			table.insert(formspec, ch_core.prihlasovaci_na_zobrazovaci(node_owner))
+			table.insert(formspec, prihlasovaci_na_zobrazovaci(node_owner))
 			if stn_owner ~= nil then
 				table.insert(formspec, " | dopravnu spravuje: ")
-				table.insert(formspec, ch_core.prihlasovaci_na_zobrazovaci(stn_owner))
+				table.insert(formspec, prihlasovaci_na_zobrazovaci(stn_owner))
 			end
 			table.insert(formspec, "]")
 		else
 			-- admin only
 			table.insert(formspec, "label[0.5,1.65;vlastník/ice:]"..
 				"field[2.75,1.25;5,0.75;owner;;")
-			table.insert(formspec, ch_core.prihlasovaci_na_zobrazovaci(node_owner))
+			table.insert(formspec, prihlasovaci_na_zobrazovaci(node_owner))
 			table.insert(formspec, "]button[8,1.25;3,0.75;setowner;nastavit]")
 			if stn_owner ~= nil then
-				table.insert(formspec, "label[11.25,1.65;dopravnu spravuje: "..ch_core.prihlasovaci_na_zobrazovaci(stn_owner).."]")
+				table.insert(formspec, "label[11.25,1.65;dopravnu spravuje: "..prihlasovaci_na_zobrazovaci(stn_owner).."]")
 			end
 		end
 	else
@@ -976,7 +998,7 @@ local function jr_formspec_callback(custom_state, player, formname, fields)
 	end
 	if fields.setowner and custom_state.pos ~= nil and is_jr_node_name(core.get_node(custom_state.pos).name) then
 		local meta = core.get_meta(custom_state.pos)
-		local jm = ch_core.jmeno_na_existujici_prihlasovaci(fields.owner)
+		local jm = fields.owner -- ch_core.jmeno_na_existujici_prihlasovaci(fields.owner)
 		if jm ~= nil then
 			meta:set_string("owner", jm)
 		else

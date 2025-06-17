@@ -163,6 +163,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		end
 		if fields.waitsig then
 			tmp_checkboxes[pe].waitsig = (fields.waitsig == "true")
+		end
 		if fields.keepopen then
 			tmp_checkboxes[pe].keepopen = (fields.keepopen == "true")
 		end
@@ -285,9 +286,8 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			minetest.close_formspec(pname, formname)
 			minetest.after(0.25, advtrains.lines.open_station_editor, player)
 			return
-		end
-	end			
-	
+		end -- if fields.save
+	end -- if pos
 end)
 
 local adefunc = function(def, preset, suffix, rotation)
