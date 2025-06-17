@@ -96,25 +96,26 @@ local function show_stoprailform(pos, player)
 		"dropdown[2.25,3;2,0.75;doors;vlevo,vpravo,neotvírat;"..door_dropdown[stdata.doors].."]"..
 		"checkbox[4.5,3.25;reverse;"..S("Reverse train")..";"..(stdata.reverse and "true" or "false").."]"..
 		"checkbox[4.5,3.75;kick;"..S("Kick out passengers")..";"..(stdata.kick and "true" or "false").."]"..
-		"checkbox[4.5,4.25;keepopen;Nezavírat dveře na odj.;"..(stdata.keepopen and "true" or "false").."]"..
+		"checkbox[4.5,4.25;keepopen;"..S("Keep doors open")..";"..(stdata.keepopen and "true" or "false").."]"..
+		"checkbox[4.5,4.75;waitsig;"..S("Wait for signal to clear")..";"..(stdata.waitsig and "true" or "false").."]"..
 		"label[0.25,4.3;"..S("Stop Time").."]"..
 		"field[0.25,4.5;1,0.75;wait;;"..stdata.wait.."]"..
 		"label[1.5,4.9;+]"..
 		"field[2,4.5;1,0.75;ddelay;;"..minetest.formspec_escape(stdata.ddelay).."]".. -- "..attrans("Door Delay").."
-		(advtrains.lines.open_station_editor ~= nil and "button[3.5,4.5;4,0.75;editstn;Editor dopraven]" or "")..
+		(advtrains.lines.open_station_editor ~= nil and "button[5.75,11;2.0,0.75;editstn;"..S("Station Editor").."]" or "")..
 		"field[0.25,6;2,0.75;speed;"..S("Dep. Speed")..";"..minetest.formspec_escape(stdata.speed).."]"..
-		"field[2.5,6;2,0.75;line;Linka na odj.;"..minetest.formspec_escape(stdata.line or "").."]"..
-		"field[4.75,6;2,0.75;routingcode;Sm.kód na odj.;"..minetest.formspec_escape(stdata.routingcode or "").."]"..
-		"field[0.25,7.25;2,0.75;interval;Interval \\[s\\]:;"..minetest.formspec_escape(stdata.interval or "").."]"..
-		"field[2.5,7.25;2,0.75;ioffset;Jeho posun:;"..minetest.formspec_escape(stdata.ioffset or "0").."]"..
-		"button[4.75,7;3,1.0;ioffsetnow;Nastavit posun\nna odjezd teď + uložit]"..
+		"field[2.5,6;2,0.75;line;"..S("Dep. Line")..";"..minetest.formspec_escape(stdata.line or "").."]"..
+		"field[4.75,6;2,0.75;routingcode;"..S("Dep. RC")..";"..minetest.formspec_escape(stdata.routingcode or "").."]"..
+		"field[0.25,7.25;2,0.75;interval;"..S("Interval:")..";"..minetest.formspec_escape(stdata.interval or "").."]"..
+		"field[2.5,7.25;2,0.75;ioffset;"..S("Offset:")..";"..minetest.formspec_escape(stdata.ioffset or "0").."]"..
+		"button[4.75,7.25;3,0.75;ioffsetnow;"..S("Set offset to now").."]"..
 		"textarea[0.25,8.4;7.5,1.5;ars;"..S("Trains stopping here (ARS rules)")..";"..advtrains.interlocking.ars_to_text(stdata.ars).."]"..
-		"label[0.3,10.25;Platí jen pro vlaky s]"..
+		"label[0.3,10.25;"..S("For trains with").."]"..
 		"field[3,10;1,0.5;minparts;;"..minetest.formspec_escape(stdata.minparts or "0").."]"..
-		"label[4.15,10.25;až]"..
+		"label[4.15,10.25;"..S("to").."]"..
 		"field[4.6,10;1,0.5;maxparts;;"..minetest.formspec_escape(stdata.maxparts or "128").."]"..
-		"label[5.75,10.25;vozy.]"..
-		"button_exit[0.25,11;7.5,0.75;save;"..S("Save").."]"..
+		"label[5.75,10.25;"..S("cars").."]"..
+		"button_exit[0.25,11;5.5,0.75;save;"..S("Save").."]"..
 		"tooltip[close;Zavře dialogové okno]"..
 		"tooltip[stn;Dopravna\\, ke které tato zastávka patří. Jedna dopravna může mít víc kolejí. K vytvoření a úpravám dopraven použijte Editor dopraven.]"..
 		"tooltip[track;Číslo koleje]"..

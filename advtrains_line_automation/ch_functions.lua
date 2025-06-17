@@ -2,6 +2,18 @@
 
 -- Functions from Cesky Hvozd utility libraries which are used in the code integrated from Singularis are now provided here.
 
+--[[
+Jednoduchá funkce, která vyhodnotí condition jako podmínku
+a podle výsledku vrátí buď true_result, nebo false_result.
+]]
+local function ifthenelse(condition, true_result, false_result)
+	if condition then
+		return true_result
+	else
+		return false_result
+	end
+end
+
 local ch_core = {}
 
 -- gives various info about a player. we return only what is relevant outside CH
