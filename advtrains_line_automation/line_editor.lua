@@ -1,6 +1,7 @@
 local def
 local F = minetest.formspec_escape
 local ch_core = advtrains.lines.ch_core
+local S = advtrains.lines.translate
 --[[
 Jednoduchá funkce, která vyhodnotí condition jako podmínku
 a podle výsledku vrátí buď true_result, nebo false_result.
@@ -87,13 +88,13 @@ end
 local function replace_linevar(stn, linevar_def)
     local station = advtrains.lines.stations[stn]
     if station == nil or station.linevars == nil then
-        return false, "Chybná stanice!"
+        return false, S("No such station")
     end
     local linevar = assert(linevar_def.name)
     local linevars = station.linevars
     local old_linevar_def = linevars[linevar]
     if old_linevar_def == nil then
-        return false, "Nemohu nahradit, varianta linky '"..linevar.."' dosud neexistuje!"
+        return false, S("Cannot replace, because lineval @1 does not yet exist", linevar)
     end
     linevars[linevar] = linevar_def
     local restart_count = 0
@@ -109,7 +110,7 @@ local function replace_linevar(stn, linevar_def)
         end
     end
     if restart_count > 0 then
-        return true, restart_count.." vlak/ů restartován/o kvůli změnám"
+        return true, S("@1 trains restarted due to changes", restart_count)
     else
         return true, nil
     end
@@ -118,11 +119,11 @@ end
 local function delete_linevar(stn, linevar)
     local station = advtrains.lines.stations[stn]
     if station == nil or station.linevars == nil then
-        return false, "Chybná stanice!"
+        return false, S("No such station")
     end
     local linevars = station.linevars
     if linevars[assert(linevar)] == nil then
-        return false, "Nemohu odstranit, varianta linky '"..linevar.."' nebyla nalezena!"
+        return false, S("Cannot delete, because lineval @1 does not yet exist", linevar)
     end
     linevars[linevar] = nil
     for train_id, train in pairs(advtrains.trains) do
@@ -146,7 +147,7 @@ local function get_formspec(custom_state)
 	local selection_index = selection_index_raw or 1
     local formspec = {
         ch_core.formspec_header({formspec_version = 6, size = {20, 16}, auto_background = true}),
-        "label[0.5,0.6;Editor variant linek]"..
+        "label[0.5,0.6;"..S("Line Editor").."]"..
         "style[s01_pos",
     }
     for i = 2, max_stations do
@@ -155,7 +156,7 @@ local function get_formspec(custom_state)
     table.insert(formspec, ";font=mono;font_size=-4]"..
         "style[rc;font=mono]"..
         "tablecolumns[color;text,align=right;text;text,align=center;color;text,width=7;color;text]"..
-        "table[0.5,1.25;19,5;linevar;#ffffff,LINKA,TRASA,SM. KÓD,#ffffff,SPRAVUJE,#ffffff,STAV")
+        "table[0.5,1.25;19,5;linevar;#ffffff,"..S("LINE,ROUTE,SM-CODE")..",#ffffff,"..S("OWNER")..",#ffffff,STAV")
 
     for _, linevar_def in ipairs(custom_state.linevars) do
         local lv_line, lv_stn, lv_rc = linevar_decompose(linevar_def.name)
@@ -175,40 +176,40 @@ local function get_formspec(custom_state)
         table.insert(formspec, ";]")
     end
     if pinfo.role ~= "new" then
-        table.insert(formspec, "button[14.5,0.3;3.5,0.75;create;nová varianta...]")
+        table.insert(formspec, "button[14.5,0.3;3.5,0.75;create;"..S("New Line...").."]")
     end
     local has_rights_to_open_variant =
         pinfo.role == "admin" or selection_index == 1 or
         pinfo.player_name == custom_state.linevars[selection_index - 1].owner
 
     if selection_index > 1 and has_rights_to_open_variant then
-        table.insert(formspec, "button[10.5,0.3;3.5,0.75;delete;smazat variantu]")
+        table.insert(formspec, "button[10.5,0.3;3.5,0.75;delete;"..S("Delete Line").."]")
     end
     table.insert(formspec, "button_exit[18.75,0.3;0.75,0.75;close;X]"..
         "field[0.5,7;1.25,0.75;line;linka:;"..F(custom_state.line).."]"..
         "field[2,7;1.5,0.75;rc;sm.kód:;"..F(custom_state.rc).."]"..
         "field[3.75,7;3,0.75;train_name;jméno vlaku:;"..F(custom_state.train_name).."]")
     if pinfo.role ~= "admin" then
-        table.insert(formspec, "label[7,6.75;spravuje:\n")
+        table.insert(formspec, "label[7,6.75;"..S("Owner:").."\n")
     else
-        table.insert(formspec, "field[7,7;4,0.75;owner;spravuje:;")
+        table.insert(formspec, "field[7,7;4,0.75;owner;"..S("Owner:")..";")
     end
     table.insert(formspec, F(custom_state.owner).."]"..
-        "checkbox[11.25,7.25;disable_linevar;vypnout;"..custom_state.disable_linevar.."]"..
-        "field[13.5,7;3,0.75;continues;pokračování:;"..F(custom_state.continues).."]")
+        "checkbox[11.25,7.25;disable_linevar;"..S("Disable")..";"..custom_state.disable_linevar.."]"..
+        "field[13.5,7;3,0.75;continues;"..S("Continues:")..";"..F(custom_state.continues).."]")
 
     if custom_state.message ~= "" then
         table.insert(formspec, "label[0.5,8.25;"..F(custom_state.message).."]")
     end
     if selection_index > 1 then
-        table.insert(formspec, "button[5,15;4.5,0.75;last_passages;poslední jízdy...]"..
+        table.insert(formspec, "button[5,15;4.5,0.75;last_passages;"..S("Last passages").."]"..
         "tooltip[last_passages;Zobrazí přehled časů několika posledních jízd na dané variantě linky.]")
     end
     if has_rights_to_open_variant then
         table.insert(formspec, "button[10,15;4.5,0.75;save;"..
-            ifthenelse(custom_state.compiled_linevar == nil, "ověřit změny\npřed uložením]", "uložit změny]"))
+            ifthenelse(custom_state.compiled_linevar == nil, S("Apply/Save").."]", S("Create/Save").."]"))
     end
-    table.insert(formspec, "button[15,15.25;4,0.5;reset;vrátit změny]")
+    table.insert(formspec, "button[15,15.25;4,0.5;reset;"..S("Reset changes").."]")
     table.insert(formspec, "tooltip[line;"..
         "Označení linky. Musí být neprázdné. Varianta linky bude použita pouze na vlaky s tímto označením linky.]"..
         "tooltip[rc;Směrový kód. Může být prázdný. Varianta linky bude použita pouze na vlaky\\,\n"..
@@ -219,12 +220,12 @@ local function get_formspec(custom_state)
         "na žádné další vlaky\\, stávající vlaky však mohou dojet do svých koncových zastávek.]")
 
     table.insert(formspec, "container[0,8.75]"..
-        "label[0.5,0.25;odjezd]"..
-        "label[2,0.25;stání]"..
-        "label[3.5,0.25;kód dop.]"..
-        "label[6.25,0.25;režim zastávky]"..
-        "label[11,0.25;kolej]"..
-        "label[12.5,0.25;omezení pozice]"..
+        "label[0.5,0.25;"..S("Departure").."]"..
+        "label[2,0.25;"..S("Stop").."]"..
+        "label[3.5,0.25;"..S("Code Dop.").."]"..
+        "label[6.25,0.25;"..S("Mode").."]"..
+        "label[11,0.25;"..S("Track").."]"..
+        "label[12.5,0.25;"..S("Position").."]"..
         "scrollbaroptions[min=0;max=550;arrows=show]"..
         "scrollbar[19,0.5;0.5,5.5;vertical;evl_scroll;"..custom_state.evl_scroll.."]"..
         "scroll_container[0.5,0.5;18.5,5.5;evl_scroll;vertical]"..
@@ -235,7 +236,7 @@ local function get_formspec(custom_state)
         "label[0.1,0.4;0]"..
         "field[1.5,0;1.25,0.75;s01_wait;;"..F(custom_state.stops[1].wait).."]"..
         "field[3,0;2.5,0.75;s01_stn;;"..F(custom_state.stops[1].stn).."]"..
-        "dropdown[5.75,0;4.5,0.75;s01_mode;výchozí,skrytá (výchozí);"..custom_state.stops[1].mode..";true]"..
+        "dropdown[5.75,0;4.5,0.75;s01_mode;"..S("Normal")..","..S("Hidden (normal)")..";"..custom_state.stops[1].mode..";true]"..
         "field[10.5,0;1.25,0.75;s01_track;;"..F(custom_state.stops[1].track).."]"..
         "field[12,0;3,0.75;s01_pos;;"..F(custom_state.stops[1].pos).."]"..
         "label[15.25,0.4;"..F(custom_state.stops[1].label).."]")
@@ -257,8 +258,8 @@ local function get_formspec(custom_state)
             "field[1.5,"..y..";1.25,0.75;s"..n.."_wait;;"..F(stop.wait).."]"..
             "field[3,"..y..";2.5,0.75;s"..n.."_stn;;"..F(stop.stn).."]"..
             "dropdown[5.75,"..y..";4.5,0.75;s"..n..
-                "_mode;normální,na znamení (experimentální),skrytá (mezilehlá),vypnutá,koncová,koncová skrytá,"..
-            "koncová (pokračuje);"..stop.mode..";true]"..
+                "_mode;"..S("Normal")..","..S("Request Stop (experimental)")..","..S("Hidden")..","..S("Inactive")..","..S("Terminus")..","..S("Terminus (hidden)")..","..
+            S("Terminus (continuing)")..";"..stop.mode..";true]"..
             "field[10.5,"..y..";1.25,0.75;s"..n.."_track;;"..F(stop.track).."]"..
             "field[12,"..y..";3,0.75;s"..n.."_pos;;"..F(stop.pos).."]"..
             "label[15.25,"..y2..";"..F(stop.label).."]")
@@ -427,21 +428,21 @@ local function custom_state_compile_linevar(custom_state)
     local owner = assert(custom_state.owner)
     local stops = {}
     if line == "" then
-        return false, "Označení linky nesmí být prázdné!"
+        return false, S("Line name must not be empty!")
     elseif line:find("[/|\\]") then
-        return false, "Označení linky nesmí obsahovat znaky '/', '|' a '\\'!"
+        return false, S("Line name must not contain characters '/', '|' or '\\'!")
     elseif line:len() > 256 then
-        return false, "Označení linky je příliš dlouhé!"
+        return false, S("Line name must not exceed 256 characters!")
     elseif stn == "" then
-        return false, "Výchozí zastávka musí být vyplněná!"
+        return false, S("Starting station code must not be empty!")
     elseif rc:find("[/|\\]") then
-        return false, "Směrový kód nesmí obsahovat znaky '/', '|' a '\\'!"
+        return false, S("Routing code must not contain '/', '|' or '\\'!")
     elseif owner == "" then
-        return false, "Správa linky musí být vyplněná!"
+        return false, S("Line owner must not be empty!")
     elseif train_name:len() > 256 then
-        return false, "Jméno vlaku je příliš dlouhé!"
+        return false, S("Train name must not exceed 256 characters!")
     elseif custom_state.continues:len() - custom_state.continues:gsub("/", ""):len() > 1 then
-        return false, "Pole 'pokračování' smí obsahovat nejvýše jedno lomítko!"
+        return false, S("Field 'Continuation' must contain maximum 1 '/'!")
     end
     -- Zkontrolovat zastávky:
     local errcount = 0
@@ -454,30 +455,30 @@ local function custom_state_compile_linevar(custom_state)
             -- přeskočit
         elseif not stop.dep:match("^[0-9][0-9]*$") then
             errcount = errcount + 1
-            stop.label = color_red.."Chybný formát času odjezdu!"
+            stop.label = color_red..S("Incorrect departure time format!")
         elseif tonumber(stop.dep) < 0 or tonumber(stop.dep) > 3600 then
             errcount = errcount + 1
-            stop.label = color_red.."Čas odjezdu musí být v rozsahu 0 až 3600!"
+            stop.label = color_red..S("Departure time must lie within 0-3600 seconds!")
         elseif dep_to_index[tonumber(stop.dep)] ~= nil then
             errcount = errcount + 1
-            stop.label = color_red.."Duplicitní čas odjezdu!"
+            stop.label = color_red..S("Duplicate departure time!")
         else
             dep_to_index[tonumber(stop.dep)] = i
             if stop.stn == "" or stations[stop.stn] == nil or stations[stop.stn].name == nil then
                 errcount = errcount + 1
-                stop.label = color_red.."Neznámý kód dopravny!"
+                stop.label = color_red..S("Unknown station code!")
             elseif stop.stn:find("[/|\\]") then
                 errcount = errcount + 1
-                stop.label = color_red.."Kód dopravny nesmí obsahovat znaky '/', '|' a '\\'!"
+                stop.label = color_red..S("Station code must not contain '/', '|' or '\\'!")
             elseif stop.track:len() > 16 then
                 errcount = errcount + 1
-                stop.label = color_red.."Označení koleje je příliš dlouhé!"
+                stop.label = color_red..S("Line name must not exceed 16 characters!")
             elseif stop.pos ~= "" and not stop.pos:match("^[-0-9][0-9]*,[-0-9][0-9]*,[-0-9][0-9]*$") then
                 errcount = errcount + 1
-                stop.label = color_red.."Neplatný formát pozice!"
+                stop.label = color_red..S("Incorrect format for stop position!")
             elseif stop.pos:len() > 22 then
                 errcount = errcount + 1
-                stop.label = color_red.."Specifikace pozice je příliš dlouhá!"
+                stop.label = color_red..S("Stop position must not exceed 22 characters!")
             else
                 -- v pořádku:
                 local new_stop = {
@@ -509,10 +510,10 @@ local function custom_state_compile_linevar(custom_state)
         end
     end
     if errcount > 0 then
-        return false, errcount.." chyb v seznamu zastávek!"
+        return false, S("@1 errors while checking line setup!", errcount)
     end
     if finalcount == 0 then
-        return false, "Varianta linky musí obsahovat alespoň jednu koncovou zastávku!"
+        return false, S("Line setup must contain at least 1 terminus stop!")
     end
     table.sort(stops, function(a, b) return a.dep < b.dep end)
 
@@ -623,9 +624,9 @@ local function formspec_callback(custom_state, player, formname, fields)
             local success, errmsg = custom_state_compile_linevar(custom_state)
             if success then
                 -- TODO: zkontrolovat práva a možnost přepsání i zde!
-                custom_state.message = color_green.."Úspěšně ověřeno. Varianta linky může být uložena."
+                custom_state.message = color_green..S("No issues found, the line can now be saved!")
             else
-                custom_state.message = color_red.."Ověření selhalo: "..(errmsg or "Neznámý důvod")
+                custom_state.message = color_red..S("Error in line setup: ")..(errmsg or S("Unknown reason"))
             end
             update_formspec = true
         else
@@ -669,7 +670,7 @@ local function formspec_callback(custom_state, player, formname, fields)
                     if success then
                         success, errmsg = replace_linevar(new_linevar_station, new_linevar_def)
                     else
-                        errmsg = "Nedostatečná práva k variantě linky '"..to_linevar.."'."
+                        errmsg = S("Insufficient permissions to edit '@1'.", to_linevar)
                     end
                 end
             elseif to_linevar == nil then
@@ -682,7 +683,7 @@ local function formspec_callback(custom_state, player, formname, fields)
                         success, errmsg = add_linevar(new_linevar_station, new_linevar_def)
                     end
                 else
-                    errmsg = "Nedostatečná práva k variantě linky '"..selected_linevar.."'."
+                    errmsg = S("Insufficient permissions to edit '@1'.", selected_linevar)
                 end
             elseif selected_linevar ~= to_linevar then
                 -- delete and replace
@@ -696,10 +697,10 @@ local function formspec_callback(custom_state, player, formname, fields)
                             success, errmsg = replace_linevar(new_linevar_station, new_linevar_def)
                         end
                     else
-                        errmsg = "Nedostatečná práva k variantě linky '"..selected_linevar.."'."
+                        errmsg = S("Insufficient permissions to edit '@1'.", selected_linevar)
                     end
                 else
-                    errmsg = "Nedostatečná práva k variantě linky '"..to_linevar.."'."
+                    errmsg = S("Insufficient permissions to edit '@1'.", to_linevar)
                 end
             else
                 -- replace
@@ -708,15 +709,15 @@ local function formspec_callback(custom_state, player, formname, fields)
                 if success then
                     success, errmsg = replace_linevar(new_linevar_station, new_linevar_def)
                 else
-                    errmsg = "Nedostatečná práva k variantě linky '"..to_linevar.."'."
+                    errmsg = S("Insufficient permissions to edit '@1'.", to_linevar)
                 end
             end
 
             if success then
-                custom_state.message = color_green.."Varianta linky '"..new_linevar.."' úspěšně uložena."
+                custom_state.message = color_green..S("Line '@1' successfully saved!", new_linevar)
                 custom_state_refresh_linevars(custom_state, new_linevar)
             else
-                custom_state.message = color_red.."Ukládání selhalo: "..(errmsg or "Neznámá chyba.")
+                custom_state.message = color_red..S("Error in line setup: ")..(errmsg or S("Unknown reason"))
             end
             update_formspec = true
         end
@@ -739,14 +740,14 @@ local function formspec_callback(custom_state, player, formname, fields)
             if success then
                 success, errmsg = delete_linevar(selected_linevar_station, selected_linevar)
             else
-                errmsg = "Nedostatečná práva k variantě linky '"..selected_linevar.."'."
+                errmsg = S("Insufficient permissions to edit '@1'.", selected_linevar)
             end
             if success then
-                custom_state.message = "Varianta linky '"..selected_linevar.."' úspěšně smazána."
+                custom_state.message = S("Line '@1' successfully deleted!", selected_linevar)
                 custom_state_refresh_linevars(custom_state)
                 custom_state_set_selection_index(custom_state, 1)
             else
-                custom_state.message = "Mazání selhalo: "..(errmsg or "Neznámá chyba.")
+                custom_state.message = S("Deletion failed: ")..(errmsg or S("Unknown reason"))
             end
             update_formspec = true
         end
@@ -788,11 +789,11 @@ show_last_passages_formspec = function(player, linevar_def, selected_linevar)
     local formspec = {
         "formspec_version[6]"..
         "size[20,10]"..
-        "label[0.5,0.6;Poslední jízdy na variantě linky ",
-        F(assert(linevar_def.name)),
+        "label[0.5,0.6;",
+        S("Last passages of line @1", F(assert(linevar_def.name))),
         "]"..
         "tablecolumns[text;text;text,width=5;text,width=5;text,width=5;text,width=5;text,width=5;text,width=5;text,width=5;text,width=5;text,width=5;text,width=5]",
-        "table[0.5,1.25;19,8;jizdy;KÓD,DOPRAVNA,1.j.,2.j.,3.j.,4.j.,5.j.,6.j.,7.j.,8.j.,9.j.,10.j."
+        "table[0.5,1.25;19,8;jizdy;",S("Code"),",",S("Station"),",1.j.,2.j.,3.j.,4.j.,5.j.,6.j.,7.j.,8.j.,9.j.,10.j."
     }
     local passages, stops = get_last_passages(linevar_def)
     local max_time = {}
@@ -804,7 +805,7 @@ show_last_passages_formspec = function(player, linevar_def, selected_linevar)
             end
         end
         -- stání na výchozí zastávce:
-        table.insert(formspec, ",,STÁNÍ NA V.Z.:")
+        table.insert(formspec, ",,"..S("At start station:"))
         for j = 1, 10 do
             local wait = passages[j].wait
             if wait ~= nil then
@@ -814,7 +815,7 @@ show_last_passages_formspec = function(player, linevar_def, selected_linevar)
             end
         end
         -- odjezd z výchozí zastávky:
-        table.insert(formspec, ","..F(stops[1][1])..","..F(stops[1][2]).." (odj.)")
+        table.insert(formspec, ","..F(stops[1][1])..","..F(stops[1][2]).." "..S("(departed)"))
         for j = 1, 10 do
             local time = passages[j][1]
             if time ~= nil then
@@ -842,7 +843,7 @@ show_last_passages_formspec = function(player, linevar_def, selected_linevar)
                 end
             end
         end
-        table.insert(formspec, ",,DOBA JÍZDY:")
+        table.insert(formspec, ",,"..S("Travelling:"))
         for i = 1, 10 do
             if max_time[i] ~= 0 then
                 table.insert(formspec, ",_"..(max_time[i] - passages[i][1]).."_")
@@ -852,7 +853,7 @@ show_last_passages_formspec = function(player, linevar_def, selected_linevar)
         end
     end
     table.insert(formspec, ";]"..
-        "button[17.75,0.3;1.75,0.75;back;zpět]"..
+        "button[17.75,0.3;1.75,0.75;back;"..S("Back").."]"..
         "tooltip[jizdy;Časové údaje jsou v sekundách železničního času.]")
     formspec = table.concat(formspec)
     local custom_state = {
@@ -864,8 +865,8 @@ end
 
 def = {
     -- params = "",
-    description = "Otevře editor variant linek",
-    privs = {ch_registered_player = true, railway_operator = true},
+    description = S("Open line editor"),
+    privs = {railway_operator = true},
     func = function(player_name, param) show_editor_formspec(minetest.get_player_by_name(player_name)) end,
 }
-core.register_chatcommand("linky", def)
+core.register_chatcommand("line_editor", def)

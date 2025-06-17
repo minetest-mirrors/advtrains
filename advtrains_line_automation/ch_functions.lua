@@ -492,8 +492,6 @@ local function def_to_string(label, defitem, separator)
 	end
 end
 
-local ifthenelse = ch_core.ifthenelse
-
 --[[
 	Sestaví záhlaví formspecu. Dovolené klíče jsou:
 	-- formspec_version
@@ -546,7 +544,7 @@ function ch_core.formspec_header(def)
 				-- colors according to Technic Chests:
 				result[7] = "listcolors[#7b7b7b;#909090;#000000;#6e823c;#ffffff]"
 			end
-			result[10] = "background9[0,0;1,1;ch_core_formspec_bg.png;true;16]"
+			--result[10] = "background9[0,0;1,1;ch_core_formspec_bg.png;true;16]"
 			-- result[9] = "background[0,0;"..fsw..","..fsh..";ch_core_formspec_bg.png]"
 		end
 	end

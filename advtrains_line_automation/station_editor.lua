@@ -135,32 +135,32 @@ end
 
 local filters = {
 	{
-		description = "od nejbližší",
+		description = S("By Distance"),
 		-- filter = filter_all,
 		sorter = sort_by_distance,
 	},
 	{
-		description = "podle kódu A-Z",
+		description = S("Station Code (A-Z)"),
 		-- filter = filter_all,
 		sorter = sort_by_stn,
 	},
 	{
-		description = "podle názvu A-Z",
+		description = S("Station Name (A-Z)"),
 		-- filter = filter_all,
 		sorter = sort_by_name,
 	},
 	{
-		description = "moje (podle kódu A-Z)",
+		description = S("My Stations (Station Code A-Z)"),
 		filter = filter_mine,
 		sorter = sort_by_stn,
 	},
 	{
-		description = "moje (podle názvu A-Z)",
+		description = S("My Stations (Station Name A-Z)"),
 		filter = filter_mine,
 		sorter = sort_by_name,
 	},
 	{
-		description = "moje (od nejbližší)",
+		description = S("My Stations (By Distance)"),
 		filter = filter_mine,
 		sorter = sort_by_distance,
 	},
@@ -206,18 +206,18 @@ local function get_formspec(custom_state)
 		"0=ch_core_empty.png,"..
 		"1=basic_materials_padlock.png\\^[resize:16x16"..
 		";text;text,width=25;color,span=1;text,width=7;text;text]"..
-		"table[0.5,1.25;19,5;dopravna;0,KÓD,NÁZEV,#ffffff,SPRAVUJE,VZDÁLENOST,INFO")
+		"table[0.5,1.25;19,5;dopravna;0,"..S("CODE")..","..S("NAME")..",#ffffff,"..S("OWNER")..","..S("DISTANCE")..","..S("INFO").."")
 	for _, st in ipairs(stations) do
 		local n_tracks = #st.tracks
 		table.insert(formspec, ",0,"..F(st.stn)..","..F(st.name)..",#ffffff,"..F(prihlasovaci_na_zobrazovaci(st.owner))..","..
-			F(station_distance_s(custom_state.player_pos, st))..","..n_tracks.." kolej")
+			F(station_distance_s(custom_state.player_pos, st))..", "..S("@1 tracks", n_tracks))
 		if n_tracks < 1 or n_tracks > 4 then
 			table.insert(formspec, "í")
 		elseif n_tracks ~= 1 then
 			table.insert(formspec, "e")
 		end
 		if n_tracks > 0 then
-			table.insert(formspec, "\\, linky " ..F(table.concat(st.lines, ",")))
+			table.insert(formspec, "\\, "..S("lines").." " ..F(table.concat(st.lines, ",")))
 		end
 	end
 	table.insert(formspec, ";"..(selection_index or "").."]")
@@ -246,17 +246,17 @@ local function get_formspec(custom_state)
 		ifthenelse(pinfo.role == "admin", "field[10.5,7;4,0.75;owner;spravuje:;", "label[10.5,6.75;spravuje:\n")..
 		spravuje.."]")
 	if pinfo.role ~= "new" then
-		table.insert(formspec, "button[0.5,8;4.5,0.75;vytvorit;vytvořit novou]"..
+		table.insert(formspec, "button[0.5,8;4.5,0.75;vytvorit;"..S("Create New").."]"..
 			"button[10,8;4.5,0.75;jrad;jízdní řády...]")
 		if st and (pinfo.role == "admin" or st.owner == pinfo.player_name) then
-			table.insert(formspec, "button[5.25,8;4.5,0.75;ulozit;uložit změny]")
+			table.insert(formspec, "button[5.25,8;4.5,0.75;ulozit;"..S("Save Changes").."]")
 			if st.tracks[1] == nil then
-				table.insert(formspec, "button[15.25,8;3,0.75;smazat;smazat]")
+				table.insert(formspec, "button[15.25,8;3,0.75;smazat;"..S("Delete").."]")
 			end
 			if custom_state.linevars[1] ~= nil then
-				table.insert(formspec, "label[0.5,9.4;přiřadit kolej]"..
-					"field[2.75,9.1;1,0.6;kolej;;]"..
-					"label[3.9,9.4;lince]"..
+				table.insert(formspec, "label[0.5,9.4;"..S("Assign Track").."]"..
+					"field[2.75,9.1;1,0.6;"..S("Track")..";;]"..
+					"label[3.9,9.4;"..S("Lines").."]"..
 					"dropdown[5,9.1;5,0.6;klinevar;")
 				for i, lvar in ipairs(custom_state.linevars) do
 					if i ~= 1 then
@@ -265,7 +265,7 @@ local function get_formspec(custom_state)
 					table.insert(formspec, F(lvar.linevar.." | "..lvar.dep.." "..stn.." ["..lvar.track.."]"))
 				end
 				table.insert(formspec, ";"..custom_state.current_linevar..";true]"..
-					"button[10.25,9;4.25,0.75;priradit_kolej;přiřadit]"..
+					"button[10.25,9;4.25,0.75;priradit_kolej;"..S("Assign").."]"..
 					"tooltip[klinevar;")
 				table.insert(formspec, F("Vysvětlení formátu:\n<linka>/<kód vých.dop.>/<sm.kód> | <odjezd> <kód dop.> [<stávající kolej>]"))
 				table.insert(formspec, "]")
@@ -273,7 +273,7 @@ local function get_formspec(custom_state)
 		end
 	end
 	if st and st.tracks[1] ~= nil then
-		table.insert(formspec, "textarea[14.75,7;4.75,2.5;;pozice kolejí:;"..F(minetest.pos_to_string(st.tracks[1].pos)))
+		table.insert(formspec, "textarea[14.75,7;4.75,2.5;;"..S("Positions of tracks:")..";"..F(minetest.pos_to_string(st.tracks[1].pos)))
 		for i = 2, #st.tracks do
 			table.insert(formspec, "\n"..F(minetest.pos_to_string(st.tracks[i].pos)))
 		end
@@ -293,31 +293,31 @@ local function formspec_callback(custom_state, player, formname, fields)
 			--new_owner = ch_core.jmeno_na_prihlasovaci(new_owner)
 		end
 		if new_stn == nil or new_stn == "" then
-			systemovy_kanal(custom_state.player_name, "CHYBA: kód nesmí být prázdný!")
+			systemovy_kanal(custom_state.player_name, S("ERROR: Code must not be empty!"))
 			return
 		end
 		local als = advtrains.lines.stations
 		if als[new_stn] ~= nil then
-			systemovy_kanal(custom_state.player_name, "CHYBA: zastávka s kódem "..new_stn.." již existuje!")
+			systemovy_kanal(custom_state.player_name, S("ERROR: Station '@1' already exists!", new_stn))
 			return
 		end
 		als[new_stn] = {name = assert(new_name), owner = assert(new_owner)}
 		custom_state.stations = nil
 		update_formspec = true
-		systemovy_kanal(custom_state.player_name, "Dopravna úspěšně vytvořena.")
+		systemovy_kanal(custom_state.player_name, S("Station successfully created."))
 	elseif fields.ulozit then
 		local new_stn, new_name, new_owner = fields.stn, fields.name or "", fields.owner
 		local pinfo = ch_core.normalize_player(player)
 		local st = custom_state.stations[(custom_state.selection_index or 0) - 1]
 		if st == nil then
-			systemovy_kanal(custom_state.player_name, "CHYBA: není vybrána žádná zastávka!")
+			systemovy_kanal(custom_state.player_name, S("ERROR: No such station!"))
 			return
 		end
 		local change_stn, change_name = st.stn ~= new_stn, st.name ~= new_name
 		local change_owner = pinfo.role == "admin" and fields.owner ~= nil and fields.owner ~= "" and
 			fields.owner ~= st.owner -- ch_core.jmeno_na_prihlasovaci(fields.owner) ~= st.owner
 		if not change_stn and not change_name and not change_owner then
-			systemovy_kanal(custom_state.player_name, "Nic nezměněno.")
+			systemovy_kanal(custom_state.player_name, S("Nothing has changed."))
 			return
 		end
 		local t = advtrains.lines.stations[st.stn]
@@ -328,17 +328,17 @@ local function formspec_callback(custom_state, player, formname, fields)
 		if change_stn then
 			-- zkontrolovat, že cílový kód je volný
 			if advtrains.lines.stations[new_stn] ~= nil then
-				systemovy_kanal(custom_state.player_name, "CHYBA: zastávka s kódem "..new_stn.." již existuje!")
+				systemovy_kanal(custom_state.player_name, S("ERROR: Station '@1' already exists!", new_stn))
 				return
 			end
 		end
 		if change_owner then
 			t.owner = fields.owner -- ch_core.jmeno_na_prihlasovaci(fields.owner)
-			systemovy_kanal(custom_state.player_name, "Správa zastávky změněna.")
+			systemovy_kanal(custom_state.player_name, S("Owner changed!"))
 		end
 		if change_name then
 			t.name = new_name
-			systemovy_kanal(custom_state.player_name, "Jmeno zastávky změněno.")
+			systemovy_kanal(custom_state.player_name, S("Name changed!"))
 		end
 		if change_stn then
 			advtrains.lines.stations[new_stn] = t
@@ -356,7 +356,7 @@ local function formspec_callback(custom_state, player, formname, fields)
 				end
 			end
 			advtrains.lines.stations[st.stn] = nil
-			systemovy_kanal(custom_state.player_name, "Kód zastávky změněn, "..count.." bloků kolejí aktualizováno.")
+			systemovy_kanal(custom_state.player_name, S("Code changed, @1 station tracks updated!", count))
 		end
 		custom_state.stations = nil
 		update_formspec = true
@@ -364,11 +364,11 @@ local function formspec_callback(custom_state, player, formname, fields)
 		local pinfo = ch_core.normalize_player(player)
 		local st = custom_state.stations[(custom_state.selection_index or 0) - 1]
 		if st == nil then
-			systemovy_kanal(custom_state.player_name, "CHYBA: není vybrána žádná zastávka!")
+			systemovy_kanal(custom_state.player_name, S("ERROR: No stop selected!"))
 			return
 		end
 		if st.tracks[1] ~= nil then
-			systemovy_kanal(custom_state.player_name, "Nelze smazat zastávku, k níž jsou přiřazeny koleje!")
+			systemovy_kanal(custom_state.player_name, S("ERROR: There are station tracks assigned, cannot delete the station!"))
 			return
 		end
 		local t = advtrains.lines.stations[st.stn]
@@ -377,13 +377,13 @@ local function formspec_callback(custom_state, player, formname, fields)
 			return
 		end
 		advtrains.lines.stations[st.stn] = nil
-		systemovy_kanal(custom_state.player_name, "Zastávka úspěšně smazána.")
+		systemovy_kanal(custom_state.player_name, S("Station deleted!"))
 		custom_state.stations = nil
 		update_formspec = true
 	elseif fields.jrad then
 		local st = custom_state.stations[(custom_state.selection_index or 0) - 1]
 		if st == nil then
-			systemovy_kanal(custom_state.player_name, "CHYBA: není vybrána žádná zastávka!")
+			systemovy_kanal(custom_state.player_name, S("ERROR: No stop selected!"))
 			return
 		end
 		advtrains.lines.show_jr_formspec(player, nil, assert(st.stn))
@@ -391,7 +391,7 @@ local function formspec_callback(custom_state, player, formname, fields)
 	elseif fields.priradit_kolej then
 		local st = custom_state.stations[(custom_state.selection_index or 0) - 1]
 		if st == nil then
-			systemovy_kanal(custom_state.player_name, "CHYBA: není vybrána žádná zastávka!")
+			systemovy_kanal(custom_state.player_name, S("ERROR: No stop selected!"))
 			return
 		end
 		local linevar_to_change = custom_state.linevars[custom_state.current_linevar]
@@ -415,7 +415,7 @@ local function formspec_callback(custom_state, player, formname, fields)
 		end
 		stop.track = tostring(fields.kolej)
 		linevar_to_change.track = stop.track
-		systemovy_kanal(custom_state.player_name, "Přiřazená kolej úspěšně nastavena.")
+		systemovy_kanal(custom_state.player_name, S("Track successfully assigned!"))
 		update_formspec = true
 	elseif fields.quit then
 		return
@@ -489,12 +489,11 @@ advtrains.lines.open_station_editor = show_formspec
 
 def = {
     -- params = "",
-    description = "Otevře editor dopraven (stanic, zastávek a odboček)",
+    description = S("Open station editor"),
     privs = {ch_registered_player = true},
     func = function(player_name, param) show_formspec(minetest.get_player_by_name(player_name)) end,
 }
-core.register_chatcommand("zastavky", def)
-core.register_chatcommand("zastávky", def)
+core.register_chatcommand("station_editor", def)
 
 
 -- Jízdní řád
