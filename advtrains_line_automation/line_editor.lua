@@ -207,7 +207,7 @@ local function get_formspec(custom_state)
     end
     if has_rights_to_open_variant then
         table.insert(formspec, "button[10,15;4.5,0.75;save;"..
-            ifthenelse(custom_state.compiled_linevar == nil, S("Apply/Save").."]", S("Create/Save").."]"))
+            ifthenelse(custom_state.compiled_linevar == nil, S("Verify/Save").."]", S("Save changes").."]"))
     end
     table.insert(formspec, "button[15,15.25;4,0.5;reset;"..S("Reset changes").."]")
     table.insert(formspec, "tooltip[line;"..
