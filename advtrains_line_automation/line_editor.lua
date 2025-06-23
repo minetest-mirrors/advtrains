@@ -220,9 +220,9 @@ local function get_formspec(custom_state)
         "na žádné další vlaky\\, stávající vlaky však mohou dojet do svých koncových zastávek.]")
 
     table.insert(formspec, "container[0,8.75]"..
-        "label[0.5,0.25;"..S("Departure").."]"..
-        "label[2,0.25;"..S("Stop").."]"..
-        "label[3.5,0.25;"..S("Code Dop.").."]"..
+        "label[0.5,0.25;"..S("Dep.").."]"..
+        "label[2,0.25;"..S("St.Time").."]"..
+        "label[3.5,0.25;"..S("Station Code").."]"..
         "label[6.25,0.25;"..S("Mode").."]"..
         "label[11,0.25;"..S("Track").."]"..
         "label[12.5,0.25;"..S("Position").."]"..

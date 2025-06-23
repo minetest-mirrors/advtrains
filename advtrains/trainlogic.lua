@@ -1048,6 +1048,7 @@ function advtrains.update_trainpart_properties(train_id, invert_flipstate)
 	--FIX: deep-copy the table!!!
 	train.max_speed=20
 	train.extent_h = 0;
+	train.door_operation_time = 1
 	
 	local rel_pos=0
 	local count_l=0
@@ -1088,6 +1089,7 @@ function advtrains.update_trainpart_properties(train_id, invert_flipstate)
 			
 			train.max_speed=math.min(train.max_speed, wagon.max_speed)
 			train.extent_h = math.max(train.extent_h, wagon.extent_h or 1);
+			train.door_operation_time = math.max(train.door_operation_time, wagon.door_operation_time or 2)
 		end
 	end
 	train.trainlen = rel_pos

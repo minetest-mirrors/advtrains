@@ -72,6 +72,9 @@ advtrains.register_wagon(name, prototype, description, inventory_image)
 	^- optional. If defined, defines the locations of the doors on the model as distance from the object center on the path.
 	^- Getting on by walking in then takes effect.
 	^- Positive values mean front, negative ones back. Resulting position is automatically shifted to the right side.
+	door_operation_time = 2
+	^- Time in seconds specifying how long opening/closing the doors takes. The maximum of this value is used
+	^- by the stop rail (and possibly ATC) to wait for closing the doors before departure. Default is 1 second.
 
 	coupler_types_front = {scharfenberg=true},
 	coupler_types_back = {chain=true},

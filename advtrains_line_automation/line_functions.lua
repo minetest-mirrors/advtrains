@@ -769,9 +769,16 @@ function al.on_train_enter(pos, train_id, train, index)
     end
 
     -- ATC příkaz
-    local atc_command = "B0 W O"..stdata.doors..(stdata.kick and "K" or "").." D"..wait..
-        (stdata.keepopen and " " or " OC ")..(stdata.reverse and "R" or "").." D"..(stdata.ddelay or 1)..
-        " A1 S" ..(stdata.speed or "M")
+    local trn_door_delay = math.ceil(train.door_operation_time or 1) -- must round to whole number
+    local atc_command = "B0 W O"..stdata.doors -- stop and open doors
+		..(stdata.kick and "K" or "") -- potentially kick passengers out
+		..(stdata.reverse and "R" or "") -- reverse if requested
+		.." D"..wait.." " -- wait for the requested time (TODO: replace this by a RWT scheduler at some point!)
+		.." A1 "..(stdata.waitsig and "G " or " ") -- enable ARS again and potentially wait for signal
+		..(stdata.keepopen and "" or "OC") -- close doors, unless keepopen was set
+		.." D"..trn_door_delay -- wait for the door delay
+		.." S"..(stdata.speed or "M") -- depart with specified speed
+							
     advtrains.atc.train_set_command(train, atc_command, true)
 
     -- provést změny vlaku

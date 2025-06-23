@@ -64,7 +64,7 @@ local function show_stoprailform(pos, player)
 	local stdata = advtrains.lines.stops[pe]
 	if not stdata then
 		advtrains.lines.stops[pe] = {
-					stn="", track="", doors="R", wait=10, ars={default=true}, ddelay=1,speed="M"
+					stn="", track="", doors="R", wait=10, ars={default=true}, speed="M"
 				}
 		stdata = advtrains.lines.stops[pe]
 	end
@@ -100,8 +100,6 @@ local function show_stoprailform(pos, player)
 		"checkbox[4.5,4.75;waitsig;"..S("Wait for signal to clear")..";"..(stdata.waitsig and "true" or "false").."]"..
 		"label[0.25,4.3;"..S("Stop Time").."]"..
 		"field[0.25,4.5;1,0.75;wait;;"..stdata.wait.."]"..
-		"label[1.5,4.9;+]"..
-		"field[2,4.5;1,0.75;ddelay;;"..minetest.formspec_escape(stdata.ddelay).."]".. -- "..attrans("Door Delay").."
 		(advtrains.lines.open_station_editor ~= nil and "button[5.75,11;2.0,0.75;editstn;"..S("Station Editor").."]" or "")..
 		"field[0.25,6;2,0.75;speed;"..S("Dep. Speed")..";"..minetest.formspec_escape(stdata.speed).."]"..
 		"field[2.5,6;2,0.75;line;"..S("Dep. Line")..";"..minetest.formspec_escape(stdata.line or "").."]"..
@@ -120,7 +118,6 @@ local function show_stoprailform(pos, player)
 		"tooltip[stn;Dopravna\\, ke které tato zastávka patří. Jedna dopravna může mít víc kolejí. K vytvoření a úpravám dopraven použijte Editor dopraven.]"..
 		"tooltip[track;Číslo koleje]"..
 		"tooltip[wait;Základní doba stání s otevřenými dveřmi]"..
-		"tooltip[ddelay;Dodatečná doba stání před odjezdem po uzavření dveří]"..
 		"tooltip[speed;Cílová rychlost zastavivšího vlaku na odjezdu. Platné hodnoty jsou M pro nejvyšší rychlost vlaku a čísla 0 až 20.]"..
 		"tooltip[line;Nová linka na odjezdu. Prázdné pole = zachovat stávající linku. Pro smazání linky zadejte znak -]"..
 		"tooltip[routingcode;Nový směrový kód na odjezdu. Prázdné pole = zachovat stávající směrový kód. Pro smazání kódu vlaku zadejte znak -]"..
@@ -226,9 +223,8 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				stdata.ars = advtrains.interlocking.text_to_ars(fields.ars)
 			end
 
-			if fields.ddelay then
-				stdata.ddelay = to_int(fields.ddelay) or 1
-			end
+			stdata.ddelay = nil -- delete legacy field
+			
 			if fields.speed then
 				stdata.speed = to_int(fields.speed) or "M"
 			end
