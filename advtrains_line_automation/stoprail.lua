@@ -93,7 +93,7 @@ local function show_stoprailform(pos, player)
 		get_stn_dropdown(player_to_stn_override[pname] or stdata.stn, pname_unless_admin)..
 		"field[6.75,2;1,0.75;track;"..S("Track")..";"..minetest.formspec_escape(stdata.track).."]"..
 		"label[0.25,3.4;"..S("Door Side").."]"..
-		"dropdown[2.25,3;2,0.75;doors;vlevo,vpravo,neotvírat;"..door_dropdown[stdata.doors].."]"..
+		"dropdown[2.25,3;2,0.75;doors;"..S("left")..","..S("right")..","..S("closed")..";"..door_dropdown[stdata.doors]..";true]"..
 		"checkbox[4.5,3.25;reverse;"..S("Reverse train")..";"..(stdata.reverse and "true" or "false").."]"..
 		"checkbox[4.5,3.75;kick;"..S("Kick out passengers")..";"..(stdata.kick and "true" or "false").."]"..
 		"checkbox[4.5,4.25;keepopen;"..S("Keep doors open")..";"..(stdata.keepopen and "true" or "false").."]"..

@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: advtrains\n"
 "Report-Msgid-Bugs-To: advtrains-discuss@lists.sr.ht\n"
 "POT-Creation-Date: 2025-06-11 23:01+0200\n"
-"PO-Revision-Date: 2025-06-11 23:02+0200\n"
+"PO-Revision-Date: 2025-06-23 22:05+0200\n"
 "Last-Translator: Y. Wang <yw05@forksworld.de>\n"
 "Language-Team: German\n"
 "Language: de\n"
@@ -68,7 +68,7 @@ msgstr ""
 
 #: stoprail.lua
 msgid "Station/Stop Track"
-msgstr "Gleis zur Kennzeichnung einer Haltestelle"
+msgstr "Haltepunktgleis"
 
 #: stoprail.lua
 msgid "Stop Time"

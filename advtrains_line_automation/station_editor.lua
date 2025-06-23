@@ -856,7 +856,7 @@ local function get_jr_formspec(custom_state)
 	end
 
 	if not custom_state.force_unprivileged then
-		if core.check_player_privs(name, {protection_bypass=true}) then -- TODO make a lines admin privilege
+		if core.check_player_privs(custom_state.player_name, {protection_bypass=true}) then -- TODO make a lines admin privilege
 			access_level = "admin"
 		elseif custom_state.player_name == node_owner or custom_state.player_name == stn_owner then
 			access_level = "owner"
