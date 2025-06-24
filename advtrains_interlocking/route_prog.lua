@@ -267,6 +267,8 @@ local function finishrpform(pname)
 	local rp = player_rte_prog[pname]
 	if not rp then return end
 	
+	rp.route.use_rscache = true
+	
 	local form = "size[7,6]label[0.5,0.5;"..S("Finish programming route").."]"
 	local terminal = get_last_route_item(rp.origin, rp.route)
 	if terminal then
@@ -286,8 +288,8 @@ local function finishrpform(pname)
 		form = form .. "label[0.5,2  ;"..S("non-interlocked area").."]"
 	end
 	form = form.."field[0.8,3.5;5.2,1;name;"..S("Enter Route Name")..";]"
-	form = form.."button_exit[0.5,4.5;  5,1;save;"..S("Save Route").."]"
-	
+	form = form.."checkbox[0.8,4.0;use_rscache;"..S("Auto lock turnouts")..";true]"
+	form = form.."button_exit[0.5,5.0;  5,1;save;"..S("Save Route").."]"
 	
 	minetest.show_formspec(pname, "at_il_routepf", form)
 end
@@ -484,6 +486,13 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 	end
 	
 	if formname == "at_il_routepf" then
+		-- if it's the checkbox that changed handle before returning (stupid checkboxes)
+		if fields.use_rscache then
+			local rp = player_rte_prog[pname]
+			if rp then
+				rp.route.use_rscache = core.is_yes(fields.use_rscache)
+			end
+		end
 		if not fields.save or not fields.name then return end
 		if fields.name == "" then
 			-- show form again
@@ -507,8 +516,6 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			local terminal = get_last_route_item(rp.origin, rp.route)
 			rp.route.terminal = terminal
 			rp.route.name = fields.name
-			-- new routes now always use the rscache
-			rp.route.use_rscache = true
 			
 			table.insert(tcbs.routes, rp.route)
 			
