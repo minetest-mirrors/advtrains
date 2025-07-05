@@ -34,7 +34,7 @@ local door_dropdown_code = {"L", "R", "C"} -- switch to numerical index of selec
 local function get_stn_dropdown(stn, player_name)
 	local stations = advtrains.lines.load_stations_for_formspec()
 	local selected_index
-	local result = {"dropdown[0.25,2;6,0.75;stn;(nepřiřazeno)"}
+	local result = {"dropdown[0.5,1.5;6.3,0.8;stn;(nepřiřazeno)"}
 	local right_mark
 	for i, st in ipairs(stations) do
 		if player_name ~= nil and player_name ~= st.owner then
@@ -84,57 +84,53 @@ local function show_stoprailform(pos, player)
 		pname_unless_admin = pname
 	end
 	local formspec = "formspec_version[4]"..
-		"size[8,12]"..
-		"item_image[0.25,0.25;1,1;advtrains_line_automation:dtrack_stop_placer]"..
-		"textarea[1.35,0.6;5.5,0.6;;;"..minetest.formspec_escape(string.format("%s %d,%d,%d", item_name, pos.x, pos.y, pos.z)).."]"..
-		"button_exit[7,0.25;0.75,0.75;close;X]"..
-		"style[ars,line,routingcode;font=mono]"..
-		"label[0.25,1.75;"..S("Station Code").." | "..S("Station Name").."]"..
+		"size[12,12.3]"..
+		"label[0.5,0.5;"..minetest.formspec_escape(string.format("%s %d,%d,%d", item_name, pos.x, pos.y, pos.z)).."]"..
+		"style[ars,arr_action,dep_action;font=mono]"..
+		"label[0.5,1.25;"..S("Station Code").." | "..S("Station Name").."]"..
 		get_stn_dropdown(player_to_stn_override[pname] or stdata.stn, pname_unless_admin)..
-		"field[6.75,2;1,0.75;track;"..S("Track")..";"..minetest.formspec_escape(stdata.track).."]"..
-		"label[0.25,3.4;"..S("Door Side").."]"..
-		"dropdown[2.25,3;2,0.75;doors;"..S("left")..","..S("right")..","..S("closed")..";"..door_dropdown[stdata.doors]..";true]"..
-		"checkbox[4.5,3.25;reverse;"..S("Reverse train")..";"..(stdata.reverse and "true" or "false").."]"..
-		"checkbox[4.5,3.75;kick;"..S("Kick out passengers")..";"..(stdata.kick and "true" or "false").."]"..
-		"checkbox[4.5,4.25;keepopen;"..S("Keep doors open")..";"..(stdata.keepopen and "true" or "false").."]"..
-		"checkbox[4.5,4.75;waitsig;"..S("Wait for signal to clear")..";"..(stdata.waitsig and "true" or "false").."]"..
-		"label[0.25,4.3;"..S("Stop Time").."]"..
-		"field[0.25,4.5;1,0.75;wait;;"..stdata.wait.."]"..
-		(advtrains.lines.open_station_editor ~= nil and "button[5.75,11;2.0,0.75;editstn;"..S("Station Editor").."]" or "")..
-		"field[0.25,6;2,0.75;speed;"..S("Dep. Speed")..";"..minetest.formspec_escape(stdata.speed).."]"..
-		"field[2.5,6;2,0.75;line;"..S("Dep. Line")..";"..minetest.formspec_escape(stdata.line or "").."]"..
-		"field[4.75,6;2,0.75;routingcode;"..S("Dep. RC")..";"..minetest.formspec_escape(stdata.routingcode or "").."]"..
-		"field[0.25,7.25;2,0.75;interval;"..S("Interval:")..";"..minetest.formspec_escape(stdata.interval or "").."]"..
-		"field[2.5,7.25;2,0.75;ioffset;"..S("Offset:")..";"..minetest.formspec_escape(stdata.ioffset or "0").."]"..
-		"button[4.75,7.25;3,0.75;ioffsetnow;"..S("Set offset to now").."]"..
-		"textarea[0.25,8.4;7.5,1.5;ars;"..S("Trains stopping here (ARS rules)")..";"..advtrains.interlocking.ars_to_text(stdata.ars).."]"..
-		"label[0.3,10.25;"..S("For trains with").."]"..
-		"field[3,10;1,0.5;minparts;;"..minetest.formspec_escape(stdata.minparts or "0").."]"..
-		"label[4.15,10.25;"..S("to").."]"..
-		"field[4.6,10;1,0.5;maxparts;;"..minetest.formspec_escape(stdata.maxparts or "128").."]"..
-		"label[5.75,10.25;"..S("cars").."]"..
-		"button_exit[0.25,11;5.5,0.75;save;"..S("Save").."]"..
-		"tooltip[close;Zavře dialogové okno]"..
-		"tooltip[stn;Dopravna\\, ke které tato zastávka patří. Jedna dopravna může mít víc kolejí. K vytvoření a úpravám dopraven použijte Editor dopraven.]"..
-		"tooltip[track;Číslo koleje]"..
-		"tooltip[wait;Základní doba stání s otevřenými dveřmi]"..
-		"tooltip[speed;Cílová rychlost zastavivšího vlaku na odjezdu. Platné hodnoty jsou M pro nejvyšší rychlost vlaku a čísla 0 až 20.]"..
-		"tooltip[line;Nová linka na odjezdu. Prázdné pole = zachovat stávající linku. Pro smazání linky zadejte znak -]"..
-		"tooltip[routingcode;Nový směrový kód na odjezdu. Prázdné pole = zachovat stávající směrový kód. Pro smazání kódu vlaku zadejte znak -]"..
-		"tooltip[ars;Seznam podmínek\\, z nichž musí vlak splnit alespoň jednu\\, aby zde zastavil:\nLN {linka}\nRC {směrovací kód}\n"..
-		"* = jakýkoliv vlak\n\\# značí komentář a ! na začátku řádky danou podmínku neguje (nedoporučuje se)]"..
-		"tooltip[minparts;Minimální počet vozů\\, které musí vlak mít\\, aby zde zastavil. Výchozí hodnota je 0.]"..
-		"tooltip[maxparts;Maximální počet vozů\\, které vlak může mít\\, aby zde zastavil. Výchozí (a maximální) hodnota je 128.]"..
-		"tooltip[editsn;Otevře v novém okně editor dopraven.\nPoužijte tento editor pro založení nové dopravny\\, jíž budete moci přiřadit koleje.]"..
-		"tooltip[interval;Hodnota v sekundách 1 až 3600 nebo nevyplněno. Je-li vyplněno\\, rozdělí čas na intervaly zadané délky,\n"..
-		"a pokud z této zastávkové koleje v rámci jednoho z nich odjede vlak\\, odjezd dalšího bude pozdržen do začátku\n"..
-		"následujícího intervalu. Výchozí začátky intervalů stejné délky jsou v celé železniční síti společné.\n"..
-		"Slouží k nastavení intervalového provozu.]"..
-		"tooltip[ioffset;Hodnota v sekundách 0 až (interval - 1). Posune začátek intervalů oproti výchozímu stavu\n"..
-		"o zadaný počet sekund vpřed. Slouží k detailnímu vyladění času odjezdů relativně vůči ostatním linkám.]"..
-		"tooltip[ioffsetnow;Nastaví posun intervalu tak\\, aby pro tuto kolej nový interval začínal právě teď.\n"..
-		"Také uloží ostatní provedené změny.]"
-
+		"field[7,1.5;1,0.8;track;"..S("Track")..";"..minetest.formspec_escape(stdata.track).."]"..
+		"tooltip[track;"..S("Track number, for informational purposes").."]"..
+		(advtrains.lines.open_station_editor ~= nil and "button[8.2,1.5;3.3,0.8;editstn;"..S("Station Editor").."]" or "")..
+		-- filter/config
+		"textarea[0.5,3;6,2;ars;"..S("For trains (ARS rules)")..";"..advtrains.interlocking.ars_to_text(stdata.ars).."]"..
+		--"button[7,3;1,0.8;prev_config;<<]"..
+		--"button[10.5,3;1,0.8;next_config;>>]"..
+		--"dropdown[7,4;4.5,0.8;mode;Normal Stop,Pass Through<NI>,Inactive<NI>;1;true]"..
+		--"tooltip[mode;"..S("Select the operation mode:\nNormal Stop: Train stops, waits the specified time and departs\nPass Through: Train does not stop, but records this stop as a timing point\nInactive: The train ignores this stop rail.\nTimetables may override this setting.").."]"..
+		--arrival
+		"label[0.5,6;"..S("Arrive:").."]"..
+		"field[2,5.7;1.5,0.8;wait;"..S("Stop Time")..";"..stdata.wait.."]"..
+		"tooltip[wait;"..S("Train will remain stopped with open doors for at least this time before departure is attempted.").."]"..
+		"label[4,5.5;"..S("Door Side").."]"..
+		"dropdown[4,5.7;2.5,0.8;doors;"..S("left")..","..S("right")..","..S("closed")..";"..door_dropdown[stdata.doors]..";true]"..
+		"tooltip[doors;"..S("Select if and on which side the train will open its doors once stopped").."]"..
+		"checkbox[7,5.9;reverse;"..S("Reverse train")..";"..(stdata.reverse and "true" or "false").."]"..
+		"tooltip[reverse;"..S("Train will depart in the direction from where it arrived").."]"..
+		"checkbox[7,6.6;kick;"..S("Kick out passengers")..";"..(stdata.kick and "true" or "false").."]"..
+		"checkbox[7,7.3;arsdis;"..S("Keep ARS enabled").."<NI>;false]"..
+		"tooltip[arsdis;"..S("Do not disable ARS on approaching. Signals behind the stop rail already set ARS routes when the train arrives, not just before departure. (currently not implemented)").."]"..
+		--"textarea[0.5,7;6,1;arr_action;"..S("Arrival Actions")..";<not yet implemented>]"..
+		--"tooltip[arr_action;"..S("List of actions to perform on arrival (currently not implemented, later will allow actions such as setting line, RC and displays)").."]"..
+		-- departure
+		"label[0.5,8.9;"..S("Depart:").."]"..
+		"field[2,8.6;1.5,0.8;speed;"..S("Speed")..";"..minetest.formspec_escape(stdata.speed).."]"..
+		"tooltip[speed;"..S("Speed that the train sets when departing. Set 'M' for maximum speed.").."]"..
+		--"label[4,8.4;"..S("Departure Mode").."<NI>]"..
+		--"dropdown[4,8.6;2.5,0.8;depmode;Normal,Interval,Begin Timetable;2;true]"..
+		--"tooltip[depmode;"..S("Select the time for departure:\nNormal: depart immediately after the stop time elapsed\nInterval: depart at the next time position set by interval and offset\nBegin Timetable: The train gets the given timetable assigned and departs according to its settings (currently not implemented)").."]"..
+		"field[7,8.6;1.8,0.8;interval;"..S("Interval:")..";"..minetest.formspec_escape(stdata.interval or "").."]"..
+		"tooltip[interval;"..S("The interval / time distance between departures in seconds. E.g. every two minutes -> set interval = 120").."]"..
+		"field[9,8.6;1.8,0.8;ioffset;"..S("Offset:")..";"..minetest.formspec_escape(stdata.ioffset or "0").."]"..
+		"tooltip[ioffset;"..S("The offset of departures from time 0:00 in seconds. E.g. interval 120 offset 60 -> departure at every odd minute").."]"..
+		"checkbox[7,10.6;keepopen;"..S("Keep doors open")..";"..(stdata.keepopen and "true" or "false").."]"..
+		"tooltip[keepopen;"..S("Do not close the doors when departing, if they are open").."]"..
+		"checkbox[7,9.9;waitsig;"..S("Wait for signal to clear")..";"..(stdata.waitsig and "true" or "false").."]"..
+		"tooltip[waitsig;"..S("Do not depart immediately, instead first enable ARS and wait until the next signal ahead clears (ATC G command) before closing the doors and departing.").."]"..
+		--"textarea[0.5,9.9;6,1;dep_action;"..S("Departure Actions")..";<not yet implemented>]"..
+		--"tooltip[dep_action;"..S("List of actions to perform on departure (currently not implemented, later will allow actions such as setting line, RC and displays)").."]"..
+		-- end
+		"button_exit[0.5,11.2;11,0.8;save;"..S("Save").."]"
 
 	minetest.show_formspec(pname, "at_lines_stop_"..pe, formspec)
 end
@@ -173,17 +169,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			end
 		end
 
-		local set_offset
-
-		if fields.ioffsetnow and fields.interval ~= "" and fields.interval ~= "0" then
-			local interval = to_int(fields.interval)
-			if 0 < interval and interval <= 3600 then
-				local rwtime = rwt.to_secs(rwt.get_time())
-				set_offset = rwtime % interval
-			end
-		end
-
-		if fields.save or set_offset ~= nil then
+		if fields.save then
 			local new_index = player_to_stn_override[pname]
 			if new_index ~= nil then
 				if new_index == 1 then
@@ -227,22 +213,6 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			
 			if fields.speed then
 				stdata.speed = to_int(fields.speed) or "M"
-			end
-			if fields.line then
-				stdata.line = fields.line
-			end
-			if fields.routingcode then
-				stdata.routingcode = fields.routingcode
-			end
-			if fields.minparts then
-				local v = to_int(fields.minparts)
-				if v <= 0 or v > 128 then v = nil end
-				stdata.minparts = v
-			end
-			if fields.maxparts then
-				local v = to_int(fields.maxparts)
-				if v <= 0 or v > 128 then v = nil end
-				stdata.maxparts = v
 			end
 			if fields.interval then
 				if fields.interval == "" or fields.interval == "0" then
