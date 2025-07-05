@@ -108,8 +108,8 @@ local function show_stoprailform(pos, player)
 		"checkbox[7,5.9;reverse;"..S("Reverse train")..";"..(stdata.reverse and "true" or "false").."]"..
 		"tooltip[reverse;"..S("Train will depart in the direction from where it arrived").."]"..
 		"checkbox[7,6.6;kick;"..S("Kick out passengers")..";"..(stdata.kick and "true" or "false").."]"..
-		"checkbox[7,7.3;arsdis;"..S("Keep ARS enabled").."<NI>;false]"..
-		"tooltip[arsdis;"..S("Do not disable ARS on approaching. Signals behind the stop rail already set ARS routes when the train arrives, not just before departure. (currently not implemented)").."]"..
+		"checkbox[7,7.3;arskeepen;"..S("Keep ARS enabled")..";"..(stdata.arskeepen and "true" or "false").."]"..
+		"tooltip[arskeepen;"..S("Do not disable ARS on approaching. Signals behind the stop rail already set ARS routes when the train arrives, not just before departure. (currently not implemented)").."]"..
 		--"textarea[0.5,7;6,1;arr_action;"..S("Arrival Actions")..";<not yet implemented>]"..
 		--"tooltip[arr_action;"..S("List of actions to perform on arrival (currently not implemented, later will allow actions such as setting line, RC and displays)").."]"..
 		-- departure
@@ -160,6 +160,9 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		end
 		if fields.keepopen then
 			tmp_checkboxes[pe].keepopen = (fields.keepopen == "true")
+		end
+		if fields.arskeepen then
+			tmp_checkboxes[pe].arskeepen = (fields.arskeepen == "true")
 		end
 
 		if fields.stn then

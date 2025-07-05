@@ -623,7 +623,9 @@ function al.on_train_approach(pos, train_id, train, index, has_entered)
             local stnname = stn and stn.name or S("Unknown Station")
             train.text_inside = S("Next Stop:") .. "\n"..stnname
         end
-        advtrains.interlocking.ars_set_disable(train, true)
+        if not stdata.arskeepen then
+			advtrains.interlocking.ars_set_disable(train, true)
+		end
     end
 end
 
