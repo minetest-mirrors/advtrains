@@ -106,6 +106,8 @@ function atil.show_route_edit_form(pname, sigd, routeid, sel_rpartidx)
 		itab(i, "E (none)", "end", nil)
 	end
 	
+	itab(i, S("(More Options)"), "advanced", nil)
+	
 	if not sel_rpartidx then sel_rpartidx = 1 end
 	form = form.."textlist[0.5,2;3.5,3.9;routelog;"..table.concat(tab, ",")..";"..(sel_rpartidx or 1)..";false]"
 	
@@ -153,6 +155,10 @@ function atil.show_route_edit_form(pname, sigd, routeid, sel_rpartidx)
 			-- checkbox for call-on
 			form = form..string.format("checkbox[4.5,4.0;se_callon;"..S("Call-on (section may be occupied)")..";%s]", rseg.call_on)
 		end
+	elseif sel_rpart and sel_rpart.advanced then
+		form = form..F.label(4.5, 2, S("Advanced Options:"))
+		-- checkbox for call-on
+		form = form..string.format("checkbox[4.5,4.0;ad_use_rscache;"..S("Auto lock turnouts")..";%s]", route.use_rscache)
 	elseif sel_rpart and sel_rpart.err then
 		form = form.."textarea[4.5,2.5;4,4;errorta;"..S("Error:")..";"..tab[sel_rpartidx].."]"
 	else
@@ -252,6 +258,9 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 				atil.show_route_edit_form(pname, sigd, routeid, sel_rpart.idx)
 				return
 			end
+		end
+		if fields.ad_use_rscache then
+			route.use_rscache = minetest.is_yes(fields.ad_use_rscache)
 		end
 		
 		--if fields.noautogen then

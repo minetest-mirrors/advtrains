@@ -7,7 +7,8 @@
 	ars = {
 		[n] = {
 			ln = "<line>"			-- either line
-			rc = "<routingcode>"  -- or routingcode
+			rc = "<routingcode>"	-- or routingcode
+			tl = {min=1, max=2}		-- or train length in meters
 			n = true/false -- true = logical not (matches everything that does not have this line/rc)
 			conj = { -- and conjunction, optional. This must be true in addition to the main rule
 				ln=... / rc=... / n=... -- like toplevel
@@ -70,6 +71,26 @@
 
 local il = advtrains.interlocking
 
+local function parse_trainlen(tlstr)
+	mins, maxs = string.match(tlstr, "^(%d*)%-(%d+)$")
+	if mins and maxs then
+		return {min=tonumber(mins), max=tonumber(maxs)}
+	end
+	return {min=tonumber(tlstr)}
+	-- if it's not parseable at all it will return an empty table which means invalid
+end
+local function trainlen_to_str(tl)
+	if tl.min and tl.max then
+		return tl.min.."-"..tl.max
+	elseif tl.min then
+		return tl.min
+	elseif tl.max then
+		return "0-"..tl.max
+	else
+		return "?"
+	end
+end
+
 
 local function conj_to_text(conj, txt)
 	while conj do
@@ -81,6 +102,8 @@ local function conj_to_text(conj, txt)
 			txt[#txt+1] = "& "..n.."LN "..conj.ln
 		elseif conj.rc then
 			txt[#txt+1] = "& "..n.."RC "..conj.rc
+		elseif conj.tl then
+			txt[#txt+1] = "& "..n.."TL "..trainlen_to_str(conj.tl)
 		end
 		conj = conj.conj
 	end
@@ -107,6 +130,8 @@ function il.ars_to_text(arstab)
 			txt[#txt+1] = prio..n.."LN "..arsent.ln
 		elseif arsent.rc then
 			txt[#txt+1] = prio..n.."RC "..arsent.rc
+		elseif arsent.tl then
+			txt[#txt+1] = prio..n.."TL "..trainlen_to_str(arsent.tl)
 		elseif arsent.c then
 			txt[#txt+1] = "#"..arsent.c
 		end
@@ -125,11 +150,13 @@ function il.ars_to_text(arstab)
 end
 
 local function parse_ruleexp(line)
-	local excl, key, val = string.match(line, "^%s*(!?)%s*([RL][CN])%s+(.+)%s*$")
+	local excl, key, val = string.match(line, "^%s*(!?)%s*([RLT][CNL])%s+(.+)%s*$")
 	if key == "RC" then
 		return {rc=val, n=(excl=="!")}
 	elseif key == "LN" then
 		return {ln=val, n=(excl=="!")}
+	elseif key == "TL" then
+		return {tl=parse_trainlen(val), n=(excl=="!")}
 	end
 end
 
@@ -203,6 +230,19 @@ local function match_arsent(arsent, train)
 	elseif arsent.rc then
 		local routingcode = train.routingcode
 		rule_matches = routingcode and string.find(" "..routingcode.." ", " "..arsent.rc.." ", nil, true)
+		if arsent.n then rule_matches = not rule_matches end
+	elseif arsent.tl then
+		local trainlen = train.trainlen
+		local lmin, lmax = arsent.tl.min, arsent.tl.max
+		if lmin and lmax then
+			rule_matches = (trainlen >= lmin) and (trainlen < lmax)
+		elseif lmin then
+			rule_matches = (trainlen >= lmin)
+		elseif lmax then
+			rule_matches = (trainlen < lmax)
+		else
+			-- errorneous entry never matches
+		end
 		if arsent.n then rule_matches = not rule_matches end
 	end
 	if rule_matches then
