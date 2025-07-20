@@ -936,13 +936,16 @@ function advtrains.interlocking.show_signalling_form(sigd, pname, sel_rte, calle
 					if hasprivs then
 						form = form.."button[0.5,4;2.5,1;smartroute;"..S("Smart Route").."]"
 						form = form.."button[  3,4;2.5,1;newroute;"..S("New (Manual)").."]"
+						form = form.."button_exit[5.5,4;1.5,1;unassign;"..S("Unassign\nSignal").."]"
 					end
 				elseif caps >= 3 then
 					-- it's a buffer!
 					form = form.."label[0.5,2.5;"..S("This is an always-halt signal (e.g. a buffer)\nNo routes can be set from here.").."]"
+					form = form.."button_exit[5.5,4;1.5,1;unassign;"..S("Unassign\nSignal").."]"
 				else
 					-- signal caps say it cannot be route start/end
 					form = form.."label[0.5,2.5;"..S("This is a pure distant signal\nNo route is currently set through.").."]"
+					form = form.."button_exit[5.5,4;1.5,1;unassign;"..S("Unassign\nSignal").."]"
 				end
 			end
 			
