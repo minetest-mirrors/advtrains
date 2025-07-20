@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: advtrains\n"
 "Report-Msgid-Bugs-To: advtrains-discuss@lists.sr.ht\n"
-"POT-Creation-Date: 2025-06-11 23:21+0200\n"
-"PO-Revision-Date: 2025-06-12 22:55+0200\n"
+"POT-Creation-Date: 2025-07-20 22:27+0200\n"
+"PO-Revision-Date: 2025-07-20 22:31+0200\n"
 "Last-Translator: Y. Wang <yw05@forksworld.de>\n"
 "Language-Team: German\n"
 "Language: de\n"
@@ -72,6 +72,10 @@ msgstr "Fahrstraße fortsetzen/beenden"
 #: route_prog.lua
 msgid "Advancing over next section is"
 msgstr "Fortsetzen über nächsten Gleisabschnitt hinaus"
+
+#: route_prog.lua route_ui.lua
+msgid "Auto lock turnouts"
+msgstr "automatischer Weichenverschluss"
 
 #: route_prog.lua
 msgid "Cancel if you are unsure!"
@@ -198,6 +202,10 @@ msgid "route continuation."
 msgstr "nicht als Fortsetzung geeignet."
 
 #: route_ui.lua
+msgid "(More Options)"
+msgstr "(Mehr Optionen)"
+
+#: route_ui.lua
 msgid "<< Select a route part to edit options"
 msgstr "<< Wähle einen Abschnitt, um Optionen zu bearbeiten"
 
@@ -208,6 +216,10 @@ msgstr "<Standardbegriff>"
 #: route_ui.lua
 msgid "ARS Rule List"
 msgstr "ARS-Regelliste"
+
+#: route_ui.lua
+msgid "Advanced Options:"
+msgstr "Erweiterte Optionen:"
 
 #: route_ui.lua
 msgid "Announce distant signal"
@@ -607,6 +619,10 @@ msgid "No trains on this section."
 msgstr "Keine Züge auf diesem Abschnitt."
 
 #: tcb_ts_ui.lua
+msgid "Please cancel route first!"
+msgstr ""
+
+#: tcb_ts_ui.lua
 msgid "Punch components to add fixed locks. (punch anything else = end)"
 msgstr ""
 "Schlage auf Komponenten um diese zu sperren (schlage irgendetwas anderes = "
@@ -687,6 +703,10 @@ msgstr "Seite @1"
 #: tcb_ts_ui.lua
 msgid "Signal at @1"
 msgstr "Signal bei @1"
+
+#: tcb_ts_ui.lua
+msgid "Signal has been unassigned. Name and routes are kept for reuse."
+msgstr "Signal getrennt. Name und Fahrstraßen bleiben im TCB gespeichert."
 
 #: tcb_ts_ui.lua
 msgid "Signal name"
@@ -770,6 +790,14 @@ msgstr "Gleisabschnitts-Details - @1"
 #: tcb_ts_ui.lua
 msgid "Trains on this section:"
 msgstr "Züge in diesem Abschnitt"
+
+#: tcb_ts_ui.lua
+msgid ""
+"Unassign\n"
+"Signal"
+msgstr ""
+"Signalzuw.\n"
+"trennen"
 
 #: tcb_ts_ui.lua
 msgid "Unconfigured Track Circuit Break, right-click to assign."
