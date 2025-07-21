@@ -122,16 +122,21 @@ end
 --[[
     Používá se na *nelinkový* vlak stojící na *neanonymní* zastávce.
     Zahájí jízdu na lince nalezené podle kombinace line/stn/rc, nebo vrátí false.
+    chg orwell: added linevar parameter, linevar no longer derived from the line/rc/stn
 ]]
-local function line_start(train, stn, departure_rwtime)
+local function line_start(train, stn, departure_rwtime, linevar)
+	if not linevar then
+		return false
+	end
     assert(train)
     assert(stn and stn ~= "")
     assert(departure_rwtime)
     local ls = al.get_line_status(train)
     if ls.linevar ~= nil then
-        error("line_start() used on a train that is already on a line: "..dump2({train = train}))
+        -- chg orwell: no longer error here, instead cancel previous linevar
+        al.cancel_linevar(train)
     end
-    local linevar, linevar_def = al.try_get_linevar(train.line, stn, train.routingcode)
+    local linevar_def = al.try_get_linevar_def(linevar, stn)
     if linevar == nil or linevar_def.disabled then
         return false
     end
@@ -162,11 +167,6 @@ local function should_stop(pos, stdata, train)
     if stdata == nil or stdata.stn == nil then
         return nil -- neplatná data
     end
-	local n_trainparts = #assert(train.trainparts)
-    -- vyhovuje počet vagonů?
-    if not ((stdata.minparts or 0) <= n_trainparts and n_trainparts <= (stdata.maxparts or 128)) then
-        return nil
-    end
     local stn = assert(stdata.stn) -- zastávka stále může být anonymní
 	local ls, linevar_def = al.get_line_status(train)
     local next_index
@@ -194,6 +194,7 @@ local function should_stop(pos, stdata, train)
         return "true"
         -- TODO: zastávky na znamení
     else
+		-- train not on a timetable
         local ars = stdata.ars
         -- vyhovuje vlak ARS pravidlům?
         local result = ars and (ars.default or advtrains.interlocking.ars_check_rule_match(ars, train))
@@ -218,7 +219,7 @@ end
     Pokud vlak jede na lince, odebere ho z této linky a vrátí true; jinak vrátí false.
 ]]
 function al.cancel_linevar(train)
-    local ls = train.line_status
+	local ls = train.line_status
     if ls == nil or ls.linevar == nil then return false end
     ls.linevar = nil
     ls.linevar_station = nil
@@ -523,40 +524,24 @@ local is_visible_mode = al.is_visible_mode
 --      nil, nil
 -- Je-li linevar_station == nil, doplní se z linevar. Je-li linevar == nil, vrátí nil, nil.
 function al.try_get_linevar_def(linevar, linevar_station)
-    if linevar == nil then
+	if linevar == nil then
         return nil, nil
     end
     if linevar_station == nil then
         local line
         line, linevar_station = al.linevar_decompose(linevar)
-        if line == nil then
+		if line == nil then
             return nil, nil
         end
     end
     local t = advtrains.lines.stations[linevar_station]
     if t ~= nil then
         t = t.linevars
-        if t ~= nil then
+		if t ~= nil then
             return t[linevar], linevar_station
         end
     end
-    return nil, nil
-end
-
---[[
-    Vrací:
-    a) nil, nil, pokud daná kombinace line/stn/rc nemá definovanou variantu linky
-    b) linevar, linevar_def, pokud má
-]]
-function al.try_get_linevar(line, stn, rc)
-    if line ~= nil and line ~= "" and stn ~= nil and stn ~= "" then
-        local linevar = line.."/"..stn.."/"..(rc or "")
-        local result = al.try_get_linevar_def(linevar, stn)
-        if result ~= nil then
-            return linevar, result
-        end
-    end
-    return nil, nil
+	return nil, nil
 end
 
 --[[
@@ -599,19 +584,11 @@ function al.get_line_status(train)
         core.log("warning", "Train "..train.id.." put out of linevar '"..ls.linevar.."', because its index "..ls.linevar_index.." became invalid.")
         al.cancel_linevar(train)
         linevar_def = nil
-    else
-        local train_line_prefix = (train.line or "").."/"
-        if train_line_prefix ~= ls.linevar:sub(1, train_line_prefix:len()) then
-            core.log("warning", "Train "..train.id.." put out of linevar '"..ls.linevar.."', because its line changed to '"..tostring(train.line).."'.")
-            al.cancel_linevar(train)
-            linevar_def = nil
-        end
     end
     return ls, linevar_def
 end
 
-function al.on_train_approach(pos, train_id, train, index, has_entered)
-    if has_entered then return end -- do not stop again!
+function al.on_train_approach(pos, train_id, train, index)
     if train.path_cn[index] ~= 1 then return end -- špatný směr
     local pe = advtrains.encode_pos(pos)
     local stdata = advtrains.lines.stops[pe]
@@ -692,7 +669,10 @@ function al.on_train_enter(pos, train_id, train, index)
 
     -- naplánovat čas odjezdu
     local wait = tonumber(stdata.wait) or 0
-    local interval = stdata.interval
+    local interval = nil
+    if stdata.dep_mode=="interval" or stdata.dep_mode=="ttbegin" then -- TODO: in ttbegin case, the interval should come from tt not from rail
+		interval = stdata.interval
+	end
     local last_dep = stdata.last_dep -- posl. odjezd z této zastávkové koleje
 
     if interval ~= nil and last_dep ~= nil then
@@ -783,26 +763,23 @@ function al.on_train_enter(pos, train_id, train, index)
 							
     advtrains.atc.train_set_command(train, atc_command, true)
 
-    -- provést změny vlaku
-    local new_line = stdata.line or ""
-    local new_routingcode = stdata.routingcode or ""
-    update_value(train, "line", new_line)
-    update_value(train, "routingcode", new_routingcode)
-
     -- začít novou linku?
-    if can_start_line and stn ~= nil and stn ~= "" and line_start(train, stn, planned_departure) then
-        debug_print("Vlak "..train_id.." zahájil jízdu na nové lince ("..ls.linevar..") ze stanice "..stn..".")
-        core.log("action", "Train "..train_id.." started a route with linevar '"..ls.linevar.."' at station '"..stn.."'.")
-        train.text_inside = get_station_name(stn)
-        assert(ls.linevar)
-        linevar_def = assert(al.try_get_linevar_def(ls.linevar))
-        local next_stop_index, next_stop_data = al.get_next_stop(linevar_def, 1)
-        if next_stop_index ~= nil then
-            train.text_inside = train.text_inside.."\nPříští zastávka/stanice: "..get_station_name(next_stop_data.stn)
-            if next_stop_data.mode ~= nil and next_stop_data.mode == MODE_REQUEST_STOP then
-                train.text_inside = train.text_inside.." (na znamení)"
-            end
-        end
+    if stdata.dep_mode == "ttbegin" then
+		-- if train may start a new line and departure mode is set to ttbegin, set the new linevar
+		if line_start(train, stn, planned_departure, stdata.tt_begin_linevar) then
+			debug_print("Vlak "..train_id.." zahájil jízdu na nové lince ("..ls.linevar..") ze stanice "..stn..".")
+			core.log("action", "Train "..train_id.." started a route with linevar '"..ls.linevar.."' at station '"..stn.."'.")
+			train.text_inside = get_station_name(stn)
+			assert(ls.linevar)
+			linevar_def = assert(al.try_get_linevar_def(ls.linevar))
+			local next_stop_index, next_stop_data = al.get_next_stop(linevar_def, 1)
+			if next_stop_index ~= nil then
+				train.text_inside = train.text_inside.."\nPříští zastávka/stanice: "..get_station_name(next_stop_data.stn)
+				if next_stop_data.mode ~= nil and next_stop_data.mode == MODE_REQUEST_STOP then
+					train.text_inside = train.text_inside.." (na znamení)"
+				end
+			end
+		end
     elseif not had_linevar and ls.linevar == nil then
         -- vlak, který nebyl a stále není linkový:
         train.text_inside = get_station_name(stn)

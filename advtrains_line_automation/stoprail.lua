@@ -51,6 +51,9 @@ local function get_stn_dropdown(stn, player_name)
 	return table.concat(result)
 end
 
+local depmode_to_dropdown = { normal=1, interval=2, ttbegin=3 }
+local dropdown_to_depmode = { "normal", "interval", "ttbegin" }
+
 local player_to_stn_override = {}
 
 local function show_stoprailform(pos, player)
@@ -116,14 +119,37 @@ local function show_stoprailform(pos, player)
 		"label[0.5,8.9;"..S("Depart:").."]"..
 		"field[2,8.6;1.5,0.8;speed;"..S("Speed")..";"..minetest.formspec_escape(stdata.speed).."]"..
 		"tooltip[speed;"..S("Speed that the train sets when departing. Set 'M' for maximum speed.").."]"..
-		--"label[4,8.4;"..S("Departure Mode").."<NI>]"..
-		--"dropdown[4,8.6;2.5,0.8;depmode;Normal,Interval,Begin Timetable;2;true]"..
-		--"tooltip[depmode;"..S("Select the time for departure:\nNormal: depart immediately after the stop time elapsed\nInterval: depart at the next time position set by interval and offset\nBegin Timetable: The train gets the given timetable assigned and departs according to its settings (currently not implemented)").."]"..
-		"field[7,8.6;1.8,0.8;interval;"..S("Interval:")..";"..minetest.formspec_escape(stdata.interval or "").."]"..
-		"tooltip[interval;"..S("The interval / time distance between departures in seconds. E.g. every two minutes -> set interval = 120").."]"..
-		"field[9,8.6;1.8,0.8;ioffset;"..S("Offset:")..";"..minetest.formspec_escape(stdata.ioffset or "0").."]"..
-		"tooltip[ioffset;"..S("The offset of departures from time 0:00 in seconds. E.g. interval 120 offset 60 -> departure at every odd minute").."]"..
-		"checkbox[7,10.6;keepopen;"..S("Keep doors open")..";"..(stdata.keepopen and "true" or "false").."]"..
+		"label[4,8.4;"..S("Departure Mode").."]"..
+		"dropdown[4,8.6;2.5,0.8;depmode;Normal,Interval,Begin Timetable;"..(depmode_to_dropdown[stdata.dep_mode] or 1)..";true]"..
+		"tooltip[depmode;"..S("Select the time for departure:\nNormal: depart immediately after the stop time elapsed\nInterval: depart at the next time position set by interval and offset\nBegin Timetable: The train gets the given timetable assigned and departs according to its settings (currently not implemented)").."]"
+		if stdata.dep_mode == "interval" then
+			formspec = formspec .. "field[7,8.6;1.8,0.8;interval;"..S("Interval:")..";"..minetest.formspec_escape(stdata.interval or "").."]"..
+			"tooltip[interval;"..S("The interval / time distance between departures in seconds. E.g. every two minutes -> set interval = 120").."]"..
+			"field[9,8.6;1.8,0.8;ioffset;"..S("Offset:")..";"..minetest.formspec_escape(stdata.ioffset or "0").."]"..
+			"tooltip[ioffset;"..S("The offset of departures from time 0:00 in seconds. E.g. interval 120 offset 60 -> departure at every odd minute").."]"
+		elseif stdata.dep_mode == "ttbegin" then
+			formspec = formspec .. "field[7,8.6;0.9,0.8;interval;"..S("Interval:")..";"..minetest.formspec_escape(stdata.interval or "").."]"..
+			"tooltip[interval;"..S("The interval / time distance between departures in seconds. E.g. every two minutes -> set interval = 120").."]"..
+			"field[8,8.6;0.9,0.8;ioffset;"..S("Offset:")..";"..minetest.formspec_escape(stdata.ioffset or "0").."]"..
+			"tooltip[ioffset;"..S("The offset of departures from time 0:00 in seconds. E.g. interval 120 offset 60 -> departure at every odd minute").."]"
+			-- TODO: interval and offset should be defined in the timetable, not here
+			-- build list of available linevars (it is convenient that linevars are defined in the station)
+			local avail_linevars = {}
+			local sel_linevar = 1
+			if stn and stn.linevars then
+				for k,_ in pairs(stn.linevars) do
+					table.insert(avail_linevars, k)
+					if stdata.tt_begin_linevar==k then sel_linevar = #avail_linevars end
+				end
+			end
+			if #avail_linevars > 0 then
+				formspec = formspec .. "label[9,8.4;"..S("TT Linevar:").."]"..
+				"dropdown[9,8.6;2.0,0.8;tt_begin_linevar;"..table.concat(avail_linevars)..";"..(sel_linevar or 1)..",false]" -- this dropdown NOT using indexing!
+			else
+				formspec = formspec .. "label[9,8.6;"..S("No linevars\navailable!").."]"
+			end
+		end
+		formspec = formspec .. "checkbox[7,10.6;keepopen;"..S("Keep doors open")..";"..(stdata.keepopen and "true" or "false").."]"..
 		"tooltip[keepopen;"..S("Do not close the doors when departing, if they are open").."]"..
 		"checkbox[7,9.9;waitsig;"..S("Wait for signal to clear")..";"..(stdata.waitsig and "true" or "false").."]"..
 		"tooltip[waitsig;"..S("Do not depart immediately, instead first enable ARS and wait until the next signal ahead clears (ATC G command) before closing the doors and departing.").."]"..
@@ -172,7 +198,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			end
 		end
 
-		if fields.save then
+		if fields.save or (fields.depmode and not fields.editstn) then -- must resend form when depmode dropdown is updated
 			local new_index = player_to_stn_override[pname]
 			if new_index ~= nil then
 				if new_index == 1 then
@@ -217,31 +243,28 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			if fields.speed then
 				stdata.speed = to_int(fields.speed) or "M"
 			end
+			
+			if fields.depmode then
+				stdata.dep_mode = dropdown_to_depmode[tonumber(fields.depmode)]
+			end
 			if fields.interval then
-				if fields.interval == "" or fields.interval == "0" then
-					stdata.interval = nil
+				local n = to_int(fields.interval)
+				if n and 0 < n and n <= 3600 then
+					stdata.interval = n
 				else
-					local n = to_int(fields.interval)
-					if 0 < n and n <= 3600 then
-						stdata.interval = n
-					end
+					stdata.interval = 60
 				end
 			end
-			if stdata.interval == nil then
-				stdata.ioffset = nil
-			elseif set_offset ~= nil then
-				stdata.ioffset = set_offset
-			elseif fields.ioffset then
-				if fields.ioffset == "" or fields.ioffset == "0" then
-					stdata.ioffset = nil
+			if fields.ioffset then
+				local n = to_int(fields.ioffset)
+				if n and n > 0 then
+					stdata.ioffset = n % stdata.interval
 				else
-					local n = to_int(fields.ioffset)
-					if n > 0 then
-						stdata.ioffset = n % stdata.interval
-					else
-						stdata.ioffset = nil
-					end
+					stdata.ioffset = 0
 				end
+			end
+			if fields.tt_begin_linevar then
+				stdata.tt_begin_linevar = fields.tt_begin_linevar
 			end
 
 			for k,v in pairs(tmp_checkboxes[pe]) do --handle checkboxes
