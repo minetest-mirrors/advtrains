@@ -197,7 +197,8 @@ local function should_stop(pos, stdata, train)
 		-- train not on a timetable
         local ars = stdata.ars
         -- vyhovuje vlak ARS pravidlům?
-        local result = ars and (ars.default or advtrains.interlocking.ars_check_rule_match(ars, train))
+        local mspec,mdef = advtrains.interlocking.ars_check_rule_match(ars, train)
+        local result = (mspec or mdef) and true
         if result then
             return "true"
         else
@@ -588,10 +589,26 @@ function al.get_line_status(train)
     return ls, linevar_def
 end
 
+local function check_selector_ars(train, stdata)
+	local ars = stdata.selector_ars
+	if not ars then
+		return true
+	end
+	-- vyhovuje vlak ARS pravidlům?
+	local mspec,mdef = advtrains.interlocking.ars_check_rule_match(ars, train)
+	return (mspec or mdef) and true
+end
+
 function al.on_train_approach(pos, train_id, train, index)
     if train.path_cn[index] ~= 1 then return end -- špatný směr
     local pe = advtrains.encode_pos(pos)
     local stdata = advtrains.lines.stops[pe]
+    if stdata == nil then
+        return -- neplatná zastávka
+    end
+    if not check_selector_ars(train, stdata) then
+		return -- does not consider stop pos here
+    end
     if should_stop(pos, stdata, train) ~= nil then
         advtrains.lzb_add_checkpoint(train, index, 2, nil)
         if train.line_status.linevar == nil then
@@ -630,6 +647,13 @@ function al.on_train_enter(pos, train_id, train, index)
     if train.path_cn[index] ~= 1 then return end -- špatný směr
     local pe = advtrains.encode_pos(pos)
     local stdata = advtrains.lines.stops[pe]
+    if stdata == nil then
+        return -- neplatná zastávka
+    end
+    if not check_selector_ars(train, stdata) then
+		return -- does not consider stop pos here
+    end
+    
     local stn = stdata.stn or ""
     local rwtime = assert(rwt.to_secs(rwt.get_time()))
     local ls, linevar_def = al.get_line_status(train)
