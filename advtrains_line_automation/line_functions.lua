@@ -788,7 +788,7 @@ function al.on_train_enter(pos, train_id, train, index)
     advtrains.atc.train_set_command(train, atc_command, true)
 
     -- začít novou linku?
-    if stdata.dep_mode == "ttbegin" then
+    if can_start_line and stdata.dep_mode == "ttbegin" then
 		-- if train may start a new line and departure mode is set to ttbegin, set the new linevar
 		if line_start(train, stn, planned_departure, stdata.tt_begin_linevar) then
 			debug_print("Vlak "..train_id.." zahájil jízdu na nové lince ("..ls.linevar..") ze stanice "..stn..".")
