@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: advtrains\n"
 "Report-Msgid-Bugs-To: advtrains-discuss@lists.sr.ht\n"
-"POT-Creation-Date: 2025-06-11 23:01+0200\n"
+"POT-Creation-Date: 2025-07-22 23:18+0200\n"
 "PO-Revision-Date: 2025-03-25 15:06+0100\n"
 "Last-Translator: Tanavit <tanavit@posto.ovh>\n"
 "Language-Team: French\n"
@@ -12,48 +12,556 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 2.4.2\n"
 
-#: stoprail.lua
-msgid "Closed"
-msgstr "Fermé"
+#: line_editor.lua
+msgid "(departed)"
+msgstr ""
+
+#: line_editor.lua
+msgid "@1 errors while checking line setup!"
+msgstr ""
+
+#: line_editor.lua
+msgid "@1 trains restarted due to changes"
+msgstr ""
+
+#: line_editor.lua
+msgid "At start station:"
+msgstr ""
+
+#: line_editor.lua
+msgid "Back"
+msgstr ""
+
+#: line_editor.lua
+msgid "Cannot delete, because lineval @1 does not yet exist"
+msgstr ""
+
+#: line_editor.lua
+msgid "Cannot replace, because lineval @1 does not yet exist"
+msgstr ""
+
+#: line_editor.lua
+msgid "Code"
+msgstr "Code"
+
+#: line_editor.lua
+msgid "Continues:"
+msgstr ""
+
+#: line_editor.lua
+msgid "Delete Line"
+msgstr ""
+
+#: line_editor.lua
+#, fuzzy
+msgid "Deletion failed: "
+msgstr "Échec de sauvegarde : "
+
+#: line_editor.lua
+msgid "Dep."
+msgstr ""
+
+#: line_editor.lua
+msgid "Departure time must lie within 0-3600 seconds!"
+msgstr ""
+
+#: line_editor.lua
+msgid "Disable"
+msgstr ""
+
+#: line_editor.lua
+msgid "Duplicate departure time!"
+msgstr ""
+
+#: line_editor.lua
+msgid "Error in line setup: "
+msgstr ""
+
+#: line_editor.lua
+msgid "Field 'Continuation' must contain maximum 1 '/'!"
+msgstr ""
+
+#: line_editor.lua
+msgid "Hidden"
+msgstr ""
+
+#: line_editor.lua
+msgid "Hidden (normal)"
+msgstr ""
+
+#: line_editor.lua
+msgid "Inactive"
+msgstr ""
+
+#: line_editor.lua
+msgid "Incorrect departure time format!"
+msgstr ""
+
+#: line_editor.lua
+msgid "Incorrect format for stop position!"
+msgstr ""
+
+#: line_editor.lua
+#, fuzzy
+msgid "Insufficient permissions to edit '@1'."
+msgstr "Privilèges insuffisants pour utiliser ceci !"
+
+#: line_editor.lua
+msgid "LINE,ROUTE,SM-CODE"
+msgstr ""
+
+#: line_editor.lua
+msgid "Last passages"
+msgstr ""
+
+#: line_editor.lua
+msgid "Last passages of line @1"
+msgstr ""
+
+#: line_editor.lua
+msgid "Line '@1' successfully deleted!"
+msgstr ""
+
+#: line_editor.lua
+msgid "Line '@1' successfully saved!"
+msgstr ""
+
+#: line_editor.lua
+msgid "Line Editor"
+msgstr ""
+
+#: line_editor.lua
+msgid "Line name must not be empty!"
+msgstr ""
+
+#: line_editor.lua
+msgid "Line name must not contain characters '/', '|' or '\\'!"
+msgstr ""
+
+#: line_editor.lua
+msgid "Line name must not exceed 16 characters!"
+msgstr ""
+
+#: line_editor.lua
+msgid "Line name must not exceed 256 characters!"
+msgstr ""
+
+#: line_editor.lua
+msgid "Line owner must not be empty!"
+msgstr ""
+
+#: line_editor.lua
+msgid "Line setup must contain at least 1 terminus stop!"
+msgstr ""
+
+#: line_editor.lua
+msgid "Mode"
+msgstr ""
+
+#: line_editor.lua
+msgid "New Line..."
+msgstr ""
+
+#: line_editor.lua
+msgid "No issues found, the line can now be saved!"
+msgstr ""
+
+#: line_editor.lua
+#, fuzzy
+msgid "No such station"
+msgstr "Pas de tel train : @1."
+
+#: line_editor.lua
+msgid "Normal"
+msgstr ""
+
+#: line_editor.lua station_editor.lua
+msgid "OWNER"
+msgstr ""
+
+#: line_editor.lua
+msgid "Open line editor"
+msgstr ""
+
+#: line_editor.lua
+msgid "Owner:"
+msgstr ""
+
+#: line_editor.lua
+msgid "Position"
+msgstr ""
+
+#: line_editor.lua
+msgid "Request Stop (experimental)"
+msgstr ""
+
+#: line_editor.lua
+#, fuzzy
+msgid "Reset changes"
+msgstr "Changement d'état de l'itinéraire."
+
+#: line_editor.lua
+msgid "Routing code must not contain '/', '|' or '\\'!"
+msgstr ""
+
+#: line_editor.lua
+msgid "Save changes"
+msgstr ""
+
+#: line_editor.lua
+#, fuzzy
+msgid "St.Time"
+msgstr "Durée d'arrêt"
+
+#: line_editor.lua
+msgid "Starting station code must not be empty!"
+msgstr ""
+
+#: line_editor.lua
+#, fuzzy
+msgid "Station"
+msgstr "Code de Station"
+
+#: line_editor.lua stoprail.lua
+msgid "Station Code"
+msgstr "Code de Station"
+
+#: line_editor.lua
+msgid "Station code must not contain '/', '|' or '\\'!"
+msgstr ""
+
+#: line_editor.lua
+msgid "Stop position must not exceed 22 characters!"
+msgstr ""
+
+#: line_editor.lua
+msgid "Terminus"
+msgstr ""
+
+#: line_editor.lua
+msgid "Terminus (continuing)"
+msgstr ""
+
+#: line_editor.lua
+msgid "Terminus (hidden)"
+msgstr ""
+
+#: line_editor.lua station_editor.lua stoprail.lua
+msgid "Track"
+msgstr "Voie"
+
+#: line_editor.lua
+msgid "Train name must not exceed 256 characters!"
+msgstr ""
+
+#: line_editor.lua
+msgid "Travelling:"
+msgstr ""
+
+#: line_editor.lua
+#, fuzzy
+msgid "Unknown reason"
+msgstr "Gare inconnue"
+
+#: line_editor.lua
+#, fuzzy
+msgid "Unknown station code!"
+msgstr "Gare inconnue"
+
+#: line_editor.lua
+msgid "Verify/Save"
+msgstr ""
+
+#: line_functions.lua
+#, fuzzy
+msgid "Next Stop:"
+msgstr "Prochain arrêt :\n"
+
+#: line_functions.lua
+msgid "Unknown Station"
+msgstr "Gare inconnue"
+
+#: station_editor.lua
+msgid "@1 tracks"
+msgstr ""
+
+#: station_editor.lua
+msgid "Assign"
+msgstr ""
+
+#: station_editor.lua
+#, fuzzy
+msgid "Assign Track"
+msgstr "Voie de Chargement"
+
+#: station_editor.lua
+msgid "By Distance"
+msgstr ""
+
+#: station_editor.lua
+msgid "CODE"
+msgstr ""
+
+#: station_editor.lua
+msgid "Code changed, @1 station tracks updated!"
+msgstr ""
+
+#: station_editor.lua
+msgid "Create New"
+msgstr ""
+
+#: station_editor.lua
+msgid "DISTANCE"
+msgstr ""
+
+#: station_editor.lua
+msgid "Delete"
+msgstr ""
+
+#: station_editor.lua
+msgid "ERROR: Code must not be empty!"
+msgstr ""
+
+#: station_editor.lua
+msgid "ERROR: No stop selected!"
+msgstr ""
+
+#: station_editor.lua
+msgid "ERROR: No such station!"
+msgstr ""
+
+#: station_editor.lua
+msgid "ERROR: Station '@1' already exists!"
+msgstr ""
+
+#: station_editor.lua
+msgid "ERROR: There are station tracks assigned, cannot delete the station!"
+msgstr ""
+
+#: station_editor.lua
+msgid "INFO"
+msgstr ""
+
+#: station_editor.lua
+#, fuzzy
+msgid "Lines"
+msgstr "Ligne"
+
+#: station_editor.lua
+msgid "My Stations (By Distance)"
+msgstr ""
+
+#: station_editor.lua
+msgid "My Stations (Station Code A-Z)"
+msgstr ""
+
+#: station_editor.lua
+msgid "My Stations (Station Name A-Z)"
+msgstr ""
+
+#: station_editor.lua
+msgid "NAME"
+msgstr ""
+
+#: station_editor.lua
+#, fuzzy
+msgid "Name changed!"
+msgstr "Changement d'état de l'itinéraire."
+
+#: station_editor.lua
+#, fuzzy
+msgid "Nothing has changed."
+msgstr "Changement d'état de l'itinéraire."
+
+#: station_editor.lua
+msgid "Open station editor"
+msgstr ""
+
+#: station_editor.lua
+msgid "Owner changed!"
+msgstr ""
+
+#: station_editor.lua
+msgid "Positions of tracks:"
+msgstr ""
+
+#: station_editor.lua
+msgid "Save Changes"
+msgstr ""
+
+#: station_editor.lua
+#, fuzzy
+msgid "Station Code (A-Z)"
+msgstr "Code de Station"
+
+#: station_editor.lua
+#, fuzzy
+msgid "Station Name (A-Z)"
+msgstr "Nom de Station"
+
+#: station_editor.lua
+#, fuzzy
+msgid "Station deleted!"
+msgstr "Code de Station"
+
+#: station_editor.lua
+msgid "Station successfully created."
+msgstr ""
+
+#: station_editor.lua
+msgid "Track successfully assigned!"
+msgstr ""
+
+#: station_editor.lua
+#, fuzzy
+msgid "[Station Editor]"
+msgstr "Code de Station"
+
+#: station_editor.lua
+msgid "lines"
+msgstr ""
 
 #: stoprail.lua
-msgid "Dep. Speed"
-msgstr "Vit. de départ"
+msgid "(foreign)"
+msgstr ""
 
 #: stoprail.lua
-msgid "Door Delay"
-msgstr "Durée d'ouverture des portes"
+msgid "(unassigned)"
+msgstr ""
+
+#: stoprail.lua
+msgid "Arrival Actions"
+msgstr ""
+
+#: stoprail.lua
+msgid "Departure Actions"
+msgstr ""
+
+#: stoprail.lua
+msgid "Departure Mode"
+msgstr ""
+
+#: stoprail.lua
+msgid "Do not close the doors when departing, if they are open"
+msgstr ""
+
+#: stoprail.lua
+msgid ""
+"Do not depart immediately, instead first enable ARS and wait until the next "
+"signal ahead clears (ATC G command) before closing the doors and departing."
+msgstr ""
+
+#: stoprail.lua
+msgid ""
+"Do not disable ARS on approaching. Signals behind the stop rail already set "
+"ARS routes when the train arrives, not just before departure. (currently not "
+"implemented)"
+msgstr ""
 
 #: stoprail.lua
 msgid "Door Side"
 msgstr "Ouv. des portes coté"
 
 #: stoprail.lua
+msgid "Interval:"
+msgstr ""
+
+#: stoprail.lua
+msgid "Keep ARS enabled"
+msgstr ""
+
+#: stoprail.lua
+msgid "Keep doors open"
+msgstr ""
+
+#: stoprail.lua
 msgid "Kick out passengers"
 msgstr "Éjecter les passagers"
 
 #: stoprail.lua
-msgid "Left"
-msgstr "Gauche"
+msgid ""
+"List of actions to perform on arrival (currently not implemented, later will "
+"allow actions such as setting line, RC and displays)"
+msgstr ""
 
 #: stoprail.lua
-msgid "Next Stop:\n"
-msgstr "Prochain arrêt :\n"
+msgid ""
+"List of actions to perform on departure (currently not implemented, later "
+"will allow actions such as setting line, RC and displays)"
+msgstr ""
+
+#: stoprail.lua
+msgid ""
+"No linevars\n"
+"available!"
+msgstr ""
+
+#: stoprail.lua
+msgid ""
+"Non-timetabled trains matching these ARS rules will stop at this position.\n"
+"Note: Train must also match the 'Selector' filter above!"
+msgstr ""
+
+#: stoprail.lua
+msgid ""
+"Non-timetabled trains matching these ARS rules will stop at this position.\n"
+"Trains under timetable will use the timetable's settings."
+msgstr ""
+
+#: stoprail.lua
+msgid "Offset:"
+msgstr ""
+
+#: stoprail.lua
+msgid ""
+"Only trains matching these ARS rules will consider this stop rail as "
+"suitable timing point/stop position.\n"
+"Affects both timetabled and non-timetabled trains.\n"
+"Example: define a stop position for long trains (TL 30) and another for "
+"short trains (TL 0-30)."
+msgstr ""
 
 #: stoprail.lua
 msgid "Reverse train"
 msgstr "Inversion du sens de marche"
 
 #: stoprail.lua
-msgid "Right"
-msgstr "Droit"
-
-#: stoprail.lua
 msgid "Save"
 msgstr "Sauvegarder"
 
 #: stoprail.lua
-msgid "Station Code"
+msgid "Select if and on which side the train will open its doors once stopped"
+msgstr ""
+
+#: stoprail.lua
+msgid ""
+"Select the time for departure:\n"
+"Normal: depart immediately after the stop time elapsed\n"
+"Interval: depart at the next time position set by interval and offset\n"
+"Begin Timetable: The train gets the given timetable assigned and departs "
+"according to its settings (currently not implemented)"
+msgstr ""
+
+#: stoprail.lua
+msgid "Selector for stop pos (ARS)"
+msgstr ""
+
+#: stoprail.lua
+msgid "Selector for stop position..."
+msgstr ""
+
+#: stoprail.lua
+#, fuzzy
+msgid "Speed"
+msgstr "Vitesse : "
+
+#: stoprail.lua
+msgid "Speed that the train sets when departing. Set 'M' for maximum speed."
+msgstr ""
+
+#: stoprail.lua
+#, fuzzy
+msgid "Station Editor"
 msgstr "Code de Station"
 
 #: stoprail.lua
@@ -61,7 +569,8 @@ msgid "Station Name"
 msgstr "Nom de Station"
 
 #: stoprail.lua
-msgid "Station code \"@1\" already exists and is owned by @2."
+#, fuzzy
+msgid "Station code '@1' does already exist and is owned by @2"
 msgstr "Le code de station \"@1\" existe et est possédé par @2."
 
 #: stoprail.lua
@@ -69,26 +578,48 @@ msgid "Station/Stop Track"
 msgstr "Voie d'arrêt en station"
 
 #: stoprail.lua
+msgid "Stn. @1 (@2) T. @3"
+msgstr ""
+
+#: stoprail.lua
 msgid "Stop Time"
 msgstr "Durée d'arrêt"
 
 #: stoprail.lua
-msgid "This station is owned by @1. You are not allowed to edit its name."
+msgid "Stopping trains (ARS)"
 msgstr ""
-"Cette station est la propriété de @1. Vous n'êtes pas autorisé à modifier "
-"son nom."
 
 #: stoprail.lua
-msgid "Track"
-msgstr "Voie"
+msgid ""
+"The interval / time distance between departures in seconds. E.g. every two "
+"minutes -> set interval = 120"
+msgstr ""
 
 #: stoprail.lua
-msgid "Trains stopping here (ARS rules)"
-msgstr "Trains marquant l'arrêt (règles ARS)"
+msgid ""
+"The offset of departures from time 0:00 in seconds. E.g. interval 120 offset "
+"60 -> departure at every odd minute"
+msgstr ""
 
 #: stoprail.lua
-msgid "Unknown Station"
-msgstr "Gare inconnue"
+msgid "Track number, for informational purposes"
+msgstr ""
+
+#: stoprail.lua
+msgid "Train will depart in the direction from where it arrived"
+msgstr ""
+
+#: stoprail.lua
+msgid ""
+"Train will remain stopped with open doors for at least this time before "
+"departure is attempted."
+msgstr ""
+
+#: stoprail.lua
+msgid ""
+"Use when multiple stop rails are located in the same track of a station. "
+"Allows to select a suitable stop position depending on the class of train."
+msgstr ""
 
 #: stoprail.lua
 msgid "Wait for signal to clear"
@@ -97,6 +628,20 @@ msgstr "En attente de signal d'autorisation"
 #: stoprail.lua
 msgid "You are not allowed to configure this track."
 msgstr "Vous n'êtes pas autorisé à configurer cette voie."
+
+#: stoprail.lua
+#, fuzzy
+msgid "closed"
+msgstr "Fermé"
+
+#: stoprail.lua
+msgid "left"
+msgstr ""
+
+#: stoprail.lua
+#, fuzzy
+msgid "right"
+msgstr "Droit"
 
 #~ msgid " does not exist or is invalid"
 #~ msgstr " n'existe pas ou est invalide"
@@ -284,9 +829,6 @@ msgstr "Vous n'êtes pas autorisé à configurer cette voie."
 #~ msgid "Clear Local Environment"
 #~ msgstr "Effacer l'environnement LuaATC"
 
-#~ msgid "Code"
-#~ msgstr "Code"
-
 #~ msgid "Command"
 #~ msgstr "Commande"
 
@@ -325,6 +867,9 @@ msgstr "Vous n'êtes pas autorisé à configurer cette voie."
 #~ msgid "Delete all train routes, force them to recalculate"
 #~ msgstr "Suppression et recalcul de tous les routages"
 
+#~ msgid "Dep. Speed"
+#~ msgstr "Vit. de départ"
+
 #~ msgid "Deprecated Track"
 #~ msgstr "Voie déconseillée"
 
@@ -357,6 +902,9 @@ msgstr "Vous n'êtes pas autorisé à configurer cette voie."
 
 #~ msgid "Disabled advtrains successfully"
 #~ msgstr "Succès de la désactivation d'advtrains"
+
+#~ msgid "Door Delay"
+#~ msgstr "Durée d'ouverture des portes"
 
 #~ msgid "Doors are closed! (Try holding sneak key!)"
 #~ msgstr "Portes closes : (Essayez la \"sneak key\"!\")"
@@ -404,9 +952,6 @@ msgstr "Vous n'êtes pas autorisé à configurer cette voie."
 #~ msgid "Instructed to save() but load() was never called!"
 #~ msgstr "Appel de save() requis sans appel préalable de load() !"
 
-#~ msgid "Insufficient privileges to use this!"
-#~ msgstr "Privilèges insuffisants pour utiliser ceci !"
-
 #~ msgid "Japanese Train Engine"
 #~ msgstr "Motrice Japonaise"
 
@@ -422,20 +967,17 @@ msgstr "Vous n'êtes pas autorisé à configurer cette voie."
 #~ msgid "Lampless Signal"
 #~ msgstr "Sémaphore"
 
+#~ msgid "Left"
+#~ msgstr "Gauche"
+
 #~ msgid "Left,Right,Closed;"
 #~ msgstr "Gauche,Droit,Fermé;"
-
-#~ msgid "Line"
-#~ msgstr "Ligne"
 
 #~ msgid "Liquid: "
 #~ msgstr "Liquide : "
 
 #~ msgid "Liquid: empty"
 #~ msgstr "Liquide : vide"
-
-#~ msgid "Loading Track"
-#~ msgstr "Voie de Chargement"
 
 #~ msgid "Lock couples"
 #~ msgstr "Verrouiller l'accouplement"
@@ -475,9 +1017,6 @@ msgstr "Vous n'êtes pas autorisé à configurer cette voie."
 
 #~ msgid "No such lua entity."
 #~ msgstr "Pas de telle entité lua."
-
-#~ msgid "No such train: @1."
-#~ msgstr "Pas de tel train : @1."
 
 #~ msgid "No such wagon: @1."
 #~ msgstr "Pas de tel wagon : @1."
@@ -558,17 +1097,11 @@ msgstr "Vous n'êtes pas autorisé à configurer cette voie."
 #~ msgid "Returns the position of the train with the given id"
 #~ msgstr "Affiche la position du train identifié"
 
-#~ msgid "Route state changed."
-#~ msgstr "Changement d'état de l'itinéraire."
-
 #~ msgid "Routingcode"
 #~ msgstr "Code de routage"
 
 #~ msgid "Save wagon properties"
 #~ msgstr "Sauvegarder les propriétés du wagon"
-
-#~ msgid "Saving failed: "
-#~ msgstr "Échec de sauvegarde : "
 
 #~ msgid "Scharfenberg Coupler"
 #~ msgstr "Attelage Scharfenberg"
@@ -587,9 +1120,6 @@ msgstr "Vous n'êtes pas autorisé à configurer cette voie."
 
 #~ msgid "Signal"
 #~ msgstr "Signal"
-
-#~ msgid "Speed:"
-#~ msgstr "Vitesse : "
 
 #~ msgid "Steam Engine"
 #~ msgstr "Locomotive à vapeur"
@@ -673,6 +1203,11 @@ msgstr "Vous n'êtes pas autorisé à configurer cette voie."
 #~ msgid "This position is protected!"
 #~ msgstr "Cet emplacement est protégé !"
 
+#~ msgid "This station is owned by @1. You are not allowed to edit its name."
+#~ msgstr ""
+#~ "Cette station est la propriété de @1. Vous n'êtes pas autorisé à modifier "
+#~ "son nom."
+
 #~ msgid "This track can not be changed."
 #~ msgstr "Cette voie ne peut pas être modifiée."
 
@@ -735,6 +1270,9 @@ msgstr "Vous n'êtes pas autorisé à configurer cette voie."
 
 #~ msgid "Train overview /coupling control:"
 #~ msgstr "Aperçu du train / commande d'accouplement :"
+
+#~ msgid "Trains stopping here (ARS rules)"
+#~ msgstr "Trains marquant l'arrêt (règles ARS)"
 
 #~ msgid "Unable to load wagon type"
 #~ msgstr "Impossible de charger le type du wagon"
