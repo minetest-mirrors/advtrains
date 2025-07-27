@@ -72,7 +72,7 @@ local function readcomment_add_flags(flags, s)
 end
 
 local function readcomment_aux(str, pos)
-	local _, epos, sval = string.find(str, "^\n*#([^\n]*)", pos)
+	local _, epos, sval = string.find(str, "^[\r\n]*#([^\r\n]*)", pos)
 	if not epos then
 		return nil
 	end
