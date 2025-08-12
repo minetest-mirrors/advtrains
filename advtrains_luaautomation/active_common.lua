@@ -146,6 +146,11 @@ function ac.run_in_env(pos, evtdata, customfct_p, ignore_no_code)
 	customfct.clear_interrupts=function()
 		atlatc.interrupt.clear_ints_at_pos(pos)
 	end
+	customfct.atc_pos = {
+		x = pos.x,
+		y = pos.y,
+		z = pos.z,
+	}
 	-- add digiline_send function, if digiline is loaded
 	if minetest.global_exists("digiline") then
 		customfct.digiline_send=function(channel, msg)
