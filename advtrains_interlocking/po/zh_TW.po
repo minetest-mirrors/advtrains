@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: advtrains\n"
 "Report-Msgid-Bugs-To: advtrains-discuss@lists.sr.ht\n"
-"POT-Creation-Date: 2025-06-11 23:21+0200\n"
+"POT-Creation-Date: 2025-07-20 22:27+0200\n"
 "PO-Revision-Date: 2023-10-09 11:31+0200\n"
 "Last-Translator: Y. Wang <yw05@forksworld.de>\n"
 "Language-Team: Chinese (Traditional)\n"
@@ -68,6 +68,10 @@ msgstr ""
 
 #: route_prog.lua
 msgid "Advancing over next section is"
+msgstr ""
+
+#: route_prog.lua route_ui.lua
+msgid "Auto lock turnouts"
 msgstr ""
 
 #: route_prog.lua
@@ -189,6 +193,10 @@ msgid "route continuation."
 msgstr ""
 
 #: route_ui.lua
+msgid "(More Options)"
+msgstr ""
+
+#: route_ui.lua
 msgid "<< Select a route part to edit options"
 msgstr ""
 
@@ -199,6 +207,10 @@ msgstr "預設座位"
 
 #: route_ui.lua
 msgid "ARS Rule List"
+msgstr ""
+
+#: route_ui.lua
+msgid "Advanced Options:"
 msgstr ""
 
 #: route_ui.lua
@@ -578,6 +590,10 @@ msgid "No trains on this section."
 msgstr ""
 
 #: tcb_ts_ui.lua
+msgid "Please cancel route first!"
+msgstr ""
+
+#: tcb_ts_ui.lua
 msgid "Punch components to add fixed locks. (punch anything else = end)"
 msgstr ""
 
@@ -661,6 +677,10 @@ msgid "Signal at @1"
 msgstr "色燈號誌機"
 
 #: tcb_ts_ui.lua
+msgid "Signal has been unassigned. Name and routes are kept for reuse."
+msgstr ""
+
+#: tcb_ts_ui.lua
 #, fuzzy
 msgid "Signal name"
 msgstr "色燈號誌機"
@@ -734,6 +754,13 @@ msgstr ""
 #: tcb_ts_ui.lua
 msgid "Trains on this section:"
 msgstr ""
+
+#: tcb_ts_ui.lua
+#, fuzzy
+msgid ""
+"Unassign\n"
+"Signal"
+msgstr "臂木式號誌機"
 
 #: tcb_ts_ui.lua
 msgid "Unconfigured Track Circuit Break, right-click to assign."
@@ -1006,9 +1033,6 @@ msgstr "您不能調整這段軌道。"
 
 #~ msgid "Kick out passengers"
 #~ msgstr "踢出乘客"
-
-#~ msgid "Lampless Signal"
-#~ msgstr "臂木式號誌機"
 
 #~ msgid "Line"
 #~ msgstr "火車線路"

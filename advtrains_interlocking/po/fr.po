@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: advtrains\n"
 "Report-Msgid-Bugs-To: advtrains-discuss@lists.sr.ht\n"
-"POT-Creation-Date: 2025-06-11 23:21+0200\n"
+"POT-Creation-Date: 2025-07-20 22:27+0200\n"
 "PO-Revision-Date: 2025-03-25 15:06+0100\n"
 "Last-Translator: Tanavit <tanavit@posto.ovh>\n"
 "Language-Team: French\n"
@@ -68,6 +68,10 @@ msgstr ""
 
 #: route_prog.lua
 msgid "Advancing over next section is"
+msgstr ""
+
+#: route_prog.lua route_ui.lua
+msgid "Auto lock turnouts"
 msgstr ""
 
 #: route_prog.lua
@@ -192,6 +196,10 @@ msgid "route continuation."
 msgstr ""
 
 #: route_ui.lua
+msgid "(More Options)"
+msgstr ""
+
+#: route_ui.lua
 msgid "<< Select a route part to edit options"
 msgstr ""
 
@@ -202,6 +210,10 @@ msgstr "Siège par défaut"
 
 #: route_ui.lua
 msgid "ARS Rule List"
+msgstr ""
+
+#: route_ui.lua
+msgid "Advanced Options:"
 msgstr ""
 
 #: route_ui.lua
@@ -584,6 +596,10 @@ msgid "No trains on this section."
 msgstr ""
 
 #: tcb_ts_ui.lua
+msgid "Please cancel route first!"
+msgstr ""
+
+#: tcb_ts_ui.lua
 msgid "Punch components to add fixed locks. (punch anything else = end)"
 msgstr ""
 
@@ -668,6 +684,10 @@ msgid "Signal at @1"
 msgstr "Signal"
 
 #: tcb_ts_ui.lua
+msgid "Signal has been unassigned. Name and routes are kept for reuse."
+msgstr ""
+
+#: tcb_ts_ui.lua
 #, fuzzy
 msgid "Signal name"
 msgstr "Signal"
@@ -743,6 +763,13 @@ msgstr ""
 #: tcb_ts_ui.lua
 msgid "Trains on this section:"
 msgstr ""
+
+#: tcb_ts_ui.lua
+#, fuzzy
+msgid ""
+"Unassign\n"
+"Signal"
+msgstr "Sémaphore"
 
 #: tcb_ts_ui.lua
 msgid "Unconfigured Track Circuit Break, right-click to assign."
@@ -1143,9 +1170,6 @@ msgstr "Vous n'êtes pas autorisé à configurer cette voie."
 
 #~ msgid "Kick out passengers"
 #~ msgstr "Éjecter les passagers"
-
-#~ msgid "Lampless Signal"
-#~ msgstr "Sémaphore"
 
 #~ msgid "Left"
 #~ msgstr "Gauche"

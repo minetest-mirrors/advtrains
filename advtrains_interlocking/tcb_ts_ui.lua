@@ -922,6 +922,7 @@ function advtrains.interlocking.show_signalling_form(sigd, pname, sel_rte, calle
 				if hasprivs then
 					form = form.."button[0.5,8;2.5,1;smartroute;"..S("Smart Route").."]"
 					form = form.."button[  3,8;2.5,1;newroute;"..S("New (Manual)").."]"
+					form = form.."button_exit[5.5,8;1.5,1;unassign;"..S("Unassign\nSignal").."]"
 					form = form..string.format("checkbox[0.5,8.75;ars;"..S("Automatic routesetting")..";%s]", not tcbs.ars_disabled)
 					form = form..string.format("checkbox[0.5,9.25;dstarstrig;"..S("Distant signal triggers ARS")..";%s]", not tcbs.no_dst_ars_trig)
 				end
@@ -935,13 +936,16 @@ function advtrains.interlocking.show_signalling_form(sigd, pname, sel_rte, calle
 					if hasprivs then
 						form = form.."button[0.5,4;2.5,1;smartroute;"..S("Smart Route").."]"
 						form = form.."button[  3,4;2.5,1;newroute;"..S("New (Manual)").."]"
+						form = form.."button_exit[5.5,4;1.5,1;unassign;"..S("Unassign\nSignal").."]"
 					end
 				elseif caps >= 3 then
 					-- it's a buffer!
 					form = form.."label[0.5,2.5;"..S("This is an always-halt signal (e.g. a buffer)\nNo routes can be set from here.").."]"
+					form = form.."button_exit[5.5,4;1.5,1;unassign;"..S("Unassign\nSignal").."]"
 				else
 					-- signal caps say it cannot be route start/end
 					form = form.."label[0.5,2.5;"..S("This is a pure distant signal\nNo route is currently set through.").."]"
+					form = form.."button_exit[5.5,4;1.5,1;unassign;"..S("Unassign\nSignal").."]"
 				end
 			end
 			
@@ -995,7 +999,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		local tcbs = ildb.get_tcbs(sigd)
 		if not tcbs then return end
 
-		if fields.quit then
+		if fields.quit and not fields.unassign then
 			sig_pselidx[pname] = nil
 			p_open_sig_form[pname] = nil
 			-- form quit: disable temporary ARS ignore
@@ -1080,6 +1084,23 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 						table.remove(tcbs.routes,sel_rte)
 					end
 				end
+			end
+		end
+		if fields.unassign and hasprivs then
+			-- unassigning the signal from the tcbs
+			-- only when no route is set.
+			-- Routes and name remain saved, in case the player wants to reassign a new signal
+			if not tcbs.routeset then
+				local signal_pos = tcbs.signal
+				ildb.set_sigd_for_signal(signal_pos, nil)
+				tcbs.signal = nil
+				tcbs.route_aspect = nil
+				tcbs.route_remote = nil
+				p_open_sig_form[pname] = nil -- form is closed/left, do not reopen
+				minetest.chat_send_player(pname, S("Signal has been unassigned. Name and routes are kept for reuse."))
+				return
+			else
+				minetest.chat_send_player(pname, S("Please cancel route first!"))
 			end
 		end
 		

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: advtrains_interlocking\n"
 "Report-Msgid-Bugs-To: advtrains-discuss@lists.sr.ht\n"
-"POT-Creation-Date: 2025-06-11 23:21+0200\n"
+"POT-Creation-Date: 2025-07-20 22:27+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -111,6 +111,10 @@ msgstr ""
 
 #: route_prog.lua
 msgid "Enter Route Name"
+msgstr ""
+
+#: route_prog.lua route_ui.lua
+msgid "Auto lock turnouts"
 msgstr ""
 
 #: route_prog.lua
@@ -225,6 +229,10 @@ msgstr ""
 msgid "TCB at @1 has different section than previous TCB"
 msgstr ""
 
+#: route_ui.lua
+msgid "(More Options)"
+msgstr ""
+
 #: route_ui.lua signal_aspect_ui.lua
 msgid "Signal Aspect:"
 msgstr ""
@@ -247,6 +255,10 @@ msgstr ""
 
 #: route_ui.lua
 msgid "Call-on (section may be occupied)"
+msgstr ""
+
+#: route_ui.lua
+msgid "Advanced Options:"
 msgstr ""
 
 #: route_ui.lua
@@ -718,6 +730,12 @@ msgid "New (Manual)"
 msgstr ""
 
 #: tcb_ts_ui.lua
+msgid ""
+"Unassign\n"
+"Signal"
+msgstr ""
+
+#: tcb_ts_ui.lua
 msgid "Automatic routesetting"
 msgstr ""
 
@@ -753,6 +771,14 @@ msgstr ""
 msgid ""
 "Cannot delete route which has ARS rules, please review and then delete "
 "through edit dialog!"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Signal has been unassigned. Name and routes are kept for reuse."
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Please cancel route first!"
 msgstr ""
 
 #: tool.lua
