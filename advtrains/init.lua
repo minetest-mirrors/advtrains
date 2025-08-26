@@ -61,6 +61,12 @@ advtrains.translate = core.get_translator("advtrains")
 -- Get current translator
 local S = advtrains.translate
 
+-- define attrans for old mods
+attrans = function(...)
+	atwarn("Mod",core.get_current_modname(),"still uses attrans(), please update or inform mod author")
+	return S(...)
+end
+
 -- Use a global slowdown factor to slow down train movements. Now a setting
 advtrains.DTIME_LIMIT = tonumber(minetest.settings:get("advtrains_dtime_limit")) or 0.2
 advtrains.SAVE_INTERVAL = tonumber(minetest.settings:get("advtrains_save_interval")) or 60
