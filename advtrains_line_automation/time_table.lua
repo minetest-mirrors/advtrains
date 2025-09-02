@@ -1,3 +1,7 @@
+
+-- Get current translator
+local S = advtrains.lines.translate
+
 local visual_scale = 15/16
 local node_box = {type = "fixed", fixed = {
 	-16/32, -16/32, 15/32 / visual_scale,
@@ -9,7 +13,7 @@ local sbox = {type = "fixed", fixed = {
 }}
 
 local def = {
-	description = "jízdní řád",
+	description = S("Timetable"),
 	drawtype = "nodebox",
 	node_box = node_box,
 	selection_box = sbox,
@@ -28,13 +32,11 @@ local def = {
 	groups = {cracky = 3, ch_jrad = 1},
 	sounds = default.node_sound_metal_defaults(),
 	visual_scale = visual_scale,
-	_ch_help = "Použitím (levým klikem) zobrazí jízdní řády všech linek.\nLze umístit do světa a nastavit na jízdní řády v konkrétní stanici/zastávce.\nPo umístění lze také barvit barvicí pistolí.",
-	_ch_help_group = "jrad",
 	after_place_node = function(pos, placer, itemstack, pointed_thing)
 		local player_name = placer and placer:get_player_name()
 		if player_name ~= nil then
 			local meta = core.get_meta(pos)
-			meta:set_string("infotext", "jízdní řád (spravuje: "..player_name..")")
+			meta:set_string("infotext", S("Timetable (owner: @1)", player_name))
 			meta:set_string("owner", player_name)
 		end
 	end,
@@ -43,7 +45,7 @@ local def = {
 			return false
 		end
 		local player_name = player:get_player_name()
-		if core.check_player_privs(name, {protection_bypass=true}) then
+		if core.check_player_privs(player_name, {protection_bypass=true}) then
 			return true
 		end
 		if core.is_protected(pos, player_name) then
@@ -74,7 +76,7 @@ local def = {
 
 core.register_node("advtrains_line_automation:jrad", table.copy(def))
 
-def.description = "jízdní řád (na tyč)"
+def.description = S("Timetable (on pole)")
 def.tiles = table.copy(def.tiles)
 def.tiles[5] = def.tiles[1]
 def.node_box = {

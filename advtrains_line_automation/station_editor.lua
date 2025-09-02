@@ -211,11 +211,6 @@ local function get_formspec(custom_state)
 		local n_tracks = #st.tracks
 		table.insert(formspec, ",0,"..F(st.stn)..","..F(st.name)..",#ffffff,"..F(prihlasovaci_na_zobrazovaci(st.owner))..","..
 			F(station_distance_s(custom_state.player_pos, st))..", "..S("@1 tracks", n_tracks))
-		if n_tracks < 1 or n_tracks > 4 then
-			table.insert(formspec, "í")
-		elseif n_tracks ~= 1 then
-			table.insert(formspec, "e")
-		end
 		if n_tracks > 0 then
 			table.insert(formspec, "\\, "..S("lines").." " ..F(table.concat(st.lines, ",")))
 		end
@@ -490,7 +485,7 @@ advtrains.lines.open_station_editor = show_formspec
 def = {
     -- params = "",
     description = S("Open station editor"),
-    privs = {ch_registered_player = true},
+    privs = {railway_operator = true},
     func = function(player_name, param) show_formspec(minetest.get_player_by_name(player_name)) end,
 }
 core.register_chatcommand("station_editor", def)
@@ -533,7 +528,7 @@ core.register_chatcommand("station_editor", def)
 	}
 ]]
 
-local all_stations_record = {stn = "", fs = F("(vyberte dopravnu)"), name_fs = ""}
+local all_stations_record = {stn = "", fs = S("(select station)"), name_fs = ""}
 local is_visible_mode = assert(advtrains.lines.is_visible_mode)
 
 -- refresh custom_state.stops according to custom_state.linevar
@@ -591,9 +586,9 @@ local function get_all_linevars()
 				last_stop_uppercase = false, train_name = false}))
 			local status_fs
 			if trains_by_linevar[linevar] ~= nil then
-				status_fs = "#00ff00,v provozu"
+				status_fs = "#00ff00,"..S("in operation")
 			else
-				status_fs = "#999999,neznámý"
+				status_fs = "#999999,"..S("unknown state")
 			end
 			table.insert(result, {
 				stn = stn,
@@ -643,9 +638,9 @@ local function get_linevars_by_filter(stn_filter, track_filter)
 							line_fs = F(line)
 							target_fs = F(advtrains.lines.get_line_description(linevar_def, line_description_options))
 							if trains_by_linevar[linevar] ~= nil then
-								status_fs = "#00ff00,v provozu"
+								status_fs = "#00ff00,"..S("in operation")
 							else
-								status_fs = "#999999,neznámý"
+								status_fs = "#999999,"..S("unknown state")
 							end
 						end
 						local track_fs = stop_data.track
@@ -824,14 +819,14 @@ local function jr_refresh_departure(custom_state)
 	local rwtime = rwt.to_secs(rwt.get_time())
 	local prediction = advtrains.lines.predict_station_departures(linevar_def, assert(stop_info.linevar_index), rwtime)
 	if #prediction == 0 then
-		custom_state.message = "v nejbližší době nenalezeny žádné odjezdy zvolené linky"
+		custom_state.message = S("No departures for the selected line found in the near future")
 		return
 	end
 	local deps = {}
 	for i, pred in ipairs(prediction) do
 		deps[i] = tostring(pred.dep - rwtime)
 	end
-	custom_state.message = "nejbližší odjezdy zvolené linky za: "..table.concat(deps, ", ").." s"
+	custom_state.message = S("next departures of the selected line in: ")..table.concat(deps, ", ").." s"
 end
 
 local function get_jr_formspec(custom_state)
@@ -866,7 +861,7 @@ local function get_jr_formspec(custom_state)
 	if node_owner ~= nil then
 		if access_level ~= "player" then
 			-- admin or owner:
-			table.insert(formspec, "label[0.5,0.6;Jízdní řády]"..
+			table.insert(formspec, "label[0.5,0.6;"..S("Timetables").."]"..
 				"dropdown[5,0.3;10,0.6;dopravna;")
 			for i, r in ipairs(custom_state.stns) do
 				table.insert(formspec, ifthenelse(i == 1, r.fs, ","..r.fs))
@@ -875,7 +870,7 @@ local function get_jr_formspec(custom_state)
 				"dropdown[15.25,0.3;3.5,0.6;kolej;")
 			for i, r in ipairs(custom_state.tracks) do
 				if i == 1 then
-					table.insert(formspec, "(všechny koleje)")
+					table.insert(formspec, S("(all platforms)"))
 				else
 					table.insert(formspec, ","..F(r))
 				end
@@ -885,39 +880,39 @@ local function get_jr_formspec(custom_state)
 			-- player (including 'new' players)
 			local stn_info = custom_state.stns[custom_state.stn]
 			if stn_info.stn == "" then
-				table.insert(formspec, "label[0.5,0.6;Jízdní řády (všechny linky)]")
+				table.insert(formspec, "label[0.5,0.6;"..S("Timetables (all lines)").."]")
 			else
 				local track = custom_state.tracks[custom_state.track]
 				if track ~= "" then
 					track = F(" ["..track.."]")
 				end
-				table.insert(formspec, "label[0.5,0.6;"..F("Jízdní řády: ")..stn_info.name_fs..track.."]")
+				table.insert(formspec, "label[0.5,0.6;"..S("Timetables: ")..stn_info.name_fs..track.."]")
 			end
 		end
 		if access_level ~= "admin" then
 			-- player/owner
-			table.insert(formspec, "label[0.5,1.65;vlastník/ice j. řádu: ")
+			table.insert(formspec, "label[0.5,1.65;"..S("Owner: "))
 			table.insert(formspec, prihlasovaci_na_zobrazovaci(node_owner))
 			if stn_owner ~= nil then
-				table.insert(formspec, " | dopravnu spravuje: ")
+				table.insert(formspec, " | "..S("Station Operator: "))
 				table.insert(formspec, prihlasovaci_na_zobrazovaci(stn_owner))
 			end
 			table.insert(formspec, "]")
 		else
 			-- admin only
-			table.insert(formspec, "label[0.5,1.65;vlastník/ice:]"..
+			table.insert(formspec, "label[0.5,1.65;"..S("Owner: ").."]"..
 				"field[2.75,1.25;5,0.75;owner;;")
 			table.insert(formspec, prihlasovaci_na_zobrazovaci(node_owner))
-			table.insert(formspec, "]button[8,1.25;3,0.75;setowner;nastavit]")
+			table.insert(formspec, "]button[8,1.25;3,0.75;setowner;"..S("Set").."]")
 			if stn_owner ~= nil then
-				table.insert(formspec, "label[11.25,1.65;dopravnu spravuje: "..prihlasovaci_na_zobrazovaci(stn_owner).."]")
+				table.insert(formspec, "label[11.25,1.65;"..S("Station Operator: ")..prihlasovaci_na_zobrazovaci(stn_owner).."]")
 			end
 		end
 	else
-		table.insert(formspec, "label[0.5,0.6;Příruční jízdní řády (všechny linky)]")
+		table.insert(formspec, "label[0.5,0.6;"..S("Timetable for current station (all lines)").."]")
 	end
 
-	table.insert(formspec, "tablecolumns[text,align=right,tooltip=linka;text,width=12,tooltip=cíl;text,tooltip=kolej;color,span=1;text,tooltip=stav;color,span=1;text,tooltip=jméno vlaku]"..
+	table.insert(formspec, "tablecolumns[text,align=right,tooltip=Line;text,width=12,tooltip=Terminus;text,tooltip=Track;color,span=1;text,tooltip=Status;color,span=1;text,tooltip=Train Name]"..
 		"table[0.5,2.25;11,5;linka;")
 	for i, r in ipairs(custom_state.linevars) do
 		if i > 1 then
@@ -958,7 +953,7 @@ local function get_jr_formspec(custom_state)
 	if custom_state.message ~= "" then
 		table.insert(formspec, "label[5.25,11.35;"..F(custom_state.message).."]")
 	end
-	table.insert(formspec, "button[0.5,11;4.5,0.75;refresh;zjistit nejbližší odjezdy...]")
+	table.insert(formspec, "button[0.5,11;4.5,0.75;refresh;"..S("Update next departures...").."]")
 	return table.concat(formspec)
 end
 
