@@ -146,7 +146,8 @@ local function show_stoprailform(pos, player)
 		get_stn_dropdown(player_to_stn_override[pname] or stdata.stn, pname_unless_admin)..
 		"field[0.5,2.6;1.5,0.8;track;"..S("Track")..";"..minetest.formspec_escape(stdata.track).."]"..
 		"tooltip[track;"..S("Track number, for informational purposes").."]"..
-		(advtrains.lines.open_station_editor ~= nil and "button[3.5,2.3;3.7,1.1;editstn;"..S("Station Editor").."]" or "")
+		(advtrains.lines.open_station_editor ~= nil and "button[2.3,2.6;2.5,0.8;editstn;"..S("Station Editor").."]" or "")..
+		(advtrains.lines.open_line_editor ~= nil and "button[4.8,2.6;2.5,0.8;editlines;"..S("Line Editor").."]" or "")
 	if stdata.selector_ars then
 		formspec = formspec .. "textarea[7.5,1.3;4,2.1;selector_ars;"..S("Selector for stop pos (ARS)")..";"..advtrains.interlocking.ars_to_text(stdata.selector_ars).."]"..
 		"tooltip[selector_ars;"..S("Only trains matching these ARS rules will consider this stop rail as suitable timing point/stop position.\nAffects both timetabled and non-timetabled trains.\nExample: define a stop position for long trains (TL 30) and another for short trains (TL 0-30).").."]"..
@@ -192,7 +193,7 @@ local function show_stoprailform(pos, player)
 		-- TODO: interval and offset should be defined in the timetable, not here
 		-- build list of available linevars (it is convenient that linevars are defined in the station)
 		local avail_linevars = {}
-		local sel_linevar = 1
+		local sel_linevar = 0
 		if stn and stn.linevars then
 			for k,_ in pairs(stn.linevars) do
 				table.insert(avail_linevars, k)
@@ -201,7 +202,7 @@ local function show_stoprailform(pos, player)
 		end
 		if #avail_linevars > 0 then
 			formspec = formspec .. 
-			"dropdown[6.2,6.6;3.8,0.8;tt_begin_linevar;"..table.concat(avail_linevars)..";"..(sel_linevar or 1)..",false]" -- this dropdown NOT using indexing!
+			"dropdown[6.2,6.6;3.8,0.8;tt_begin_linevar;"..table.concat(avail_linevars, ",")..";"..(sel_linevar or 0)..",false]" -- this dropdown NOT using indexing!
 		else
 			formspec = formspec .. "label[6.2,6.6;"..S("No linevars\navailable!").."]"
 		end
@@ -255,7 +256,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			end
 		end
 
-		if fields.save or (fields.depmode and not fields.editstn) or fields.selector_ars_enable then -- must resend form when depmode dropdown is updated or the selector enable button is pressed)
+		if fields.save or (fields.depmode and not fields.editstn and not fields.editlines) or fields.selector_ars_enable then -- must resend form when depmode dropdown is updated or the selector enable button is pressed)
 			local new_index = player_to_stn_override[pname]
 			if new_index ~= nil then
 				if new_index == 1 then
@@ -342,6 +343,10 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		elseif fields.editstn and advtrains.lines.open_station_editor ~= nil then
 			minetest.close_formspec(pname, formname)
 			minetest.after(0.25, advtrains.lines.open_station_editor, player)
+			return
+		elseif fields.editlines and advtrains.lines.open_line_editor ~= nil then
+			minetest.close_formspec(pname, formname)
+			minetest.after(0.25, advtrains.lines.open_line_editor, player)
 			return
 		end -- if fields.save
 	end -- if pos

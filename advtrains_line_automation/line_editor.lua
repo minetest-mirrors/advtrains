@@ -156,7 +156,7 @@ local function get_formspec(custom_state)
     table.insert(formspec, ";font=mono;font_size=-4]"..
         "style[rc;font=mono]"..
         "tablecolumns[color;text,align=right;text;text,align=center;color;text,width=7;color;text]"..
-        "table[0.5,1.25;19,5;linevar;#ffffff,"..S("LINE,ROUTE,SM-CODE")..",#ffffff,"..S("OWNER")..",#ffffff,STAV")
+        "table[0.5,1.25;19,5;linevar;#ffffff,"..S("LINE,ROUTE,VAR.")..",#ffffff,"..S("OWNER")..",#ffffff,STAV")
 
     for _, linevar_def in ipairs(custom_state.linevars) do
         local lv_line, lv_stn, lv_rc = linevar_decompose(linevar_def.name)
@@ -186,9 +186,9 @@ local function get_formspec(custom_state)
         table.insert(formspec, "button[10.5,0.3;3.5,0.75;delete;"..S("Delete Line").."]")
     end
     table.insert(formspec, "button_exit[18.75,0.3;0.75,0.75;close;X]"..
-        "field[0.5,7;1.25,0.75;line;linka:;"..F(custom_state.line).."]"..
-        "field[2,7;1.5,0.75;rc;sm.kód:;"..F(custom_state.rc).."]"..
-        "field[3.75,7;3,0.75;train_name;jméno vlaku:;"..F(custom_state.train_name).."]")
+        "field[0.5,7;1.25,0.75;line;"..S("Line:")..";"..F(custom_state.line).."]"..
+        "field[2,7;1.5,0.75;rc;"..S("Variant:")..";"..F(custom_state.rc).."]"..
+        "field[3.75,7;3,0.75;train_name;"..S("Dest. Display:")..";"..F(custom_state.train_name).."]")
     if pinfo.role ~= "admin" then
         table.insert(formspec, "label[7,6.75;"..S("Owner:").."\n")
     else
@@ -779,9 +779,17 @@ local function show_editor_formspec(player, linevar_to_select)
 	ch_core.show_formspec(player, "advtrains_line_automation:editor_linek", get_formspec(custom_state), formspec_callback, custom_state, {})
 end
 
+-- make line editor globally available
+advtrains.lines.open_line_editor = show_editor_formspec
+
 local function lp_formspec_callback(custom_state, player, formname, fields)
     if fields.back then
         show_editor_formspec(player, custom_state.selected_linevar)
+    elseif fields.update then
+		local selected_linevar_def = try_get_linevar_def(custom_state.selected_linevar)
+        if selected_linevar_def ~= nil then
+            show_last_passages_formspec(player, selected_linevar_def, custom_state.selected_linevar)
+        end
     end
 end
 
@@ -853,6 +861,7 @@ show_last_passages_formspec = function(player, linevar_def, selected_linevar)
         end
     end
     table.insert(formspec, ";]"..
+		"button[13.75,0.3;1.75,0.75;update;"..S("Update").."]"..
         "button[17.75,0.3;1.75,0.75;back;"..S("Back").."]"..
         "tooltip[jizdy;Časové údaje jsou v sekundách železničního času.]")
     formspec = table.concat(formspec)

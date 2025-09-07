@@ -137,7 +137,7 @@ local function line_start(train, stn, departure_rwtime, linevar)
         al.cancel_linevar(train)
     end
     local linevar_def = al.try_get_linevar_def(linevar, stn)
-    if linevar == nil or linevar_def.disabled then
+    if linevar == nil or linevar_def == nil or linevar_def.disabled then
         return false
     end
     ls.linevar = linevar
@@ -496,13 +496,13 @@ function al.get_delay_description(line_status, linevar_def, rwtime)
         return {
             has_delay = true,
             delay = delay,
-            text = "zpoždění "..delay.." sekund",
+            text = "late "..delay.." seconds",
         }
     else
         return {
             has_delay = false,
             delay = delay,
-            text = "bez zpoždění",
+            text = "on time",
         }
     end
 end
@@ -967,7 +967,7 @@ local function get_train_position(line_status, linevar_def, rwtime)
             local result = "„"..get_station_name(last_pos.stn).."“"
             local delay_info = al.get_delay_description(line_status, linevar_def, rwtime)
             if last_pos_info.type ~= "standing" then
-                result = result.." (před "..(rwtime - last_pos.rwtime).." sekundami)"
+                result = result.." ("..(rwtime - last_pos.rwtime).." seconds ago)"
             end
             if delay_info.has_delay ~= nil then
                 result = result.." ("..delay_info.text..")"
@@ -1292,19 +1292,19 @@ local function vlaky(param, past_trains_too)
                     direction = get_station_name(direction_stop.stn)
                 end
                 local line = al.linevar_decompose(linevar_def.name)
-                local s = "("..train_id..") ["..line.."] směr „"..direction.."“, poloha: "..
+                local s = "("..train_id..") ["..line.."] direction „"..direction.."“, location: "..
                     get_train_position(ls, linevar_def, rwtime)
                 if results[train_id] ~= nil then
-                    s = s.." ["..results[train_id].." cestující/ch]"
+                    s = s.." ["..results[train_id].." passengers]"
                 end
                 table.insert(results, {key = linevar_def.name.."/"..ls.linevar_index, value = s})
             end
         elseif past_trains_too and ls.linevar_past ~= nil and (train_line_prefix == nil or ls.linevar_past.line == param) then
             local age = rwtime - ls.linevar_past.arrival
-            local s = "("..train_id..") ["..ls.linevar_past.line.."] služební, poloha: "..
-                get_station_name(ls.linevar_past.station).." (před "..age.." sekundami)"
+            local s = "("..train_id..") ["..ls.linevar_past.line.."] finished, location: "..
+                get_station_name(ls.linevar_past.station).." ("..age.." seconds ago)"
             if results[train_id] ~= nil then
-                s = s.." ["..results[train_id].." cestující/ch]"
+                s = s.." ["..results[train_id].." passengers]"
             end
             table.insert(results, {
                 key = string.format("%s/~/%s/%05d", ls.linevar_past.line, ls.linevar_past.station, age),
@@ -1321,31 +1321,31 @@ end
 
 -- příkaz /vlaky
 local def = {
-    params = "[linka]",
-    description = "Vypíše všechny linkové vlaky na zadané lince (resp. na všech linkách)",
+    params = "[line]",
+    description = "List all trains on the given line (or all lines)",
     privs = {},
     func = function(player_name, param)
         local result = vlaky(param, false)
         if #result == 0 then
-            return false, "Nenalezen žádný odpovídající vlak."
+            return false, "No matching train found."
         end
-        return true, "Nalezeno "..#result.." vlaků:\n- "..table.concat(result, "\n- ")
+        return true, "Listing "..#result.." trains:\n- "..table.concat(result, "\n- ")
     end,
 }
-core.register_chatcommand("vlaky", def)
+core.register_chatcommand("list_trains", def)
 def = {
-    params = "[linka]",
-    description = "Vypíše všechny linkové vlaky na zadané lince (resp. na všech linkách) a ty, které nedávno jízdu na lince ukončily",
+    params = "[line]",
+    description = "List all trains on the given line (or all lines) + trains that have recently completed the line",
     privs = {ch_registered_player = true},
     func = function(player_name, param)
         local result = vlaky(param, true)
         if #result == 0 then
-            return false, "Nenalezen žádný odpovídající vlak."
+            return false, "No matching train found."
         end
-        return true, "Nalezeno "..#result.." vlaků:\n- "..table.concat(result, "\n- ")
+        return true, "Listing "..#result.." trains:\n- "..table.concat(result, "\n- ")
     end,
 }
-core.register_chatcommand("vlaky+", def)
+core.register_chatcommand("list_trains+", def)
 
 def = {
     -- params = "",
