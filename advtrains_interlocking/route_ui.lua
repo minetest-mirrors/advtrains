@@ -140,8 +140,8 @@ function atil.show_route_edit_form(pname, sigd, routeid, sel_rpartidx)
 			-- checkbox for assign distant signal
 			local assign_dst = rseg.assign_dst
 			if assign_dst == nil then
-				assign_dst = (sel_rpart.seg~=1) -- special behavior when assign_dst is nil (and not false):
-				-- defaults to false for the very first signal and true for all others (= minimal user configuration overhead)
+				assign_dst = true -- special behavior when assign_dst is nil (and not false):
+				-- defaults to true (= minimal user configuration overhead) (changed on 2025-09-23 after some consideration)
 				-- Note: on save, the value will be fixed at either false or true
 			end
 			form = form..string.format("checkbox[4.5,4.0;sa_distant;"..S("Announce distant signal")..";%s]", assign_dst)
