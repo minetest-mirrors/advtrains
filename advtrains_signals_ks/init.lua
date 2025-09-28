@@ -185,7 +185,8 @@ for _, rtab in ipairs({
 		{rot =  "0", sbox = {-1/8, -1/2, -1/2,  1/8, 1/2, -1/4}, ici=true, nextrot = "30"},
 		{rot = "30", sbox = {-3/8, -1/2, -1/2, -1/8, 1/2, -1/4}, nextrot = "45"},
 		{rot = "45", sbox = {-1/2, -1/2, -1/2, -1/4, 1/2, -1/4}, nextrot = "60"},
-		{rot = "60", sbox = {-1/2, -1/2, -3/8, -1/4, 1/2, -1/8}, nextrot = "0"},
+		{rot = "60", sbox = {-1/2, -1/2, -3/8, -1/4, 1/2, -1/8}, nextrot = "offr"},
+		{rot = "offr", sbox = {3/8, -1/2, -1/8, 5/8, 1/2, 1/8}, nextrot = "0"},
 	}) do
 	local rot = rtab.rot
 	
@@ -258,7 +259,7 @@ for _, rtab in ipairs({
 				get_aspect_info = afunc,
 				route_role = "main_distant",
 				trackworker_next_rot = "advtrains_signals_ks:hs_"..typ.."_"..rtab.nextrot,
-				trackworker_rot_incr_param2 = (rot=="60")
+				trackworker_rot_incr_param2 = (rot=="offr")
 			},
 			on_rightclick = advtrains.interlocking.signal.on_rightclick,
 			can_dig = advtrains.interlocking.signal.can_dig,
@@ -331,7 +332,7 @@ for _, rtab in ipairs({
 				route_role = "distant",
 				pure_distant = true,
 				trackworker_next_rot = "advtrains_signals_ks:vs_"..typ.."_"..rtab.nextrot,
-				trackworker_rot_incr_param2 = (rot=="60")
+				trackworker_rot_incr_param2 = (rot=="offr")
 			},
 			on_rightclick = advtrains.interlocking.signal.on_rightclick,
 			can_dig = advtrains.interlocking.signal.can_dig,
@@ -386,7 +387,7 @@ for _, rtab in ipairs({
 				get_aspect_info = afunc,
 				route_role = "shunt",
 				trackworker_next_rot = "advtrains_signals_ks:ra_"..typ.."_"..rtab.nextrot,
-				trackworker_rot_incr_param2 = (rot=="60")
+				trackworker_rot_incr_param2 = (rot=="offr")
 			},
 			on_rightclick = advtrains.interlocking.signal.on_rightclick,
 			can_dig = advtrains.interlocking.signal.can_dig,
@@ -424,7 +425,7 @@ for _, rtab in ipairs({
 			advtrains = {
 				get_aspect_info = asp,
 				trackworker_next_rot = "advtrains_signals_ks:"..prefix.."_"..typ.."_"..rtab.nextrot,
-				trackworker_rot_incr_param2 = (rot=="60"),
+				trackworker_rot_incr_param2 = (rot=="offr"),
 				trackworker_next_var = "advtrains_signals_ks:"..prefix.."_"..nxt.."_"..rot,
 			},
 			on_rightclick = advtrains.interlocking.signal.on_rightclick,
@@ -534,7 +535,7 @@ for _, rtab in ipairs({
 		t.selection_box.fixed[1][5] = 0
 		t.advtrains = {
 				trackworker_next_rot = "advtrains_signals_ks:zs3_"..typ.."_"..rtab.nextrot,
-				trackworker_rot_incr_param2 = (rot=="60")
+				trackworker_rot_incr_param2 = (rot=="offr")
 			}
 		minetest.register_node("advtrains_signals_ks:zs3_"..typ.."_"..rot, t)
 		--TODO add rotation using trackworker
@@ -547,7 +548,7 @@ for _, rtab in ipairs({
 		t.tiles[3] = t.tiles[3] .. "^[multiply:yellow"
 		t.advtrains = {
 				trackworker_next_rot = "advtrains_signals_ks:zs3v_"..typ.."_"..rtab.nextrot,
-				trackworker_rot_incr_param2 = (rot=="60")
+				trackworker_rot_incr_param2 = (rot=="offr")
 			}
 		minetest.register_node("advtrains_signals_ks:zs3v_"..typ.."_"..rot, t)
 		--TODO add rotation using trackworker
@@ -575,7 +576,7 @@ for _, rtab in ipairs({
 		},
 		advtrains = {
 			trackworker_next_rot = "advtrains_signals_ks:mast_mast_"..rtab.nextrot,
-			trackworker_rot_incr_param2 = (rot=="60")
+			trackworker_rot_incr_param2 = (rot=="offr")
 		},
 		drop = "advtrains_signals_ks:mast_mast_0",
 	})
