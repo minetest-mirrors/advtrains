@@ -2,5 +2,4 @@
 .project
 .settings
 luacov.*
-advtrains/locale/*.tr
-advtrains/po/*~
+*/locale/*~
