@@ -1,8 +1,6 @@
 -- Default tracks for advtrains
 -- (c) orwell96 and contributors
 
--- Initialize internationalization (using ywang's poconvert)
-advtrains.poconvert.from_flat("advtrains_train_track")
 -- ask engine for translator instance, this will load the translation files
 local S = core.get_translator("advtrains_train_track")
 

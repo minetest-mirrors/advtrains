@@ -153,7 +153,19 @@ local function convert_po_string(textdomain, str)
 	return table.concat(st, "\n")
 end
 
+local warn_mods = {}
+
+-- warn about poconvert deprecation
+local function warn_poconvert()
+	local modname = core.get_current_modname()
+	if not warn_mods[modname] then
+		warn_mods[modname] = true
+		core.log("warning", modname .. ": poconvert is deprecated; consider using .po files directly")
+	end
+end
+
 local function convert_po_file(textdomain, inpath, outpath)
+	warn_poconvert()
 	local f, err = io.open(inpath, "rb")
 	assert(f, err)
 	local str = convert_po_string(textdomain, f:read("*a"))
@@ -164,6 +176,7 @@ end
 
 local function convert_flat_po_directory(textdomain, modpath)
 	assert(textdomain, "No textdomain specified for po file conversion")
+	warn_poconvert()
 	local mp = modpath or minetest.get_modpath(textdomain)
 	assert(mp ~= nil, "No path to write for " .. textdomain)
 	local popath = mp .. "/po"

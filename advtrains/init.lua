@@ -52,9 +52,9 @@ advtrains.TRAIN_MAX_WAGONS = 20
 
 advtrains.modpath = minetest.get_modpath("advtrains")
 
--- Initialize internationalization (using ywang's poconvert)
+-- Continue to provide poconvert for other mods that may depend on this
 advtrains.poconvert = dofile(advtrains.modpath.."/poconvert.lua")
-advtrains.poconvert.from_flat("advtrains")
+
 -- ask engine for translator instance, this will load the translation files
 advtrains.translate = core.get_translator("advtrains")
 

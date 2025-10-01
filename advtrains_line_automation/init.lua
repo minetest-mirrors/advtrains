@@ -18,8 +18,6 @@ advtrains.lines = {
 
 local modpath = minetest.get_modpath(minetest.get_current_modname()) .. DIR_DELIM
 
--- Initialize internationalization (using ywang's poconvert)
-advtrains.poconvert.from_flat("advtrains_line_automation")
 -- ask engine for translator instance, this will load the translation files
 advtrains.lines.translate = core.get_translator("advtrains_line_automation")
 
