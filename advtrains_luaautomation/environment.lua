@@ -1,6 +1,8 @@
 -------------
 -- lua sandboxed environment
 
+local S = atlatc.translate
+
 -- function to cross out functions and userdata.
 -- modified from dump()
 function atlatc.remove_invalid_data(o, nested)
@@ -218,7 +220,7 @@ if advtrains.interlocking then
 	end
 	static_env.set_route = function(signal, route_name)
 		local pos, sigd, tcbs, routeid, route = gen_checks(signal, route_name)
-		return advtrains.interlocking.route.update_route(sigd, tcbs, routeid)
+		return advtrains.interlocking.route.update_route(sigd, tcbs, routeid, nil, S("LuaATC component"))
 	end
 	static_env.cancel_route = function(signal)
 		local pos, sigd, tcbs, routeid, route = gen_checks(signal, "", true)

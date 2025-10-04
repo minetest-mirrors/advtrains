@@ -858,12 +858,13 @@ function advtrains.interlocking.show_signalling_form(sigd, pname, sel_rte, calle
 			form = form.."label[0.5,2.5;"..S("A route is requested from this signal:").."]"
 			form = form.."label[0.5,3.0;"..minetest.formspec_escape(rte.name).."]"
 		end
+		form = form .. "label[0.5,3.5;" .. core.formspec_escape(S("Routesetting trigger: @1", tcbs.routeset_trigger or S("Unknown reason"))) .. "]"
 		if tcbs.route_committed then
-			form = form.."label[0.5,3.5;"..S("Route has been set.").."]"
+			form = form.."label[0.5,4;"..S("Route has been set.").."]"
 		else
-			form = form.."label[0.5,3.5;"..S("Waiting for route to be set...").."]"
+			form = form.."label[0.5,4;"..S("Waiting for route to be set...").."]"
 			if tcbs.route_rsn then
-				form = form.."label[0.5,4;"..minetest.formspec_escape(tcbs.route_rsn).."]"
+				form = form.."label[0.5,4.5;"..minetest.formspec_escape(tcbs.route_rsn).."]"
 			end
 		end
 		if not tcbs.route_auto then
@@ -1044,7 +1045,7 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 			end
 			if sel_rte and tcbs.routes[sel_rte] then
 				if fields.setroute then
-					ilrs.update_route(sigd, tcbs, sel_rte)
+					ilrs.update_route(sigd, tcbs, sel_rte, nil, S("Manual routesetting by @1", pname))
 				end
 				if fields.dsproute then
 					local t = os.clock()

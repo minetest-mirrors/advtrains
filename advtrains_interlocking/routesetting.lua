@@ -329,6 +329,7 @@ function ilrs.cancel_route_from(sigd)
 		c_tcbs.route_aspect = nil
 		c_tcbs.route_remote = nil
 		c_tcbs.routeset = nil
+		c_tcbs.routeset_trigger = nil
 		c_tcbs.route_auto = nil
 		c_tcbs.route_origin = nil
 		
@@ -369,7 +370,8 @@ end
 -- sigd, tcbs: self-explanatory
 -- newrte: If a new route should be set, the route index of it (in tcbs.routes). Can also be a table (multi-ars). nil otherwise
 -- cancel: true in combination with newrte=nil causes cancellation of the current route.
-function ilrs.update_route(sigd, tcbs, newrte, cancel)
+-- trigger: The reason for setting the route
+function ilrs.update_route(sigd, tcbs, newrte, cancel, trigger)
 	--atdebug("Update_Route for",sigd,tcbs.signal_name)
 	local has_changed_aspect = false
 	if tcbs.route_origin and not sigd_equal(tcbs.route_origin, sigd) then
@@ -388,6 +390,7 @@ function ilrs.update_route(sigd, tcbs, newrte, cancel)
 		tcbs.route_remote = nil
 		has_changed_aspect = true
 		tcbs.routeset = nil
+		tcbs.routeset_trigger = nil
 		tcbs.route_auto = nil
 	end
 	if newrte or tcbs.routeset then
@@ -399,11 +402,13 @@ function ilrs.update_route(sigd, tcbs, newrte, cancel)
 				error("update_route got multi-ARS with empty table, this is not allowed")
 			end
 			tcbs.routeset = newrte
+			tcbs.routeset_trigger = trigger
 		else
 			if type(tcbs.routeset)=="table" and not next(tcbs.routeset) then
 				-- just unset, don't error
 				atwarn(sigd, "had multi-ARS route set with empty list! Cancelled!")
 				tcbs.routeset = nil
+				tcbs.routeset_trigger = nil
 				return
 			end
 		end

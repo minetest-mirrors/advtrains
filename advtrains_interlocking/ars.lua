@@ -70,6 +70,7 @@
 ]]
 
 local il = advtrains.interlocking
+local S = il.translate
 
 local function parse_trainlen(tlstr)
 	mins, maxs = string.match(tlstr, "^(%d*)%-(%d+)$")
@@ -385,7 +386,7 @@ function advtrains.interlocking.ars_check(signalpos, train, trig_from_dst)
 			--atdebug("Ars setting ",rteid)
 			--delay routesetting, it should not occur inside train step
 			-- using after here is OK because that gets called on every path recalculation
-			minetest.after(0, il.route.update_route, sigd, tcbs, rteid, nil)
+			minetest.after(0, il.route.update_route, sigd, tcbs, rteid, nil, S("Train @1", train.id))
 		end
 	end
 end
