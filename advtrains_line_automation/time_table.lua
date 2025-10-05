@@ -30,7 +30,7 @@ local def = {
 	paramtype2 = "4dir",
 	sunlight_propagates = true,
 	groups = {cracky = 3, ch_jrad = 1},
-	sounds = default.node_sound_metal_defaults(),
+	sounds = default and default.node_sound_metal_defaults and default.node_sound_metal_defaults() or nil,
 	visual_scale = visual_scale,
 	after_place_node = function(pos, placer, itemstack, pointed_thing)
 		local player_name = placer and placer:get_player_name()
