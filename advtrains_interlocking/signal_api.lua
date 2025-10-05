@@ -307,7 +307,7 @@ function signal.get_aspect_internal(pos, aspt)
 		-- oh, no main aspect, nevermind
 		return signal.MASP_HALT, nil, node, ndef
 	end
-	local ndefat = ndef.advtrains or {}
+	local ndefat = ndef and ndef.advtrains or {}
 	local masp = aspt.main or signal.MASP_HALT
 	
 	if type(masp) == "string" then
@@ -317,12 +317,16 @@ function signal.get_aspect_internal(pos, aspt)
 			-- case is fine, distant only signal
 			masp = signal.MASP_DEFAULT
 		else			
-			assert(ndefat.main_aspects, "With named aspects, node "..node.name.." needs advtrains.main_aspects table!")
-			-- resolve the main aspect from the mainaspects table
-			if not ndefat.main_aspects_lookup then
-				cache_mainaspects(ndefat)
+			if not ndefat.main_aspects then
+				atwarn(pos, "With named aspects, node", node and node.name, "needs advtrains.main_aspects table! Fix the aspect on the signal!")
+				masp = signal.MASP_HALT
+			else
+				-- resolve the main aspect from the mainaspects table
+				if not ndefat.main_aspects_lookup then
+					cache_mainaspects(ndefat)
+				end
+				masp = ndefat.main_aspects_lookup[aspt.main] or signal.MASP_DEFAULT
 			end
-			masp = ndefat.main_aspects_lookup[aspt.main] or signal.MASP_DEFAULT
 		end
 	end
 	-- return whatever the main aspect is
@@ -385,7 +389,7 @@ function signal.reapply_aspect(pts)
 	end
 	-- call into ndef
 	--atdebug("applying to",pos,": main_asp",masp,"rem_masp",rem_masp,"rem_aspi",rem_aspi)
-	if ndef.advtrains and ndef.advtrains.apply_aspect then
+	if ndef and ndef.advtrains and ndef.advtrains.apply_aspect then
 		ndef.advtrains.apply_aspect(pos, node, masp, rem_masp, rem_aspi)
 	end
 	-- notify trains
