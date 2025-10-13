@@ -20,6 +20,7 @@ local function updatemeta(pos)
 	local stdata = advtrains.lines.stops[pe]
 	if not stdata then
 		meta:set_string("infotext", "Error")
+		return
 	end
 	local stn = advtrains.lines.stations[stdata.stn]
 	local stn_viewname = stn and stn.name or "-"
