@@ -1401,8 +1401,14 @@ function advtrains.register_wagon(sysname_p, prototype, desc, inv_img, nincreati
 	local wagon_groups = { not_in_creative_inventory = nincreative and 1 or 0}
 	if prototype.is_locomotive then wagon_groups['at_loco'] = 1 end
 	if prototype.seat_groups then
-		if prototype.seat_groups.dstand then wagon_groups['at_control'] = 1 end
-		if prototype.seat_groups.pass then wagon_groups['at_pax'] = 1 end
+		wagon_groups['at_rideable'] = 1
+		for seats, seat in pairs(prototype.seat_groups) do
+			if seat.driving_ctrl_access then
+				wagon_groups['at_control'] = 1
+			else
+				wagon_groups['at_pax'] = 1
+			end
+		end
 	end
 	if prototype.has_inventory then wagon_groups['at_freight'] = 1 end
 
