@@ -808,7 +808,7 @@ minetest.register_chatcommand("at_status",
         description = S("Print advtrains status info"), 
         privs = {train_operator = true},
         func = function(name, param)
-			return true, S("Advtrains Status: no_action @1 slowdown @2 (log @3)", no_action, advtrains.global_slowdown, math.log(advtrains.global_slowdown))
+			return true, S("Advtrains Status: no_action @1 slowdown @2 (log @3)", tostring(no_action), advtrains.global_slowdown, math.log(advtrains.global_slowdown))
         end,
 })
 
