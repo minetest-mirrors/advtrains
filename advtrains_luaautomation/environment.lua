@@ -252,19 +252,22 @@ if advtrains.lines then
 	local atlrwt = advtrains.lines.rwt
 	static_env.rwt = {
 		now = atlrwt.now,
-		new = atlrwt.new,
-		copy = atlrwt.copy,
+		new_t = atlrwt.new_t,
+		new_i = atlrwt.new_i,
 		to_table = atlrwt.to_table,
-		to_secs = atlrwt.to_secs,
-		to_string = atlrwt.to_string,
+		t_sec = atlrwt.t_sec,
+		i_sec = atlrwt.i_sec,
+		to_secs = atlrwt.to_secs, -- deprecated
+		t_str = atlrwt.t_str,
+		i_str = atlrwt.i_str,
+		to_string = atlrwt.to_string, -- deprecated
 		add = atlrwt.add,
 		diff = atlrwt.diff,
 		sub = atlrwt.sub,
-		adj_diff = atlrwt.adj_diff,
-		adjust_cycle = atlrwt.adjust_cycle,
-		adjust = atlrwt.adjust,
-		to_string = atlrwt.to_string,
-		get_time_until = atlrwt.get_time_until,
+		
+		is_after = atlrwt.is_after,
+		is_before = atlrwt.is_before,
+		
 		next_rpt = atlrwt.next_rpt,
 		last_rpt = atlrwt.last_rpt,
 		time_from_last_rpt = atlrwt.time_from_last_rpt,
