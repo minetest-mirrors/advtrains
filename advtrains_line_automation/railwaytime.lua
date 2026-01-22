@@ -60,6 +60,9 @@ local CYCLE = 24*60*60
 local MODULUS = CYCLE*7
 local MODULUS_H = MODULUS / 2
 
+rwt.CYCLE = CYCLE
+rwt.MODULUS = MODULUS
+
 -- adjust so that it is in range [-MODULUS/2, MODULUS/2)
 local function i_adjust(sec)
 	return ((sec + MODULUS_H) % MODULUS) - MODULUS_H
@@ -146,7 +149,7 @@ end
 
 function rwt.new_i(sign, c, h, m, s)
 	assert(math.abs(sign)==1)
-	assert(c>=0 and c<7 and c==math.floor(c))
+	assert(c>=0 and c<3 and c==math.floor(c)) -- interval may be max. +-3 days to avoid overflow!
 	assert(h>=0 and h<24 and h==math.floor(h))
 	assert(m>=0 and m<60 and m==math.floor(m))
 	assert(s>=0 and s<60)
@@ -228,6 +231,7 @@ function rwt.i_sec(rwint)
 		return res.sign * (res.c*60*60*24 + res.h*60*60 + res.m*60 + res.s)
 	end
 end
+rwt.to_secs = rwt.i_sec -- deprecated alias
 
 -- time to string
 -- fmt:

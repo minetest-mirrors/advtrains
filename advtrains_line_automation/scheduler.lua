@@ -9,6 +9,15 @@ local sched = {}
 local UNITS_THRESH = 10
 local MAX_PER_ITER = 10
 
+local MODULUS = ln.rwt.MODULUS
+local MODULUS_H = MODULUS / 2
+
+-- true if a > b (mod MODULUS)
+local function gt_mod(a, b)
+	local d = a - b -- d>0 -> a>b
+	return ((d + MODULUS_H) % MODULUS) > MODULUS_H
+end
+
 local callbacks = {}
 
 -- Register a handler callback to handle scheduler items.
@@ -53,7 +62,7 @@ function sched.run()
 	local ucn, elem
 	while cnt <= MAX_PER_ITER do
 		elem = queue[1]
-		if elem and elem.t <= ctime then
+		if elem and not gt_mod(elem.t,ctime) then
 			table.remove(queue, 1)
 			if callbacks[elem.e] then
 				-- run it
@@ -79,7 +88,7 @@ end
 --    used to prevent expotentially growing "scheduler bombs"
 -- unitlim: Custom override for UNITS_THRESH (see there)
 function sched.enqueue(rwtime, handler, evtdata, unitid, unitlim)
-	local qtime = ln.rwt.to_secs(rwtime)
+	local qtime = ln.rwt.t_sec(rwtime)
 	assert(type(handler)=="string")
 	assert(type(unitid)=="string")
 	assert(type(unitlim)=="number")
@@ -96,7 +105,7 @@ function sched.enqueue(rwtime, handler, evtdata, unitid, unitlim)
 	
 	while true do
 		elem = queue[cnt]
-		if not elem or elem.t > qtime then
+		if not elem or gt_mod(elem.t, qtime) then
 			table.insert(queue, cnt, {
 					t=qtime,
 					e=handler,
@@ -111,10 +120,9 @@ function sched.enqueue(rwtime, handler, evtdata, unitid, unitlim)
 end
 
 -- See enqueue(). Same meaning, except that rwtime is relative to now.
-function sched.enqueue_in(rwtime, handler, evtdata, unitid, unitlim)
+function sched.enqueue_in(rwint, handler, evtdata, unitid, unitlim)
 	local ctime = ln.rwt.get_time()
-	local rwtime_s = ln.rwt.to_secs(rwtime)
-	sched.enqueue(ctime + rwtime_s, handler, evtdata, unitid, unitlim)
+	sched.enqueue(ln.rwt.add(ctime, rwint), handler, evtdata, unitid, unitlim)
 end
 
 -- Discards all schedules for unit "unitid" (removes them from the queue)
