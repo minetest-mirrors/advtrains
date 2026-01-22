@@ -816,7 +816,7 @@ local function jr_refresh_departure(custom_state)
 		custom_state.message = ""
 		return
 	end
-	local rwtime = rwt.to_secs(rwt.get_time())
+	local rwtime = rwt.now()
 	local prediction = advtrains.lines.predict_station_departures(linevar_def, assert(stop_info.linevar_index), rwtime)
 	if #prediction == 0 then
 		custom_state.message = S("No departures for the selected line found in the near future")
@@ -824,7 +824,7 @@ local function jr_refresh_departure(custom_state)
 	end
 	local deps = {}
 	for i, pred in ipairs(prediction) do
-		deps[i] = tostring(pred.dep - rwtime)
+		deps[i] = tostring(rwt.diff(rwtime, pred.dep))
 	end
 	custom_state.message = S("next departures of the selected line in: ")..table.concat(deps, ", ").." s"
 end

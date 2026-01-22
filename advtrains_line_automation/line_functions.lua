@@ -467,9 +467,9 @@ function al.get_delay_description(line_status, linevar_def, rwtime)
         return {text = ""}
     end
     local stops = linevar_def.stops
-    local expected_departure = line_status.linevar_dep + assert(stops[line_status.linevar_index]).dep
+    local expected_departure = rwt.add(line_status.linevar_dep, assert(stops[line_status.linevar_index]).dep)
     local real_departure = line_status.linevar_last_dep
-    local delay = real_departure - expected_departure
+    local delay = rwt.diff(expected_departure, real_departure)
 
     if rwtime ~= nil then
         local expected_departure_next
@@ -479,13 +479,13 @@ function al.get_delay_description(line_status, linevar_def, rwtime)
             else
                 local mode = stops[i].mode
                 if mode == nil or mode ~= MODE_DISABLED then
-                    expected_departure_next = line_status.linevar_dep + stops[i].dep
+                    expected_departure_next = rwt.add(line_status.linevar_dep, stops[i].dep)
                     break
                 end
             end
         end
         if expected_departure_next ~= nil then
-            local delay2 = rwtime - expected_departure_next
+            local delay2 = rwt.diff(expected_departure_next, rwtime)
             if delay2 > delay then
                 delay = delay2
             end
@@ -563,16 +563,14 @@ function al.get_line_status(train)
         -- nelinkový vlak
         local linevar_past = ls.linevar_past
         if linevar_past ~= nil then
-            local rwtime = rwt.to_secs(rwt.get_time())
-            if train.line ~= linevar_past.line or rwtime - linevar_past.arrival >= 86400 then
+            if train.line ~= linevar_past.line or rwt.diff(linevar_past.arrival, rwt.now()) >= 86400 then
                 -- smazat linevar_past, pokud se změnilo označení linky nebo uplynulo 24 hodin
                 ls.linevar_past = nil
             end
         end
         return ls, nil
     end
-    local rwtime = rwt.to_secs(rwt.get_time())
-    if rwtime - ls.linevar_dep >= 86400 then
+    if rwt.diff(ls.linevar_dep, rwt.now()) >= 86400 then
         core.log("warning", "Train "..train.id.." put out of linevar '"..ls.linevar.."', because it was riding more then 24 hours.")
         al.cancel_linevar(train)
         return ls, nil
@@ -655,7 +653,7 @@ function al.on_train_enter(pos, train_id, train, index)
     end
     
     local stn = stdata.stn or ""
-    local rwtime = assert(rwt.to_secs(rwt.get_time()))
+    local rwtime = assert(rwt.now())
     local ls, linevar_def = al.get_line_status(train)
     local next_index
     if stn ~= "" then
@@ -663,7 +661,7 @@ function al.on_train_enter(pos, train_id, train, index)
             next_index = find_next_index(ls, linevar_def, stn)
         end
         ls.last_enter = {stn = stn, encpos = pe, rwtime = rwtime}
-        debug_print("Vlak "..train_id.." zaznamenán: "..stn.." "..core.pos_to_string(pos).." @ "..rwtime)
+        debug_print("Vlak "..train_id.." zaznamenán: "..stn.." "..core.pos_to_string(pos).." @ "..rwt.t_str(rwtime))
     end
     local should_stop_result = should_stop(pos, stdata, train)
     if should_stop_result == nil then
@@ -700,20 +698,20 @@ function al.on_train_enter(pos, train_id, train, index)
     local last_dep = stdata.last_dep -- posl. odjezd z této zastávkové koleje
 
     if interval ~= nil and last_dep ~= nil then
-        if last_dep > rwtime then
+        if rwt.is_after(last_dep, rwtime) then
             last_dep = rwtime
         end
         local ioffset = stdata.ioffset or 0
-        local normal_dep = rwtime + wait
-        local next_dep = last_dep + (interval - (last_dep + (interval - ioffset)) % interval)
-        if normal_dep < next_dep then
+        local normal_dep = rwt.add(rwtime, wait)
+        local next_dep = rwt.next_rpt(last_dep, interval, ioffset)
+        if rwt.is_before(normal_dep, next_dep) then
             -- core.log("action", "[INFO] The train "..train_id.." will wait for "..(next_dep - normal_dep).." additional seconds due to interval at "..core.pos_to_string(pos)..".")
-            wait = wait + (next_dep - normal_dep)
+            wait = wait + rwt.diff(normal_dep, next_dep)
         -- else -- will wait normal time
         end
     end
-    local planned_departure = rwtime + wait
-    debug_print("Vlak "..train_id.." zastavil na "..stn.." a odjede za "..wait.." sekund ("..planned_departure..").")
+    local planned_departure = rwt.add(rwtime, wait)
+    debug_print("Vlak "..train_id.." zastavil na "..stn.." a odjede za "..wait.." sekund ("..rwt.t_str(planned_departure)..").")
     stdata.last_dep = planned_departure -- naplánovaný čas odjezdu
     stdata.last_wait = wait -- naplánovaná doba čekání
     ls.standing_at = pe
@@ -746,7 +744,7 @@ function al.on_train_enter(pos, train_id, train, index)
         else
             -- koncová zastávka
             can_start_line = stop_def.mode == MODE_FINAL_CONTINUE
-            core.log("action", "Train "..train_id.." arrived at the final station "..stop_def.stn.." of linevar "..ls.linevar.." after "..(rwtime - ls.linevar_dep).." seconds.")
+            core.log("action", "Train "..train_id.." arrived at the final station "..stop_def.stn.." of linevar "..ls.linevar.." after "..rwt.diff(ls.linevar_dep, rwtime).." seconds.")
             debug_print("Vlak "..train_id.." skončil jízdu na lince "..ls.linevar..", může pokračovat na jinou linku: "..(can_start_line and "ihned" or "na příští zastávce"))
             train.text_inside = al.get_stop_description(linevar_def.stops[next_index])
             local current_passage = current_passages[train_id]
@@ -819,11 +817,11 @@ function al.on_train_leave(pos, train_id, train, index)
     end
     local stn = stdata.stn or ""
     local ls, linevar_def = al.get_line_status(train)
-    local rwtime = assert(rwt.to_secs(rwt.get_time()))
+    local rwtime = rwt.now()
 
     if stn ~= "" then
         ls.last_leave = {stn = stn, encpos = pe, rwtime = rwtime}
-        debug_print("Vlak "..train_id.." zaznamenán na odjezdu: "..stn.." "..core.pos_to_string(pos).." @ "..rwtime)
+        debug_print("Vlak "..train_id.." zaznamenán na odjezdu: "..stn.." "..core.pos_to_string(pos).." @ "..rwt.t_str(rwtime))
     end
 
     if ls.standing_at == pe then
@@ -838,8 +836,8 @@ function al.on_train_leave(pos, train_id, train, index)
         end
         if stn ~= "" then
             debug_print("Vlak "..train_id.." odjel ze zastávky "..stn)
-            if ls.linevar_last_dep ~= nil and ls.linevar_last_dep > rwtime then
-                debug_print("Vlak "..train_id.." předčasně odjel z dopravny "..stn.." (zbývalo "..(ls.linevar_last_dep - rwtime).." sekund)")
+            if ls.linevar_last_dep ~= nil and rwt.is_after(ls.linevar_last_dep, rwtime) then
+                debug_print("Vlak "..train_id.." předčasně odjel z dopravny "..stn.." (zbývalo "..rwt.diff(rwtime, ls.linevar_last_dep).." sekund)")
                 ls.linevar_last_dep = rwtime -- předčasný odjezd
                 if ls.linevar_index == 1 then
                     ls.linevar_dep = rwtime
@@ -931,7 +929,7 @@ local function get_last_pos(line_status)
         last_pos, last_pos_type = last_enter, "enter"
         if standing_at ~= nil and standing_at == last_enter.encpos then
             last_pos_type = "standing"
-        elseif last_leave ~= nil and last_leave.rwtime > last_enter.rwtime then
+        elseif last_leave ~= nil and rwt.is_after(last_leave.rwtime, last_enter.rwtime) then
             last_pos, last_pos_type = last_leave, "leave"
         end
     elseif last_leave ~= nil then
@@ -967,7 +965,7 @@ local function get_train_position(line_status, linevar_def, rwtime)
             local result = "„"..get_station_name(last_pos.stn).."“"
             local delay_info = al.get_delay_description(line_status, linevar_def, rwtime)
             if last_pos_info.type ~= "standing" then
-                result = result.." ("..(rwtime - last_pos.rwtime).." seconds ago)"
+                result = result.." ("..rwt.diff(last_pos.rwtime, rwtime).." seconds ago)"
             end
             if delay_info.has_delay ~= nil then
                 result = result.." ("..delay_info.text..")"
@@ -1018,7 +1016,7 @@ local function predict_train_continue(line, stn, rc, departure, result)
         local stdata = advtrains.lines.stations[stop.stn]
         if stop.mode == MODE_FINAL or stop.mode == MODE_FINAL_CONTINUE or stop.mode == MODE_FINAL_HIDDEN then
             -- koncová zastávka
-            local arr = departure + stop.dep
+            local arr = rwt.add(departure + stop.dep)
             local record = {
                 stn = assert(stop.stn),
                 track = stop.track or "",
@@ -1033,7 +1031,7 @@ local function predict_train_continue(line, stn, rc, departure, result)
             return
         elseif stop.mode ~= MODE_DISABLED then
             -- mezilehlá zastávka
-            local dep = departure + stop.dep
+            local dep = rwt.add(departure + stop.dep)
             table.insert(result, {
                 stn = assert(stop.stn),
                 track = stop.track or "",
@@ -1076,7 +1074,7 @@ function al.predict_train(line_status, linevar_def, rwtime, allow_continue)
     local result = {}
     local index = assert(line_status.linevar_index)
     if rwtime == nil then
-        rwtime = rwt.to_secs(rwt.get_time())
+        rwtime = rwt.now()
     end
     local delay_desc = al.get_delay_description(line_status, linevar_def, rwtime)
     local delay
@@ -1108,7 +1106,7 @@ function al.predict_train(line_status, linevar_def, rwtime, allow_continue)
         local stdata = advtrains.lines.stations[stop.stn]
         if stop.mode == MODE_FINAL or stop.mode == MODE_FINAL_CONTINUE or stop.mode == MODE_FINAL_HIDDEN then
             -- koncová zastávka
-            local arr = departure + stop.dep + delay
+            local arr = rwt.add(rwt.add(departure, stop.dep), delay)
             local record = {
                 stn = assert(stop.stn),
                 track = stop.track or "",
@@ -1122,17 +1120,17 @@ function al.predict_train(line_status, linevar_def, rwtime, allow_continue)
             }
             table.insert(result, record)
             if allow_continue and (linevar_def.continue_line or "") ~= "" and stop.mode == MODE_FINAL_CONTINUE then
-                predict_train_continue(linevar_def.continue_line, stop.stn, linevar_def.continue_rc, arr + (stop.wait or 10), result)
+                predict_train_continue(linevar_def.continue_line, stop.stn, linevar_def.continue_rc, rwt.add(arr, (stop.wait or 10)), result)
             end
             break
         elseif stop.mode ~= MODE_DISABLED then
             -- mezilehlá zastávka
-            local dep = departure + stop.dep + delay
+            local dep = rwt.add(rwt.add(departure, stop.dep), delay)
             table.insert(result, {
                 stn = assert(stop.stn),
                 track = stop.track or "",
                 stdata = stdata,
-                arr = dep - (stop.wait or 10),
+                arr = rwt.sub(dep, (stop.wait or 10)),
                 arr_linevar_def = linevar_def,
                 arr_index = index,
                 dep = dep,
@@ -1166,7 +1164,7 @@ function al.predict_station_departures(linevar_def, linevar_index, rwtime, train
         trains = al.get_trains_by_linevar()[linevar] or {}
     end
     if rwtime == nil then
-        rwtime = rwt.to_secs(rwt.get_time())
+        rwtime = rwt.now()
     end
     local result = {}
     for _, train in ipairs(trains) do
@@ -1178,7 +1176,7 @@ function al.predict_station_departures(linevar_def, linevar_index, rwtime, train
                     pr.dep ~= nil and pr.dep_linevar_def ~= nil and pr.dep_index ~= nil and
                     pr.dep_linevar_def.name == linevar and
                     pr.dep_index == linevar_index and
-                    pr.dep > rwtime
+                    rwt.is_after(pr.dep, rwtime)
                 then
                     table.insert(result, pr)
                     break
@@ -1186,7 +1184,7 @@ function al.predict_station_departures(linevar_def, linevar_index, rwtime, train
             end
         end
     end
-    table.sort(result, function(a, b) return a.dep < b.dep end)
+    table.sort(result, function(a, b) return rwt.is_before(a.dep, b.dep) end)
     return result
 end
 
@@ -1276,7 +1274,7 @@ local function vlaky(param, past_trains_too)
     if param ~= "" then
         train_line_prefix = param.."/"
     end
-    local rwtime = rwt.to_secs(rwt.get_time())
+    local rwtime = rwt.now()
     local players_per_train = {}
     local results = {}
     for player_name, train_id in pairs(advtrains.player_to_train_mapping) do
@@ -1336,7 +1334,7 @@ core.register_chatcommand("list_trains", def)
 def = {
     params = "[line]",
     description = "List all trains on the given line (or all lines) + trains that have recently completed the line",
-    privs = {ch_registered_player = true},
+    privs = {},
     func = function(player_name, param)
         local result = vlaky(param, true)
         if #result == 0 then
@@ -1361,19 +1359,19 @@ def = {
             return false, "Vlak "..param.." není linkový!"
         end
         -- function al.predict_train(line_status, linevar_def, rwtime, allow_continue)
-        local rwtime = rwt.to_secs(rwt.get_time())
+        local rwtime = rwt.now()
         local predictions = al.predict_train(line_status, linevar_def, rwtime, true)
         local result = {"----"}
         local s
         for i, record in ipairs(predictions) do
             local arr, dep
             if record.arr ~= nil then
-                arr = "("..(record.arr - rwtime)..", lv="..record.arr_linevar_def.name..", i="..record.arr_index..")"
+                arr = "("..rwt.diff(rwtime, record.arr)..", lv="..record.arr_linevar_def.name..", i="..record.arr_index..")"
             else
                 arr = "nil"
             end
             if record.dep ~= nil then
-                dep  = "("..(record.dep - rwtime)..", lv="..record.dep_linevar_def.name..", i="..record.dep_index..")"
+                dep  = "("..rwt.diff(rwtime, record.dep)..", lv="..record.dep_linevar_def.name..", i="..record.dep_index..")"
             else
                 dep = "nil"
             end

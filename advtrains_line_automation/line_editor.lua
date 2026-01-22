@@ -827,7 +827,7 @@ show_last_passages_formspec = function(player, linevar_def, selected_linevar)
         for j = 1, 10 do
             local time = passages[j][1]
             if time ~= nil then
-                table.insert(formspec, ",("..time..")")
+                table.insert(formspec, ",("..rwt.t_str(time)..")")
                 if max_time[j] < time then
                     max_time[j] = time
                 end
