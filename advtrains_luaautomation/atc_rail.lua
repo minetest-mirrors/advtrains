@@ -207,7 +207,7 @@ function r.fire_event(pos, evtdata, appr_internal)
 			if not appr_internal then
 				error("atc_set_lzb_tsr() can only be used during 'approach' events!")
 			end
-			assert(tonumber(speed), "Number expected!")
+			speed = assert(tonumber(speed), "Number expected!")
 			
 			local index = appr_internal.index
 			advtrains.lzb_add_checkpoint(train, index, speed, nil)
