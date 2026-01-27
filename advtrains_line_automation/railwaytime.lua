@@ -57,10 +57,12 @@ The meaning of string short forms differ from the time instant case:
 local rwt = {}
 
 local CYCLE = 24*60*60
-local MODULUS = CYCLE*7
+local NCYC = 7
+local MODULUS = CYCLE*NCYC
 local MODULUS_H = MODULUS / 2
 
 rwt.CYCLE = CYCLE
+rwt.NCYC = NCYC
 rwt.MODULUS = MODULUS
 
 -- adjust so that it is in range [-MODULUS/2, MODULUS/2)
@@ -380,70 +382,68 @@ end
 --   It is preferred to therefore have a longer interval
 --   and the actual sequence will be ..., 20;00, 23;45, 1;05;00
 
+-- helper func to return a table of {
+-- rwtime_s, rpti_s, rpto_s (rwtime, interval and offset in seconds)
+-- ctime (time into current relative cycle [rpto; rpto+CYCLE) )
+-- rtime (last/next occurence of the rpt (time into cycle))
+-- cycle ( number of relative cycle = cycle no of the current cycle start time)
+-- inst ( instance number within the cycle )
+-- }
+function rwt.rpt_getinfo(rwtime, rpt_interval, rpt_offset, next)
+	if not rpt_interval then rpt_interval = CYCLE end
+	local t = {}
+	t.rwtime = rwt.t_sec(rwtime)
+	t.rpti   = rwt.i_sec(rpt_interval)
+	t.rpto   = rwt.i_sec(rpt_offset)
+	-- reduce to cycle
+	local trel = (t.rwtime - t.rpto) % MODULUS
+	t.cycle = atfloor(trel / CYCLE)
+	t.ctime = trel % CYCLE -- time into current cycle, offset by the rpt offset
+	t.rtime = t.ctime - (t.ctime % t.rpti) -- last rpt occurence time into cycle
+	if next then
+		-- next requested, cutoff to cycle
+		t.rtime = t.rtime + t.rpti -- next rpt occurence time into cycle
+		if t.rtime > (CYCLE - t.rpti/2) then -- last time cutoff rule, and overflow of cycle
+			t.rtime = CYCLE
+			t.cycle = (t.cycle + 1) % NCYC
+		end
+	else
+		if t.rtime > (CYCLE - t.rpti/2) then -- last time cutoff rule
+			t.rtime = t.rtime - t.rpti
+		end
+	end
+	-- determine instance
+	if t.rtime == CYCLE then -- next rounded up case
+		t.inst = 0
+	else
+		t.inst = atfloor(t.rtime / t.rpti) -- this should be exact, theoretically no need for floor
+	end
+	return t
+end
+
 -- Get the time (in seconds) until the next time this rpt occurs
 function rwt.time_to_next_rpt(rwtime, rpt_interval, rpt_offset)
-	if not rpt_interval then rpt_interval = CYCLE end
-	
-	local rwtime_s = rwt.t_sec(rwtime)
-	local rpti_s   = rwt.i_sec(rpt_interval)
-	local rpto_s   = rwt.i_sec(rpt_offset)
-	local otimcyc = (rwtime_s - rpto_s) % CYCLE -- time into current cycle, offset by the rpt offset
-	-- otimcyc is the time into a cycle which is assumed to start at rpto_s
-	local lasttime = otimcyc - (otimcyc % rpti_s)
-	local nexttime = lasttime + rpti_s -- next occurence is last occurence plus interval
-	
-	if nexttime > (CYCLE - rpti_s/2) then -- last time cutoff rule, and overflow of cycle
-		nexttime = CYCLE
-	end
-	
-	return nexttime - otimcyc
+	local t = rwt.rpt_getinfo(rwtime, rpt_interval, rpt_offset, true)
+	return t.rtime - t.ctime, t.cycle, t.inst
 end
 
 
 -- Get the time (in seconds) since the last time this rpt occured
 function rwt.time_from_last_rpt(rwtime, rpt_interval, rpt_offset)
-	if not rpt_interval then rpt_interval = CYCLE end
-	
-	local rwtime_s = rwt.t_sec(rwtime)
-	local rpti_s   = rwt.i_sec(rpt_interval)
-	local rpto_s   = rwt.i_sec(rpt_offset)
-	local otimcyc = (rwtime_s - rpto_s) % CYCLE -- time into current cycle, offset by the rpt offset
-	-- otimcyc is the time into a cycle which is assumed to start at rpto_s
-	local lasttime = otimcyc - (otimcyc % rpti_s)
-	
-	if lasttime > (CYCLE - rpti_s/2) then -- last time cutoff rule
-		lasttime = lasttime - rpti_s
-	end
-	
-	return otimcyc - lasttime
+	local t = rwt.rpt_getinfo(rwtime, rpt_interval, rpt_offset, false)
+	return t.ctime - t.rtime, t.cycle, t.inst
 end
 
--- From rwtime, get the next time that is divisible by rpt_interval offset by rpt_offset
+-- From rwtime, get the next time that this rpt matches
 function rwt.next_rpt(rwtime, rpt_interval, rpt_offset)
-	local time_to_next = rwt.time_to_next_rpt(rwtime, rpt_interval, rpt_offset)
-	return rwt.add(rwtime, time_to_next)
+	local time_to_next, c, i = rwt.time_to_next_rpt(rwtime, rpt_interval, rpt_offset)
+	return rwt.add(rwtime, time_to_next), c, i
 end
 
--- from rwtime, get the last time that this rpt matched (which is actually just next_rpt - rpt_offset
+-- from rwtime, get the last time that this rpt matched
 function rwt.last_rpt(rwtime, rpt_interval, rpt_offset)
-	local time_from_last = rwt.time_from_last_rpt(rwtime, rpt_interval, rpt_offset)
-	return rwt.sub(rwtime, time_from_last)
-end
-
-function rwt.to_os_time(rwtime)
-	local rw_now = rwt.to_secs(rwt.get_time())
-	return rwt.to_secs(rwtime) - rw_now + os.time()
+	local time_from_last, c, i = rwt.time_from_last_rpt(rwtime, rpt_interval, rpt_offset)
+	return rwt.sub(rwtime, time_from_last), c, i
 end
 
 advtrains.lines.rwt = rwt
-
-if core.get_modpath("ch_time") then
-	ch_time.set_rwtime_callback(function()
-		local rwtime = rwt.get_time()
-		return {
-			secs = rwt.to_secs(rwtime),
-			string = rwt.to_string(rwtime, true),
-			string_extended = rwt.to_string(rwtime),
-		}
-	end)
-end
