@@ -794,6 +794,7 @@ local function lp_formspec_callback(custom_state, player, formname, fields)
 end
 
 show_last_passages_formspec = function(player, linevar_def, selected_linevar)
+	local rwt = advtrains.lines.rwt
     local formspec = {
         "formspec_version[6]"..
         "size[20,10]"..
@@ -827,8 +828,8 @@ show_last_passages_formspec = function(player, linevar_def, selected_linevar)
         for j = 1, 10 do
             local time = passages[j][1]
             if time ~= nil then
-                table.insert(formspec, ",("..rwt.t_str(time)..")")
-                if max_time[j] < time then
+                table.insert(formspec, ",("..core.formspec_escape(rwt.t_str(time, 1))..")")
+                if rwt.is_before(max_time[j], time) then
                     max_time[j] = time
                 end
             else
@@ -842,8 +843,8 @@ show_last_passages_formspec = function(player, linevar_def, selected_linevar)
                 local dep_vych = passages[j][1]
                 local time = passages[j][i]
                 if time ~= nil and dep_vych ~= nil then
-                    table.insert(formspec, ","..(time - dep_vych))
-                    if max_time[j] < time then
+                    table.insert(formspec, ","..(rwt.diff(dep_vych, time)))
+                    if rwt.is_before(max_time[j], time) then
                         max_time[j] = time
                     end
                 else
@@ -854,7 +855,7 @@ show_last_passages_formspec = function(player, linevar_def, selected_linevar)
         table.insert(formspec, ",,"..S("Travelling:"))
         for i = 1, 10 do
             if max_time[i] ~= 0 then
-                table.insert(formspec, ",_"..(max_time[i] - passages[i][1]).."_")
+                table.insert(formspec, ",_"..(rwt.diff(passages[i][1], max_time[i])).."_")
             else
                 table.insert(formspec, ",-")
             end
