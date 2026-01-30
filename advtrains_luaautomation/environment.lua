@@ -161,6 +161,10 @@ local static_env = {
 		if not train then return false end
 		return table.copy(train.trainparts or {})
 	end,
+	get_wagon_train_id = function(wagon_id)
+		local wagon = advtrains.wagons[wagon_id]
+		return wagon and wagon.train_id or false
+	end,
 	-- sends an atc command to train regardless of where it is in the world
 	atc_send_to_train = function(train_id, command)
 		assertt(command, "string")
