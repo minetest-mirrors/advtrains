@@ -438,13 +438,13 @@ function al.get_stop_description(stop_data, next_stop_data)
     if next_stop_data ~= nil then
         local mode = next_stop_data.mode
         if mode ~= MODE_DISABLED and mode ~= MODE_HIDDEN and mode ~= MODE_FINAL_HIDDEN then
-            s2 = "Příští zastávka/stanice: "..get_station_name(next_stop_data.stn)
+            s2 = S("Next Stop: ")..get_station_name(next_stop_data.stn)
             if mode == MODE_REQUEST_STOP then
-                s2 = s2.." (na znamení)"
+                s2 = s2..S(" (on request)")
             end
         end
     else
-        s2 = "Koncová zastávka"
+        s2 = S("Terminus")
     end
     if s1 ~= "" and s2 ~= "" then
         return s1.."\n"..s2
@@ -796,9 +796,9 @@ function al.on_train_enter(pos, train_id, train, index)
 			linevar_def = assert(al.try_get_linevar_def(ls.linevar))
 			local next_stop_index, next_stop_data = al.get_next_stop(linevar_def, 1)
 			if next_stop_index ~= nil then
-				train.text_inside = train.text_inside.."\nPříští zastávka/stanice: "..get_station_name(next_stop_data.stn)
+				train.text_inside = train.text_inside.."\n"..S("Next stop: ")..get_station_name(next_stop_data.stn)
 				if next_stop_data.mode ~= nil and next_stop_data.mode == MODE_REQUEST_STOP then
-					train.text_inside = train.text_inside.." (na znamení)"
+					train.text_inside = train.text_inside..S(" (on request)")
 				end
 			end
 		end
