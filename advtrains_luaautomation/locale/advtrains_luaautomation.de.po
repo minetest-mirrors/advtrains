@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: advtrains\n"
 "Report-Msgid-Bugs-To: advtrains-discuss@lists.sr.ht\n"
-"POT-Creation-Date: 2025-06-11 23:03+0200\n"
+"POT-Creation-Date: 2026-01-31 22:06+0100\n"
 "PO-Revision-Date: 2025-06-11 23:13+0200\n"
 "Last-Translator: Y. Wang <yw05@forksworld.de>\n"
 "Language-Team: German\n"
@@ -154,6 +154,11 @@ msgstr "Erfolgreich abgemeldet!"
 #: chatcmds.lua
 msgid "Unubscribe to the log of an Advtrains LuaATC environment"
 msgstr "Meldungen aus LuaATC-Umgebung nicht mehr empfangen"
+
+#: environment.lua
+#, fuzzy
+msgid "LuaATC component"
+msgstr "Nicht konfiguierter LuaATC-Bauteil"
 
 #: init.lua
 msgid ""

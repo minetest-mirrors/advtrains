@@ -2,15 +2,19 @@ msgid ""
 msgstr ""
 "Project-Id-Version: advtrains\n"
 "Report-Msgid-Bugs-To: advtrains-discuss@lists.sr.ht\n"
-"POT-Creation-Date: 2025-07-20 22:27+0200\n"
-"PO-Revision-Date: 2025-07-20 22:31+0200\n"
+"POT-Creation-Date: 2026-01-31 22:06+0100\n"
+"PO-Revision-Date: 2026-01-31 22:09+0100\n"
 "Last-Translator: Y. Wang <yw05@forksworld.de>\n"
 "Language-Team: German\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.2.2\n"
+"X-Generator: Poedit 3.6\n"
+
+#: ars.lua
+msgid "Train @1"
+msgstr "Zug @1"
 
 #: autonaming.lua
 msgid "Prefix set, next signal name will be: @1"
@@ -51,11 +55,11 @@ msgstr "@1 Ziel @2"
 
 #: route_prog.lua
 msgid "@1 is held in @2 position when this route is set and freed "
-msgstr "@1 wird durch die Fahrstraße in Position @2 festgelegt"
+msgstr "@1 wird durch die Fahrstraße in Position @2 festgelegt "
 
 #: route_prog.lua
 msgid "@1 is no longer affected when this route is set."
-msgstr "@1 wird nicht mehr durch die Fahrstraße festgelegt"
+msgstr "@1 wird nicht mehr durch die Fahrstraße festgelegt."
 
 #: route_prog.lua
 msgid "Added track section @1 to the route."
@@ -75,7 +79,7 @@ msgstr "Fortsetzen über nächsten Gleisabschnitt hinaus"
 
 #: route_prog.lua route_ui.lua
 msgid "Auto lock turnouts"
-msgstr "automatischer Weichenverschluss"
+msgstr "Automatischer Weichenverschluss"
 
 #: route_prog.lua
 msgid "Cancel if you are unsure!"
@@ -438,7 +442,7 @@ msgstr ""
 
 #: tcb_ts_ui.lua
 msgid " (invalid)"
-msgstr "(ungültig)"
+msgstr " (ungültig)"
 
 #: tcb_ts_ui.lua
 msgid "@1 locks in state @2"
@@ -595,6 +599,11 @@ msgid "Link: @1"
 msgstr "Verknüpfung: @1"
 
 #: tcb_ts_ui.lua
+#, fuzzy
+msgid "Manual routesetting by @1"
+msgstr "ARS (autom. Fahrstraßenauswahl)"
+
+#: tcb_ts_ui.lua
 msgid "Multiple routes are requested (first available is set):"
 msgstr "Mehrere Fahrstraßen angefragt (erste verfügbare wird eingestellt):"
 
@@ -620,7 +629,7 @@ msgstr "Keine Züge auf diesem Abschnitt."
 
 #: tcb_ts_ui.lua
 msgid "Please cancel route first!"
-msgstr ""
+msgstr "Fahrstraße zuerst auflösen!"
 
 #: tcb_ts_ui.lua
 msgid "Punch components to add fixed locks. (punch anything else = end)"
@@ -667,6 +676,10 @@ msgstr "Fahrstraßen werden nicht automatisch gestellt."
 #: tcb_ts_ui.lua
 msgid "Routes:"
 msgstr "Fahrstraßen:"
+
+#: tcb_ts_ui.lua
+msgid "Routesetting trigger: @1"
+msgstr "Fahrstraßenauslöser: @1"
 
 #: tcb_ts_ui.lua
 msgid "Section holds @1 route locks."
@@ -789,7 +802,7 @@ msgstr "Gleisabschnitts-Details - @1"
 
 #: tcb_ts_ui.lua
 msgid "Trains on this section:"
-msgstr "Züge in diesem Abschnitt"
+msgstr "Züge in diesem Abschnitt:"
 
 #: tcb_ts_ui.lua
 msgid ""
@@ -803,6 +816,10 @@ msgstr ""
 msgid "Unconfigured Track Circuit Break, right-click to assign."
 msgstr ""
 "Nicht konfiguierte Gleisabschnittsgrenze (TCB). Rechtsklick zum Zuweisen."
+
+#: tcb_ts_ui.lua
+msgid "Unknown reason"
+msgstr "Unbekannter Grund"
 
 #: tcb_ts_ui.lua
 msgid "Wait for this route to be cancelled in order to do anything here."
@@ -1279,10 +1296,6 @@ msgstr "Sie dürfen dieses Gleis nicht konfigurieren."
 #~ "\n"
 #~ "Linksklick: Gleistyp ändern\n"
 #~ "Rechtsklick: Objekt drehen"
-
-#, fuzzy
-#~ msgid "Train "
-#~ msgstr "Der Zug wurde Kopiert."
 
 #~ msgid "Train copied."
 #~ msgstr "Der Zug wurde Kopiert."

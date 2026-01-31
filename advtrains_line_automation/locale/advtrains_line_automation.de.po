@@ -2,15 +2,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: advtrains\n"
 "Report-Msgid-Bugs-To: advtrains-discuss@lists.sr.ht\n"
-"POT-Creation-Date: 2025-07-22 23:18+0200\n"
-"PO-Revision-Date: 2025-07-22 23:28+0200\n"
+"POT-Creation-Date: 2026-01-31 22:06+0100\n"
+"PO-Revision-Date: 2026-01-31 22:39+0100\n"
 "Last-Translator: Y. Wang <yw05@forksworld.de>\n"
 "Language-Team: German\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.2.2\n"
+"X-Generator: Poedit 3.6\n"
 
 #: line_editor.lua
 msgid "(departed)"
@@ -54,7 +54,7 @@ msgstr "Linie löschen"
 
 #: line_editor.lua
 msgid "Deletion failed: "
-msgstr "Löschen fehlgeschlagen"
+msgstr "Löschen fehlgeschlagen: "
 
 #: line_editor.lua
 msgid "Dep."
@@ -63,6 +63,10 @@ msgstr "Ab"
 #: line_editor.lua
 msgid "Departure time must lie within 0-3600 seconds!"
 msgstr "Abfahrtszeit muss zwischen 0-3600 Sekunden liegen!"
+
+#: line_editor.lua
+msgid "Dest. Display:"
+msgstr "Zielanzeige:"
 
 #: line_editor.lua
 msgid "Disable"
@@ -74,7 +78,7 @@ msgstr "Doppelte Abfahrtszeit!"
 
 #: line_editor.lua
 msgid "Error in line setup: "
-msgstr "Fehler in der Linie:"
+msgstr "Fehler in der Linie: "
 
 #: line_editor.lua
 msgid "Field 'Continuation' must contain maximum 1 '/'!"
@@ -98,59 +102,63 @@ msgstr "Inkorrektes Abfahrtszeitformat!"
 
 #: line_editor.lua
 msgid "Incorrect format for stop position!"
-msgstr "Inkorrektes Format für Stoppposition°"
+msgstr "Inkorrektes Format für Stoppposition!"
 
 #: line_editor.lua
 msgid "Insufficient permissions to edit '@1'."
-msgstr ""
+msgstr "Nicht genug Berechtigungen, um '@1' zu bearbeiten."
 
 #: line_editor.lua
-msgid "LINE,ROUTE,SM-CODE"
-msgstr ""
+msgid "LINE,ROUTE,VAR."
+msgstr "LINIE,ROUTE,VAR."
 
 #: line_editor.lua
 msgid "Last passages"
-msgstr ""
+msgstr "Letzte Fahrten"
 
 #: line_editor.lua
 msgid "Last passages of line @1"
-msgstr ""
+msgstr "Letzte Fahrten der Linie @1"
 
 #: line_editor.lua
 msgid "Line '@1' successfully deleted!"
-msgstr ""
+msgstr "Linie '@1' erfolgreich gelöscht!"
 
 #: line_editor.lua
 msgid "Line '@1' successfully saved!"
-msgstr ""
+msgstr "Linie '@1' erfolgreich gespeichert"
 
-#: line_editor.lua
+#: line_editor.lua stoprail.lua
 msgid "Line Editor"
-msgstr ""
+msgstr "Linieneditor"
 
 #: line_editor.lua
 msgid "Line name must not be empty!"
-msgstr ""
+msgstr "Linienname darf nicht leer sein"
 
 #: line_editor.lua
 msgid "Line name must not contain characters '/', '|' or '\\'!"
-msgstr ""
+msgstr "Linienname darf nicht '/', '|' oder '\\' enthalten!"
 
 #: line_editor.lua
 msgid "Line name must not exceed 16 characters!"
-msgstr ""
+msgstr "Linienname darf nicht mehr als 16 Zeichen haben!"
 
 #: line_editor.lua
 msgid "Line name must not exceed 256 characters!"
-msgstr ""
+msgstr "Linienname darf nicht mehr als 256 Zeichen haben!"
 
 #: line_editor.lua
 msgid "Line owner must not be empty!"
-msgstr ""
+msgstr "Besitzer darf nicht leer sein!"
 
 #: line_editor.lua
 msgid "Line setup must contain at least 1 terminus stop!"
-msgstr ""
+msgstr "Linie muss mindestens 1 Endstation haben!"
+
+#: line_editor.lua
+msgid "Line:"
+msgstr "Linie:"
 
 #: line_editor.lua
 msgid "Mode"
@@ -158,11 +166,11 @@ msgstr "Modus"
 
 #: line_editor.lua
 msgid "New Line..."
-msgstr ""
+msgstr "Neue Linie..."
 
 #: line_editor.lua
 msgid "No issues found, the line can now be saved!"
-msgstr ""
+msgstr "Keine Probleme gefunden, Linie kann jetzt gespeichert werden!"
 
 #: line_editor.lua
 msgid "No such station"
@@ -170,39 +178,39 @@ msgstr "Kein solcher Bahnhof"
 
 #: line_editor.lua
 msgid "Normal"
-msgstr ""
+msgstr "Normal"
 
 #: line_editor.lua station_editor.lua
 msgid "OWNER"
-msgstr ""
+msgstr "BESITZER"
 
 #: line_editor.lua
 msgid "Open line editor"
-msgstr ""
+msgstr "Öffne Linieneditor"
 
 #: line_editor.lua
 msgid "Owner:"
-msgstr ""
+msgstr "Besitzer:"
 
 #: line_editor.lua
 msgid "Position"
-msgstr ""
+msgstr "Position"
 
 #: line_editor.lua
 msgid "Request Stop (experimental)"
-msgstr ""
+msgstr "Bedarfshalt (experimentell)"
 
 #: line_editor.lua
 msgid "Reset changes"
-msgstr ""
+msgstr "Änd. zurücksetzen"
 
 #: line_editor.lua
 msgid "Routing code must not contain '/', '|' or '\\'!"
-msgstr ""
+msgstr "Routingcode darf nicht '/', '|' oder '\\' enthalten!"
 
 #: line_editor.lua
 msgid "Save changes"
-msgstr ""
+msgstr "Speichern"
 
 #: line_editor.lua
 msgid "St.Time"
@@ -210,7 +218,7 @@ msgstr "W.zeit"
 
 #: line_editor.lua
 msgid "Starting station code must not be empty!"
-msgstr ""
+msgstr "Startstations-Code darf nicht leer sein!"
 
 #: line_editor.lua
 msgid "Station"
@@ -222,23 +230,23 @@ msgstr "Kennz."
 
 #: line_editor.lua
 msgid "Station code must not contain '/', '|' or '\\'!"
-msgstr ""
+msgstr "Stationscode darf nicht '/', '|' oder '\\' enthalten!"
 
 #: line_editor.lua
 msgid "Stop position must not exceed 22 characters!"
-msgstr ""
+msgstr "Halteposition darf nicht mehr als 22 Zeichen haben!"
 
-#: line_editor.lua
+#: line_editor.lua line_functions.lua
 msgid "Terminus"
-msgstr ""
+msgstr "Endstation"
 
 #: line_editor.lua
 msgid "Terminus (continuing)"
-msgstr ""
+msgstr "Endstation (fortsetzend)"
 
 #: line_editor.lua
 msgid "Terminus (hidden)"
-msgstr ""
+msgstr "Endstation (versteckt)"
 
 #: line_editor.lua station_editor.lua stoprail.lua
 msgid "Track"
@@ -246,7 +254,7 @@ msgstr "Gleis"
 
 #: line_editor.lua
 msgid "Train name must not exceed 256 characters!"
-msgstr ""
+msgstr "Zugname darf nicht mehr als 256 Zeichen haben!"
 
 #: line_editor.lua
 msgid "Travelling:"
@@ -261,20 +269,48 @@ msgid "Unknown station code!"
 msgstr "Unbekannter Stationscode"
 
 #: line_editor.lua
+msgid "Update"
+msgstr "Aktualisieren"
+
+#: line_editor.lua
+msgid "Variant:"
+msgstr "Variante:"
+
+#: line_editor.lua
 msgid "Verify/Save"
-msgstr ""
+msgstr "Prüfen/Speichern"
+
+#: line_functions.lua
+msgid " (on request)"
+msgstr " (Bedarfshalt)"
 
 #: line_functions.lua
 msgid "Next Stop:"
 msgstr "Nächste Haltestelle:"
 
 #: line_functions.lua
+msgid "Next Stop: "
+msgstr "Nächste Haltestelle: "
+
+#: line_functions.lua
+msgid "Next stop: "
+msgstr "Nächste Haltestelle: "
+
+#: line_functions.lua
 msgid "Unknown Station"
 msgstr "Unbekannte Station"
 
 #: station_editor.lua
+msgid "(all platforms)"
+msgstr "(alle Bahnsteige)"
+
+#: station_editor.lua
+msgid "(select station)"
+msgstr "(wähle Bahnhof)"
+
+#: station_editor.lua
 msgid "@1 tracks"
-msgstr ""
+msgstr "@1 Gleise"
 
 #: station_editor.lua
 msgid "Assign"
@@ -286,51 +322,51 @@ msgstr "Gleis zuweisen"
 
 #: station_editor.lua
 msgid "By Distance"
-msgstr ""
+msgstr "Nach Distanz"
 
 #: station_editor.lua
 msgid "CODE"
-msgstr ""
+msgstr "CODE"
 
 #: station_editor.lua
 msgid "Code changed, @1 station tracks updated!"
-msgstr ""
+msgstr "Code geändert, @1 Stationsgleise aktualisiert!"
 
 #: station_editor.lua
 msgid "Create New"
-msgstr ""
+msgstr "Neu erstellen"
 
 #: station_editor.lua
 msgid "DISTANCE"
-msgstr ""
+msgstr "DISTANZ"
 
 #: station_editor.lua
 msgid "Delete"
-msgstr ""
+msgstr "Löschen"
 
 #: station_editor.lua
 msgid "ERROR: Code must not be empty!"
-msgstr ""
+msgstr "FEHLER: Code darf nicht leer sein!"
 
 #: station_editor.lua
 msgid "ERROR: No stop selected!"
-msgstr ""
+msgstr "FEHLER: Keine Haltestelle ausgewählt!"
 
 #: station_editor.lua
 msgid "ERROR: No such station!"
-msgstr ""
+msgstr "FEHLER: Keine solche Haltestelle!"
 
 #: station_editor.lua
 msgid "ERROR: Station '@1' already exists!"
-msgstr ""
+msgstr "FEHLER: Haltestelle '@1' existiert schon!"
 
 #: station_editor.lua
 msgid "ERROR: There are station tracks assigned, cannot delete the station!"
-msgstr ""
+msgstr "FEHLER: Es sind Stationsgleise zugewiesen, kann Station nicht löschen!"
 
 #: station_editor.lua
 msgid "INFO"
-msgstr ""
+msgstr "INFO"
 
 #: station_editor.lua
 msgid "Lines"
@@ -338,43 +374,55 @@ msgstr "Linien"
 
 #: station_editor.lua
 msgid "My Stations (By Distance)"
-msgstr ""
+msgstr "Meine Stationen (nach Distanz)"
 
 #: station_editor.lua
 msgid "My Stations (Station Code A-Z)"
-msgstr ""
+msgstr "Meine Stationen (Stationscode A-Z)"
 
 #: station_editor.lua
 msgid "My Stations (Station Name A-Z)"
-msgstr ""
+msgstr "Meine Stationen (Stationsname A-Z)"
 
 #: station_editor.lua
 msgid "NAME"
-msgstr ""
+msgstr "NAME"
 
 #: station_editor.lua
 msgid "Name changed!"
-msgstr ""
+msgstr "Name geändert!"
+
+#: station_editor.lua
+msgid "No departures for the selected line found in the near future"
+msgstr "Keine Abfahrten für diese Linie in nächster Zeit"
 
 #: station_editor.lua
 msgid "Nothing has changed."
-msgstr ""
+msgstr "Nichts hat sich geändert."
 
 #: station_editor.lua
 msgid "Open station editor"
-msgstr ""
+msgstr "Stationseditor öffnen"
 
 #: station_editor.lua
 msgid "Owner changed!"
-msgstr ""
+msgstr "Besitzer geändert!"
+
+#: station_editor.lua
+msgid "Owner: "
+msgstr "Besitzer:"
 
 #: station_editor.lua
 msgid "Positions of tracks:"
-msgstr ""
+msgstr "Position der Gleise:"
 
 #: station_editor.lua
 msgid "Save Changes"
-msgstr ""
+msgstr "Änderungen speichern"
+
+#: station_editor.lua
+msgid "Set"
+msgstr "Setzen"
 
 #: station_editor.lua
 msgid "Station Code (A-Z)"
@@ -385,32 +433,68 @@ msgid "Station Name (A-Z)"
 msgstr "Name der Haltestelle (A-Z)"
 
 #: station_editor.lua
+msgid "Station Operator: "
+msgstr "Stationsbetreiber: "
+
+#: station_editor.lua
 msgid "Station deleted!"
 msgstr "Station gelöscht!"
 
 #: station_editor.lua
 msgid "Station successfully created."
-msgstr ""
+msgstr "Station erfolgreich erstellt."
+
+#: station_editor.lua
+msgid "Timetable for current station (all lines)"
+msgstr "Fahrplan für aktuelle Station (alle Linien)"
+
+#: station_editor.lua
+msgid "Timetables"
+msgstr "Fahrpläne"
+
+#: station_editor.lua
+msgid "Timetables (all lines)"
+msgstr "Fahrpläne (alle Linien)"
+
+#: station_editor.lua
+msgid "Timetables: "
+msgstr "Fahrpläne:"
 
 #: station_editor.lua
 msgid "Track successfully assigned!"
-msgstr ""
+msgstr "Gleis erfolgreich zugewiesen!"
+
+#: station_editor.lua
+msgid "Update next departures..."
+msgstr "Nächste Abfahren aktualisieren..."
 
 #: station_editor.lua
 msgid "[Station Editor]"
 msgstr "[Stationseditor]"
 
 #: station_editor.lua
+msgid "in operation"
+msgstr "in Betrieb"
+
+#: station_editor.lua
 msgid "lines"
-msgstr ""
+msgstr "Linien"
+
+#: station_editor.lua
+msgid "next departures of the selected line in: "
+msgstr "Nächste Abfahrt dieser Linie in: "
+
+#: station_editor.lua
+msgid "unknown state"
+msgstr "Unbekannter Zustand"
 
 #: stoprail.lua
 msgid "(foreign)"
-msgstr ""
+msgstr "(fremd)"
 
 #: stoprail.lua
 msgid "(unassigned)"
-msgstr ""
+msgstr "(nicht zugewiesen)"
 
 #: stoprail.lua
 msgid "Arrival Actions"
@@ -426,13 +510,15 @@ msgstr "Abfahrtsmodus"
 
 #: stoprail.lua
 msgid "Do not close the doors when departing, if they are open"
-msgstr ""
+msgstr "Türen bei Abfahrt nicht schließen"
 
 #: stoprail.lua
 msgid ""
 "Do not depart immediately, instead first enable ARS and wait until the next "
 "signal ahead clears (ATC G command) before closing the doors and departing."
 msgstr ""
+"Bei Abfahrt, aktiviert zuerst ARS und wartet bis Signal Fahrt zeigt (wie ATC "
+"G Befehl) bevor Türen geschlossen werden und abgefahren wird."
 
 #: stoprail.lua
 msgid ""
@@ -440,6 +526,8 @@ msgid ""
 "ARS routes when the train arrives, not just before departure. (currently not "
 "implemented)"
 msgstr ""
+"Deaktiviert ARS nicht. Signale hinter dem Stationsgleis stellen bereits "
+"Fahrstraßen ein. (aktuell nicht implementiert)"
 
 #: stoprail.lua
 msgid "Door Side"
@@ -465,13 +553,13 @@ msgstr "Fahrgäste zum Ausstieg zwingen"
 msgid ""
 "List of actions to perform on arrival (currently not implemented, later will "
 "allow actions such as setting line, RC and displays)"
-msgstr ""
+msgstr "Liste von Aktionen bei Ankunft (aktuell nicht implementiert)"
 
 #: stoprail.lua
 msgid ""
 "List of actions to perform on departure (currently not implemented, later "
 "will allow actions such as setting line, RC and displays)"
-msgstr ""
+msgstr "Liste von Aktionen bei Abfahrt (aktuell nicht implementiert)"
 
 #: stoprail.lua
 msgid ""
@@ -486,12 +574,16 @@ msgid ""
 "Non-timetabled trains matching these ARS rules will stop at this position.\n"
 "Note: Train must also match the 'Selector' filter above!"
 msgstr ""
+"Nicht-Fahrplanzüge, die diesen Regeln entsprechen, halten hier.\n"
+"Achtung: Züge müssen auch dem 'Selektor' oben entsprechen!"
 
 #: stoprail.lua
 msgid ""
 "Non-timetabled trains matching these ARS rules will stop at this position.\n"
 "Trains under timetable will use the timetable's settings."
 msgstr ""
+"Nicht-Fahrplanzüge, die diesen Regeln entsprechen, halten hier.\n"
+"Züge im Fahrplan nutzen die Einstellungen des Fahrplans."
 
 #: stoprail.lua
 msgid "Offset:"
@@ -505,6 +597,11 @@ msgid ""
 "Example: define a stop position for long trains (TL 30) and another for "
 "short trains (TL 0-30)."
 msgstr ""
+"Nur Züge, die diesen Regeln entsprechen, beachten dieses Stationsgleis als "
+"potentielle Halteposition.\n"
+"Betrifft sowohl Fahrplanzüge als auch Nicht-Fahrplanzüge.\n"
+"Beispiel: definiere 2 Halteplätze je für Langzüge (TL 30) und Kurzzüge (TL "
+"0-30)."
 
 #: stoprail.lua
 msgid "Reverse train"
@@ -516,7 +613,7 @@ msgstr "Speichern"
 
 #: stoprail.lua
 msgid "Select if and on which side the train will open its doors once stopped"
-msgstr ""
+msgstr "Wähle aus, ob und auf welcher Seite die Türen öffnen sollen"
 
 #: stoprail.lua
 msgid ""
@@ -526,6 +623,11 @@ msgid ""
 "Begin Timetable: The train gets the given timetable assigned and departs "
 "according to its settings (currently not implemented)"
 msgstr ""
+"Abfahrtszeitpunkt auswählen:\n"
+"Normal: fährt sofort nach Ablauf der Haltezeit ab\n"
+"Intervall: fährt zum nächsten Zeitpunkt im gegebenen Intervall / Versatz ab\n"
+"Fahrplan beginnen: Beginnt den ausgewählten Fahrplan und fährt nach dessen "
+"Einstellungen ab"
 
 #: stoprail.lua
 msgid "Selector for stop pos (ARS)"
@@ -541,7 +643,7 @@ msgstr "Geschw."
 
 #: stoprail.lua
 msgid "Speed that the train sets when departing. Set 'M' for maximum speed."
-msgstr ""
+msgstr "Geschwindigkeit des Zugs nach Abfahrt. 'M' für Höchstgeschwindigkeit."
 
 #: stoprail.lua
 msgid "Station Editor"
@@ -563,7 +665,7 @@ msgstr "Haltepunktgleis"
 
 #: stoprail.lua
 msgid "Stn. @1 (@2) T. @3"
-msgstr ""
+msgstr "Stn. @1 (@2) Gl. @3"
 
 #: stoprail.lua
 msgid "Stop Time"
@@ -578,32 +680,39 @@ msgid ""
 "The interval / time distance between departures in seconds. E.g. every two "
 "minutes -> set interval = 120"
 msgstr ""
+"Intervall / Abstand zwischen 2 Zügen in Sekunden. Z.B. alle 2 Minuten -> "
+"setze 120"
 
 #: stoprail.lua
 msgid ""
 "The offset of departures from time 0:00 in seconds. E.g. interval 120 offset "
 "60 -> departure at every odd minute"
 msgstr ""
+"Versatz gegenüber Zeit 00;00 in Sekunden. Z.B. Intervall 120 Versatz 60 "
+"bedeutet Abfahrt zu Minuten 01, 03, 05 usw."
 
 #: stoprail.lua
 msgid "Track number, for informational purposes"
-msgstr ""
+msgstr "Gleisnummer, für Informationszwecke"
 
 #: stoprail.lua
 msgid "Train will depart in the direction from where it arrived"
-msgstr ""
+msgstr "Zug fährt in die entgegengesetzte Richtung ab"
 
 #: stoprail.lua
 msgid ""
 "Train will remain stopped with open doors for at least this time before "
 "departure is attempted."
-msgstr ""
+msgstr "Zug bleibt mindestens für diese Zeit mit geöffneten Türen stehen."
 
 #: stoprail.lua
 msgid ""
 "Use when multiple stop rails are located in the same track of a station. "
 "Allows to select a suitable stop position depending on the class of train."
 msgstr ""
+"Nutzen Sie dies, wenn sich mehrere Stationsgleise im selben Gleis befinden "
+"sollen, welche verschiedene Haltepositionen für verschiedene Zugarten "
+"angeben. Erlaubt es, für jede Zugart die passende Position auszuwählen."
 
 #: stoprail.lua
 msgid "Wait for signal to clear"
@@ -624,6 +733,18 @@ msgstr "Links"
 #: stoprail.lua
 msgid "right"
 msgstr "Rechts"
+
+#: time_table.lua
+msgid "Timetable"
+msgstr "Fahrplan"
+
+#: time_table.lua
+msgid "Timetable (on pole)"
+msgstr "Fahrplan (auf Stange)"
+
+#: time_table.lua
+msgid "Timetable (owner: @1)"
+msgstr "Fahrplan (Besitzer: @1)"
 
 #~ msgid "(Doors closed)"
 #~ msgstr "(Türen geschlossen)"

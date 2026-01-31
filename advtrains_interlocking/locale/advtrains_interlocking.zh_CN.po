@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: advtrains\n"
 "Report-Msgid-Bugs-To: advtrains-discuss@lists.sr.ht\n"
-"POT-Creation-Date: 2025-07-20 22:27+0200\n"
+"POT-Creation-Date: 2026-01-31 22:06+0100\n"
 "PO-Revision-Date: 2023-10-09 11:24+0200\n"
 "Last-Translator: Y. Wang <yw05@forksworld.de>\n"
 "Language-Team: Chinese (Simplified)\n"
@@ -11,6 +11,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.3.2\n"
+
+#: ars.lua
+#, fuzzy
+msgid "Train @1"
+msgstr "已复制列车。"
 
 #: autonaming.lua
 msgid "Prefix set, next signal name will be: @1"
@@ -566,6 +571,10 @@ msgid "Link: @1"
 msgstr ""
 
 #: tcb_ts_ui.lua
+msgid "Manual routesetting by @1"
+msgstr ""
+
+#: tcb_ts_ui.lua
 msgid "Multiple routes are requested (first available is set):"
 msgstr ""
 
@@ -636,6 +645,10 @@ msgstr ""
 
 #: tcb_ts_ui.lua
 msgid "Routes:"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Routesetting trigger: @1"
 msgstr ""
 
 #: tcb_ts_ui.lua
@@ -764,6 +777,10 @@ msgstr "臂板信号机"
 
 #: tcb_ts_ui.lua
 msgid "Unconfigured Track Circuit Break, right-click to assign."
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Unknown reason"
 msgstr ""
 
 #: tcb_ts_ui.lua
@@ -1192,10 +1209,6 @@ msgstr "您不能调整这段轨道。"
 #~ "\n"
 #~ "左键单击：切换轨道类型\n"
 #~ "右键单击：旋转方块"
-
-#, fuzzy
-#~ msgid "Train "
-#~ msgstr "已复制列车。"
 
 #~ msgid "Train copied."
 #~ msgstr "已复制列车。"

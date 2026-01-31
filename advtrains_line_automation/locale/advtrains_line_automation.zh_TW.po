@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: advtrains\n"
 "Report-Msgid-Bugs-To: advtrains-discuss@lists.sr.ht\n"
-"POT-Creation-Date: 2025-07-22 23:18+0200\n"
+"POT-Creation-Date: 2026-01-31 22:06+0100\n"
 "PO-Revision-Date: 2023-10-09 11:31+0200\n"
 "Last-Translator: Y. Wang <yw05@forksworld.de>\n"
 "Language-Team: Chinese (Traditional)\n"
@@ -65,6 +65,10 @@ msgid "Departure time must lie within 0-3600 seconds!"
 msgstr ""
 
 #: line_editor.lua
+msgid "Dest. Display:"
+msgstr ""
+
+#: line_editor.lua
 msgid "Disable"
 msgstr ""
 
@@ -105,7 +109,7 @@ msgid "Insufficient permissions to edit '@1'."
 msgstr ""
 
 #: line_editor.lua
-msgid "LINE,ROUTE,SM-CODE"
+msgid "LINE,ROUTE,VAR."
 msgstr ""
 
 #: line_editor.lua
@@ -124,7 +128,7 @@ msgstr ""
 msgid "Line '@1' successfully saved!"
 msgstr ""
 
-#: line_editor.lua
+#: line_editor.lua stoprail.lua
 msgid "Line Editor"
 msgstr ""
 
@@ -151,6 +155,11 @@ msgstr ""
 #: line_editor.lua
 msgid "Line setup must contain at least 1 terminus stop!"
 msgstr ""
+
+#: line_editor.lua
+#, fuzzy
+msgid "Line:"
+msgstr "火車線路"
 
 #: line_editor.lua
 msgid "Mode"
@@ -231,7 +240,7 @@ msgstr ""
 msgid "Stop position must not exceed 22 characters!"
 msgstr ""
 
-#: line_editor.lua
+#: line_editor.lua line_functions.lua
 msgid "Terminus"
 msgstr ""
 
@@ -265,7 +274,19 @@ msgid "Unknown station code!"
 msgstr "車站碼"
 
 #: line_editor.lua
+msgid "Update"
+msgstr ""
+
+#: line_editor.lua
+msgid "Variant:"
+msgstr ""
+
+#: line_editor.lua
 msgid "Verify/Save"
+msgstr ""
+
+#: line_functions.lua
+msgid " (on request)"
 msgstr ""
 
 #: line_functions.lua
@@ -273,8 +294,25 @@ msgid "Next Stop:"
 msgstr ""
 
 #: line_functions.lua
+msgid "Next Stop: "
+msgstr ""
+
+#: line_functions.lua
+msgid "Next stop: "
+msgstr ""
+
+#: line_functions.lua
 msgid "Unknown Station"
 msgstr ""
+
+#: station_editor.lua
+msgid "(all platforms)"
+msgstr ""
+
+#: station_editor.lua
+#, fuzzy
+msgid "(select station)"
+msgstr "ID 為「@1」的列車不存在。"
 
 #: station_editor.lua
 msgid "@1 tracks"
@@ -363,6 +401,10 @@ msgid "Name changed!"
 msgstr ""
 
 #: station_editor.lua
+msgid "No departures for the selected line found in the near future"
+msgstr ""
+
+#: station_editor.lua
 msgid "Nothing has changed."
 msgstr ""
 
@@ -375,11 +417,19 @@ msgid "Owner changed!"
 msgstr ""
 
 #: station_editor.lua
+msgid "Owner: "
+msgstr ""
+
+#: station_editor.lua
 msgid "Positions of tracks:"
 msgstr ""
 
 #: station_editor.lua
 msgid "Save Changes"
+msgstr ""
+
+#: station_editor.lua
+msgid "Set"
 msgstr ""
 
 #: station_editor.lua
@@ -394,6 +444,11 @@ msgstr "車站名稱"
 
 #: station_editor.lua
 #, fuzzy
+msgid "Station Operator: "
+msgstr "車站碼"
+
+#: station_editor.lua
+#, fuzzy
 msgid "Station deleted!"
 msgstr "車站碼"
 
@@ -402,7 +457,27 @@ msgid "Station successfully created."
 msgstr ""
 
 #: station_editor.lua
+msgid "Timetable for current station (all lines)"
+msgstr ""
+
+#: station_editor.lua
+msgid "Timetables"
+msgstr ""
+
+#: station_editor.lua
+msgid "Timetables (all lines)"
+msgstr ""
+
+#: station_editor.lua
+msgid "Timetables: "
+msgstr ""
+
+#: station_editor.lua
 msgid "Track successfully assigned!"
+msgstr ""
+
+#: station_editor.lua
+msgid "Update next departures..."
 msgstr ""
 
 #: station_editor.lua
@@ -411,8 +486,21 @@ msgid "[Station Editor]"
 msgstr "車站碼"
 
 #: station_editor.lua
+msgid "in operation"
+msgstr ""
+
+#: station_editor.lua
 msgid "lines"
 msgstr ""
+
+#: station_editor.lua
+msgid "next departures of the selected line in: "
+msgstr ""
+
+#: station_editor.lua
+#, fuzzy
+msgid "unknown state"
+msgstr "車站碼"
 
 #: stoprail.lua
 msgid "(foreign)"
@@ -632,6 +720,18 @@ msgstr ""
 
 #: stoprail.lua
 msgid "right"
+msgstr ""
+
+#: time_table.lua
+msgid "Timetable"
+msgstr ""
+
+#: time_table.lua
+msgid "Timetable (on pole)"
+msgstr ""
+
+#: time_table.lua
+msgid "Timetable (owner: @1)"
 msgstr ""
 
 #~ msgid "3-way turnout"

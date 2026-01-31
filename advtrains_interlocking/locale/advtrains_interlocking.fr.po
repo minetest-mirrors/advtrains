@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: advtrains\n"
 "Report-Msgid-Bugs-To: advtrains-discuss@lists.sr.ht\n"
-"POT-Creation-Date: 2025-07-20 22:27+0200\n"
+"POT-Creation-Date: 2026-01-31 22:06+0100\n"
 "PO-Revision-Date: 2025-03-25 15:06+0100\n"
 "Last-Translator: Tanavit <tanavit@posto.ovh>\n"
 "Language-Team: French\n"
@@ -11,6 +11,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 2.4.2\n"
+
+#: ars.lua
+#, fuzzy
+msgid "Train @1"
+msgstr "Identificateur du train "
 
 #: autonaming.lua
 msgid "Prefix set, next signal name will be: @1"
@@ -572,6 +577,11 @@ msgid "Link: @1"
 msgstr ""
 
 #: tcb_ts_ui.lua
+#, fuzzy
+msgid "Manual routesetting by @1"
+msgstr "Routage à distance"
+
+#: tcb_ts_ui.lua
 msgid "Multiple routes are requested (first available is set):"
 msgstr ""
 
@@ -643,6 +653,10 @@ msgstr ""
 
 #: tcb_ts_ui.lua
 msgid "Routes:"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Routesetting trigger: @1"
 msgstr ""
 
 #: tcb_ts_ui.lua
@@ -774,6 +788,11 @@ msgstr "Sémaphore"
 #: tcb_ts_ui.lua
 msgid "Unconfigured Track Circuit Break, right-click to assign."
 msgstr ""
+
+#: tcb_ts_ui.lua
+#, fuzzy
+msgid "Unknown reason"
+msgstr "Gare inconnue"
 
 #: tcb_ts_ui.lua
 msgid "Wait for this route to be cancelled in order to do anything here."
@@ -1459,9 +1478,6 @@ msgstr "Vous n'êtes pas autorisé à configurer cette voie."
 #~ msgid "Train"
 #~ msgstr "Identificateur du train"
 
-#~ msgid "Train "
-#~ msgstr "Identificateur du train "
-
 #~ msgid "Train ID"
 #~ msgstr "Identificateur du train"
 
@@ -1506,9 +1522,6 @@ msgstr "Vous n'êtes pas autorisé à configurer cette voie."
 
 #~ msgid "Uninitialized, removing"
 #~ msgstr "Non initialisé, retiré"
-
-#~ msgid "Unknown Station"
-#~ msgstr "Gare inconnue"
 
 #~ msgid "Unloading Track"
 #~ msgstr "Voie de Déchargement"

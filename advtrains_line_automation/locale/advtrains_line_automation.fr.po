@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: advtrains\n"
 "Report-Msgid-Bugs-To: advtrains-discuss@lists.sr.ht\n"
-"POT-Creation-Date: 2025-07-22 23:18+0200\n"
+"POT-Creation-Date: 2026-01-31 22:06+0100\n"
 "PO-Revision-Date: 2025-03-25 15:06+0100\n"
 "Last-Translator: Tanavit <tanavit@posto.ovh>\n"
 "Language-Team: French\n"
@@ -66,6 +66,10 @@ msgid "Departure time must lie within 0-3600 seconds!"
 msgstr ""
 
 #: line_editor.lua
+msgid "Dest. Display:"
+msgstr ""
+
+#: line_editor.lua
 msgid "Disable"
 msgstr ""
 
@@ -107,7 +111,7 @@ msgid "Insufficient permissions to edit '@1'."
 msgstr "Privilèges insuffisants pour utiliser ceci !"
 
 #: line_editor.lua
-msgid "LINE,ROUTE,SM-CODE"
+msgid "LINE,ROUTE,VAR."
 msgstr ""
 
 #: line_editor.lua
@@ -126,7 +130,7 @@ msgstr ""
 msgid "Line '@1' successfully saved!"
 msgstr ""
 
-#: line_editor.lua
+#: line_editor.lua stoprail.lua
 msgid "Line Editor"
 msgstr ""
 
@@ -153,6 +157,11 @@ msgstr ""
 #: line_editor.lua
 msgid "Line setup must contain at least 1 terminus stop!"
 msgstr ""
+
+#: line_editor.lua
+#, fuzzy
+msgid "Line:"
+msgstr "Ligne"
 
 #: line_editor.lua
 msgid "Mode"
@@ -234,7 +243,7 @@ msgstr ""
 msgid "Stop position must not exceed 22 characters!"
 msgstr ""
 
-#: line_editor.lua
+#: line_editor.lua line_functions.lua
 msgid "Terminus"
 msgstr ""
 
@@ -269,7 +278,19 @@ msgid "Unknown station code!"
 msgstr "Gare inconnue"
 
 #: line_editor.lua
+msgid "Update"
+msgstr ""
+
+#: line_editor.lua
+msgid "Variant:"
+msgstr ""
+
+#: line_editor.lua
 msgid "Verify/Save"
+msgstr ""
+
+#: line_functions.lua
+msgid " (on request)"
 msgstr ""
 
 #: line_functions.lua
@@ -278,8 +299,27 @@ msgid "Next Stop:"
 msgstr "Prochain arrêt :\n"
 
 #: line_functions.lua
+#, fuzzy
+msgid "Next Stop: "
+msgstr "Prochain arrêt :\n"
+
+#: line_functions.lua
+#, fuzzy
+msgid "Next stop: "
+msgstr "Prochain arrêt :\n"
+
+#: line_functions.lua
 msgid "Unknown Station"
 msgstr "Gare inconnue"
+
+#: station_editor.lua
+msgid "(all platforms)"
+msgstr ""
+
+#: station_editor.lua
+#, fuzzy
+msgid "(select station)"
+msgstr "Pas de tel train : @1."
 
 #: station_editor.lua
 msgid "@1 tracks"
@@ -369,6 +409,10 @@ msgid "Name changed!"
 msgstr "Changement d'état de l'itinéraire."
 
 #: station_editor.lua
+msgid "No departures for the selected line found in the near future"
+msgstr ""
+
+#: station_editor.lua
 #, fuzzy
 msgid "Nothing has changed."
 msgstr "Changement d'état de l'itinéraire."
@@ -382,11 +426,19 @@ msgid "Owner changed!"
 msgstr ""
 
 #: station_editor.lua
+msgid "Owner: "
+msgstr ""
+
+#: station_editor.lua
 msgid "Positions of tracks:"
 msgstr ""
 
 #: station_editor.lua
 msgid "Save Changes"
+msgstr ""
+
+#: station_editor.lua
+msgid "Set"
 msgstr ""
 
 #: station_editor.lua
@@ -401,6 +453,11 @@ msgstr "Nom de Station"
 
 #: station_editor.lua
 #, fuzzy
+msgid "Station Operator: "
+msgstr "Code de Station"
+
+#: station_editor.lua
+#, fuzzy
 msgid "Station deleted!"
 msgstr "Code de Station"
 
@@ -409,7 +466,27 @@ msgid "Station successfully created."
 msgstr ""
 
 #: station_editor.lua
+msgid "Timetable for current station (all lines)"
+msgstr ""
+
+#: station_editor.lua
+msgid "Timetables"
+msgstr ""
+
+#: station_editor.lua
+msgid "Timetables (all lines)"
+msgstr ""
+
+#: station_editor.lua
+msgid "Timetables: "
+msgstr ""
+
+#: station_editor.lua
 msgid "Track successfully assigned!"
+msgstr ""
+
+#: station_editor.lua
+msgid "Update next departures..."
 msgstr ""
 
 #: station_editor.lua
@@ -418,8 +495,21 @@ msgid "[Station Editor]"
 msgstr "Code de Station"
 
 #: station_editor.lua
+msgid "in operation"
+msgstr ""
+
+#: station_editor.lua
 msgid "lines"
 msgstr ""
+
+#: station_editor.lua
+msgid "next departures of the selected line in: "
+msgstr ""
+
+#: station_editor.lua
+#, fuzzy
+msgid "unknown state"
+msgstr "Gare inconnue"
 
 #: stoprail.lua
 msgid "(foreign)"
@@ -642,6 +732,18 @@ msgstr ""
 #, fuzzy
 msgid "right"
 msgstr "Droit"
+
+#: time_table.lua
+msgid "Timetable"
+msgstr ""
+
+#: time_table.lua
+msgid "Timetable (on pole)"
+msgstr ""
+
+#: time_table.lua
+msgid "Timetable (owner: @1)"
+msgstr ""
 
 #~ msgid " does not exist or is invalid"
 #~ msgstr " n'existe pas ou est invalide"

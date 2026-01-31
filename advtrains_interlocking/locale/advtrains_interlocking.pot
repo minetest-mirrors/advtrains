@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: advtrains_interlocking\n"
 "Report-Msgid-Bugs-To: advtrains-discuss@lists.sr.ht\n"
-"POT-Creation-Date: 2025-07-20 22:27+0200\n"
+"POT-Creation-Date: 2026-01-31 22:06+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,10 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: ars.lua
+msgid "Train @1"
+msgstr ""
 
 #: autonaming.lua
 msgid "Prefix set, next signal name will be: @1"
@@ -658,6 +662,14 @@ msgid "A route is requested from this signal:"
 msgstr ""
 
 #: tcb_ts_ui.lua
+msgid "Routesetting trigger: @1"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Unknown reason"
+msgstr ""
+
+#: tcb_ts_ui.lua
 msgid "Route has been set."
 msgstr ""
 
@@ -765,6 +777,10 @@ msgstr ""
 
 #: tcb_ts_ui.lua
 msgid "Wait for this route to be cancelled in order to do anything here."
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Manual routesetting by @1"
 msgstr ""
 
 #: tcb_ts_ui.lua
