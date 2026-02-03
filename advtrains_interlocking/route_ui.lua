@@ -295,6 +295,13 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
 		end
 
 		if fields.newfrom then
+			local route_valid, err = advtrains.interlocking.check_route_valid(route, sigd)
+			if not route_valid then
+				minetest.close_formspec(pname, formname)
+				minetest.chat_send_player(pname, err)
+				return
+			end
+
 			advtrains.interlocking.init_route_prog(pname, sigd, route)
 			minetest.close_formspec(pname, formname)
 			tcbs.ars_ignore_next = nil
