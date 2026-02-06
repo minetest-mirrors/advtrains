@@ -87,6 +87,52 @@ function ac.on_receive_fields(pos, formname, fields, player)
 			-- discard all schedules for this node
 			advtrains.lines.sched.discard_all(advtrains.encode_pos(pos))
 		end
+
+		-- Parse code headers
+		--[[
+		Valid code headers:
+		* ADVT-Environment-Name: <env name>
+		* ADVT-Approach-Callback-Mode: <0/1/2>
+		]]
+		local errmsg_lines = {}
+		local code_headers = {}
+		for k, v in nodetbl.code:gmatch("%-%- ADVT%-([%w%-]+): ([^\n\r]*)") do
+			code_headers[k] = v
+		end
+
+		if code_headers["Environment-Name"] then
+			local env = code_headers["Environment-Name"]:trim()
+			if not atlatc.envs[env] then
+				errmsg_lines[#errmsg_lines+1] = S("Invalid environment name in header: @1", env)
+			else
+				nodetbl.env = env
+			end
+			code_headers["Environment-Name"] = nil
+		end
+
+		if code_headers["Approach-Callback-Mode"] then
+			local mode_raw = code_headers["Approach-Callback-Mode"]:trim()
+			if mode_raw == "0" or mode_raw == "1" or mode_raw == "2" then
+				nodetbl.data = nodetbl.data or {}
+				nodetbl.data.__approach_callback_mode = tonumber(mode_raw)
+			else
+				errmsg_lines[#errmsg_lines+1] = S("Invalid approach callback mode in header: @1", mode_raw)
+			end
+			code_headers["Approach-Callback-Mode"] = nil
+		end
+
+		local invalid_headers = {}
+		for k in pairs(code_headers) do
+			invalid_headers[#invalid_headers+1] = k
+		end
+		if #invalid_headers > 0 then
+			table.sort(invalid_headers)
+			errmsg_lines[#errmsg_lines+1] = S("Invalid attribute headers: @1", table.concat(invalid_headers, ", "))
+		end
+
+		if #errmsg_lines > 0 then
+			nodetbl.err = core.formspec_escape(table.concat(errmsg_lines, "; "))
+		end
 	end
 	if fields.cle then
 		nodetbl.data={}
