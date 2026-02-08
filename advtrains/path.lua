@@ -339,9 +339,12 @@ function advtrains.path_get_index_by_offset(train, index, offset)
 	local c_idx_f = c_idx + 1
 
 	local frac = index - start_index_f
+	--atdebug("in path_get_index_by_offset(",train.id,index,offset,")")
+	--atdebug("start_index_f=",start_index_f,"end_index_f=",end_index_f,"c_idx=",c_idx,"c_idx_f=",c_idx,"frac=",frac)
 
-	advtrains_path_get(train, math.min(start_index_f, end_index_f, c_idx, c_idx_f))
-	advtrains_path_get(train, math.max(start_index_f, end_index_f, c_idx, c_idx_f))
+	-- FIX 2026-02-08 due to rounding errors when searching backward it might be slightly behind the index, so add +-1 item buffer
+	advtrains_path_get(train, math.min(start_index_f, end_index_f, c_idx, c_idx_f) - 1)
+	advtrains_path_get(train, math.max(start_index_f, end_index_f, c_idx, c_idx_f) + 1)
 
 	local dist1, dist2 = train.path_dist[start_index_f], train.path_dist[start_index_f+1]
 	local start_dist = dist1 + (dist2-dist1)*frac
@@ -350,6 +353,7 @@ function advtrains.path_get_index_by_offset(train, index, offset)
 	local end_dist = start_dist + offset
 	
 	local c_idx = atfloor(index + offset)
+	--atdebug("c_idx=",c_idx,"end_dist=",end_dist)
 	
 	-- Step 3: move forward/backward to find real index
 	-- We assume here that the distance between 2 path items is never smaller than 1.
@@ -360,13 +364,21 @@ function advtrains.path_get_index_by_offset(train, index, offset)
 	--  Desired position:  -------#------
 	--  Path items      :  --|--|--|--|--
 	--  c_idx           :       ^
-
+	
 	while train.path_dist[c_idx] < end_dist do
 		c_idx = c_idx + 1
+		if not train.path_dist[c_idx] then
+			atdebug("path_dist out of generated range (first loop):",c_idx)
+			advtrains.path_print(train, atdebug)
+		end
 	end
 	
 	while train.path_dist[c_idx] > end_dist do
 		c_idx = c_idx - 1
+		if not train.path_dist[c_idx] then
+			atdebug("path_dist out of generated range (second loop):",c_idx)
+			advtrains.path_print(train, atdebug)
+		end
 	end
 	
 	-- Step 4: now c_idx points to the place shown above. Find out the fractional part.
