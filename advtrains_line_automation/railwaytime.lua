@@ -230,7 +230,7 @@ function rwt.i_sec(rwint)
 	elseif type(rwint) == "number" then
 		return rwint
 	elseif type(rwint)=="table" then
-		return res.sign * (res.c*60*60*24 + res.h*60*60 + res.m*60 + res.s)
+		return rwint.sign * (rwint.c*60*60*24 + rwint.h*60*60 + rwint.m*60 + rwint.s)
 	end
 end
 rwt.to_secs = rwt.i_sec -- deprecated alias
