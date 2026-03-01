@@ -37,12 +37,6 @@ local last_passages = {--[[
     }
 ]]}
 
-local diakritika_na_velka = {
-	["á"] = "Á", ["ä"] = "Ä", ["č"] = "Č", ["ď"] = "Ď", ["é"] = "É", ["ě"] = "Ě", ["í"] = "Í", ["ĺ"] = "Ĺ", ["ľ"] = "Ľ",
-	["ň"] = "Ň", ["ó"] = "Ó", ["ô"] = "Ô", ["ŕ"] = "Ŕ", ["ř"] = "Ř", ["š"] = "Š", ["ť"] = "Ť", ["ú"] = "Ú", ["ů"] = "Ů",
-	["ý"] = "Ý", ["ž"] = "Ž",
-}
-
 local debug_print_i = 0
 
 -- LOCAL funkce:
@@ -63,24 +57,6 @@ local function get_station_name(stn)
     end
 end
 al.get_station_name = get_station_name
-
-local function na_velka_pismena(s)
-	local l = #s
-	local i = 1
-	local res = ""
-	local c
-	while i <= l do
-		c = diakritika_na_velka[s:sub(i, i + 1)]
-		if c then
-			res = res .. c
-			i = i + 2
-		else
-			res = res .. s:sub(i, i)
-			i = i + 1
-		end
-	end
-	return string.upper(res)
-end
 
 --[[
     -- Vrací index následujícího výskytu 'stn' v seznamu zastávek podle linevar_def.
@@ -368,7 +344,6 @@ function al.get_line_display(linevar_def)
         line_number = true,
         last_stop = true,
         last_stop_prefix = "",
-        last_stop_uppercase = true,
     }))
 end
 
@@ -378,7 +353,6 @@ end
         first_stop = bool or nil, -- zahrnout do popisu název výchozí zastávky? nil => false
         last_stop = bool or nil, -- zahrnout do popisu název cílové zastávky? nil => true
         last_stop_prefix = string or nil, -- text před název cílové zastávky; nil => "⇒ "
-        last_stop_uppercase = bool or nil, -- je-li true, název cílové zastávky se před uvedením převede na velká písmena
     }
 ]]
 function al.get_line_description(linevar_def, options)
@@ -396,9 +370,6 @@ function al.get_line_description(linevar_def, options)
     end
     if first_stn == last_stn and options.first_stop and (options.last_stop == nil or options.last_stop) then
         s2 = get_station_name(last_stn)
-        if options.last_stop_uppercase then
-            s2 = na_velka_pismena(s2)
-        end
         s3 = " (okružní)"
     else
         if options.first_stop then
@@ -408,9 +379,6 @@ function al.get_line_description(linevar_def, options)
         end
         if options.last_stop == nil or options.last_stop then
             s3 = get_station_name(last_stn)
-            if options.last_stop_uppercase then
-                s3 = na_velka_pismena(s3)
-            end
             s3 = (options.last_stop_prefix or "⇒ ")..s3
         else
             s3 = ""
