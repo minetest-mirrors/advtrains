@@ -147,13 +147,7 @@ local function line_start(train, stn, departure_rwtime, linevar)
     ls.linevar_last_dep = departure_rwtime
     ls.linevar_last_stn = stn
     ls.linevar_past = nil
-    train.text_outside = al.get_line_description(linevar_def, {
-        line_number = true,
-        last_stop = true,
-        last_stop_prefix = "",
-        last_stop_uppercase = true,
-        train_name = true,
-    })
+    train.text_outside = al.get_line_display(linevar_def)
     return true
 end
 
@@ -365,6 +359,19 @@ function al.get_terminus(linevar_def, current_index, allow_hidden_stops)
     return r_i, r_stop
 end
 
+function al.get_line_display(linevar_def)
+    if linevar_def.train_name then
+        return linevar_def.train_name
+    end
+
+    return core.get_translated_string("", al.get_line_description(linevar_def, {
+        line_number = true,
+        last_stop = true,
+        last_stop_prefix = "",
+        last_stop_uppercase = true,
+    }))
+end
+
 --[[
     options = {
         line_number = bool or nil, -- zahrnout do popisu číslo linky? nil => false
@@ -372,8 +379,6 @@ end
         last_stop = bool or nil, -- zahrnout do popisu název cílové zastávky? nil => true
         last_stop_prefix = string or nil, -- text před název cílové zastávky; nil => "⇒ "
         last_stop_uppercase = bool or nil, -- je-li true, název cílové zastávky se před uvedením převede na velká písmena
-        train_name = bool or nil, -- zahrnout do popisu jméno vlaku, je-li k dispozici; nil => false
-        train_name_prefix = string or nil, -- text před jméno vlaku; nil => "\n"
     }
 ]]
 function al.get_line_description(linevar_def, options)
@@ -383,7 +388,7 @@ function al.get_line_description(linevar_def, options)
         return "???"
     end
     if options == nil then options = {} end
-    local s1, s2, s3, s4
+    local s1, s2, s3
     if options.line_number then
         s1 = "["..line.."] "
     else
@@ -411,12 +416,7 @@ function al.get_line_description(linevar_def, options)
             s3 = ""
         end
     end
-    if options.train_name and linevar_def.train_name ~= nil then
-        s4 = (options.train_name_prefix or "\n")..linevar_def.train_name
-    else
-        s4 = ""
-    end
-    return s1..s2..s3..s4
+    return s1..s2..s3
 end
 
 function al.get_stop_description(stop_data, next_stop_data)

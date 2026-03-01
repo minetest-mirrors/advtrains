@@ -583,7 +583,7 @@ local function get_all_linevars()
 		for linevar, linevar_def in pairs(stdata.linevars or empty_table) do
 			local line, stn = advtrains.lines.linevar_decompose(linevar)
 			local target_fs = F(advtrains.lines.get_line_description(linevar_def, {line_number = false, last_stop = true, last_stop_prefix = "",
-				last_stop_uppercase = false, train_name = false}))
+				last_stop_uppercase = false}))
 			local status_fs
 			if trains_by_linevar[linevar] ~= nil then
 				status_fs = "#00ff00,"..S("in operation")
@@ -613,7 +613,7 @@ end
 local function get_linevars_by_filter(stn_filter, track_filter)
 	local result = {}
 	local empty_table = {}
-	local line_description_options = {line_number = false, last_stop = true, last_stop_prefix = "", last_stop_uppercase = false, train_name = false}
+	local line_description_options = {line_number = false, last_stop = true, last_stop_prefix = "", last_stop_uppercase = false}
 	local trains_by_linevar = advtrains.lines.get_trains_by_linevar()
 	assert(stn_filter)
 	if track_filter == "" then
