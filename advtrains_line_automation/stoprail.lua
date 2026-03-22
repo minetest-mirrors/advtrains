@@ -358,7 +358,8 @@ local adefunc = function(def, preset, suffix, rotation)
 			after_place_node=function(pos)
 				local pe = advtrains.encode_pos(pos)
 				advtrains.lines.stops[pe] = {
-					stn="", track="", doors="R", wait=10, waitsig = true
+					stn="", track="", doors="R", wait=10, waitsig = true,
+					ars = { default = true },
 				}
 				updatemeta(pos)
 			end,
