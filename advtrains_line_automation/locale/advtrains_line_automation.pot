@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: advtrains_line_automation\n"
 "Report-Msgid-Bugs-To: advtrains-discuss@lists.sr.ht\n"
-"POT-Creation-Date: 2026-01-31 22:06+0100\n"
+"POT-Creation-Date: 2026-03-22 17:25+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -65,7 +65,7 @@ msgstr ""
 msgid "Dest. Display:"
 msgstr ""
 
-#: line_editor.lua
+#: line_editor.lua station_editor.lua
 msgid "Owner:"
 msgstr ""
 
@@ -333,6 +333,10 @@ msgstr ""
 msgid "My Stations (By Distance)"
 msgstr ""
 
+#: station_editor.lua stoprail.lua
+msgid "Station Editor"
+msgstr ""
+
 #: station_editor.lua
 msgid "CODE"
 msgstr ""
@@ -358,7 +362,19 @@ msgid "lines"
 msgstr ""
 
 #: station_editor.lua
+msgid "Code:"
+msgstr ""
+
+#: station_editor.lua
+msgid "Name:"
+msgstr ""
+
+#: station_editor.lua
 msgid "Create New"
+msgstr ""
+
+#: station_editor.lua
+msgid "Timetables..."
 msgstr ""
 
 #: station_editor.lua
@@ -515,10 +531,6 @@ msgstr ""
 
 #: stoprail.lua
 msgid "Track number, for informational purposes"
-msgstr ""
-
-#: stoprail.lua
-msgid "Station Editor"
 msgstr ""
 
 #: stoprail.lua

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: advtrains\n"
 "Report-Msgid-Bugs-To: advtrains-discuss@lists.sr.ht\n"
-"POT-Creation-Date: 2026-01-31 22:06+0100\n"
-"PO-Revision-Date: 2026-01-31 22:39+0100\n"
+"POT-Creation-Date: 2026-03-22 17:25+0100\n"
+"PO-Revision-Date: 2026-03-22 17:28+0100\n"
 "Last-Translator: Y. Wang <yw05@forksworld.de>\n"
 "Language-Team: German\n"
 "Language: de\n"
@@ -126,7 +126,7 @@ msgstr "Linie '@1' erfolgreich gelöscht!"
 
 #: line_editor.lua
 msgid "Line '@1' successfully saved!"
-msgstr "Linie '@1' erfolgreich gespeichert"
+msgstr "Linie '@1' erfolgreich gespeichert!"
 
 #: line_editor.lua stoprail.lua
 msgid "Line Editor"
@@ -134,7 +134,7 @@ msgstr "Linieneditor"
 
 #: line_editor.lua
 msgid "Line name must not be empty!"
-msgstr "Linienname darf nicht leer sein"
+msgstr "Linienname darf nicht leer sein!"
 
 #: line_editor.lua
 msgid "Line name must not contain characters '/', '|' or '\\'!"
@@ -188,7 +188,7 @@ msgstr "BESITZER"
 msgid "Open line editor"
 msgstr "Öffne Linieneditor"
 
-#: line_editor.lua
+#: line_editor.lua station_editor.lua
 msgid "Owner:"
 msgstr "Besitzer:"
 
@@ -266,7 +266,7 @@ msgstr "Unbekannter Grund"
 
 #: line_editor.lua
 msgid "Unknown station code!"
-msgstr "Unbekannter Stationscode"
+msgstr "Unbekannter Stationscode!"
 
 #: line_editor.lua
 msgid "Update"
@@ -333,6 +333,10 @@ msgid "Code changed, @1 station tracks updated!"
 msgstr "Code geändert, @1 Stationsgleise aktualisiert!"
 
 #: station_editor.lua
+msgid "Code:"
+msgstr "Code:"
+
+#: station_editor.lua
 msgid "Create New"
 msgstr "Neu erstellen"
 
@@ -393,6 +397,10 @@ msgid "Name changed!"
 msgstr "Name geändert!"
 
 #: station_editor.lua
+msgid "Name:"
+msgstr "Name:"
+
+#: station_editor.lua
 msgid "No departures for the selected line found in the near future"
 msgstr "Keine Abfahrten für diese Linie in nächster Zeit"
 
@@ -410,7 +418,7 @@ msgstr "Besitzer geändert!"
 
 #: station_editor.lua
 msgid "Owner: "
-msgstr "Besitzer:"
+msgstr "Besitzer: "
 
 #: station_editor.lua
 msgid "Positions of tracks:"
@@ -427,6 +435,10 @@ msgstr "Setzen"
 #: station_editor.lua
 msgid "Station Code (A-Z)"
 msgstr "Stationscode (A-Z)"
+
+#: station_editor.lua stoprail.lua
+msgid "Station Editor"
+msgstr "Stationseditor"
 
 #: station_editor.lua
 msgid "Station Name (A-Z)"
@@ -457,8 +469,12 @@ msgid "Timetables (all lines)"
 msgstr "Fahrpläne (alle Linien)"
 
 #: station_editor.lua
+msgid "Timetables..."
+msgstr "Fahrpläne..."
+
+#: station_editor.lua
 msgid "Timetables: "
-msgstr "Fahrpläne:"
+msgstr "Fahrpläne: "
 
 #: station_editor.lua
 msgid "Track successfully assigned!"
@@ -644,10 +660,6 @@ msgstr "Geschw."
 #: stoprail.lua
 msgid "Speed that the train sets when departing. Set 'M' for maximum speed."
 msgstr "Geschwindigkeit des Zugs nach Abfahrt. 'M' für Höchstgeschwindigkeit."
-
-#: stoprail.lua
-msgid "Station Editor"
-msgstr "Stationseditor"
 
 #: stoprail.lua
 msgid "Station Name"

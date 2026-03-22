@@ -199,7 +199,7 @@ local function get_formspec(custom_state)
 	local selection_index = custom_state.selection_index
     local formspec = {
         ch_core.formspec_header({formspec_version = 6, size = {20, 10}, auto_background = true}),
-		"label[0.5,0.6;Editor dopraven]",
+		"label[0.5,0.6;"..S("Station Editor").."]",
     }
 
 	table.insert(formspec, "tablecolumns[image,"..
@@ -236,13 +236,13 @@ local function get_formspec(custom_state)
 		stn, nazev, spravuje = "", "", F(pinfo.viewname)
 	end
 	table.insert(formspec,
-		"field[0.5,7;2.5,0.75;stn;kód:;"..stn.."]"..
-		"field[3.25,7;7,0.75;name;název:;"..nazev.."]"..
-		ifthenelse(pinfo.role == "admin", "field[10.5,7;4,0.75;owner;spravuje:;", "label[10.5,6.75;spravuje:\n")..
+		"field[0.5,7;2.5,0.75;stn;"..S("Code:")..";"..stn.."]"..
+		"field[3.25,7;7,0.75;name;"..S("Name:")..";"..nazev.."]"..
+		ifthenelse(pinfo.role == "admin", "field[10.5,7;4,0.75;owner;"..S("Owner:")..";", "label[10.5,6.75;"..S("Owner:").."\n")..
 		spravuje.."]")
 	if pinfo.role ~= "new" then
 		table.insert(formspec, "button[0.5,8;4.5,0.75;vytvorit;"..S("Create New").."]"..
-			"button[10,8;4.5,0.75;jrad;jízdní řády...]")
+			"button[10,8;4.5,0.75;jrad;"..S("Timetables...").."]")
 		if st and (pinfo.role == "admin" or st.owner == pinfo.player_name) then
 			table.insert(formspec, "button[5.25,8;4.5,0.75;ulozit;"..S("Save Changes").."]")
 			if st.tracks[1] == nil then

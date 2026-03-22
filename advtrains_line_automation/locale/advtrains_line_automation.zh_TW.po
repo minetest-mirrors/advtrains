@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: advtrains\n"
 "Report-Msgid-Bugs-To: advtrains-discuss@lists.sr.ht\n"
-"POT-Creation-Date: 2026-01-31 22:06+0100\n"
+"POT-Creation-Date: 2026-03-22 17:25+0100\n"
 "PO-Revision-Date: 2023-10-09 11:31+0200\n"
 "Last-Translator: Y. Wang <yw05@forksworld.de>\n"
 "Language-Team: Chinese (Traditional)\n"
@@ -190,7 +190,7 @@ msgstr ""
 msgid "Open line editor"
 msgstr ""
 
-#: line_editor.lua
+#: line_editor.lua station_editor.lua
 msgid "Owner:"
 msgstr ""
 
@@ -340,6 +340,10 @@ msgid "Code changed, @1 station tracks updated!"
 msgstr ""
 
 #: station_editor.lua
+msgid "Code:"
+msgstr ""
+
+#: station_editor.lua
 msgid "Create New"
 msgstr ""
 
@@ -401,6 +405,10 @@ msgid "Name changed!"
 msgstr ""
 
 #: station_editor.lua
+msgid "Name:"
+msgstr ""
+
+#: station_editor.lua
 msgid "No departures for the selected line found in the near future"
 msgstr ""
 
@@ -437,6 +445,11 @@ msgstr ""
 msgid "Station Code (A-Z)"
 msgstr "車站碼"
 
+#: station_editor.lua stoprail.lua
+#, fuzzy
+msgid "Station Editor"
+msgstr "車站碼"
+
 #: station_editor.lua
 #, fuzzy
 msgid "Station Name (A-Z)"
@@ -466,6 +479,10 @@ msgstr ""
 
 #: station_editor.lua
 msgid "Timetables (all lines)"
+msgstr ""
+
+#: station_editor.lua
+msgid "Timetables..."
 msgstr ""
 
 #: station_editor.lua
@@ -639,11 +656,6 @@ msgstr "速度"
 #: stoprail.lua
 msgid "Speed that the train sets when departing. Set 'M' for maximum speed."
 msgstr ""
-
-#: stoprail.lua
-#, fuzzy
-msgid "Station Editor"
-msgstr "車站碼"
 
 #: stoprail.lua
 msgid "Station Name"
