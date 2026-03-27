@@ -42,6 +42,8 @@ function advtrains.create_wagon(wtype, owner)
 	wgn.owner = owner
 	wgn.id = new_id
 	---wgn.train_id = train_id   --- will get this via update_trainpart_properties
+	wgn.fc = {}
+	wgn.fcind = 1
 	advtrains.wagons[new_id] = wgn
 	--atdebug("Created new wagon:",wgn)
 	return new_id
