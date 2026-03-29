@@ -181,6 +181,18 @@ local mainaspects_ra = {
 	},
 }
 
+-- mast rotation function: on rotate, also rotate all ks masts above it
+local function trackworker_on_cycle_rotation(pos, node, player, new_node, has_aux1_down)
+	-- find node above and try to rotate it as well
+	local upos = vector.add(pos, {x=0,y=1,z=0})
+	local unode = advtrains.ndb.get_node_or_nil(upos)
+	-- only if it is also a node added by this mod
+	if node and string.match(unode.name, "^advtrains_signals_ks:") then
+		advtrains.trackworker_cycle_node_rotation(upos, unode, player)
+	end
+	return true -- don't inhibit action
+end
+
 for _, rtab in ipairs({
 		{rot =  "0", sbox = {-1/8, -1/2, -1/2,  1/8, 1/2, -1/4}, ici=true, nextrot = "30"},
 		{rot = "30", sbox = {-3/8, -1/2, -1/2, -1/8, 1/2, -1/4}, nextrot = "45"},
@@ -259,7 +271,8 @@ for _, rtab in ipairs({
 				get_aspect_info = afunc,
 				route_role = "main_distant",
 				trackworker_next_rot = "advtrains_signals_ks:hs_"..typ.."_"..rtab.nextrot,
-				trackworker_rot_incr_param2 = (rot=="offr")
+				trackworker_rot_incr_param2 = (rot=="offr"),
+				trackworker_on_cycle_rotation = trackworker_on_cycle_rotation,
 			},
 			on_rightclick = advtrains.interlocking.signal.on_rightclick,
 			can_dig = advtrains.interlocking.signal.can_dig,
@@ -332,7 +345,8 @@ for _, rtab in ipairs({
 				route_role = "distant",
 				pure_distant = true,
 				trackworker_next_rot = "advtrains_signals_ks:vs_"..typ.."_"..rtab.nextrot,
-				trackworker_rot_incr_param2 = (rot=="offr")
+				trackworker_rot_incr_param2 = (rot=="offr"),
+				trackworker_on_cycle_rotation = trackworker_on_cycle_rotation,
 			},
 			on_rightclick = advtrains.interlocking.signal.on_rightclick,
 			can_dig = advtrains.interlocking.signal.can_dig,
@@ -387,7 +401,8 @@ for _, rtab in ipairs({
 				get_aspect_info = afunc,
 				route_role = "shunt",
 				trackworker_next_rot = "advtrains_signals_ks:ra_"..typ.."_"..rtab.nextrot,
-				trackworker_rot_incr_param2 = (rot=="offr")
+				trackworker_rot_incr_param2 = (rot=="offr"),
+				trackworker_on_cycle_rotation = trackworker_on_cycle_rotation,
 			},
 			on_rightclick = advtrains.interlocking.signal.on_rightclick,
 			can_dig = advtrains.interlocking.signal.can_dig,
@@ -427,6 +442,7 @@ for _, rtab in ipairs({
 				trackworker_next_rot = "advtrains_signals_ks:"..prefix.."_"..typ.."_"..rtab.nextrot,
 				trackworker_rot_incr_param2 = (rot=="offr"),
 				trackworker_next_var = "advtrains_signals_ks:"..prefix.."_"..nxt.."_"..rot,
+				trackworker_on_cycle_rotation = trackworker_on_cycle_rotation,
 			},
 			on_rightclick = advtrains.interlocking.signal.on_rightclick,
 			can_dig = advtrains.interlocking.signal.can_dig,
@@ -534,9 +550,10 @@ for _, rtab in ipairs({
 		t.drop = "advtrains_signals_ks:zs3_off_0"
 		t.selection_box.fixed[1][5] = 0
 		t.advtrains = {
-				trackworker_next_rot = "advtrains_signals_ks:zs3_"..typ.."_"..rtab.nextrot,
-				trackworker_rot_incr_param2 = (rot=="offr")
-			}
+			trackworker_next_rot = "advtrains_signals_ks:zs3_"..typ.."_"..rtab.nextrot,
+			trackworker_rot_incr_param2 = (rot=="offr"),
+			trackworker_on_cycle_rotation = trackworker_on_cycle_rotation,
+		}
 		minetest.register_node("advtrains_signals_ks:zs3_"..typ.."_"..rot, t)
 		--TODO add rotation using trackworker
 
@@ -547,9 +564,10 @@ for _, rtab in ipairs({
 		t.drop = "advtrains_signals_ks:zs3v_off_0"
 		t.tiles[3] = t.tiles[3] .. "^[multiply:yellow"
 		t.advtrains = {
-				trackworker_next_rot = "advtrains_signals_ks:zs3v_"..typ.."_"..rtab.nextrot,
-				trackworker_rot_incr_param2 = (rot=="offr")
-			}
+			trackworker_next_rot = "advtrains_signals_ks:zs3v_"..typ.."_"..rtab.nextrot,
+			trackworker_rot_incr_param2 = (rot=="offr"),
+			trackworker_on_cycle_rotation = trackworker_on_cycle_rotation,
+		}
 		minetest.register_node("advtrains_signals_ks:zs3v_"..typ.."_"..rot, t)
 		--TODO add rotation using trackworker
 	end
@@ -576,7 +594,8 @@ for _, rtab in ipairs({
 		},
 		advtrains = {
 			trackworker_next_rot = "advtrains_signals_ks:mast_mast_"..rtab.nextrot,
-			trackworker_rot_incr_param2 = (rot=="offr")
+			trackworker_rot_incr_param2 = (rot=="offr"),
+			trackworker_on_cycle_rotation = trackworker_on_cycle_rotation,
 		},
 		drop = "advtrains_signals_ks:mast_mast_0",
 	})
