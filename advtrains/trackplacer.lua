@@ -238,6 +238,112 @@ end
 
 -- TRACK WORKER --
 
+-- function called when placing (right-clicking) with track worker
+function advtrains.trackworker_cycle_node_rotation(pos, node, player)
+	local name = player:get_player_name()
+	if not name then
+		return
+	end
+	local has_aux1_down = player:get_player_control().aux1
+	
+	if not advtrains.check_track_protection(pos, name) then
+		return
+	end
+
+	-- New since 2.5: only the fields in the node definition are considered, no more hacky pattern matching on the nodename
+	
+	local ndef = minetest.registered_nodes[node.name]
+	
+	if not ndef.advtrains or not ndef.advtrains.trackworker_next_rot then
+		minetest.chat_send_player(name, S("This node can't be rotated using the trackworker!"))
+		return
+	end
+	
+	-- check if the node is modify-protected
+	if advtrains.is_track(node.name) then
+		-- is a track, we can query
+		local can_modify, reason = advtrains.can_dig_or_modify_track(pos)
+		if not can_modify then
+			local str = S("This track can not be rotated!")
+			if reason then
+				str = str .. " " .. reason
+			end
+			minetest.chat_send_player(name, str)
+			return
+		end
+	end
+	
+	local new_node
+	if has_aux1_down then
+		--feature: flip the node by 180°
+		--i've always wanted this!
+		new_node = {name=node.name, param2=(node.param2+2)%4}
+	else
+		new_node = {name = ndef.advtrains.trackworker_next_rot, param2 = node.param2}
+		if ndef.advtrains.trackworker_rot_incr_param2 then
+			new_node.param2 = ((node.param2 + 1) % 4)
+		end
+	end
+	
+	-- check if the node has a callback and check if it inhibits (like screwdriver)
+	if ndef.advtrains.trackworker_on_cycle_rotation then
+		if ndef.advtrains.trackworker_on_cycle_rotation(pos, node, player, new_node, has_aux1_down) == false then
+			-- inhibit action
+			return
+		end
+	end
+	
+	advtrains.ndb.swap_node(pos, new_node)
+	
+end
+
+-- function called when using (left-clicking) with track worker
+function advtrains.trackworker_cycle_node_variant(pos, node, player)
+	local name = player:get_player_name()
+	if not name then
+	   return
+	end
+	
+	if not advtrains.check_track_protection(pos, name) then
+		return
+	end
+		
+	-- New since 2.5: only the fields in the node definition are considered, no more hacky pattern matching on the nodename
+	
+	local ndef = minetest.registered_nodes[node.name]
+	
+	if not ndef.advtrains or not ndef.advtrains.trackworker_next_var then
+		minetest.chat_send_player(name, S("This node can't be changed using the trackworker!"))
+		return
+	end
+	
+	-- check if the node is modify-protected
+	if advtrains.is_track(node.name) then
+		-- is a track, we can query
+		local can_modify, reason = advtrains.can_dig_or_modify_track(pos)
+		if not can_modify then
+			local str = S("This track can not be rotated!")
+			if reason then
+				str = str .. " " .. reason
+			end
+			minetest.chat_send_player(name, str)
+			return
+		end
+	end
+	
+	local new_node = {name = ndef.advtrains.trackworker_next_var, param2 = node.param2}
+	
+	-- check if the node has a callback and check if it inhibits (like screwdriver)
+	if ndef.advtrains.trackworker_on_cycle_variant then
+		if ndef.advtrains.trackworker_on_cycle_variant(pos, node, player, new_node) == false then
+			-- inhibit action
+			return
+		end
+	end
+	
+	advtrains.ndb.swap_node(pos, new_node)
+	
+end
 
 minetest.register_craftitem("advtrains:trackworker",{
 	description = S("Track Worker Tool\n\nLeft-click: change rail type (straight/curve/switch)\nRight-click: rotate object"),
@@ -245,93 +351,20 @@ minetest.register_craftitem("advtrains:trackworker",{
 	inventory_image = "advtrains_trackworker.png",
 	wield_image = "advtrains_trackworker.png",
 	stack_max = 1,
-	on_place = function(itemstack, placer, pointed_thing)
-		local name = placer:get_player_name()
-		if not name then
-			return
-		end
-		local has_aux1_down = placer:get_player_control().aux1
+	on_place = function(itemstack, player, pointed_thing)
 		if pointed_thing.type=="node" then
 			local pos=pointed_thing.under
-			if not advtrains.check_track_protection(pos, name) then
-				return
-			end
 			local node=minetest.get_node(pos)
-
-			-- New since 2.5: only the fields in the node definition are considered, no more hacky pattern matching on the nodename
 			
-			local ndef = minetest.registered_nodes[node.name]
-			
-			if not ndef.advtrains or not ndef.advtrains.trackworker_next_rot then
-				minetest.chat_send_player(placer:get_player_name(), S("This node can't be rotated using the trackworker!"))
-				return
-			end
-			
-			-- check if the node is modify-protected
-			if advtrains.is_track(node.name) then
-				-- is a track, we can query
-				local can_modify, reason = advtrains.can_dig_or_modify_track(pos)
-				if not can_modify then
-					local str = S("This track can not be rotated!")
-					if reason then
-						str = str .. " " .. reason
-					end
-					minetest.chat_send_player(placer:get_player_name(), str)
-					return
-				end
-			end
-			
-			if has_aux1_down then
-				--feature: flip the node by 180°
-				--i've always wanted this!
-				advtrains.ndb.swap_node(pos, {name=node.name, param2=(node.param2+2)%4})
-				return
-			end
-			
-			local new_node = {name = ndef.advtrains.trackworker_next_rot, param2 = node.param2}
-			if ndef.advtrains.trackworker_rot_incr_param2 then
-				new_node.param2 = ((node.param2 + 1) % 4)
-			end
-			advtrains.ndb.swap_node(pos, new_node)
+			advtrains.trackworker_cycle_node_rotation(pos, node, player)
 		end
 	end,
-	on_use=function(itemstack, player, pointed_thing)
-		local name = player:get_player_name()
-		if not name then
-		   return
-		end
+	on_use = function(itemstack, player, pointed_thing)
 		if pointed_thing.type=="node" then
 			local pos=pointed_thing.under
 			local node=minetest.get_node(pos)
-			if not advtrains.check_track_protection(pos, name) then
-				return
-			end
 			
-			-- New since 2.5: only the fields in the node definition are considered, no more hacky pattern matching on the nodename
-			
-			local ndef = minetest.registered_nodes[node.name]
-			
-			if not ndef.advtrains or not ndef.advtrains.trackworker_next_var then
-				minetest.chat_send_player(name, S("This node can't be changed using the trackworker!"))
-				return
-			end
-			
-			-- check if the node is modify-protected
-			if advtrains.is_track(node.name) then
-				-- is a track, we can query
-				local can_modify, reason = advtrains.can_dig_or_modify_track(pos)
-				if not can_modify then
-					local str = S("This track can not be rotated!")
-					if reason then
-						str = str .. " " .. reason
-					end
-					minetest.chat_send_player(name, str)
-					return
-				end
-			end
-			
-			local new_node = {name = ndef.advtrains.trackworker_next_var, param2 = node.param2}
-			advtrains.ndb.swap_node(pos, new_node)
+			advtrains.trackworker_cycle_node_variant(pos, node, player)
 		end
 	end,
 })
