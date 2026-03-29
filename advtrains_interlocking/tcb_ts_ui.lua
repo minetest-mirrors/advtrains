@@ -921,8 +921,8 @@ function advtrains.interlocking.show_signalling_form(sigd, pname, sel_rte, calle
 					end
 				end
 				if hasprivs then
-					form = form.."button[0.5,8;2.5,1;smartroute;"..S("Smart Route").."]"
-					form = form.."button[  3,8;2.5,1;newroute;"..S("New (Manual)").."]"
+					form = form.."button[0.5,8;2.5,1;smartroute;"..S("New (auto-search)").."]"
+					form = form.."button[  3,8;2.5,1;newroute;"..S("New (manual)").."]"
 					form = form.."button_exit[5.5,8;1.5,1;unassign;"..S("Unassign\nSignal").."]"
 					form = form..string.format("checkbox[0.5,8.75;ars;"..S("Automatic routesetting")..";%s]", not tcbs.ars_disabled)
 					form = form..string.format("checkbox[0.5,9.25;dstarstrig;"..S("Distant signal triggers ARS")..";%s]", not tcbs.no_dst_ars_trig)

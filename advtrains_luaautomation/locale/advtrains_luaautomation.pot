@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: advtrains_luaautomation\n"
 "Report-Msgid-Bugs-To: advtrains-discuss@lists.sr.ht\n"
-"POT-Creation-Date: 2026-03-22 17:25+0100\n"
+"POT-Creation-Date: 2026-03-29 19:43+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -41,6 +41,18 @@ msgstr ""
 msgid ""
 "You are not allowed to configure this LuaATC component without the @1 "
 "privilege."
+msgstr ""
+
+#: active_common.lua
+msgid "Invalid environment name in header: @1"
+msgstr ""
+
+#: active_common.lua
+msgid "Invalid approach callback mode in header: @1"
+msgstr ""
+
+#: active_common.lua
+msgid "Invalid attribute headers: @1"
 msgstr ""
 
 #: active_common.lua

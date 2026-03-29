@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: advtrains_interlocking\n"
 "Report-Msgid-Bugs-To: advtrains-discuss@lists.sr.ht\n"
-"POT-Creation-Date: 2026-03-22 17:25+0100\n"
+"POT-Creation-Date: 2026-03-29 19:43+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -734,11 +734,11 @@ msgid "Routes are not automatically set."
 msgstr ""
 
 #: tcb_ts_ui.lua
-msgid "Smart Route"
+msgid "New (auto-search)"
 msgstr ""
 
 #: tcb_ts_ui.lua
-msgid "New (Manual)"
+msgid "New (manual)"
 msgstr ""
 
 #: tcb_ts_ui.lua
@@ -757,6 +757,14 @@ msgstr ""
 
 #: tcb_ts_ui.lua
 msgid "No routes are yet defined."
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "Smart Route"
+msgstr ""
+
+#: tcb_ts_ui.lua
+msgid "New (Manual)"
 msgstr ""
 
 #: tcb_ts_ui.lua
