@@ -12,16 +12,42 @@ function ac.save()
 	return {nodes = ac.nodes}
 end
 
+function ac.get_player_default_environment(player)
+	local meta = player:get_meta()
+	local env = meta:get_string("atlatc_default_env")
+
+	if not atlatc.envs[env] then
+		-- Set the first key for the user as default environment
+		for envname, _ in pairs(atlatc.envs) do
+			meta:set_string("atlatc_default_env", envname)
+			return envname
+		end
+
+		-- We don't have any environments
+		return nil
+	end
+
+	return env
+end
+function ac.set_player_default_environment(player, env)
+	if atlatc.envs[env] then
+		local meta = player:get_meta()
+		meta:set_string("atlatc_default_env", env)
+		return true
+	end
+	return false
+end
+
 function ac.after_place_node(pos, player)
+	local env = ac.get_player_default_environment(player)
+	if env then
+		local ph = minetest.pos_to_string(pos)
+		ac.nodes[ph] = { env = env }
+	end
+
 	local meta=minetest.get_meta(pos)
 	meta:set_string("formspec", ac.getform(pos, meta))
 	meta:set_string("infotext", S("Unconfigured LuaATC component"))
-	local ph=minetest.pos_to_string(pos)
-	--just get first available key!
-	for en,_ in pairs(atlatc.envs) do
-		ac.nodes[ph]={env=en}
-		return
-	end
 end
 function ac.getform(pos, meta_p)
 	local meta = meta_p or minetest.get_meta(pos)

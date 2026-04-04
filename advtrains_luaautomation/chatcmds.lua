@@ -110,6 +110,34 @@ core.register_chatcommand("env_subscriptions", {
 	end,
 })
 
+core.register_chatcommand("env_default", {
+	params = "[environment name]",
+	description = S("Set or get your default LuaATC environment."),
+	privs = {atlatc=true},
+	func = function(name, param)
+		local player = minetest.get_player_by_name(name)
+		if not player then
+			return false, S("You're not online!")
+		end
+
+		param = string.trim(param)
+		if param == "" then
+			local env = atlatc.active.get_player_default_environment(player)
+			if env then
+				return true, S("Your default environment is '@1'.", env)
+			else
+				return false, S("No avaliable environemnt! Create one with /env_create.")
+			end
+		end
+
+		if atlatc.active.set_player_default_environment(player, param) then
+			return true, S("Default environment set to '@1'.", param)
+		else
+			return false, S("Invalid environment name!")
+		end
+	end,
+})
+
 minetest.register_on_player_receive_fields(function(player, formname, fields)
 	
 	local pname=player:get_player_name()
