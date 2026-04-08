@@ -14,6 +14,7 @@ local function ifthenelse(condition, true_result, false_result)
 	end
 end
 
+local utf8_sort_cache = {}
 local ch_core = {}
 
 -- gives various info about a player. we return only what is relevant outside CH
