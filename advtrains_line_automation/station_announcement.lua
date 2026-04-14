@@ -1157,7 +1157,7 @@ end
 local function get_start_by_linevar_def(cache, linevar_def)
     local result = cache[linevar_def.name]
     if result == nil then
-        result = al.get_line_description(linevar_def, {first_stop = true, last_stop = false, last_stop_prefix = ""})
+        result = al.get_line_description(linevar_def, {first_stop = true, last_stop = false})
         if result == "???" then
             result = ""
         end
@@ -1169,7 +1169,7 @@ end
 local function get_destination_by_linevar_def(cache, linevar_def)
     local result = cache[linevar_def.name]
     if result == nil then
-        result = al.get_line_description(linevar_def, {first_stop = false, last_stop = true, last_stop_prefix = ""})
+        result = al.get_line_description(linevar_def, {first_stop = false, last_stop = true})
         if result == "???" then
             result = ""
         end

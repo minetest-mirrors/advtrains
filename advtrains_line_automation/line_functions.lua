@@ -343,7 +343,6 @@ function al.get_line_display(linevar_def)
     return core.get_translated_string("", al.get_line_description(linevar_def, {
         line_number = true,
         last_stop = true,
-        last_stop_prefix = "",
     }))
 end
 
@@ -352,7 +351,6 @@ end
         line_number = bool or nil, -- zahrnout do popisu číslo linky? nil => false
         first_stop = bool or nil, -- zahrnout do popisu název výchozí zastávky? nil => false
         last_stop = bool or nil, -- zahrnout do popisu název cílové zastávky? nil => true
-        last_stop_prefix = string or nil, -- text před název cílové zastávky; nil => "⇒ "
     }
 ]]
 function al.get_line_description(linevar_def, options)
@@ -362,29 +360,25 @@ function al.get_line_description(linevar_def, options)
         return "???"
     end
     if options == nil then options = {} end
-    local s1, s2, s3
+    local s1, s2 = "", ""
     if options.line_number then
         s1 = "["..line.."] "
-    else
-        s1 = ""
     end
-    if first_stn == last_stn and options.first_stop and (options.last_stop == nil or options.last_stop) then
-        s2 = get_station_name(last_stn)
-        s3 = " (okružní)"
-    else
+    if options.last_stop == nil or options.last_stop then
+        local last_stn_description = get_station_name(last_stn)
         if options.first_stop then
-            s2 = get_station_name(first_stn).." "
+            if first_stn == last_stn then
+                s2 = S("@1 (Ring line)", last_stn_description)
+            else
+                s2 = ("%s ⇒ %s"):format(get_station_name(first_stn), last_stn_description)
+            end
         else
-            s2 = ""
+            s2 = last_stn_description
         end
-        if options.last_stop == nil or options.last_stop then
-            s3 = get_station_name(last_stn)
-            s3 = (options.last_stop_prefix or "⇒ ")..s3
-        else
-            s3 = ""
-        end
+    elseif options.first_stop then
+        s2 = get_station_name(first_stn)
     end
-    return s1..s2..s3
+    return s1..s2
 end
 
 function al.get_stop_description(stop_data, next_stop_data)
