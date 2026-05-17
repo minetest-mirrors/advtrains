@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: advtrains_luaautomation\n"
 "Report-Msgid-Bugs-To: advtrains-discuss@lists.sr.ht\n"
-"POT-Creation-Date: 2026-03-29 19:43+0200\n"
+"POT-Creation-Date: 2026-05-17 09:19+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -156,6 +156,26 @@ msgid "No subscribers!"
 msgstr ""
 
 #: chatcmds.lua
+msgid "Set or get your default LuaATC environment."
+msgstr ""
+
+#: chatcmds.lua
+msgid "You're not online!"
+msgstr ""
+
+#: chatcmds.lua
+msgid "Your default environment is '@1'."
+msgstr ""
+
+#: chatcmds.lua
+msgid "No avaliable environemnt! Create one with /env_create."
+msgstr ""
+
+#: chatcmds.lua
+msgid "Default environment set to '@1'."
+msgstr ""
+
+#: chatcmds.lua
 msgid "Environment deleted!"
 msgstr ""
 
@@ -184,10 +204,11 @@ msgid "LuaATC Operation Panel"
 msgstr ""
 
 #: pcnaming.lua
-msgid ""
-"Passive Component Naming Tool\n"
-"\n"
-"Right-click to name a passive component."
+msgid "Passive Component Naming Tool"
+msgstr ""
+
+#: pcnaming.lua
+msgid "Right-click to name a passive component."
 msgstr ""
 
 #: pcnaming.lua

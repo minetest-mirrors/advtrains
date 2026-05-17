@@ -29,7 +29,8 @@ end
 local pcrename = {}
 
 minetest.register_craftitem("advtrains_luaautomation:pcnaming",{
-	description = S("Passive Component Naming Tool\n\nRight-click to name a passive component."),
+	description = S("Passive Component Naming Tool") .. "\n\n" .. S("Right-click to name a passive component."),
+	short_description = S("Passive Component Naming Tool"),
 	groups = {cracky=1}, -- key=name, value=rating; rating=1..3.
 	inventory_image = "atlatc_pcnaming.png",
 	wield_image = "atlatc_pcnaming.png",

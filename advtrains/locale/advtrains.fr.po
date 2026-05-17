@@ -2,15 +2,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: advtrains\n"
 "Report-Msgid-Bugs-To: advtrains-discuss@lists.sr.ht\n"
-"POT-Creation-Date: 2025-06-10 21:40+0200\n"
-"PO-Revision-Date: 2025-03-25 15:06+0100\n"
+"POT-Creation-Date: 2026-05-17 09:18+0800\n"
+"PO-Revision-Date: 2026-05-17 09:23+0800\n"
 "Last-Translator: Tanavit <tanavit@posto.ovh>\n"
 "Language-Team: French\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.4.2\n"
+"X-Generator: Poedit 3.8\n"
 
 #: atc.lua
 msgid "ATC Kick command warning: doors are closed."
@@ -408,6 +408,15 @@ msgid "This track can not be removed!"
 msgstr "Cette voie ne peut pas être enlevée !"
 
 #: trackplacer.lua
+msgid ""
+"Left-click: change rail type (straight/curve/switch)\n"
+"Right-click: rotate object"
+msgstr ""
+"Clic-Gauche : change le type de rail (droit/courbé/aiguillage)\n"
+"\n"
+"Clic-Droit : tourne l'objet"
+
+#: trackplacer.lua
 msgid "This node can't be changed using the trackworker!"
 msgstr "Ce nœud ne peut être modifié avec l'outil \"Trackworker\" !"
 
@@ -420,17 +429,8 @@ msgid "This track can not be rotated!"
 msgstr "Cette voie ne peut pas être tournée !"
 
 #: trackplacer.lua
-msgid ""
-"Track Worker Tool\n"
-"\n"
-"Left-click: change rail type (straight/curve/switch)\n"
-"Right-click: rotate object"
-msgstr ""
-"Outil \"Trackworker\"\n"
-"\n"
-"Clic-Gauche : change le type de rail (droit/courbé/aiguillage)\n"
-"\n"
-"Clic-Droit : tourne l'objet"
+msgid "Track Worker Tool"
+msgstr "Outil \"Trackworker\""
 
 #: tracks.lua
 msgid "Position is occupied by a train."
@@ -455,16 +455,12 @@ msgid "Insufficient privileges to use this!"
 msgstr "Privilèges insuffisants pour utiliser ceci !"
 
 #: wagonprop_tool.lua
-msgid "Wagon Properties Tool"
-msgstr "Outil de propriété du wagon"
+msgid "Punch a wagon to view and edit the Wagon Properties"
+msgstr "Frappez un wagon pour voir et modifier ses propriétés"
 
 #: wagonprop_tool.lua
-msgid ""
-"Wagon Properties Tool\n"
-"Punch a wagon to view and edit the Wagon Properties"
-msgstr ""
-"Outil de propriété du wagon\n"
-"Frappez un wagon pour voir et modifier ses propriétés"
+msgid "Wagon Properties Tool"
+msgstr "Outil de propriété du wagon"
 
 #: wagons.lua
 msgid " units"

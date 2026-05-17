@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: advtrains\n"
 "Report-Msgid-Bugs-To: advtrains-discuss@lists.sr.ht\n"
-"POT-Creation-Date: 2026-03-29 19:43+0200\n"
+"POT-Creation-Date: 2026-05-17 09:19+0800\n"
 "PO-Revision-Date: 2025-03-25 15:06+0100\n"
 "Last-Translator: Tanavit <tanavit@posto.ovh>\n"
 "Language-Team: French\n"
@@ -825,10 +825,7 @@ msgid "Emplace manual lock"
 msgstr ""
 
 #: tool.lua
-msgid ""
-"Interlocking tool\n"
-"Punch: Highlight track section\n"
-"Place: check route locks/show track section info"
+msgid "Interlocking tool"
 msgstr ""
 
 #: tool.lua
@@ -841,6 +838,12 @@ msgstr ""
 
 #: tool.lua
 msgid "Node is not a track!"
+msgstr ""
+
+#: tool.lua
+msgid ""
+"Punch: Highlight track section\n"
+"Place: check route locks/show track section info"
 msgstr ""
 
 #: tool.lua

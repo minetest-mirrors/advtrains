@@ -3,7 +3,7 @@
 local S = advtrains.translate
 
 minetest.register_craftitem("advtrains:wagon_prop_tool",{ --craftitem because it does nothing on its own
-	description = S("Wagon Properties Tool\nPunch a wagon to view and edit the Wagon Properties"),
+	description = S("Wagon Properties Tool") .. "\n" .. S("Punch a wagon to view and edit the Wagon Properties"),
 	short_description = S("Wagon Properties Tool"),
 	groups = {},
 	inventory_image = "advtrains_wagon_prop_tool.png",

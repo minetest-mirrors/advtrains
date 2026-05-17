@@ -2,15 +2,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: advtrains\n"
 "Report-Msgid-Bugs-To: advtrains-discuss@lists.sr.ht\n"
-"POT-Creation-Date: 2025-06-10 21:40+0200\n"
-"PO-Revision-Date: 2023-10-09 11:31+0200\n"
+"POT-Creation-Date: 2026-05-17 09:18+0800\n"
+"PO-Revision-Date: 2026-05-17 09:27+0800\n"
 "Last-Translator: Y. Wang <yw05@forksworld.de>\n"
 "Language-Team: Chinese (Traditional)\n"
 "Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.3.2\n"
+"X-Generator: Poedit 3.8\n"
 
 #: atc.lua
 msgid "ATC Kick command warning: doors are closed."
@@ -378,6 +378,14 @@ msgid "This track can not be removed!"
 msgstr "您不能移除這段軌道。"
 
 #: trackplacer.lua
+msgid ""
+"Left-click: change rail type (straight/curve/switch)\n"
+"Right-click: rotate object"
+msgstr ""
+"左鍵單擊：切換軌道型別\n"
+"右鍵單擊：旋轉方塊"
+
+#: trackplacer.lua
 #, fuzzy
 msgid "This node can't be changed using the trackworker!"
 msgstr "您不能使用鐵路調整工具調整這個方塊。"
@@ -393,16 +401,8 @@ msgid "This track can not be rotated!"
 msgstr "您不能旋轉這段軌道。"
 
 #: trackplacer.lua
-msgid ""
-"Track Worker Tool\n"
-"\n"
-"Left-click: change rail type (straight/curve/switch)\n"
-"Right-click: rotate object"
-msgstr ""
-"鐵路調整工具\n"
-"\n"
-"左鍵單擊：切換軌道型別\n"
-"右鍵單擊：旋轉方塊"
+msgid "Track Worker Tool"
+msgstr "鐵路調整工具"
 
 #: tracks.lua
 msgid "Position is occupied by a train."
@@ -425,14 +425,11 @@ msgid "Insufficient privileges to use this!"
 msgstr ""
 
 #: wagonprop_tool.lua
-#, fuzzy
-msgid "Wagon Properties Tool"
-msgstr "車廂屬性"
+msgid "Punch a wagon to view and edit the Wagon Properties"
+msgstr ""
 
 #: wagonprop_tool.lua
-msgid ""
-"Wagon Properties Tool\n"
-"Punch a wagon to view and edit the Wagon Properties"
+msgid "Wagon Properties Tool"
 msgstr ""
 
 #: wagons.lua

@@ -71,7 +71,8 @@ end
 
 
 minetest.register_craftitem("advtrains_interlocking:tool",{
-	description = S("Interlocking tool\nPunch: Highlight track section\nPlace: check route locks/show track section info"),
+	description = S("Interlocking tool") .. "\n" .. S("Punch: Highlight track section\nPlace: check route locks/show track section info"),
+	short_description = S("Interlocking tool"),
 	groups = {cracky=1}, -- key=name, value=rating; rating=1..3.
 	inventory_image = "at_il_tool.png",
 	wield_image = "at_il_tool.png",

@@ -346,7 +346,8 @@ function advtrains.trackworker_cycle_node_variant(pos, node, player)
 end
 
 minetest.register_craftitem("advtrains:trackworker",{
-	description = S("Track Worker Tool\n\nLeft-click: change rail type (straight/curve/switch)\nRight-click: rotate object"),
+	description = S("Track Worker Tool") .. "\n\n" .. S("Left-click: change rail type (straight/curve/switch)\nRight-click: rotate object"),
+	short_description = S("Track Worker Tool"),
 	groups = {cracky=1}, -- key=name, value=rating; rating=1..3.
 	inventory_image = "advtrains_trackworker.png",
 	wield_image = "advtrains_trackworker.png",

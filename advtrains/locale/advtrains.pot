@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: advtrains\n"
 "Report-Msgid-Bugs-To: advtrains-discuss@lists.sr.ht\n"
-"POT-Creation-Date: 2026-03-29 19:43+0200\n"
+"POT-Creation-Date: 2026-05-17 09:18+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -378,10 +378,12 @@ msgstr ""
 
 #: trackplacer.lua
 msgid ""
-"Track Worker Tool\n"
-"\n"
 "Left-click: change rail type (straight/curve/switch)\n"
 "Right-click: rotate object"
+msgstr ""
+
+#: trackplacer.lua
+msgid "Track Worker Tool"
 msgstr ""
 
 #: tracks.lua
@@ -401,9 +403,7 @@ msgid "OVERRUN RED SIGNAL! Examine situation and reverse train to move again."
 msgstr ""
 
 #: wagonprop_tool.lua
-msgid ""
-"Wagon Properties Tool\n"
-"Punch a wagon to view and edit the Wagon Properties"
+msgid "Punch a wagon to view and edit the Wagon Properties"
 msgstr ""
 
 #: wagonprop_tool.lua
