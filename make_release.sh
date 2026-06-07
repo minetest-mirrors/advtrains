@@ -7,6 +7,11 @@ if [ ! "$VERS" ];then
    exit 1
 fi
 
+if [ -n "$(git status --porcelain)" ]; then
+   echo "There are uncommitted changes, ensure that working directory is clean!"
+   exit 1
+fi
+
 # cd to root dir
 cd "$(dirname "$0")"
 AROOT="$(pwd)"
