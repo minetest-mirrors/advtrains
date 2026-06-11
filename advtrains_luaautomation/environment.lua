@@ -230,6 +230,18 @@ if advtrains.interlocking then
 		local pos, sigd, tcbs, routeid, route = gen_checks(signal, "", true)
 		return advtrains.interlocking.route.update_route(sigd, tcbs, nil, true)
 	end
+	static_env.get_active_route = function(signal)
+		local pos, sigd, tcbs = gen_checks(signal, "", true)
+		return tcbs.routeset and tcbs.routes[tcbs.routeset] and tcbs.routes[tcbs.routeset].name or nil
+	end
+	static_env.list_routes = function(signal)
+		local pos, sigd, tcbs = gen_checks(signal, "", true)
+		local routes = {}
+		for _, route in ipairs(tcbs.routes) do
+			routes[#routes+1] = route.name
+		end
+		return routes
+	end
 	static_env.get_aspect = function(signal)
 		local pos = atlatc.pcnaming.resolve_pos(signal)
 		return advtrains.interlocking.signal.get_aspect_info(pos)
