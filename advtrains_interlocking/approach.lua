@@ -62,7 +62,9 @@ advtrains.tnc_register_on_approach(function(pos, id, train, index, has_entered, 
 	-- stored in lzbdata and updated once the train drives over. However, for the sake of simplicity, it is simply
 	-- a value in the train. In this case, this is sufficient because once a train triggers ARS for the first time,
 	-- resetting the path does not matter to the set route and ARS doesn't need to be called again.
-	if spos and ars_enabled then
+
+	-- since wagons can't move on their own (yet) only check for ars if train is capable of moving
+	if spos and ars_enabled and train.locomotives_in_train > 0 then
 		--atdebug(id,"IL Spos (ARS)",spos,asp)
 		il.ars_check(spos, train)
 	end
