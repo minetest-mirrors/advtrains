@@ -156,7 +156,7 @@ local function get_formspec(custom_state)
     table.insert(formspec, ";font=mono;font_size=-4]"..
         "style[rc;font=mono]"..
         "tablecolumns[color;text,align=right;text;text,align=center;color;text,width=7;color;text]"..
-        "table[0.5,1.25;19,5;linevar;#ffffff,"..S("LINE,ROUTE,VAR.")..",#ffffff,"..S("OWNER")..",#ffffff,STAV")
+        "table[0.5,1.25;19,5;linevar;#ffffff,"..S("LINE,ROUTE,VAR.")..",#ffffff,"..S("OWNER")..",#ffffff,STATUS")
 
     for _, linevar_def in ipairs(custom_state.linevars) do
         local lv_line, lv_stn, lv_rc = linevar_decompose(linevar_def.name)
@@ -211,13 +211,10 @@ local function get_formspec(custom_state)
     end
     table.insert(formspec, "button[15,15.25;4,0.5;reset;"..S("Reset changes").."]")
     table.insert(formspec, "tooltip[line;"..
-        "Označení linky. Musí být neprázdné. Varianta linky bude použita pouze na vlaky s tímto označením linky.]"..
-        "tooltip[rc;Směrový kód. Může být prázdný. Varianta linky bude použita pouze na vlaky\\,\n"..
-        "jejichž směrový kód se přesně shoduje se zadaným. Obvykle se toto pole nechává prázdné.]"..
-        "tooltip[train_name;Volitelný údaj. Je-li zadán\\, jízdní řády budou uvádět u spojů této\n"..
-        "varianty zadané jméno.]"..
-        "tooltip[disable_linevar;Zaškrtnutím variantu linky vypnete. Vypnutá varianta linky není používána\n"..
-        "na žádné další vlaky\\, stávající vlaky však mohou dojet do svých koncových zastávek.]")
+        S("Line designation. Must not be empty. This identifies a certain line.").."]"..
+        "tooltip[rc;"..S("Line variant code. Optional, can be used to identify different variants of a line (e.g. branches).").."]"..
+        "tooltip[train_name;"..S("Optional field, name of the line as used in departure displays and on timetables.").."]"..
+        "tooltip[disable_linevar;"..S("Check to disable the timetable.\nA disabled timetable will not be used for new trains, trains already on the line will finish it.").."]")
 
     table.insert(formspec, "container[0,8.75]"..
         "label[0.5,0.25;"..S("Dep.").."]"..
@@ -267,25 +264,10 @@ local function get_formspec(custom_state)
 
     table.insert(formspec,
         "scroll_container_end[]"..
-        "tooltip[0,0;1.5,1;Odjezd: očekávaná jízdní doba v sekundách od odjezdu z výchozí zastávky\n"..
-        "do odjezdu z dané zastávky. Podle ní se počítá zpoždění. Hodnota musí být jedinečná\n"..
-        "pro každou zastávku na lince a podle ní se zastávky seřadí.\n"..
-        "Pro úplné smazání dopravny z linky nechte pole prázdné.]"..
-        "tooltip[1.5,0;1.5,1;Stání: očekáváná doba stání před odjezdem. Pro koncové zastávky očekávaná doba stání po příjezdu.]"..
-        "tooltip[3.5,0;2.75,1;Kód dopravny: kód dopravny\\, kde má vlak zastavit. Vlak bude ignorovat\n"..
-        "ARS pravidla a zastaví na první zastávkové koleji v dopravně pro odpovídající počet vagonů.\n"..
-        "Kód dopravny se na lince může opakovat.]"..
-        "tooltip[6.25,0;4.75,1;Režim zastávky: výchozí/normální - vždy zastaví\\;\n"..
-        "na znamení: zastaví na znamení (zatím experimentální)\\;\n"..
-        "skrytá – vždy zastaví\\, ale nezobrazí se v jízdních řádech\\;\n"..
-        "vypnutá – nezastaví (použijte při výlukách nebo při zrušení zastávky)\\;\n"..
-        "koncová – vždy zastaví a tím ukončí spoj\\, vlak se stane nelinkovým\\;\n"..
-        "koncová (pokračuje) – jako koncová\\, ale vlak se může na odjezdu opět stát linkovým.]"..
-        "tooltip[10.5,0;1.5,1;Kolej: nepovinný\\, orientační údaj do jízdních řádů – na které koleji\n"..
-        "vlaky obvykle zastavují. Nepovinný údaj.]"..
-        "tooltip[12.5,0;3.5,1;Omezení pozice: Zadávejte jen v případě potřeby.\n"..
-        "Je-li zadáno\\, vlak v dané dopravně nezastaví na žádné jiné zastávkové koleji\n"..
-        "než na té\\, která leží přesně na zadané pozici. Příklad platné hodnoty:\n123,7,-13]"..
+        "tooltip[0,0;1.5,1;"..S("Departure: Time (in seconds) after the start of the timetable at which the train departs from this station.\nIt is used to calculate delays. Stations on the line are sorted by their departure time.\nSet this field empty to delete a station from the timetable.").."]"..
+        "tooltip[1.5,0;1.5,1;"..S("Stop time: Minimum time (in seconds) for which the train stops at the station before departing.").."]"..
+        "tooltip[3.5,0;2.75,1;"..S("Station code: The code of the station to stop/pass.").."]"..
+        "tooltip[6.25,0;4.75,1;"..S("Stop mode:\nNormal - Train stops and departs after the stop time\nRequest stop - Train stops when the 'stop request' button is pressed\nHidden - like Normal, but is not shown in passenger timetable\nInactive - passes without stopping\nTerminus - Train stops and ends the timetable operation\nTerminus (hidden) - like Terminus, but will not appear in the passenger timetable\nTerminus (continuing) - Train will continue as timetable configured in the stop rail at the terminus location").."]"..
         "container_end[]")
 
 	-- if pinfo.role ~= "new" then
@@ -864,7 +846,7 @@ show_last_passages_formspec = function(player, linevar_def, selected_linevar)
     table.insert(formspec, ";]"..
 		"button[13.75,0.3;1.75,0.75;update;"..S("Update").."]"..
         "button[17.75,0.3;1.75,0.75;back;"..S("Back").."]"..
-        "tooltip[jizdy;Časové údaje jsou v sekundách železničního času.]")
+        "tooltip[jizdy;"..S("Time data in seconds of railway time").."]")
     formspec = table.concat(formspec)
     local custom_state = {
         player_name = player:get_player_name(),
