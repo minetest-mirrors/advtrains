@@ -984,7 +984,7 @@ local function predict_train_continue(line, stn, rc, departure, result)
         local stdata = advtrains.lines.stations[stop.stn]
         if stop.mode == MODE_FINAL or stop.mode == MODE_FINAL_CONTINUE or stop.mode == MODE_FINAL_HIDDEN then
             -- koncová zastávka
-            local arr = rwt.add(departure + stop.dep)
+            local arr = rwt.add(departure, stop.dep)
             local record = {
                 stn = assert(stop.stn),
                 track = stop.track or "",
@@ -999,12 +999,12 @@ local function predict_train_continue(line, stn, rc, departure, result)
             return
         elseif stop.mode ~= MODE_DISABLED then
             -- mezilehlá zastávka
-            local dep = rwt.add(departure + stop.dep)
+            local dep = rwt.add(departure, stop.dep)
             table.insert(result, {
                 stn = assert(stop.stn),
                 track = stop.track or "",
                 stdata = stdata,
-                arr = dep - (stop.wait or 10),
+                arr = rwt.add(dep, -(stop.wait or 10)),
                 arr_linevar_def = linevar_def,
                 arr_index = index,
                 dep = dep,
