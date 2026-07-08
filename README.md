@@ -30,16 +30,16 @@ Further information is available on the [wiki](https://advtrains.de/wiki/).
 
 ## How to contribute
 
-* [Bug tracker](https://bugs.linux-forks.de/advtrains)
 * [Discussion and Support mailing list][srht-discuss]
 * Send patches via [git-send-email][gsm] to the [dev mailing
   list][srht-devel]
-
+* Or contribute on [Codeberg][codeberg]
 
 
 [srht-discuss]: https://lists.sr.ht/~gpcf/advtrains-discuss
 [srht-devel]: https://lists.sr.ht/~gpcf/advtrains-devel
 [gsm]: https://git-send-email.io/
+[codeberg]: https://codeberg.org/advtrains/advtrains
 
 
 ## Credits
@@ -51,11 +51,12 @@ Various features and bugfixes have been contributed by:
 - gpcf
 - Blockhead
 - ywang
+- Maverick2797
+- 1F616EMO
 
 Small code contributions:
 
 - hlqkj
-- Maverick2797
 - AntumDeluge
 - lemon-melon
 - mbblp
