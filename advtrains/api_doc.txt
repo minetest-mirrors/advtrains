@@ -129,6 +129,21 @@ advtrains.register_wagon(name, prototype, description, inventory_image)
 	^- optional: Function that is called whenever the train's velocity changes or every 2 seconds. Used to call 'self.object:update_animation()' if needed.
 	^- for compatibility reasons the name 'update_animation' for this function is still supported. 
 
+	custom_copy_from_wagon_to_clipboard() = function(wagon) end
+	^- optional: This is only used by the copy/paste tool to allow wagons that have custom data (such as livery information) to have their data be included in the copy operation.
+	^- This function must also be defined if paste_to_wagon_from_clipboard() is defined, otherwise neither function will be called.
+	^- The wagon parameter is a value from the advtrains.wagons[] table representing an exising wagon in the train being copied by the copy/paste tool.
+	^- This function should return a Lua value (a bool, string, integer or table as needed) that will be passed to the paste_to_wagon_from_clipboard() during the paste operation.
+	paste_to_wagon_from_clipboard() = function(wagon, custom_info)
+	^- optional: This is only used by the copy/paste tool to allow wagons that have custom data, such as livery information, to have their data be included in the paste operation.
+	^- This function must also be defined if custom_copy_from_wagon_to_clipboard() is defined, otherwise neither function will be called.
+	^- The wagon parameter is a value from the advtrains.wagons[] table representing the new wagon that is being created by the copy/paste tool.
+	^- The custom_info parameter is the value that was returned by the custom_copy_from_wagon_to_clipboard() for the wagon during the copy operation.
+	^- This function does not need to return a value.
+	^- Note: advtrains does nothing with custom_info other than pass it to paste_to_wagon_from_clipboard(). It can contain any data that is needed.  Mod authors should be aware,
+	^- however, that although unlikely, players can delete their wagons in between the copy and paste operations and so should avoid passing and using references to the source
+	^- wagon via custom_info. Improper handling of this situation will lead to a crash during the the paste operation. To be safe, custom_info should always contain a copy of the
+	^- needed data from the source wagon.
 }
 
 # Notes on wagons

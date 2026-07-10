@@ -1,4 +1,4 @@
---clipboard = {trainlen = number, [n] = {type = string, flipped = bool, }
+--clipboard = {trainlen = number, [n] = {type = string, flipped = bool, properties = {}, bike_painter_livery = string, custom_info = <optional custom data>}
 
 -- Yaw is in radians. There are 2pi rad in a circle. North is the 0 point and the angle increases anticlockwise.
 -- 4.712389 = 1.5pi; sin(1.5pi) = -1
@@ -63,10 +63,30 @@ minetest.register_tool("advtrains:copytool", {
 
 			local wagons = {}
 			local n = 1
-			for _, wagonProto in pairs(clipboard.wagons) do
-				local wagon = advtrains.create_wagon(wagonProto.type, pname)
-				advtrains.wagons[wagon].wagon_flipped = wagonProto.wagon_flipped
-				wagons[n] = wagon
+			for _, clip_data in pairs(clipboard.wagons) do
+				wagons[n] = advtrains.create_wagon(clip_data.type, pname)
+				local wagon = advtrains.wagons[wagons[n]]
+				wagon.wagon_flipped = clip_data.wagon_flipped
+
+				-- Paste relevant wagon properties
+				wagon.whitelist = clip_data.properties.whitelist
+				wagon.roadnumber = clip_data.properties.roadnumber
+				wagon.fc = clip_data.properties.fc
+				wagon.fcind = clip_data.properties.fcind
+
+				-- Paste bike painter livery information
+				if clip_data.bike_painter_livery then
+					wagon.livery = clip_data.bike_painter_livery
+				end
+
+				-- Paste any optional custom data
+				if clip_data.custom_info then
+					local wagon_proto = advtrains.wagon_prototypes[wagon.type or wagon.entity_name]
+					if wagon_proto and wagon_proto.custom_paste_to_wagon_from_clipboard then
+						wagon_proto.custom_paste_to_wagon_from_clipboard(wagon, clip_data.custom_info)
+					end
+				end
+
 				n = n + 1
 			end
 
@@ -124,11 +144,46 @@ minetest.register_tool("advtrains:copytool", {
 			local wagon = advtrains.wagons[wagonid]
 			clipboard.wagons[n] = {
 				wagon_flipped = wagon.wagon_flipped,
+				properties = {
+					-- Copy relevant wagon properties
+					whitelist = wagon.whitelist,
+					roadnumber = wagon.roadnumber,
+					fc = wagon.fc,
+					fcind = wagon.fcind,
+				},
 				type = wagon.type
 			}
+
+			-- Copy bike painter livery information
+			if wagon.livery and type(wagon.livery) == "string" then
+				-- As a convenience for older wagon mods, copy the livery string that can be set
+				-- by some mods that support using the bike painter. Note that this will result in
+				-- incomplete or missing livery information being copied for some mods that use
+				-- additional fields for livery information. In general, all mods that support
+				-- customizing liveries should provide the necessary implementations of
+				-- custom_copy_from_wagon_to_clipboard() and custom_paste_to_wagon_from_clipboard()
+				-- in their wagon's prototype to support their liveries being properly copied with
+				-- this tool. It is beyond the scope of advtrains to support livery schemes defined
+				-- in other mods.
+
+				-- As with code that supports the bike painter elsewhere in advtrains, this code
+				-- should be considered temporary since it may be removed in the future.
+				clipboard.wagons[n].bike_painter_livery = wagon.livery
+			end
+
+			-- Copy any custom data (for liveries or other uses) if defined in the wagon's prototype
+			local wagon_proto = advtrains.wagon_prototypes[wagon.type or wagon.entity_name]
+			if wagon_proto and wagon_proto.custom_copy_from_wagon_to_clipboard and wagon_proto.custom_paste_to_wagon_from_clipboard then
+				-- Use wagon_proto.custom_copy_from_wagon_to_clipboard() and
+				-- wagon_proto.custom_paste_to_wagon_from_clipboard() if and only if both are
+				-- defined. They should always be defined in tandem for a wagon when custom liveries
+				-- or other mod specific data need to be copied by this tool. The content of
+				-- custom_info is not relevant to the copy tool. It is treated as a "black box".
+				clipboard.wagons[n].custom_info = wagon_proto.custom_copy_from_wagon_to_clipboard(wagon)
+			end
+
 			n = n + 1
 		end
-		
 
 		local function flip_clipboard(wagon_clipboard)
 			local flipped = {}
