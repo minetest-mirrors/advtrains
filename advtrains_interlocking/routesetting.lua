@@ -98,7 +98,7 @@ function ilrs.set_route(signal, route, try)
 					c_locks[lp] = lst
 				end
 			elseif not try then
-				atwarn("While setting route",rtename,"of",signal,"segment "..i..",required path from",c_tcbs,"to",c_rseg.next,"was not found in the track section's RS cache. Please check!")
+				atwarn("While setting route",rtename,"of",signal,"segment "..i..",required path from",c_sigd,"to",c_rseg.next,"was not found. Maybe TCBs have been moved without updating the routes? Please check!")
 			end
 		end
 		-- add all from locks, these override the rscache
